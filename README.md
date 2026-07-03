@@ -79,3 +79,4 @@ npm run build:next     # next build only (skip migrate)
 4. Set build command: `npm run build` (or `node scripts/prepare-migrate.mjs && payload migrate && next build`)
 5. Run `npm run seed:catalogue` once after first deploy (or seed via admin)
 6. Point GoDaddy DNS to Vercel
+# oriana-inverters
