@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" fill="none" role="img" aria-label="Careers at Oriana">
+  <rect width="640" height="400" fill="#0d2248"/>
+  <rect x="60" y="80" width="520" height="240" rx="12" fill="#1a428a" opacity="0.6"/>
+  <rect x="100" y="120" width="120" height="160" rx="8" fill="#4da3ff" opacity="0.3"/>
+  <rect x="240" y="120" width="120" height="160" rx="8" fill="#4da3ff" opacity="0.5"/>
+  <rect x="380" y="120" width="120" height="160" rx="8" fill="#4da3ff" opacity="0.7"/>
+  <circle cx="160" cy="170" r="28" fill="#c5d4e8"/>
+  <circle cx="300" cy="170" r="28" fill="#c5d4e8"/>
+  <circle cx="440" cy="170" r="28" fill="#c5d4e8"/>
+  <rect x="130" y="220" width="60" height="8" rx="2" fill="#e8eef6" opacity="0.8"/>
+  <rect x="270" y="220" width="60" height="8" rx="2" fill="#e8eef6" opacity="0.8"/>
+  <rect x="410" y="220" width="60" height="8" rx="2" fill="#e8eef6" opacity="0.8"/>
+  <rect x="200" y="260" width="240" height="12" rx="4" fill="#4da3ff"/>
+  <text x="320" y="375" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" fill="#c5d4e8">Engineering � Manufacturing � Clean Energy</text>
+</svg>

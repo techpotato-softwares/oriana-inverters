@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" fill="none" role="img" aria-label="Hybrid storage inverter">
+  <rect width="480" height="320" fill="#f4f6f9"/>
+  <rect x="110" y="55" width="260" height="210" rx="12" fill="url(#g4)" stroke="#1a428a" stroke-width="3"/>
+  <rect x="140" y="90" width="200" height="45" rx="4" fill="#0d2248"/>
+  <rect x="140" y="155" width="90" height="80" rx="6" fill="#4da3ff" opacity="0.25" stroke="#1a428a"/>
+  <path d="M155 195 L175 175 L195 195 L215 165 L235 195" stroke="#1a428a" stroke-width="3" fill="none"/>
+  <rect x="250" y="155" width="90" height="80" rx="6" fill="#1a428a" opacity="0.12" stroke="#1a428a"/>
+  <circle cx="295" cy="195" r="20" fill="none" stroke="#1a428a" stroke-width="2"/>
+  <text x="240" y="305" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#5a6b82">ORIANA · Hybrid Storage</text>
+  <defs>
+    <linearGradient id="g4" x1="110" y1="55" x2="370" y2="265" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e8eef6"/>
+      <stop offset="1" stop-color="#c5d4e8"/>
+    </linearGradient>
+  </defs>
+</svg>
