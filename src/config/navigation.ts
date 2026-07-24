@@ -2,48 +2,46 @@
 
 export const inverterMegaMenu = [
   {
-    title: 'Single Phase PV Inverter',
-    href: '/products/category/single-phase',
+    title: 'Residential Grid-Tied PV Inverter',
+    href: '/products/category/residential-grid-tied',
     products: [
-      { label: 'ORI-1P(3.6-5)K-US', href: '/products/ori-1p-3-6-5k-us' },
-      { label: 'ORI-1P(6-10)K-US', href: '/products/ori-1p-6-10k-us' },
-      { label: 'ORI-S6(3.8-11.4)K-US', href: '/products/ori-s6-3-8-11-4k-us' },
+      { label: 'OG6-GR1P(2-3)K01-NV-YD', href: '/products/og6-gr1p2k01-nv-yd' },
+      { label: 'OG6-GR1P(4-5)K-S(21A)', href: '/products/og6-gr1p5k-s-21a' },
+      { label: 'OG6-GR3P(3-10)K02-NV-ND', href: '/products/og6-gr3p5k02-nv-nd' },
+      { label: 'OG5-GR3P(3-25)K(21A)', href: '/products/og5-gr3p12k-21a' },
     ],
   },
   {
-    title: 'Three Phase PV Inverter',
-    href: '/products/category/three-phase',
+    title: 'C&I Grid-Tied PV Inverter',
+    href: '/products/category/ci-grid-tied',
     products: [
-      { label: 'ORI-S5(75-125)K-US', href: '/products/ori-s5-75-125k-us' },
-      { label: 'ORI-T75(50-110)K-US', href: '/products/ori-t75-50-110k-us' },
-      { label: 'ORI-GC(25-60)K-US', href: '/products/ori-gc-25-60k-us' },
+      { label: 'OG6-GC3P(25-40)K03-NV-ND', href: '/products/og6-gc3p25k03-nv-nd' },
+      { label: 'OG6-GC3P(40-60)K-NV-ND', href: '/products/og6-gc3p40k04-nv-nd' },
+      { label: 'OG6-GC(80-125)K', href: '/products/og6-gc80k' },
+      { label: 'OG6-GC3P(150-200)K07-NV-ND', href: '/products/og6-gc3p150k07-nv-nd' },
     ],
   },
   {
-    title: 'Utility-Scale PV Inverter',
-    href: '/products/category/utility-scale',
+    title: 'Utility Grid-Tied PV Inverter',
+    href: '/products/category/utility-grid-tied',
     products: [
-      { label: 'ORI-GU250K-EHV-US', href: '/products/ori-gu250k-ehv-us' },
-      { label: 'ORI-4200-MV Skid Solution', href: '/products/ori-4200-mv-skid' },
-      { label: 'ORI-U2500 Central', href: '/products/ori-u2500-central' },
+      { label: 'OG6-GU3P350K06-EV-ND', href: '/products/og6-gu3p350k06-ev-nd' },
     ],
   },
   {
-    title: 'Energy Storage Inverter',
-    href: '/products/category/energy-storage',
+    title: 'Residential Hybrid Inverter',
+    href: '/products/category/residential-hybrid',
     products: [
-      { label: 'ORI-S6-EH1P(3.8-11.4)K-H-US', href: '/products/ori-s6-eh1p-hybrid' },
-      { label: 'ORI-S6-EH2P(9.6-16)K-US', href: '/products/ori-s6-eh2p-hybrid' },
-      { label: 'ORI-S6-EH3P(30-60)K-US', href: '/products/ori-s6-eh3p-hybrid' },
+      { label: 'OG6-EH1P(3-8)K-L-PLUS', href: '/products/og6-eh1p3k-l-plus' },
+      { label: 'OG6-EH3P(8-18)K02-NV-YD-L', href: '/products/og6-eh3p8k02-nv-yd-l' },
+      { label: 'OG6-EH3P(30-60)K-H(21A)', href: '/products/og6-eh3p30k-h-21a' },
     ],
   },
   {
-    title: 'Accessories',
-    href: '/products/category/accessories',
+    title: 'C&I Hybrid Inverter',
+    href: '/products/category/ci-hybrid',
     products: [
-      { label: 'ORI-EPM Energy Manager', href: '/products/ori-epm' },
-      { label: 'ORI-Data Logger', href: '/products/ori-data-logger' },
-      { label: 'ORI-Monitoring Platform', href: '/products/ori-monitoring' },
+      { label: 'OG6-EH3P(80-125)K10-NV-YD-H', href: '/products/og6-eh3p80k10-nv-yd-h' },
     ],
   },
 ]
@@ -152,14 +150,14 @@ export const megaMenus: Record<
         links: [
           { label: 'Residential PV', href: '/solutions/residential' },
           { label: 'Energy Storage', href: '/solutions/storage' },
-          { label: 'Hybrid Systems', href: '/products/category/energy-storage' },
+          { label: 'Hybrid Systems', href: '/products/category/residential-hybrid' },
         ],
       },
       {
         title: 'Products',
         links: [
-          { label: 'Single Phase Inverters', href: '/products/category/single-phase' },
-          { label: 'Hybrid Inverters', href: '/products/ori-s6-eh1p-hybrid' },
+          { label: 'Residential Grid-Tied', href: '/products/category/residential-grid-tied' },
+          { label: 'Residential Hybrid', href: '/products/category/residential-hybrid' },
           { label: 'All Home Products', href: '/products' },
         ],
       },
@@ -187,8 +185,8 @@ export const megaMenus: Record<
       {
         title: 'Products',
         links: [
-          { label: 'Three Phase Inverters', href: '/products/category/three-phase' },
-          { label: 'ORI-S5 Series', href: '/products/ori-s5-75-125k-us' },
+          { label: 'C&I Grid-Tied', href: '/products/category/ci-grid-tied' },
+          { label: 'C&I Hybrid', href: '/products/category/ci-hybrid' },
           { label: 'All C&I Products', href: '/products' },
         ],
       },
@@ -209,16 +207,16 @@ export const megaMenus: Record<
         title: 'Solutions',
         links: [
           { label: 'Utility-Scale PV', href: '/solutions/utility' },
-          { label: 'Central Inverters', href: '/products/category/utility-scale' },
+          { label: 'Utility Grid-Tied', href: '/products/category/utility-grid-tied' },
           { label: 'Grid Services', href: '/solutions/utility' },
         ],
       },
       {
         title: 'Products',
         links: [
-          { label: 'ORI-GU250K', href: '/products/ori-gu250k-ehv-us' },
-          { label: 'ORI-U2500 Central', href: '/products/ori-u2500-central' },
-          { label: 'All Utility Products', href: '/products/category/utility-scale' },
+          { label: 'OG6-GU3P350K', href: '/products/og6-gu3p350k06-ev-nd' },
+          { label: 'C&I Grid-Tied 80–125K', href: '/products/og6-gc80k' },
+          { label: 'All Utility Products', href: '/products/category/utility-grid-tied' },
         ],
       },
       {

@@ -44,12 +44,13 @@
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 86rem;
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
 
   /* Oriana brand */
   --color-oriana-navy: #071525;
   --color-oriana-blue: #1a428a;
   --color-oriana-sky: #4da3ff;
+  --color-oriana-sun: #f5b942;
   --color-oriana-silver: #eef2f8;
   --color-oriana-muted: #5a6b82;
   --color-oriana-surface: #f7f9fc;

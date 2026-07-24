@@ -8,6 +8,11 @@ import { inverterMegaMenu } from '@/config/navigation'
 import { cn } from '@/utilities/ui'
 
 const categoryPlaceholders: Record<string, string> = {
+  'residential-grid-tied': '/assets/products/single-phase.svg',
+  'ci-grid-tied': '/assets/products/three-phase.svg',
+  'utility-grid-tied': '/assets/products/utility-scale.svg',
+  'residential-hybrid': '/assets/products/hybrid-storage.svg',
+  'ci-hybrid': '/assets/products/hybrid-storage.svg',
   'single-phase': '/assets/products/single-phase.svg',
   'three-phase': '/assets/products/three-phase.svg',
   'utility-scale': '/assets/products/utility-scale.svg',
@@ -16,7 +21,7 @@ const categoryPlaceholders: Record<string, string> = {
 }
 
 function categorySlugFromHref(href: string) {
-  return href.split('/').pop() ?? 'single-phase'
+  return href.split('/').pop() ?? 'residential-grid-tied'
 }
 
 /** Solis / Sungrow two-panel products megamenu — categories left, product cards right */
@@ -24,7 +29,8 @@ export function ProductsMegaMenuPanel() {
   const [activeIndex, setActiveIndex] = useState(0)
   const active = inverterMegaMenu[activeIndex]
   const categorySlug = categorySlugFromHref(active.href)
-  const placeholder = categoryPlaceholders[categorySlug] ?? categoryPlaceholders['single-phase']
+  const placeholder =
+    categoryPlaceholders[categorySlug] ?? categoryPlaceholders['residential-grid-tied']
 
   return (
     <div

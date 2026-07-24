@@ -1,5 +1,6 @@
 'use client'
 
+import { EnergyMesh } from './EnergyMesh'
 import { FadeIn } from './FadeIn'
 
 type PageHeroProps = {
@@ -12,18 +13,19 @@ type PageHeroProps = {
 export function PageHero({ eyebrow, title, description, children }: PageHeroProps) {
   return (
     <section className="relative overflow-hidden bg-oriana-navy pb-16 pt-32 lg:pb-20 lg:pt-40">
-      <div className="absolute inset-0 bg-gradient-to-br from-oriana-navy via-[#0d2248] to-oriana-blue" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_80%_0%,rgba(77,163,255,0.12),transparent)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:48px_48px]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#041018] via-oriana-navy to-[#0f2f6b]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_80%_0%,rgba(77,163,255,0.16),transparent)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_35%_at_10%_90%,rgba(245,185,66,0.1),transparent)]" />
+      <EnergyMesh className="opacity-70" />
 
       <div className="container relative">
         <FadeIn>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-oriana-sky">{eyebrow}</p>
-          <h1 className="mt-4 font-display text-4xl font-bold text-white md:text-5xl lg:text-6xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">{eyebrow}</p>
+          <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight text-white md:text-5xl lg:text-6xl">
             {title}
           </h1>
           {description && (
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/60">{description}</p>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/65">{description}</p>
           )}
           {children}
         </FadeIn>

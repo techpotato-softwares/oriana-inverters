@@ -13,16 +13,20 @@ import {
 export const metadata = {
   title: 'Inverters',
   description:
-    'Browse Oriana solar inverters — single phase, three phase, utility-scale, energy storage, and accessories.',
+    'Browse Oriana solar inverters — residential & C&I grid-tied, utility-scale, and hybrid energy storage.',
 }
 
-/** Legacy query-param URLs from the old products page */
+/** Legacy query-param / old category slug redirects */
 const legacyCategoryRedirects: Record<string, string> = {
-  string: 'single-phase',
-  hybrid: 'energy-storage',
-  utility: 'utility-scale',
-  micro: 'single-phase',
-  accessories: 'accessories',
+  string: 'residential-grid-tied',
+  hybrid: 'residential-hybrid',
+  utility: 'utility-grid-tied',
+  micro: 'residential-grid-tied',
+  accessories: 'ci-grid-tied',
+  'single-phase': 'residential-grid-tied',
+  'three-phase': 'ci-grid-tied',
+  'utility-scale': 'utility-grid-tied',
+  'energy-storage': 'residential-hybrid',
 }
 
 type Props = { searchParams: Promise<{ cat?: string }> }

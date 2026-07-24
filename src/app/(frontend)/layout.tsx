@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Plus_Jakarta_Sans } from 'next/font/google'
+import { Outfit, Plus_Jakarta_Sans } from 'next/font/google'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
@@ -18,11 +18,22 @@ const jakarta = Plus_Jakarta_Sans({
   display: 'swap',
 })
 
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+  display: 'swap',
+})
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
 
   return (
-    <html className={jakarta.variable} lang="en" data-theme="light" suppressHydrationWarning>
+    <html
+      className={`${jakarta.variable} ${outfit.variable}`}
+      lang="en"
+      data-theme="light"
+      suppressHydrationWarning
+    >
       <head>
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />

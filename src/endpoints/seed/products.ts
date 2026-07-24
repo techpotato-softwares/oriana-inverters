@@ -34,6 +34,11 @@ function minimalPdf(name: string): File {
 }
 
 const categoryImages: Record<string, string> = {
+  'residential-grid-tied': 'single-phase.svg',
+  'ci-grid-tied': 'three-phase.svg',
+  'utility-grid-tied': 'utility-scale.svg',
+  'residential-hybrid': 'hybrid-storage.svg',
+  'ci-hybrid': 'hybrid-storage.svg',
   'single-phase': 'single-phase.svg',
   'three-phase': 'three-phase.svg',
   'utility-scale': 'utility-scale.svg',

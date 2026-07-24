@@ -7,9 +7,21 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 import { redirects } from './redirects'
 
-const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : process.env.__NEXT_PRIVATE_ORIGIN || 'http://localhost:3000'
+const normalizeServerURL = (url: string): string => {
+  const trimmed = url.trim()
+  if (!trimmed) return 'http://localhost:3000'
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed.replace(/\/$/, '')
+  }
+  return `https://${trimmed.replace(/\/$/, '')}`
+}
+
+const NEXT_PUBLIC_SERVER_URL = normalizeServerURL(
+  process.env.NEXT_PUBLIC_SERVER_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : process.env.__NEXT_PRIVATE_ORIGIN || 'http://localhost:3000'),
+)
 
 const nextConfig: NextConfig = {
   // Temporarily required on Windows until Next.js fixes Turbopack Sass resolution.

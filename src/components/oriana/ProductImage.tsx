@@ -2,6 +2,12 @@ import Image from 'next/image'
 import { cn } from '@/utilities/ui'
 
 const categoryPlaceholders: Record<string, string> = {
+  'residential-grid-tied': '/assets/products/single-phase.svg',
+  'ci-grid-tied': '/assets/products/three-phase.svg',
+  'utility-grid-tied': '/assets/products/utility-scale.svg',
+  'residential-hybrid': '/assets/products/hybrid-storage.svg',
+  'ci-hybrid': '/assets/products/hybrid-storage.svg',
+  // legacy aliases
   'single-phase': '/assets/products/single-phase.svg',
   'three-phase': '/assets/products/three-phase.svg',
   'utility-scale': '/assets/products/utility-scale.svg',
@@ -21,14 +27,15 @@ type ProductImageProps = {
 
 export function ProductImage({
   name,
-  categorySlug = 'single-phase',
+  categorySlug = 'residential-grid-tied',
   src,
   alt,
   className,
   priority = false,
   sizes = '(max-width: 768px) 100vw, 50vw',
 }: ProductImageProps) {
-  const placeholder = categoryPlaceholders[categorySlug] ?? categoryPlaceholders['single-phase']
+  const placeholder =
+    categoryPlaceholders[categorySlug] ?? categoryPlaceholders['residential-grid-tied']
   const imageSrc = src || placeholder
   const isSvg = imageSrc.endsWith('.svg')
 

@@ -79,44 +79,83 @@ export function SiteHeader() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<MegaMenuKey | null>(null)
+  const [scrolled, setScrolled] = useState(false)
+  const isHome = pathname === '/'
+  const overHero = isHome && !scrolled && !openMenu && !mobileOpen
 
   useEffect(() => {
     setMobileOpen(false)
     setOpenMenu(null)
   }, [pathname])
 
-  const linkClass =
-    'relative px-3 py-5 text-sm font-medium text-oriana-navy transition-colors hover:text-oriana-blue'
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const linkClass = cn(
+    'relative px-3 py-5 text-sm font-medium transition-colors',
+    overHero
+      ? 'text-white/85 hover:text-white'
+      : 'text-oriana-navy hover:text-oriana-blue',
+  )
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-50 bg-white shadow-sm"
+      className={cn(
+        'fixed inset-x-0 top-0 z-50 transition-all duration-300',
+        overHero
+          ? 'bg-transparent'
+          : 'bg-white/90 shadow-sm backdrop-blur-xl backdrop-saturate-150',
+      )}
       onMouseLeave={() => setOpenMenu(null)}
     >
       {/* Utility bar */}
-      <div className="hidden border-b border-oriana-navy/6 bg-oriana-surface text-xs text-oriana-muted lg:block">
+      <div
+        className={cn(
+          'hidden border-b text-xs lg:block',
+          overHero
+            ? 'border-white/10 bg-transparent text-white/60'
+            : 'border-oriana-navy/6 bg-oriana-surface text-oriana-muted',
+        )}
+      >
         <div className="container flex h-9 items-center justify-between">
           <span>Customer Hotline: +1 (800) ORIANA-1</span>
           <div className="flex items-center gap-5">
-            <button type="button" className="flex items-center gap-1.5 hover:text-oriana-blue">
+            <button
+              type="button"
+              className={cn('flex items-center gap-1.5', overHero ? 'hover:text-white' : 'hover:text-oriana-blue')}
+            >
               <Globe className="h-3.5 w-3.5" />
               USA · English
             </button>
-            <Link href="/search" className="hover:text-oriana-blue" aria-label="Search">
+            <Link
+              href="/search"
+              className={overHero ? 'hover:text-white' : 'hover:text-oriana-blue'}
+              aria-label="Search"
+            >
               <Search className="h-3.5 w-3.5" />
             </Link>
-            <Link href="/admin" className="font-semibold uppercase tracking-wide hover:text-oriana-blue">
+            <Link
+              href="/admin"
+              className={cn(
+                'font-semibold uppercase tracking-wide',
+                overHero ? 'hover:text-white' : 'hover:text-oriana-blue',
+              )}
+            >
               Login
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="relative border-b border-oriana-navy/8">
+      <div className={cn('relative border-b', overHero ? 'border-white/10' : 'border-oriana-navy/8')}>
         <div className="container">
           <div className="flex h-16 items-center justify-between lg:h-[4.25rem]">
             <Link href="/" className="shrink-0">
-              <Logo priority variant="light" />
+              <Logo priority variant={overHero ? 'dark' : 'light'} />
             </Link>
 
             {/* Sungrow-style centred nav triggers */}
@@ -127,7 +166,7 @@ export function SiteHeader() {
                   <button
                     key={key}
                     type="button"
-                    className={cn(linkClass, open && 'text-oriana-blue')}
+                    className={cn(linkClass, open && (overHero ? 'text-white' : 'text-oriana-blue'))}
                     onMouseEnter={() => setOpenMenu(key)}
                     onFocus={() => setOpenMenu(key)}
                     aria-expanded={open}
@@ -136,7 +175,8 @@ export function SiteHeader() {
                     {megaMenus[key].label}
                     <span
                       className={cn(
-                        'absolute inset-x-3 bottom-0 h-0.5 origin-center bg-oriana-blue transition-transform duration-300',
+                        'absolute inset-x-3 bottom-0 h-0.5 origin-center transition-transform duration-300',
+                        overHero ? 'bg-oriana-sky' : 'bg-oriana-blue',
                         open ? 'scale-x-100' : 'scale-x-0',
                       )}
                     />
@@ -151,7 +191,12 @@ export function SiteHeader() {
               </Link>
               <Link
                 href="/contact"
-                className="ml-1 rounded-full bg-oriana-blue px-5 py-2 text-sm font-semibold text-white transition hover:bg-oriana-navy"
+                className={cn(
+                  'ml-1 rounded-md px-5 py-2 text-sm font-semibold transition',
+                  overHero
+                    ? 'bg-oriana-sky text-oriana-navy hover:bg-white'
+                    : 'bg-oriana-blue text-white hover:bg-oriana-navy',
+                )}
               >
                 Request Quote
               </Link>
@@ -159,7 +204,7 @@ export function SiteHeader() {
 
             <button
               type="button"
-              className="p-2 text-oriana-navy xl:hidden"
+              className={cn('p-2 xl:hidden', overHero ? 'text-white' : 'text-oriana-navy')}
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Menu"
             >
@@ -205,7 +250,7 @@ export function SiteHeader() {
           </Link>
           <Link
             href="/contact"
-            className="mt-4 block rounded-full bg-oriana-blue py-3 text-center text-sm font-semibold text-white"
+            className="mt-4 block rounded-md bg-oriana-blue py-3 text-center text-sm font-semibold text-white"
           >
             Request a Quote
           </Link>

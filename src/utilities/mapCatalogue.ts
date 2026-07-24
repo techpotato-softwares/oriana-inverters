@@ -39,7 +39,7 @@ export function mapProduct(doc: Product): CatalogueProduct {
     slug: doc.slug,
     name: doc.name,
     category: categoryDoc?.title ?? 'Inverter',
-    categorySlug: categoryDoc?.slug ?? 'single-phase',
+    categorySlug: categoryDoc?.slug ?? 'residential-grid-tied',
     segment: segmentLabels[doc.segment ?? ''] ?? 'Residential',
     segmentKey: (doc.segment ?? 'residential') as CatalogueProduct['segmentKey'],
     powerRange: doc.powerRange ?? '—',

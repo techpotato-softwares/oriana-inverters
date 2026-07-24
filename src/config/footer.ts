@@ -8,7 +8,7 @@ export const footerNav = [
       { label: 'Utility PV Solutions', href: '/solutions/utility' },
       { label: 'Energy Storage', href: '/solutions/storage' },
       { label: 'PV Inverters', href: '/products' },
-      { label: 'Energy Storage Systems', href: '/products/category/energy-storage' },
+      { label: 'Hybrid Inverters', href: '/products/category/residential-hybrid' },
     ],
   },
   {
