@@ -1,0 +1,35 @@
+{
+  "name": "@oriana/cdk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CDK Infrastructure for oriana-invertors-web",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "clean": "rimraf cdk.out",
+    "synth:dev": "cdk synth oriana-invertors-web-dev",
+    "synth:qa": "cdk synth oriana-invertors-web-qa",
+    "synth:prod": "cdk synth oriana-invertors-web-prod",
+    "deploy:dev": "cdk deploy oriana-invertors-web-dev --require-approval never",
+    "deploy:qa": "cdk deploy oriana-invertors-web-qa --require-approval never",
+    "deploy:prod": "cdk deploy oriana-invertors-web-prod",
+    "diff:dev": "cdk diff oriana-invertors-web-dev",
+    "diff:qa": "cdk diff oriana-invertors-web-qa",
+    "diff:prod": "cdk diff oriana-invertors-web-prod",
+    "destroy:dev": "cdk destroy oriana-invertors-web-dev",
+    "destroy:qa": "cdk destroy oriana-invertors-web-qa",
+    "bootstrap": "cdk bootstrap",
+    "cdk": "cdk"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.115.0",
+    "constructs": "^10.3.0",
+    "source-map-support": "^0.5.21"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.2",
+    "aws-cdk": "^2.115.0",
+    "rimraf": "^5.0.5"
+  }
+}
