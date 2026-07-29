@@ -4,7 +4,7 @@ import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
-import { CfnOutput, Duration } from "aws-cdk-lib";
+import { CfnOutput, Duration, RemovalPolicy } from "aws-cdk-lib";
 import { EnvironmentConfig, APP_NAME } from "../../config/environment";
 
 export interface WebCloudFrontConstructProps {
@@ -20,6 +20,7 @@ export interface WebCloudFrontConstructProps {
 export class WebCloudFrontConstruct extends Construct {
   public readonly distribution: cloudfront.Distribution;
   public readonly distributionUrl: string;
+  public readonly staticAssetsBucket: s3.Bucket;
 
   constructor(scope: Construct, id: string, props: WebCloudFrontConstructProps) {
     super(scope, id);
@@ -51,6 +52,28 @@ export class WebCloudFrontConstruct extends Construct {
     };
 
     const additionalBehaviors: Record<string, cloudfront.BehaviorOptions> = {};
+    const isProd = config.environment === "prod";
+
+    // Serve hashed Next.js assets from S3 so page loads do not burst the Lambda URL (429).
+    this.staticAssetsBucket = new s3.Bucket(this, "StaticAssetsBucket", {
+      bucketName: `${APP_NAME}-static-${config.environment}`,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      removalPolicy: isProd ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+      autoDeleteObjects: !isProd,
+    });
+
+    const staticOrigin = origins.S3BucketOrigin.withOriginAccessControl(
+      this.staticAssetsBucket,
+    );
+
+    additionalBehaviors["/_next/static/*"] = {
+      origin: staticOrigin,
+      viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+      cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+      compress: true,
+    };
 
     if (mediaBucket) {
       const s3Origin = origins.S3BucketOrigin.withOriginAccessControl(mediaBucket);
@@ -88,6 +111,12 @@ export class WebCloudFrontConstruct extends Construct {
       value: `${this.distributionUrl}/admin`,
       description: "Payload CMS admin URL",
       exportName: `${APP_NAME}-AdminURL-${config.environment}`,
+    });
+
+    new CfnOutput(this, "StaticAssetsBucketName", {
+      value: this.staticAssetsBucket.bucketName,
+      description: "S3 bucket for Next.js static assets",
+      exportName: `${APP_NAME}-StaticAssetsBucket-${config.environment}`,
     });
   }
 }

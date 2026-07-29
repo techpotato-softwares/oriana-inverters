@@ -82,22 +82,24 @@ jobs:
             echo "DATABASE_URL=$DATABASE_URL"
           } >> "$GITHUB_ENV"
 
-      - name: Migrate schema
+      - name: Bootstrap schema (push tables)
         working-directory: apps/cms
         env:
-          PAYLOAD_DATABASE_PUSH: "true"
           NODE_OPTIONS: "--dns-result-order=ipv4first"
-        run: npm run migrate || true
+        run: npm run schema:push
 
       - name: Seed catalogue
         if: ${{ github.event.inputs.seed_type == 'catalogue' || github.event.inputs.seed_type == 'full' }}
         working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run seed:catalogue
 
       - name: Seed admin user
         if: ${{ github.event.inputs.seed_type == 'admin' || github.event.inputs.seed_type == 'full' }}
         working-directory: apps/cms
         env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
           ADMIN_EMAIL: ${{ github.event.inputs.admin_email }}
           ADMIN_PASSWORD: ${{ github.event.inputs.admin_password }}
           ADMIN_NAME: ${{ github.event.inputs.admin_name || 'Admin' }}

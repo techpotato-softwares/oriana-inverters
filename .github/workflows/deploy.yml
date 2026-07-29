@@ -99,13 +99,12 @@ jobs:
             echo "db_ready=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Migrate schema
+      - name: Bootstrap schema (push tables)
         if: ${{ github.event.inputs.skip_migrate != 'true' && steps.secrets.outputs.db_ready == 'true' }}
         working-directory: apps/cms
         env:
-          PAYLOAD_DATABASE_PUSH: "true"
           NODE_OPTIONS: "--dns-result-order=ipv4first"
-        run: npm run migrate || true
+        run: npm run schema:push
 
       - name: Build CMS
         working-directory: apps/cms
@@ -124,6 +123,29 @@ jobs:
           CRON_SECRET: ${{ env.CRON_SECRET }}
           PREVIEW_SECRET: ${{ env.PREVIEW_SECRET }}
         run: npx cdk deploy "${{ steps.env.outputs.stack }}" --require-approval never --outputs-file cdk-outputs.json
+
+      - name: Sync Next.js static assets to S3
+        run: |
+          ENV="${{ steps.env.outputs.environment }}"
+          STACK="${{ steps.env.outputs.stack }}"
+          OUT=cdk/cdk-outputs.json
+          STATIC_BUCKET=$(jq -r --arg s "$STACK" '.[$s] | to_entries[] | select(.key|test("StaticAssetsBucketName")) | .value' "$OUT" 2>/dev/null | head -1)
+
+          if [ -z "$STATIC_BUCKET" ] || [ "$STATIC_BUCKET" = "null" ]; then
+            echo "Static assets bucket output not found; skipping sync"
+            exit 0
+          fi
+
+          aws s3 sync apps/cms/.next/static "s3://${STATIC_BUCKET}/_next/static" \
+            --delete \
+            --cache-control "public,max-age=31536000,immutable"
+
+          DIST_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?contains(Comment, 'oriana-invertors-web-${ENV}')].Id | [0]" \
+            --output text)
+          if [ -n "$DIST_ID" ] && [ "$DIST_ID" != "None" ]; then
+            aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/_next/static/*"
+          fi
 
       - name: Sync Lambda env with CloudFront URL
         run: |
