@@ -1,6 +1,7 @@
 import { Construct } from "constructs";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
+import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import { CfnOutput, Duration } from "aws-cdk-lib";
@@ -8,8 +9,8 @@ import { EnvironmentConfig, APP_NAME } from "../../config/environment";
 
 export interface WebCloudFrontConstructProps {
   config: EnvironmentConfig;
-  /** Lambda Function URL (https://xxx.lambda-url.region.on.aws/) */
-  functionUrl: string;
+  /** Lambda Function URL resource (not the URL string — CDK extracts hostname via Fn::Split) */
+  functionUrl: lambda.IFunctionUrl;
   mediaBucket?: s3.IBucket;
 }
 
@@ -35,15 +36,7 @@ export class WebCloudFrontConstruct extends Construct {
         )
       : undefined;
 
-    // CloudFront HttpOrigin must receive hostname only (no protocol/path/port).
-    const originDomain = functionUrl
-      .replace(/^https?:\/\//, "")
-      .replace(/\/.*$/, "")
-      .replace(/:\d+$/, "");
-
-    const lambdaOrigin = new origins.HttpOrigin(originDomain, {
-      protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
-      httpsPort: 443,
+    const lambdaOrigin = new origins.FunctionUrlOrigin(functionUrl, {
       readTimeout: Duration.seconds(60),
       keepaliveTimeout: Duration.seconds(60),
     });

@@ -121,7 +121,7 @@ export class OrianaInvertorsWebStack extends Stack {
     console.log("\nCreating CloudFront...");
     const cf = new WebCloudFrontConstruct(this, "CloudFront", {
       config,
-      functionUrl: webLambda.functionUrl.url,
+      functionUrl: webLambda.functionUrl,
       mediaBucket,
     });
 
