@@ -86,6 +86,7 @@ jobs:
         working-directory: apps/cms
         env:
           PAYLOAD_DATABASE_PUSH: "true"
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run migrate || true
 
       - name: Seed catalogue

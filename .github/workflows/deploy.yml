@@ -1,8 +1,6 @@
 name: Deploy oriana-invertors-web
 
 on:
-  push:
-    branches: [main, qa]
   workflow_dispatch:
     inputs:
       environment:
@@ -106,6 +104,7 @@ jobs:
         working-directory: apps/cms
         env:
           PAYLOAD_DATABASE_PUSH: "true"
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run migrate || true
 
       - name: Build CMS
@@ -114,6 +113,7 @@ jobs:
           NEXT_PUBLIC_SERVER_URL: ${{ vars.NEXT_PUBLIC_SERVER_URL || 'https://placeholder.cloudfront.net' }}
           PAYLOAD_SECRET: ${{ env.PAYLOAD_SECRET }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run build:next
 
       - name: CDK deploy
