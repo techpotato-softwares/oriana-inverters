@@ -26,7 +26,7 @@ DB_PASSWORD=$(echo "$DB_JSON" | jq -r '.DB_PASSWORD')
 DB_SSL=$(echo "$DB_JSON" | jq -r '.DB_SSL // true')
 
 SSL_QUERY=""
-if [[ "$DB_SSL" == "true" ]]; then SSL_QUERY="?sslmode=require"; fi
+if [[ "$DB_SSL" == "true" ]]; then SSL_QUERY="?sslmode=require&uselibpqcompat=true"; fi
 DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}${SSL_QUERY}"
 
 printf 'export PAYLOAD_SECRET=%q\n' "$PAYLOAD_SECRET"
