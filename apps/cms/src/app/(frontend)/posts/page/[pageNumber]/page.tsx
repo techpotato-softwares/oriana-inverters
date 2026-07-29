@@ -9,7 +9,7 @@ import React from 'react'
 import PageClient from './page.client'
 import { notFound } from 'next/navigation'
 
-export const revalidate = 600
+export const dynamic = 'force-dynamic'
 
 type Args = {
   params: Promise<{
@@ -70,6 +70,10 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 }
 
 export async function generateStaticParams() {
+  if (process.env.BUILD_SKIP_DB === 'true') {
+    return []
+  }
+
   try {
     const payload = await getPayload({ config: configPromise })
     const { totalDocs } = await payload.count({

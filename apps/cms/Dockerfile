@@ -28,6 +28,7 @@ ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
 # Build with non-secret placeholders; runtime env overrides in Lambda
 RUN PAYLOAD_SECRET=build-time-placeholder \
     DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres \
+    BUILD_SKIP_DB=true \
     npm run build:next -w @oriana/cms
 
 FROM base AS runner
