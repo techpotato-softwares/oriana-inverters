@@ -7,20 +7,26 @@ on:
         description: Target environment
         required: true
         type: choice
-        options:
-          - dev
-          - qa
-          - prod
+        options: [dev, qa, prod]
         default: qa
       seed_type:
         description: What to seed
         required: true
         type: choice
-        options:
-          - catalogue
-          - admin
-          - full
+        options: [catalogue, admin, full]
         default: catalogue
+      admin_email:
+        description: Admin email (required for admin/full)
+        required: false
+        type: string
+      admin_password:
+        description: Admin password (required for admin/full)
+        required: false
+        type: string
+      admin_name:
+        description: Admin name
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -54,14 +60,11 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Ensure secrets exist
-        run: |
-          chmod +x scripts/bootstrap-secrets.sh
-          ./scripts/bootstrap-secrets.sh "${{ github.event.inputs.environment }}"
+        run: ./scripts/bootstrap-secrets.sh "${{ github.event.inputs.environment }}"
 
       - name: Load secrets
         run: |
           ENV="${{ github.event.inputs.environment }}"
-          chmod +x scripts/load-deploy-secrets.sh
           eval "$(./scripts/load-deploy-secrets.sh "$ENV")"
 
           if [ "$DB_PASSWORD" = "CHANGE_ME_UPDATE_IN_AWS_CONSOLE" ]; then
@@ -94,12 +97,13 @@ jobs:
         if: ${{ github.event.inputs.seed_type == 'admin' || github.event.inputs.seed_type == 'full' }}
         working-directory: apps/cms
         env:
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-          ADMIN_NAME: ${{ secrets.ADMIN_NAME || 'Admin' }}
+          ADMIN_EMAIL: ${{ github.event.inputs.admin_email }}
+          ADMIN_PASSWORD: ${{ github.event.inputs.admin_password }}
+          ADMIN_NAME: ${{ github.event.inputs.admin_name || 'Admin' }}
         run: |
+          echo "::add-mask::$ADMIN_PASSWORD"
           if [ -z "$ADMIN_EMAIL" ] || [ -z "$ADMIN_PASSWORD" ]; then
-            echo "Set GitHub secrets ADMIN_EMAIL and ADMIN_PASSWORD for this environment"
+            echo "Provide admin_email and admin_password inputs for admin/full seed"
             exit 1
           fi
           npm run seed:admin
