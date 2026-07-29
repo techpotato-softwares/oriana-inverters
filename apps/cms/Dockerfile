@@ -17,7 +17,6 @@ RUN npm ci --workspace=@oriana/cms --include-workspace-root --omit=optional || n
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/cms/node_modules ./apps/cms/node_modules
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
