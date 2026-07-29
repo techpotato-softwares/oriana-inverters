@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 # Bootstrap Secrets Manager placeholders for oriana-invertors-web.
-#
-# Reads DB details from one file: config/deploy.env
-# using ENV-prefixed keys (DEV_*, QA_*, PROD_*).
-#
+# Reads DB details from config/deploy.env using ENV-prefixed keys.
 # Usage: ./scripts/bootstrap-secrets.sh qa
 
 set -euo pipefail
@@ -65,18 +62,19 @@ put_secret() {
     aws secretsmanager put-secret-value \
       --secret-id "$id" \
       --secret-string "$json" \
-      --region "$REGION"
+      --region "$REGION" >/dev/null
     echo "Updated secret: $id"
   else
     aws secretsmanager create-secret \
       --name "$id" \
       --description "oriana-invertors-web ${ENV}" \
       --secret-string "$json" \
-      --region "$REGION"
+      --region "$REGION" >/dev/null
     echo "Created secret: $id"
   fi
 }
 
+# Create payload secrets once
 if ! secret_exists "$PAYLOAD_SECRET_PATH"; then
   PS=$(gen_secret)
   CS=$(gen_secret)
@@ -87,14 +85,22 @@ if ! secret_exists "$PAYLOAD_SECRET_PATH"; then
   put_secret "$PAYLOAD_SECRET_PATH" "$PAYLOAD_JSON"
 fi
 
-EXISTING_DB=$(get_secret_json "$DB_SECRET")
-if [[ "$EXISTING_DB" != "{}" ]]; then
-  DB_PASSWORD=$(echo "$EXISTING_DB" | jq -r '.DB_PASSWORD // empty')
-  if [[ -z "$DB_PASSWORD" || "$DB_PASSWORD" == "null" ]]; then
+# DB password source priority:
+# 1) DB_PASSWORD_OVERRIDE (workflow manual input)
+# 2) existing secret DB_PASSWORD
+# 3) placeholder
+if [[ -n "${DB_PASSWORD_OVERRIDE:-}" ]]; then
+  DB_PASSWORD="$DB_PASSWORD_OVERRIDE"
+else
+  EXISTING_DB=$(get_secret_json "$DB_SECRET")
+  if [[ "$EXISTING_DB" != "{}" ]]; then
+    DB_PASSWORD=$(echo "$EXISTING_DB" | jq -r '.DB_PASSWORD // empty')
+    if [[ -z "$DB_PASSWORD" || "$DB_PASSWORD" == "null" ]]; then
+      DB_PASSWORD="$PLACEHOLDER_PASSWORD"
+    fi
+  else
     DB_PASSWORD="$PLACEHOLDER_PASSWORD"
   fi
-else
-  DB_PASSWORD="$PLACEHOLDER_PASSWORD"
 fi
 
 SSL_QUERY=""

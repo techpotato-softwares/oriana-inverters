@@ -26,7 +26,7 @@ npm install && npm run dev
 |--------|---------|
 | `AWS_ACCESS_KEY_ID` | IAM user for deploy |
 | `AWS_SECRET_ACCESS_KEY` | IAM secret |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Optional — seed workflow only |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Optional if you prefer not to type inputs each run |
 
 Optional repo variable: `AWS_REGION` (default `ap-south-1`).
 
@@ -51,7 +51,7 @@ Copy from [`config/deploy.env.example`](config/deploy.env.example) for other env
 - Choose **environment**: `dev` | `qa` | `prod`
 - Workflow will:
   1. **CDK bootstrap** (first time)
-  2. **Create Secrets Manager placeholders** (auto-generates `PAYLOAD_SECRET`; DB password = `CHANGE_ME_UPDATE_IN_AWS_CONSOLE`)
+  2. **Create Secrets Manager placeholders** (auto-generates `PAYLOAD_SECRET`; if `db_password` input is provided, it is used immediately)
   3. Deploy stack + Lambda + CloudFront + S3
 
 ### 4. Set database password (one time per env)
@@ -65,7 +65,7 @@ You do **not** need to generate `PAYLOAD_SECRET` manually — it is created on f
 
 ### 5. Seed content
 
-**Actions → Seed Payload CMS** → choose env + `catalogue` / `admin` / `full`
+**Actions → Seed Payload CMS** → choose env + `catalogue` / `admin` / `full` and optionally provide `admin_email` + `admin_password` inputs
 
 ## Secrets created automatically
 
