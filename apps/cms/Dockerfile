@@ -21,6 +21,7 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV NEXT_IMAGE_UNOPTIMIZED=true
 
 # Build args for public URL (CloudFront) — can be empty at image build
 ARG NEXT_PUBLIC_SERVER_URL=http://localhost:3000
@@ -53,8 +54,13 @@ COPY --from=builder /app/apps/cms/public ./apps/cms/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/cms/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/cms/.next/static ./apps/cms/.next/static
 
+# Next.js writes image/cache data at runtime; Lambda only allows writes under /tmp.
+RUN mkdir -p /tmp/next-cache \
+  && rm -rf /app/apps/cms/.next/cache \
+  && ln -sf /tmp/next-cache /app/apps/cms/.next/cache
+
 USER nextjs
 EXPOSE 3000
 
 # standalone output places server.js under apps/cms when monorepo
-CMD ["node", "apps/cms/server.js"]
+CMD ["sh", "-c", "mkdir -p /tmp/next-cache && exec node apps/cms/server.js"]

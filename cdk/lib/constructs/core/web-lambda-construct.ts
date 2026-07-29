@@ -67,6 +67,8 @@ export class WebLambdaConstruct extends Construct {
         AWS_LAMBDA_EXEC_WRAPPER: "/opt/bootstrap",
         PORT: "3000",
         AWS_LWA_ENABLE_COMPRESSION: "true",
+        NEXT_TELEMETRY_DISABLED: "1",
+        NEXT_IMAGE_UNOPTIMIZED: "true",
         ...environment,
       },
       loggingFormat: lambda.LoggingFormat.JSON,

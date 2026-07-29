@@ -110,6 +110,7 @@ jobs:
         working-directory: apps/cms
         env:
           NEXT_PUBLIC_SERVER_URL: ${{ vars.NEXT_PUBLIC_SERVER_URL || 'https://placeholder.cloudfront.net' }}
+          NEXT_IMAGE_UNOPTIMIZED: 'true'
           PAYLOAD_SECRET: ${{ env.PAYLOAD_SECRET }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
           NODE_OPTIONS: "--dns-result-order=ipv4first"
