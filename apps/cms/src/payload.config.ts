@@ -61,6 +61,15 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
+      // Supabase session pooler is tiny (often pool_size=15 shared). Keep this low so
+      // schema:push / Lambda don't exhaust EMAXCONNSESSION during Drizzle introspect.
+      max: Number(
+        process.env.PG_POOL_MAX ||
+          (process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1 : 3),
+      ),
+      idleTimeoutMillis: process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1000 : 10_000,
+      connectionTimeoutMillis: 60_000,
+      allowExitOnIdle: true,
     },
     // Set PAYLOAD_DATABASE_PUSH=true for first-time schema bootstrap; prefer migrations in CI/CD
     push: process.env.PAYLOAD_DATABASE_PUSH === 'true',
