@@ -81,4 +81,19 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withPayload(nextConfig, { devBundleServerPackages: false })
+const payloadConfig = withPayload(nextConfig, { devBundleServerPackages: false })
+
+// withPayload appends Critical-CH, which forces browsers to retry the document and
+// leaves /admin RSC Suspense dehydrated (blank white page). Strip it after wrap.
+const payloadHeaders = payloadConfig.headers
+payloadConfig.headers = async () => {
+  const headers = (await payloadHeaders?.()) ?? []
+  return headers.map((entry) => ({
+    ...entry,
+    headers: (entry.headers ?? []).filter(
+      (header) => header.key.toLowerCase() !== 'critical-ch',
+    ),
+  }))
+}
+
+export default payloadConfig

@@ -42,8 +42,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_IMAGE_UNOPTIMIZED=true
 ENV PORT=3000
-ENV AWS_LWA_ENABLE_COMPRESSION=true
-ENV AWS_LWA_INVOKE_MODE=response_stream
+ENV AWS_LWA_ENABLE_COMPRESSION=false
+ENV AWS_LWA_INVOKE_MODE=buffered
 
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
