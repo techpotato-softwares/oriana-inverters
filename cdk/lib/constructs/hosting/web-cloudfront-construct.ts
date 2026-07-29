@@ -35,10 +35,11 @@ export class WebCloudFrontConstruct extends Construct {
         )
       : undefined;
 
-    // Strip trailing slash for origin
+    // CloudFront HttpOrigin must receive hostname only (no protocol/path/port).
     const originDomain = functionUrl
       .replace(/^https?:\/\//, "")
-      .replace(/\/$/, "");
+      .replace(/\/.*$/, "")
+      .replace(/:\d+$/, "");
 
     const lambdaOrigin = new origins.HttpOrigin(originDomain, {
       protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
