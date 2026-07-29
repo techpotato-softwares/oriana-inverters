@@ -12,7 +12,7 @@ COPY apps/ui/package.json ./apps/ui/
 COPY packages/shared/package.json ./packages/shared/
 COPY cdk/package.json ./cdk/
 
-RUN npm ci --workspace=@oriana/cms --include-workspace-root --omit=optional || npm install --workspace=@oriana/cms --include-workspace-root
+RUN npm ci --workspace=@oriana/cms --include-workspace-root || npm install --workspace=@oriana/cms --include-workspace-root
 
 FROM base AS builder
 WORKDIR /app
