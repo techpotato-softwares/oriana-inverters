@@ -53,7 +53,7 @@ export class WebLambdaConstruct extends Construct {
         exclude: [
           "cdk/cdk.out",
           "**/node_modules",
-          "**/.next",
+          "**/.next/cache",
           "**/.git",
           "**/payload.db",
           "tests",

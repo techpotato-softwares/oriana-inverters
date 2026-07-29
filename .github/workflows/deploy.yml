@@ -126,26 +126,8 @@ jobs:
 
       - name: Sync Next.js static assets to S3
         run: |
-          ENV="${{ steps.env.outputs.environment }}"
-          STACK="${{ steps.env.outputs.stack }}"
-          OUT=cdk/cdk-outputs.json
-          STATIC_BUCKET=$(jq -r --arg s "$STACK" '.[$s] | to_entries[] | select(.key|test("StaticAssetsBucketName")) | .value' "$OUT" 2>/dev/null | head -1)
-
-          if [ -z "$STATIC_BUCKET" ] || [ "$STATIC_BUCKET" = "null" ]; then
-            echo "Static assets bucket output not found; skipping sync"
-            exit 0
-          fi
-
-          aws s3 sync apps/cms/.next/static "s3://${STATIC_BUCKET}/_next/static" \
-            --delete \
-            --cache-control "public,max-age=31536000,immutable"
-
-          DIST_ID=$(aws cloudfront list-distributions \
-            --query "DistributionList.Items[?contains(Comment, 'oriana-invertors-web-${ENV}')].Id | [0]" \
-            --output text)
-          if [ -n "$DIST_ID" ] && [ "$DIST_ID" != "None" ]; then
-            aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/_next/static/*"
-          fi
+          chmod +x ./scripts/sync-next-static-to-s3.sh
+          ./scripts/sync-next-static-to-s3.sh "${{ steps.env.outputs.environment }}"
 
       - name: Sync Lambda env with CloudFront URL
         run: |
