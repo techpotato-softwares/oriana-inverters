@@ -25,13 +25,10 @@ ENV NODE_ENV=production
 # Build args for public URL (CloudFront) — can be empty at image build
 ARG NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
-# Dummy secrets so Next/Payload can compile; runtime overrides via Lambda env
-ARG PAYLOAD_SECRET=build-time-secret-change-me
-ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
-ARG DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
-ENV DATABASE_URL=$DATABASE_URL
-
-RUN npm run build:next -w @oriana/cms
+# Build with non-secret placeholders; runtime env overrides in Lambda
+RUN PAYLOAD_SECRET=build-time-placeholder \
+    DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres \
+    npm run build:next -w @oriana/cms
 
 FROM base AS runner
 WORKDIR /app
