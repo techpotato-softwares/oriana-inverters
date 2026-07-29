@@ -26,21 +26,21 @@ ENV NEXT_IMAGE_UNOPTIMIZED=true
 # Build args for public URL (CloudFront) — can be empty at image build
 ARG NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
-# Reuse CI-built .next output when present; otherwise build inside the image.
-RUN if [ -f apps/cms/.next/standalone/apps/cms/server.js ]; then \
-      echo "Using pre-built Next.js output from CI"; \
-    else \
-      PAYLOAD_SECRET=build-time-placeholder \
-      DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres \
-      BUILD_SKIP_DB=true \
-      npm run build:next -w @oriana/cms; \
-    fi
+
+# Always build inside Docker so standalone includes traced node_modules.
+# Do NOT reuse CI .next output: CDK excludes **/node_modules from the build
+# context, which strips .next/standalone/node_modules and breaks the image.
+RUN PAYLOAD_SECRET=build-time-placeholder \
+    DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres \
+    BUILD_SKIP_DB=true \
+    npm run build:next -w @oriana/cms
 
 FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_IMAGE_UNOPTIMIZED=true
 ENV PORT=3000
 ENV AWS_LWA_ENABLE_COMPRESSION=true
 ENV AWS_LWA_INVOKE_MODE=response_stream
@@ -54,10 +54,11 @@ COPY --from=builder /app/apps/cms/public ./apps/cms/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/cms/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/cms/.next/static ./apps/cms/.next/static
 
-# Next.js writes image/cache data at runtime; Lambda only allows writes under /tmp.
+# Next.js writes cache data at runtime; Lambda only allows writes under /tmp.
 RUN mkdir -p /tmp/next-cache \
   && rm -rf /app/apps/cms/.next/cache \
-  && ln -sf /tmp/next-cache /app/apps/cms/.next/cache
+  && ln -sfn /tmp/next-cache /app/apps/cms/.next/cache \
+  && chown -h nextjs:nodejs /app/apps/cms/.next/cache
 
 USER nextjs
 EXPOSE 3000

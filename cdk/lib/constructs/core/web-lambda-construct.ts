@@ -52,8 +52,9 @@ export class WebLambdaConstruct extends Construct {
         platform: ecr_assets.Platform.LINUX_AMD64,
         exclude: [
           "cdk/cdk.out",
+          // Exclude workspace installs, but never CI/local .next (Docker builds fresh).
           "**/node_modules",
-          "**/.next/cache",
+          "**/.next",
           "**/.git",
           "**/payload.db",
           "tests",

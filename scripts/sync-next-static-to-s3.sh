@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # Sync Next.js static assets to the S3 bucket used by CloudFront for /_next/static/*.
 #
-# Prefers the local CI build output (apps/cms/.next/static) so assets match the
-# Lambda image when Docker reuses the same build. Falls back to copying assets
-# referenced in HTML from the Lambda Function URL when no local build exists.
+# Default: copy assets referenced by the live Lambda HTML (source of truth for the
+# running container image). Optional --source-dir uses a local folder instead.
 #
 # Usage:
 #   ./scripts/sync-next-static-to-s3.sh qa
@@ -23,6 +22,7 @@ LAMBDA_URL=""
 STATIC_BUCKET=""
 SITE_URL=""
 SOURCE_DIR=""
+WAIT_SECONDS=180
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -30,6 +30,7 @@ while [ $# -gt 0 ]; do
     --bucket) STATIC_BUCKET="$2"; shift 2 ;;
     --site-url) SITE_URL="$2"; shift 2 ;;
     --source-dir) SOURCE_DIR="$2"; shift 2 ;;
+    --wait-seconds) WAIT_SECONDS="$2"; shift 2 ;;
     *) echo "Unknown arg: $1" >&2; exit 1 ;;
   esac
 done
@@ -66,24 +67,9 @@ fi
 LAMBDA_URL="${LAMBDA_URL%/}"
 SITE_URL="${SITE_URL%/}"
 
-if [ -z "$SOURCE_DIR" ]; then
-  for candidate in "apps/cms/.next/static" ".next/static"; do
-    if [ -d "$candidate" ] && [ -n "$(ls -A "$candidate" 2>/dev/null)" ]; then
-      SOURCE_DIR="$candidate"
-      break
-    fi
-  done
-fi
-
 echo "Syncing static assets"
 echo "  env:    $ENV"
 echo "  bucket: s3://$STATIC_BUCKET"
-if [ -n "$SOURCE_DIR" ]; then
-  echo "  source: $SOURCE_DIR (local build)"
-else
-  echo "  source: Lambda HTML fallback"
-  echo "  lambda: ${LAMBDA_URL:-missing}"
-fi
 
 upload_encoded_aliases() {
   python3 - <<'PY' "$STATIC_BUCKET"
@@ -140,6 +126,7 @@ PY
 }
 
 sync_from_local() {
+  echo "  source: $SOURCE_DIR (local build)"
   aws s3 sync "$SOURCE_DIR" "s3://${STATIC_BUCKET}/_next/static" \
     --delete \
     --cache-control "public,max-age=31536000,immutable"
@@ -150,15 +137,36 @@ extract_paths_from_html() {
   python3 -c '
 import re, sys
 html = sys.stdin.read()
-if html.lstrip().startswith("{"):
+if not html or html.lstrip().startswith("{") or "<html" not in html.lower():
     sys.exit(1)
 paths = sorted(set(re.findall(
     r"/_next/static/[^\"\s<>]+?\.(?:js|css|png|jpg|jpeg|webp|svg|woff2)",
     html,
 )))
+if not paths:
+    sys.exit(1)
 for p in paths:
     print(p)
 '
+}
+
+wait_for_lambda_html() {
+  local deadline=$((SECONDS + WAIT_SECONDS))
+  local page html
+  : > /tmp/static-paths.txt
+  while [ "$SECONDS" -lt "$deadline" ]; do
+    for page in /admin/login /admin /; do
+      if html=$(curl -fsSL --max-time 30 "${LAMBDA_URL}${page}" 2>/dev/null); then
+        if printf '%s' "$html" | extract_paths_from_html >/tmp/static-paths.txt 2>/dev/null; then
+          echo "  healthy: ${LAMBDA_URL}${page}" >&2
+          return 0
+        fi
+      fi
+    done
+    echo "  waiting for Lambda HTML... ($((deadline - SECONDS))s left)" >&2
+    sleep 5
+  done
+  return 1
 }
 
 sync_from_lambda_html() {
@@ -167,23 +175,13 @@ sync_from_lambda_html() {
     return 1
   fi
 
-  PATHS=""
-  for page in /admin/login /admin /; do
-    HTML=""
-    if HTML=$(curl -fsSL "${LAMBDA_URL}${page}" 2>/dev/null); then
-      if PATHS=$(printf '%s' "$HTML" | extract_paths_from_html 2>/dev/null); then
-        if [ -n "$PATHS" ]; then
-          echo "  discovered assets from ${LAMBDA_URL}${page}"
-          break
-        fi
-      fi
-    fi
-  done
-
-  if [ -z "$PATHS" ]; then
-    echo "No /_next/static paths found in Lambda HTML (/admin/login, /admin, /)" >&2
+  echo "  source: Lambda HTML (${LAMBDA_URL})"
+  wait_for_lambda_html || {
+    echo "Lambda did not return HTML with /_next/static assets within ${WAIT_SECONDS}s" >&2
+    echo "Check CloudWatch logs for /aws/lambda/${FN}" >&2
     return 1
-  fi
+  }
+  PATHS="$(cat /tmp/static-paths.txt)"
 
   TMP_DIR=$(mktemp -d)
   trap 'rm -rf "$TMP_DIR"' EXIT
@@ -193,10 +191,12 @@ sync_from_lambda_html() {
 
   while IFS= read -r asset_path; do
     [ -n "$asset_path" ] || continue
-    s3_key="${asset_path#/}"
-    local_file="$TMP_DIR/$(basename "$asset_path")"
+    [[ "$asset_path" == /_next/static/* ]] || continue
 
-    if ! curl -fsSL "${LAMBDA_URL}${asset_path}" -o "$local_file"; then
+    s3_key="${asset_path#/}"
+    local_file="$TMP_DIR/$(basename "$asset_path" | tr '/[]' '___')"
+
+    if ! curl -fsSL --max-time 60 "${LAMBDA_URL}${asset_path}" -o "$local_file"; then
       echo "Failed to download ${asset_path}" >&2
       failed=$((failed + 1))
       continue

@@ -25,6 +25,8 @@ const NEXT_PUBLIC_SERVER_URL = normalizeServerURL(
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  // Monorepo: include workspace deps in the standalone output for Lambda.
+  outputFileTracingRoot: path.resolve(dirname, '../..'),
   transpilePackages: ['@oriana/ui', '@oriana/shared'],
   sassOptions: {
     loadPaths: ['./node_modules/@payloadcms/ui/dist/scss/'],
