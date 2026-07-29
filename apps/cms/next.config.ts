@@ -24,6 +24,12 @@ const NEXT_PUBLIC_SERVER_URL = normalizeServerURL(
 )
 
 const nextConfig: NextConfig = {
+  // Bake into the server bundle so Payload RootLayout wraps async content in
+  // Suspense (fixes blank /admin on Lambda buffered mode). Runtime-only env is
+  // not enough — Next may inline process.env at build time.
+  env: {
+    PAYLOAD_CACHE_COMPONENTS_ENABLED: 'true',
+  },
   output: 'standalone',
   // Monorepo: include workspace deps in the standalone output for Lambda.
   outputFileTracingRoot: path.resolve(dirname, '../..'),
@@ -83,17 +89,19 @@ const nextConfig: NextConfig = {
 
 const payloadConfig = withPayload(nextConfig, { devBundleServerPackages: false })
 
-// withPayload appends Critical-CH, which forces browsers to retry the document and
-// leaves /admin RSC Suspense dehydrated (blank white page). Strip it after wrap.
+// withPayload appends Critical-CH (browser must retry with client hints). That retry
+// leaves admin RSC outlets empty on CloudFront/Lambda. Drop Critical-CH only.
 const payloadHeaders = payloadConfig.headers
 payloadConfig.headers = async () => {
   const headers = (await payloadHeaders?.()) ?? []
-  return headers.map((entry) => ({
-    ...entry,
-    headers: (entry.headers ?? []).filter(
-      (header) => header.key.toLowerCase() !== 'critical-ch',
-    ),
-  }))
+  return headers
+    .map((entry) => ({
+      ...entry,
+      headers: (entry.headers ?? []).filter(
+        (header) => header.key.toLowerCase() !== 'critical-ch',
+      ),
+    }))
+    .filter((entry) => (entry.headers?.length ?? 0) > 0)
 }
 
 export default payloadConfig

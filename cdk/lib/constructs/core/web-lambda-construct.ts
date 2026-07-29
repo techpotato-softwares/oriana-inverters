@@ -71,6 +71,9 @@ export class WebLambdaConstruct extends Construct {
         // Next.js RSC flight data, leaving Payload admin with an empty shell.
         AWS_LWA_ENABLE_COMPRESSION: "false",
         AWS_LWA_INVOKE_MODE: "buffered",
+        // Payload RootLayout: Suspense around async init so LayoutRouter is not
+        // dropped as `children: null` under LWA buffered mode (blank /admin).
+        PAYLOAD_CACHE_COMPONENTS_ENABLED: "true",
         NEXT_TELEMETRY_DISABLED: "1",
         NEXT_IMAGE_UNOPTIMIZED: "true",
         ...environment,
