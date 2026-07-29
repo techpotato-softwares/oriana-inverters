@@ -1,0 +1,185 @@
+name: Deploy oriana-invertors-web
+
+on:
+  push:
+    branches: [main, qa]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options:
+          - dev
+          - qa
+          - prod
+        default: qa
+      skip_migrate:
+        description: Skip database migrate (use if DB password not set yet)
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'ap-south-1' }}
+  NODE_VERSION: "22"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'prod' || 'qa') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve environment
+        id: env
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          if [ -z "$ENV" ]; then
+            if [ "${{ github.ref_name }}" = "main" ]; then ENV=prod; else ENV=qa; fi
+          fi
+          echo "environment=$ENV" >> "$GITHUB_OUTPUT"
+          echo "stack=oriana-invertors-web-$ENV" >> "$GITHUB_OUTPUT"
+          echo "Deploying environment: $ENV"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: CDK bootstrap
+        working-directory: cdk
+        run: |
+          ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
+          echo "Bootstrapping CDK for account $ACCOUNT region $AWS_REGION"
+          npx cdk bootstrap "aws://${ACCOUNT}/${AWS_REGION}"
+
+      - name: Bootstrap Secrets Manager placeholders
+        run: |
+          chmod +x scripts/bootstrap-secrets.sh
+          ./scripts/bootstrap-secrets.sh "${{ steps.env.outputs.environment }}"
+
+      - name: Load secrets from Secrets Manager
+        id: secrets
+        run: |
+          ENV="${{ steps.env.outputs.environment }}"
+          APP=oriana-invertors-web
+
+          chmod +x scripts/load-deploy-secrets.sh
+          eval "$(./scripts/load-deploy-secrets.sh "$ENV")"
+
+          echo "::add-mask::$PAYLOAD_SECRET"
+          echo "::add-mask::$DATABASE_URL"
+          echo "::add-mask::$DB_PASSWORD"
+
+          {
+            echo "PAYLOAD_SECRET=$PAYLOAD_SECRET"
+            echo "CRON_SECRET=$CRON_SECRET"
+            echo "PREVIEW_SECRET=$PREVIEW_SECRET"
+            echo "DATABASE_URL=$DATABASE_URL"
+            echo "PAYLOAD_SECRET_PLACEHOLDER=$PAYLOAD_SECRET"
+            echo "CRON_SECRET_PLACEHOLDER=$CRON_SECRET"
+            echo "PREVIEW_SECRET_PLACEHOLDER=$PREVIEW_SECRET"
+          } >> "$GITHUB_ENV"
+
+          if [ "$DB_PASSWORD" = "CHANGE_ME_UPDATE_IN_AWS_CONSOLE" ]; then
+            echo "db_ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::DB password is still placeholder. Update /oriana-invertors-web/$ENV/database in Secrets Manager (DB_PASSWORD), then re-run deploy."
+          else
+            echo "db_ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Migrate / push Payload schema
+        if: ${{ github.event.inputs.skip_migrate != true && steps.secrets.outputs.db_ready == 'true' }}
+        working-directory: apps/cms
+        env:
+          PAYLOAD_DATABASE_PUSH: "true"
+        run: npm run migrate || true
+
+      - name: Skip migrate notice
+        if: ${{ steps.secrets.outputs.db_ready != 'true' }}
+        run: |
+          echo "::notice::Skipping migrate — set DB_PASSWORD in Secrets Manager first, then re-run with skip_migrate=false"
+
+      - name: Build CMS (standalone)
+        working-directory: apps/cms
+        run: npm run build:next
+        env:
+          NEXT_PUBLIC_SERVER_URL: ${{ vars.NEXT_PUBLIC_SERVER_URL || 'https://placeholder.cloudfront.net' }}
+          PAYLOAD_SECRET: ${{ env.PAYLOAD_SECRET }}
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
+      - name: CDK deploy
+        working-directory: cdk
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          PAYLOAD_SECRET: ${{ env.PAYLOAD_SECRET }}
+          CRON_SECRET: ${{ env.CRON_SECRET }}
+          PREVIEW_SECRET: ${{ env.PREVIEW_SECRET }}
+        run: |
+          npx cdk deploy "${{ steps.env.outputs.stack }}" --require-approval never --outputs-file cdk-outputs.json
+
+      - name: Sync Lambda environment from Secrets Manager + CloudFront
+        run: |
+          ENV="${{ steps.env.outputs.environment }}"
+          STACK="${{ steps.env.outputs.stack }}"
+          OUT=cdk/cdk-outputs.json
+          FN="oriana-invertors-web-$ENV"
+
+          CF_URL=$(jq -r --arg s "$STACK" '.[$s] | to_entries[] | select(.key|test("CloudFrontURL")) | .value' "$OUT" 2>/dev/null | head -1)
+
+          aws lambda get-function-configuration --function-name "$FN" \
+            --query 'Environment.Variables' --output json > /tmp/env.json 2>/dev/null || echo '{}' > /tmp/env.json
+
+          MEDIA_BUCKET=$(jq -r --arg s "$STACK" '.[$s] | to_entries[] | select(.key|test("MediaBucketName")) | .value' "$OUT" 2>/dev/null | head -1)
+
+          jq \
+            --arg url "${CF_URL:-https://placeholder.cloudfront.net}" \
+            --arg db "$DATABASE_URL" \
+            --arg ps "$PAYLOAD_SECRET" \
+            --arg cs "$CRON_SECRET" \
+            --arg prs "$PREVIEW_SECRET" \
+            --arg bucket "${MEDIA_BUCKET:-}" \
+            --arg region "$AWS_REGION" \
+            '. + {
+              NEXT_PUBLIC_SERVER_URL: $url,
+              DATABASE_URL: $db,
+              PAYLOAD_SECRET: $ps,
+              CRON_SECRET: $cs,
+              PREVIEW_SECRET: $prs,
+              S3_BUCKET: $bucket,
+              S3_REGION: $region
+            }' /tmp/env.json > /tmp/env2.json
+
+          aws lambda update-function-configuration \
+            --function-name "$FN" \
+            --environment "Variables=$(jq -c '.' /tmp/env2.json)"
+
+          {
+            echo "### Deployed oriana-invertors-web"
+            echo "- Environment: \`$ENV\`"
+            echo "- Stack: \`$STACK\`"
+            if [ -n "$CF_URL" ] && [ "$CF_URL" != "null" ]; then
+              echo "- CloudFront: $CF_URL"
+              echo "- Admin: $CF_URL/admin"
+            fi
+            if [ "${{ steps.secrets.outputs.db_ready }}" != "true" ]; then
+              echo ""
+              echo "**Next step:** Update \`/oriana-invertors-web/$ENV/database\` → \`DB_PASSWORD\` in AWS Secrets Manager, then re-run this workflow."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

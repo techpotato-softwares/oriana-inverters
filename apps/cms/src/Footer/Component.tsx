@@ -1,0 +1,1 @@
+../../../ui/src/Footer/Component.tsx

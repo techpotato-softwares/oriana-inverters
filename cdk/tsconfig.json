@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true
+  },
+  "include": [
+    "bin/**/*",
+    "config/**/*",
+    "lib/config/**/*",
+    "lib/stacks/oriana-invertors-web-stack.ts",
+    "lib/constructs/core/web-lambda-construct.ts",
+    "lib/constructs/hosting/web-cloudfront-construct.ts",
+    "lib/constructs/storage/**/*",
+    "lib/constructs/database/**/*",
+    "lib/constructs/permissions/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "cdk.out",
+    "lib/stacks/api-stack.ts",
+    "lib/constructs/core/api-gateway-construct.ts",
+    "lib/constructs/core/lambda-construct.ts",
+    "lib/constructs/core/scheduled-lambda-construct.ts",
+    "lib/constructs/security/**/*",
+    "lib/constructs/hosting/static-site-construct.ts",
+    "lib/utils/**/*"
+  ]
+}

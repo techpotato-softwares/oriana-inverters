@@ -1,82 +1,93 @@
-# Oriana Inverters Website
+# Oriana Invertors Web — Monorepo
 
-Marketing and product catalogue website for [Oriana Inverters](https://www.orianainverters.com), built with **Next.js 15 + Payload CMS 3**.
+Solar inverter manufacturer website: **Payload CMS** + **Next.js** public site, deployed to AWS as `oriana-invertors-web-{env}`.
 
-## Stack
+## Layout (ArcForge-style)
 
-- **Frontend:** Next.js (React), Tailwind CSS 4, Framer Motion
-- **CMS:** Payload CMS 3 (admin at `/admin`)
-- **Database:** SQLite locally (`file:./payload.db`) — switch to Neon PostgreSQL for production
-- **Media:** Supports images (up to 4K), MP4/WebM video, PDFs
+| Path | Role (≈ ArcForge) |
+|------|-------------------|
+| [`apps/cms`](apps/cms) | Payload CMS + Next host (≈ `api/`) — **deployable** |
+| [`apps/ui`](apps/ui) | Public UI source (≈ `ui/`) — consumed by cms |
+| [`packages/shared`](packages/shared) | Shared types |
+| [`cdk`](cdk) | AWS CDK — stack `oriana-invertors-web-{env}` |
 
-## Getting Started
-
-```bash
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-```
-
-Open:
-- **Website:** http://localhost:3000
-- **CMS Admin:** http://localhost:3000/admin (create your first user on first visit)
-
-## Environment
-
-Copy `.env` and update secrets before production:
-
-```
-DATABASE_URL=file:./payload.db
-PAYLOAD_SECRET=your-secret-here
-NEXT_PUBLIC_SERVER_URL=http://localhost:3000
-```
-
-For production (Vercel + Neon), see `solar-inverter-website-plan.md` §13 and §16.
-
-## Project Structure
-
-```
-src/
-├── app/(frontend)/     # Public website routes
-├── app/(payload)/      # Payload CMS admin + API
-├── collections/        # Products, Media, Posts, Pages...
-├── components/oriana/  # Oriana-branded UI (hero, gallery, video)
-└── payload.config.ts
-```
-
-## Media & Video
-
-Upload 4K videos and high-res images via Payload admin (`/admin` → Media). The `VideoBackground` component supports multiple sources with resolution-based `media` queries (1080p / 4K).
-
-## Catalogue data (Payload CMS)
-
-Product pages, categories, and the download center read from Payload collections (`products`, `categories`, `downloads`). Static fallback data in `src/data/products.ts` is used only when the CMS is empty.
-
-Seed the catalogue (categories, 5 products, 6 sample downloads):
+## Local development
 
 ```bash
-npm run seed:catalogue
+cp apps/cms/.env.example apps/cms/.env
+npm install && npm run dev
 ```
 
-Manage products at **Admin → Products**. Upload real product photos to replace the SVG placeholders.
+## Deploy via GitHub Actions (recommended)
 
-## Build
+### 1. GitHub repository secrets
+
+| Secret | Purpose |
+|--------|---------|
+| `AWS_ACCESS_KEY_ID` | IAM user for deploy |
+| `AWS_SECRET_ACCESS_KEY` | IAM secret |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Optional — seed workflow only |
+
+Optional repo variable: `AWS_REGION` (default `ap-south-1`).
+
+### 2. Environment file (no passwords in git)
+
+Edit [`config/deploy.env`](config/deploy.env) with Supabase **host**, **port**, **database name**, **user** only:
 
 ```bash
-npm run build          # migrate (non-interactive) + next build
-npm run build:next     # next build only (skip migrate)
+QA_DB_HOST=db.xxxx.supabase.co
+QA_DB_PORT=5432
+QA_DB_NAME=postgres
+QA_DB_USER=postgres
+QA_DB_SSL=true
 ```
 
-`npm run build` runs `scripts/prepare-migrate.mjs` first to clear dev-mode schema markers that would otherwise hang on an interactive prompt.
+Copy from [`config/deploy.env.example`](config/deploy.env.example) for other envs.
 
-## Deploy
+### 3. Run deploy workflow
 
-1. Push to GitHub
-2. Import to Vercel
-3. Add Neon PostgreSQL + Vercel Blob integrations
-4. Set build command: `npm run build` (or `node scripts/prepare-migrate.mjs && payload migrate && next build`)
-5. Run `npm run seed:catalogue` once after first deploy (or seed via admin)
-6. Point GoDaddy DNS to Vercel
-# oriana-inverters
+**Actions → Deploy oriana-invertors-web → Run workflow**
+
+- Choose **environment**: `dev` | `qa` | `prod`
+- Workflow will:
+  1. **CDK bootstrap** (first time)
+  2. **Create Secrets Manager placeholders** (auto-generates `PAYLOAD_SECRET`; DB password = `CHANGE_ME_UPDATE_IN_AWS_CONSOLE`)
+  3. Deploy stack + Lambda + CloudFront + S3
+
+### 4. Set database password (one time per env)
+
+AWS Console → **Secrets Manager** → `/oriana-invertors-web/qa/database` → Edit:
+
+- Set `DB_PASSWORD` to your Supabase database password  
+- Re-run **Deploy** (workflow rebuilds `DATABASE_URL` from host + password)
+
+You do **not** need to generate `PAYLOAD_SECRET` manually — it is created on first deploy.
+
+### 5. Seed content
+
+**Actions → Seed Payload CMS** → choose env + `catalogue` / `admin` / `full`
+
+## Secrets created automatically
+
+| Secret path | Contents |
+|-------------|----------|
+| `/oriana-invertors-web/{env}/database` | `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DATABASE_URL`, … |
+| `/oriana-invertors-web/{env}/payload` | Auto-generated `PAYLOAD_SECRET`, `CRON_SECRET`, `PREVIEW_SECRET` |
+
+## Environments
+
+| Env | Database | Stack |
+|-----|----------|--------|
+| **qa** | Supabase | `oriana-invertors-web-qa` |
+| **prod** | RDS | `oriana-invertors-web-prod` |
+
+## Manual (local AWS CLI)
+
+```bash
+# After editing config/deploy.env
+export AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... AWS_REGION=ap-south-1
+./scripts/bootstrap-secrets.sh qa
+cd cdk && npm run bootstrap && npm run deploy:qa
+```
+
+See [`docs/QA_VERIFY.md`](docs/QA_VERIFY.md) and [`ARCHITECTURE.md`](ARCHITECTURE.md).

@@ -22,3 +22,12 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Monorepo
+apps/cms/.next/
+apps/cms/payload.db
+apps/*/node_modules/
+packages/*/node_modules/
+cdk/cdk.out/
+cdk/cdk-outputs.json
+cdk/dist/

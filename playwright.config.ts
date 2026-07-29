@@ -34,7 +34,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm build && pnpm start',
+    command: 'npm run build && npm run start',
     reuseExistingServer: true,
     timeout: 5 * 60 * 1000,
     url: 'http://localhost:3000',
