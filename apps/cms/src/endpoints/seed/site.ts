@@ -33,6 +33,36 @@ const publicAssets = path.resolve(dirname, '../../../public/assets')
 
 const seedOpts = { overrideAccess: true as const, context: { disableRevalidate: true } }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+function isRetryable(error: unknown): boolean {
+  const text = String(error) + (error && typeof error === 'object' && 'cause' in error ? String((error as { cause: unknown }).cause) : '')
+  return (
+    text.includes('timeout exceeded when trying to connect') ||
+    text.includes('EMAXCONNSESSION') ||
+    text.includes('too many clients') ||
+    text.includes('Connection terminated') ||
+    text.includes('ECONNRESET') ||
+    text.includes('ETIMEDOUT')
+  )
+}
+
+async function withRetry<T>(label: string, fn: () => Promise<T>, attempts = 5): Promise<T> {
+  let last: unknown
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      return await fn()
+    } catch (error) {
+      last = error
+      if (!isRetryable(error) || i === attempts) break
+      const wait = 2000 * i
+      console.warn(`[seed] ${label} failed (attempt ${i}/${attempts}), retrying in ${wait}ms…`)
+      await sleep(wait)
+    }
+  }
+  throw last
+}
+
 function readAsset(relativePath: string, mimetype: string): File | null {
   const filePath = path.join(publicAssets, relativePath)
   if (!fs.existsSync(filePath)) return null
@@ -51,64 +81,73 @@ async function upsertMedia(
   relativePath: string,
   mimetype: string,
 ): Promise<number | undefined> {
-  const existing = await payload.find({
-    collection: 'media',
-    where: { filename: { equals: filename } },
-    limit: 1,
-    ...seedOpts,
-  })
-  if (existing.docs[0]) return existing.docs[0].id as number
+  try {
+    return await withRetry(`media:${filename}`, async () => {
+      const existing = await payload.find({
+        collection: 'media',
+        where: { filename: { equals: filename } },
+        limit: 1,
+        ...seedOpts,
+      })
+      if (existing.docs[0]) return existing.docs[0].id as number
 
-  const file = readAsset(relativePath, mimetype)
-  if (!file) {
-    payload.logger.warn(`Asset not found: ${relativePath}`)
+      const file = readAsset(relativePath, mimetype)
+      if (!file) {
+        payload.logger.warn(`Asset not found: ${relativePath}`)
+        return undefined
+      }
+
+      const doc = await payload.create({
+        collection: 'media',
+        data: { alt: filename.replace(/\.[^.]+$/, '') },
+        file,
+        ...seedOpts,
+      })
+      return doc.id as number
+    })
+  } catch (error) {
+    payload.logger.warn(`Skipping media ${filename} after retries: ${String(error)}`)
     return undefined
   }
-
-  const doc = await payload.create({
-    collection: 'media',
-    data: { alt: filename.replace(/\.[^.]+$/, '') },
-    file,
-    ...seedOpts,
-  })
-  return doc.id as number
 }
 
 export async function seedSite({ payload }: { payload: Payload }) {
   payload.logger.info('— Seeding Oriana site content...')
 
-  // Media
-  const mediaIds: Record<string, number | undefined> = {
-    'single-phase.svg': await upsertMedia(payload, 'single-phase.svg', 'products/single-phase.svg', 'image/svg+xml'),
-    'three-phase.svg': await upsertMedia(payload, 'three-phase.svg', 'products/three-phase.svg', 'image/svg+xml'),
-    'utility-scale.svg': await upsertMedia(payload, 'utility-scale.svg', 'products/utility-scale.svg', 'image/svg+xml'),
-    'hybrid-storage.svg': await upsertMedia(payload, 'hybrid-storage.svg', 'products/hybrid-storage.svg', 'image/svg+xml'),
-    'careers.svg': await upsertMedia(payload, 'careers.svg', 'illustrations/careers.svg', 'image/svg+xml'),
-    'sustainability.svg': await upsertMedia(
-      payload,
-      'sustainability.svg',
-      'illustrations/sustainability.svg',
-      'image/svg+xml',
-    ),
-    'logo-light.png': await upsertMedia(payload, 'logo-light.png', 'logo-light.png', 'image/png'),
+  // Media (sequential + retries — pooler hates bursts)
+  const mediaFiles: [string, string, string][] = [
+    ['single-phase.svg', 'products/single-phase.svg', 'image/svg+xml'],
+    ['three-phase.svg', 'products/three-phase.svg', 'image/svg+xml'],
+    ['utility-scale.svg', 'products/utility-scale.svg', 'image/svg+xml'],
+    ['hybrid-storage.svg', 'products/hybrid-storage.svg', 'image/svg+xml'],
+    ['careers.svg', 'illustrations/careers.svg', 'image/svg+xml'],
+    ['sustainability.svg', 'illustrations/sustainability.svg', 'image/svg+xml'],
+    ['logo-light.png', 'logo-light.png', 'image/png'],
+  ]
+  const mediaIds: Record<string, number | undefined> = {}
+  for (const [filename, rel, mime] of mediaFiles) {
+    mediaIds[filename] = await upsertMedia(payload, filename, rel, mime)
+    await sleep(300)
   }
 
   // Site settings
-  await payload.updateGlobal({
-    slug: 'site-settings',
-    data: {
-      brandName: 'Oriana Inverters',
-      supportEmail: 'support@orianainverters.com',
-      infoEmail: 'info@orianainverters.com',
-      securityEmail: 'security@orianainverters.com',
-      privacyEmail: 'privacy@orianainverters.com',
-      hotline: '+1 (800) ORIANA-1',
-      defaultMetaTitle: 'Oriana Inverters | Solar Inverter & Energy Storage Solutions',
-      defaultMetaDescription:
-        'High-efficiency solar inverters and storage platforms for residential, commercial, and utility projects worldwide.',
-    },
-    ...seedOpts,
-  })
+  await withRetry('global:site-settings', () =>
+    payload.updateGlobal({
+      slug: 'site-settings',
+      data: {
+        brandName: 'Oriana Inverters',
+        supportEmail: 'support@orianainverters.com',
+        infoEmail: 'info@orianainverters.com',
+        securityEmail: 'security@orianainverters.com',
+        privacyEmail: 'privacy@orianainverters.com',
+        hotline: '+1 (800) ORIANA-1',
+        defaultMetaTitle: 'Oriana Inverters | Solar Inverter & Energy Storage Solutions',
+        defaultMetaDescription:
+          'High-efficiency solar inverters and storage platforms for residential, commercial, and utility projects worldwide.',
+      },
+      ...seedOpts,
+    }),
+  )
 
   // Header
   await payload.updateGlobal({
