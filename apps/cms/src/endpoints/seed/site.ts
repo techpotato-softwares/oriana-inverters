@@ -114,20 +114,29 @@ async function upsertMedia(
 export async function seedSite({ payload }: { payload: Payload }) {
   payload.logger.info('— Seeding Oriana site content...')
 
-  // Media (sequential + retries — pooler hates bursts)
-  const mediaFiles: [string, string, string][] = [
-    ['single-phase.svg', 'products/single-phase.svg', 'image/svg+xml'],
-    ['three-phase.svg', 'products/three-phase.svg', 'image/svg+xml'],
-    ['utility-scale.svg', 'products/utility-scale.svg', 'image/svg+xml'],
-    ['hybrid-storage.svg', 'products/hybrid-storage.svg', 'image/svg+xml'],
-    ['careers.svg', 'illustrations/careers.svg', 'image/svg+xml'],
-    ['sustainability.svg', 'illustrations/sustainability.svg', 'image/svg+xml'],
-    ['logo-light.png', 'logo-light.png', 'image/png'],
-  ]
+  // Session-mode poolers often time out on media uploads from CI — skip by default.
+  // Set SEED_SKIP_MEDIA=false to upload assets into the media collection.
+  const skipMedia = process.env.SEED_SKIP_MEDIA !== 'false'
   const mediaIds: Record<string, number | undefined> = {}
-  for (const [filename, rel, mime] of mediaFiles) {
-    mediaIds[filename] = await upsertMedia(payload, filename, rel, mime)
-    await sleep(300)
+
+  if (skipMedia) {
+    payload.logger.info(
+      '— Skipping media uploads (SEED_SKIP_MEDIA); frontend uses public /assets paths',
+    )
+  } else {
+    const mediaFiles: [string, string, string][] = [
+      ['single-phase.svg', 'products/single-phase.svg', 'image/svg+xml'],
+      ['three-phase.svg', 'products/three-phase.svg', 'image/svg+xml'],
+      ['utility-scale.svg', 'products/utility-scale.svg', 'image/svg+xml'],
+      ['hybrid-storage.svg', 'products/hybrid-storage.svg', 'image/svg+xml'],
+      ['careers.svg', 'illustrations/careers.svg', 'image/svg+xml'],
+      ['sustainability.svg', 'illustrations/sustainability.svg', 'image/svg+xml'],
+      ['logo-light.png', 'logo-light.png', 'image/png'],
+    ]
+    for (const [filename, rel, mime] of mediaFiles) {
+      mediaIds[filename] = await upsertMedia(payload, filename, rel, mime)
+      await sleep(300)
+    }
   }
 
   // Site settings
@@ -163,7 +172,7 @@ export async function seedSite({ payload }: { payload: Payload }) {
       whereToBuyHref: '/where-to-buy',
       quoteLabel: 'Request Quote',
       quoteHref: '/contact',
-      logo: mediaIds['logo-light.png'],
+      ...(mediaIds['logo-light.png'] ? { logo: mediaIds['logo-light.png'] } : {}),
       logoAlt: 'Oriana Inverters',
       navMenus: primaryNav.map((key) => {
         const menu = megaMenus[key]
@@ -208,7 +217,10 @@ export async function seedSite({ payload }: { payload: Payload }) {
     slug: 'careers',
     data: {
       ...staticCareers,
-      why: { ...staticCareers.why, image: mediaIds['careers.svg'] },
+      why: {
+        ...staticCareers.why,
+        ...(mediaIds['careers.svg'] ? { image: mediaIds['careers.svg'] } : {}),
+      },
     } as never,
     ...seedOpts,
   })
@@ -220,7 +232,9 @@ export async function seedSite({ payload }: { payload: Payload }) {
       ...staticSustainability,
       approach: {
         ...staticSustainability.approach,
-        image: mediaIds['sustainability.svg'],
+        ...(mediaIds['sustainability.svg']
+          ? { image: mediaIds['sustainability.svg'] }
+          : {}),
       },
     } as never,
     ...seedOpts,
@@ -250,7 +264,9 @@ export async function seedSite({ payload }: { payload: Payload }) {
     })
     const data = {
       ...sol,
-      image: mediaIds[solutionImageMap[sol.slug]],
+      ...(mediaIds[solutionImageMap[sol.slug]]
+        ? { image: mediaIds[solutionImageMap[sol.slug]] }
+        : {}),
     }
     if (existing.docs[0]) {
       await payload.update({ collection: 'solutions', id: existing.docs[0].id, data, ...seedOpts })
@@ -283,7 +299,9 @@ export async function seedSite({ payload }: { payload: Payload }) {
       location: cs.location,
       year: cs.year,
       imageUrl: cs.image,
-      image: mediaIds[caseImageMap[cs.image] || ''],
+      ...(mediaIds[caseImageMap[cs.image] || '']
+        ? { image: mediaIds[caseImageMap[cs.image] || ''] }
+        : {}),
       summary: cs.summary,
       challenge: cs.challenge,
       solution: cs.solution,

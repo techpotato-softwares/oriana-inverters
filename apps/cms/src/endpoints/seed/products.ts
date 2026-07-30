@@ -49,6 +49,12 @@ const categoryImages: Record<string, string> = {
 export async function seedProducts({ payload }: { payload: Payload }) {
   payload.logger.info('— Seeding product categories...')
 
+  // Default skip — Supabase session pooler + media uploads from CI is unreliable.
+  const skipMedia = process.env.SEED_SKIP_MEDIA !== 'false'
+  if (skipMedia) {
+    payload.logger.info('— Catalogue seed skipping media/PDF uploads (SEED_SKIP_MEDIA)')
+  }
+
   const categoryIds: Record<string, number> = {}
 
   for (const cat of staticCategories) {
@@ -96,7 +102,6 @@ export async function seedProducts({ payload }: { payload: Payload }) {
       ...seedOpts,
     })
 
-    const imageFile = readLocalSvg(categoryImages[product.categorySlug] ?? 'single-phase.svg')
     let heroImageId: number | undefined =
       existing.docs[0]?.heroImage && typeof existing.docs[0].heroImage === 'object'
         ? existing.docs[0].heroImage.id
@@ -104,7 +109,8 @@ export async function seedProducts({ payload }: { payload: Payload }) {
           ? existing.docs[0].heroImage
           : undefined
 
-    if (!heroImageId) {
+    if (!skipMedia && !heroImageId) {
+      const imageFile = readLocalSvg(categoryImages[product.categorySlug] ?? 'single-phase.svg')
       const hero = await payload.create({
         collection: 'media',
         data: {
@@ -129,7 +135,7 @@ export async function seedProducts({ payload }: { payload: Payload }) {
       warranty: product.warranty,
       featured: product.featured ?? false,
       keySpecs: product.specs.map((s) => ({ label: s.label, value: s.value })),
-      heroImage: heroImageId,
+      ...(heroImageId ? { heroImage: heroImageId } : {}),
       _status: 'published' as const,
     }
 
@@ -147,6 +153,11 @@ export async function seedProducts({ payload }: { payload: Payload }) {
         ...seedOpts,
       })
     }
+  }
+
+  if (skipMedia) {
+    payload.logger.info('— Skipping sample downloads (require media uploads)')
+    return
   }
 
   payload.logger.info('— Seeding downloads...')
