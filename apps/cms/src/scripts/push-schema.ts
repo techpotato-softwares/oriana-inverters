@@ -9,42 +9,12 @@
  *  - allow PG_POOL_MAX>=2 during push (introspect can need >1 connection)
  *  - retry on pool exhaustion AND connection timeouts
  */
-import pg from 'pg'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+import { missingRequiredTables } from './required-tables'
 
-/** Tables that must exist for Oriana CMS + site content seed. */
-const REQUIRED_TABLES = [
-  'users',
-  'products',
-  'categories',
-  'downloads',
-  'media',
-  'site_settings',
-  'home',
-  'about',
-  'contact',
-  'careers',
-  'support',
-  'warranty',
-  'sustainability',
-  'sustainability_reports',
-  'where_to_buy',
-  'page_intros',
-  'header',
-  'footer',
-  'case_studies',
-  'faqs',
-  'videos',
-  'distributors',
-  'jobs',
-  'partners',
-  'certifications',
-  'solutions',
-  'content_pages',
-] as const
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 function errorText(error: unknown): string {
   const parts: unknown[] = [error]
@@ -76,48 +46,14 @@ const isRetryableDbError = (error: unknown): boolean => {
   )
 }
 
-async function missingTables(): Promise<string[]> {
-  if (process.env.PAYLOAD_FORCE_SCHEMA_PUSH === 'true') {
-    return [...REQUIRED_TABLES]
-  }
-
-  const client = new pg.Client({
-    connectionString: process.env.DATABASE_URL,
-    connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 60_000),
-    // Avoid hanging SSL handshakes against pooler from GHA runners
-    ssl: process.env.DATABASE_URL?.includes('sslmode=require')
-      ? { rejectUnauthorized: false }
-      : undefined,
-  })
-
-  try {
-    await client.connect()
-    const result = await client.query<{ table_name: string }>(
-      `SELECT table_name
-       FROM information_schema.tables
-       WHERE table_schema = 'public'
-         AND table_name = ANY($1::text[])`,
-      [REQUIRED_TABLES],
-    )
-    const present = new Set(result.rows.map((r) => r.table_name))
-    return REQUIRED_TABLES.filter((t) => !present.has(t))
-  } finally {
-    try {
-      await client.end()
-    } catch {
-      /* ignore */
-    }
-  }
-}
-
 const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 3)
 
 let missing: string[]
 try {
-  missing = await missingTables()
+  missing = await missingRequiredTables()
 } catch (error) {
   console.warn('Pre-check of tables failed (will attempt schema:push anyway):', errorText(error))
-  missing = [...REQUIRED_TABLES]
+  missing = ['(pre-check failed)']
 }
 
 if (missing.length === 0) {

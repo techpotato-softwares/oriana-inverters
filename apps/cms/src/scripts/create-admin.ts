@@ -10,6 +10,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { withRetry } from '@/endpoints/seed/dbRetry'
+import { ensureSchema } from './ensure-schema'
 import { warmDb } from './warm-db'
 
 const email = process.env.ADMIN_EMAIL
@@ -32,6 +33,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 await warmDb()
+await ensureSchema()
 
 const payload = await getPayload({ config })
 try {

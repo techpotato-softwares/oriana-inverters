@@ -16,7 +16,7 @@ on:
         options: [site, catalogue, admin, full]
         default: site
       skip_schema_push:
-        description: Skip schema:push (use if tables already exist / push hung previously)
+        description: Skip dedicated schema:push step (seed still auto-creates missing tables)
         required: false
         type: boolean
         default: false
@@ -48,7 +48,7 @@ jobs:
   seed:
     runs-on: ubuntu-latest
     # Whole job must not hang forever on pooler/Drizzle
-    timeout-minutes: 25
+    timeout-minutes: 35
     environment: ${{ github.event.inputs.environment }}
     steps:
       - name: Checkout
@@ -159,10 +159,12 @@ jobs:
           # Let pooler recycle Payload's held session before the seed step
           sleep 15
 
+      # Seed always runs ensureSchema() — creates site_settings etc. even when the
+      # dedicated push step was skipped (common when only legacy tables existed).
       - name: Seed site content (pages, globals, chrome + catalogue)
         if: ${{ github.event.inputs.seed_type == 'site' || github.event.inputs.seed_type == 'full' }}
         working-directory: apps/cms
-        timeout-minutes: 15
+        timeout-minutes: 20
         env:
           NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
         run: npm run seed:site
@@ -170,7 +172,7 @@ jobs:
       - name: Seed catalogue only
         if: ${{ github.event.inputs.seed_type == 'catalogue' }}
         working-directory: apps/cms
-        timeout-minutes: 10
+        timeout-minutes: 15
         env:
           NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
         run: npm run seed:catalogue
@@ -178,6 +180,7 @@ jobs:
       - name: Seed admin user
         if: ${{ github.event.inputs.seed_type == 'admin' || github.event.inputs.seed_type == 'full' }}
         working-directory: apps/cms
+        timeout-minutes: 15
         env:
           NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
           ADMIN_EMAIL: ${{ github.event.inputs.admin_email }}

@@ -2,9 +2,11 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { seedSite } from '@/endpoints/seed/site'
+import { ensureSchema } from './ensure-schema'
 import { warmDb } from './warm-db'
 
 await warmDb()
+await ensureSchema()
 
 const payload = await getPayload({ config })
 try {

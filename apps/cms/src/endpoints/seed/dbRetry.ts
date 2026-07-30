@@ -19,6 +19,8 @@ export function errorText(error: unknown): string {
 
 export function isRetryableDbError(error: unknown): boolean {
   const text = errorText(error)
+  // Schema missing is not transient — fail fast so ensureSchema can fix it
+  if (text.includes('does not exist') || text.includes('42P01')) return false
   return (
     text.includes('timeout exceeded when trying to connect') ||
     text.includes('cannot begin transaction') ||
