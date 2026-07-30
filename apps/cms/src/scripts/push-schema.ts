@@ -2,6 +2,9 @@
  * Bootstrap Postgres schema via Drizzle push (PAYLOAD_DATABASE_PUSH=true).
  * Use on empty DBs before seeding when no migrations are checked in yet.
  *
+ * Also re-pushes when new collections/globals are missing (e.g. site_settings
+ * after a CMS content model expansion) — not only on empty databases.
+ *
  * Supabase session poolers reject with EMAXCONNSESSION when too many clients
  * connect at once — keep PG_POOL_MAX=1 and retry transient pool exhaustion.
  */
@@ -10,6 +13,38 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+/** Tables that must exist for Oriana CMS + site content seed. */
+const REQUIRED_TABLES = [
+  'users',
+  'products',
+  'categories',
+  'downloads',
+  'media',
+  // Site content globals / collections (CMS migration)
+  'site_settings',
+  'home',
+  'about',
+  'contact',
+  'careers',
+  'support',
+  'warranty',
+  'sustainability',
+  'sustainability_reports',
+  'where_to_buy',
+  'page_intros',
+  'header',
+  'footer',
+  'case_studies',
+  'faqs',
+  'videos',
+  'distributors',
+  'jobs',
+  'partners',
+  'certifications',
+  'solutions',
+  'content_pages',
+] as const
 
 const isPoolExhausted = (error: unknown): boolean => {
   const parts: unknown[] = [error]
@@ -29,8 +64,10 @@ const isPoolExhausted = (error: unknown): boolean => {
   )
 }
 
-async function schemaAlreadyPresent(): Promise<boolean> {
-  if (process.env.PAYLOAD_FORCE_SCHEMA_PUSH === 'true') return false
+async function missingTables(): Promise<string[]> {
+  if (process.env.PAYLOAD_FORCE_SCHEMA_PUSH === 'true') {
+    return [...REQUIRED_TABLES]
+  }
 
   const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
@@ -41,10 +78,15 @@ async function schemaAlreadyPresent(): Promise<boolean> {
   })
 
   try {
-    const result = await pool.query<{ present: boolean }>(
-      `SELECT to_regclass('public.users') IS NOT NULL AS present`,
+    const result = await pool.query<{ table_name: string }>(
+      `SELECT table_name
+       FROM information_schema.tables
+       WHERE table_schema = 'public'
+         AND table_name = ANY($1::text[])`,
+      [REQUIRED_TABLES],
     )
-    return Boolean(result.rows[0]?.present)
+    const present = new Set(result.rows.map((r) => r.table_name))
+    return REQUIRED_TABLES.filter((t) => !present.has(t))
   } finally {
     await pool.end()
   }
@@ -52,10 +94,19 @@ async function schemaAlreadyPresent(): Promise<boolean> {
 
 const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 5)
 
-if (await schemaAlreadyPresent()) {
-  console.log('Schema already present (public.users exists); skipping schema:push.')
+const missing = await missingTables()
+
+if (missing.length === 0) {
+  console.log('Schema already up to date (all required tables present); skipping schema:push.')
   console.log('Set PAYLOAD_FORCE_SCHEMA_PUSH=true to push anyway.')
   process.exit(0)
+}
+
+if (process.env.PAYLOAD_FORCE_SCHEMA_PUSH === 'true') {
+  console.log('PAYLOAD_FORCE_SCHEMA_PUSH=true — running schema:push.')
+} else {
+  console.log(`Missing tables (${missing.length}): ${missing.join(', ')}`)
+  console.log('Running schema:push to create/update them…')
 }
 
 let lastError: unknown
