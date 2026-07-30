@@ -12,14 +12,14 @@
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
     "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create",
-    "schema:push": "cross-env NODE_OPTIONS=--no-deprecation PAYLOAD_DATABASE_PUSH=true PG_POOL_MAX=1 payload run src/scripts/push-schema.ts",
+    "schema:push": "cross-env NODE_OPTIONS=\"--no-deprecation --dns-result-order=ipv4first\" PAYLOAD_DATABASE_PUSH=true PG_POOL_MAX=3 PG_CONNECT_TIMEOUT_MS=120000 payload run src/scripts/push-schema.ts",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types && cp src/payload-types.ts ../../packages/shared/src/payload-types.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
-    "seed:catalogue": "cross-env NODE_OPTIONS=--no-deprecation NODE_ENV=production payload run src/scripts/seed-catalogue.ts",
-    "seed:site": "cross-env NODE_OPTIONS=--no-deprecation NODE_ENV=production payload run src/scripts/seed-site.ts",
-    "seed:admin": "cross-env NODE_OPTIONS=--no-deprecation NODE_ENV=production payload run src/scripts/create-admin.ts",
+    "seed:catalogue": "cross-env NODE_OPTIONS=\"--no-deprecation --dns-result-order=ipv4first\" NODE_ENV=production PG_POOL_MAX=2 PG_CONNECT_TIMEOUT_MS=120000 payload run src/scripts/seed-catalogue.ts",
+    "seed:site": "cross-env NODE_OPTIONS=\"--no-deprecation --dns-result-order=ipv4first\" NODE_ENV=production PG_POOL_MAX=2 PG_CONNECT_TIMEOUT_MS=120000 payload run src/scripts/seed-site.ts",
+    "seed:admin": "cross-env NODE_OPTIONS=\"--no-deprecation --dns-result-order=ipv4first\" NODE_ENV=production PG_POOL_MAX=2 PG_CONNECT_TIMEOUT_MS=120000 payload run src/scripts/create-admin.ts",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
   },
   "dependencies": {

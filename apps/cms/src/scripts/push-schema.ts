@@ -1,12 +1,13 @@
 /**
  * Bootstrap Postgres schema via Drizzle push (PAYLOAD_DATABASE_PUSH=true).
- * Use on empty DBs before seeding when no migrations are checked in yet.
  *
- * Also re-pushes when new collections/globals are missing (e.g. site_settings
- * after a CMS content model expansion) — not only on empty databases.
+ * Re-pushes when required tables are missing (e.g. after CMS content model expansion).
  *
- * Supabase session poolers reject with EMAXCONNSESSION when too many clients
- * connect at once — keep PG_POOL_MAX=1 and retry transient pool exhaustion.
+ * Supabase session poolers are tiny and flake under Drizzle introspect (many catalog
+ * queries). We:
+ *  - use a short-lived Client for the pre-check (never leave a Pool open)
+ *  - allow PG_POOL_MAX>=2 during push (introspect can need >1 connection)
+ *  - retry on pool exhaustion AND connection timeouts
  */
 import pg from 'pg'
 import { getPayload } from 'payload'
@@ -21,7 +22,6 @@ const REQUIRED_TABLES = [
   'categories',
   'downloads',
   'media',
-  // Site content globals / collections (CMS migration)
   'site_settings',
   'home',
   'about',
@@ -46,7 +46,7 @@ const REQUIRED_TABLES = [
   'content_pages',
 ] as const
 
-const isPoolExhausted = (error: unknown): boolean => {
+function errorText(error: unknown): string {
   const parts: unknown[] = [error]
   if (error && typeof error === 'object') {
     const err = error as { cause?: unknown; message?: unknown }
@@ -56,11 +56,23 @@ const isPoolExhausted = (error: unknown): boolean => {
       parts.push((err.cause as { message: unknown }).message)
     }
   }
-  const text = parts.map(String).join(' ')
+  return parts.map(String).join(' ')
+}
+
+const isRetryableDbError = (error: unknown): boolean => {
+  const text = errorText(error)
   return (
     text.includes('EMAXCONNSESSION') ||
     text.includes('max clients reached') ||
-    text.includes('too many clients')
+    text.includes('too many clients') ||
+    text.includes('timeout exceeded when trying to connect') ||
+    text.includes('Connection terminated') ||
+    text.includes('ECONNRESET') ||
+    text.includes('ECONNREFUSED') ||
+    text.includes('ETIMEDOUT') ||
+    text.includes('remaining connection slots') ||
+    text.includes('sorry, too many clients') ||
+    text.includes('payloadInitError')
   )
 }
 
@@ -69,16 +81,18 @@ async function missingTables(): Promise<string[]> {
     return [...REQUIRED_TABLES]
   }
 
-  const pool = new pg.Pool({
+  const client = new pg.Client({
     connectionString: process.env.DATABASE_URL,
-    max: 1,
-    connectionTimeoutMillis: 30_000,
-    idleTimeoutMillis: 1000,
-    allowExitOnIdle: true,
+    connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 60_000),
+    // Avoid hanging SSL handshakes against pooler from GHA runners
+    ssl: process.env.DATABASE_URL?.includes('sslmode=require')
+      ? { rejectUnauthorized: false }
+      : undefined,
   })
 
   try {
-    const result = await pool.query<{ table_name: string }>(
+    await client.connect()
+    const result = await client.query<{ table_name: string }>(
       `SELECT table_name
        FROM information_schema.tables
        WHERE table_schema = 'public'
@@ -88,13 +102,23 @@ async function missingTables(): Promise<string[]> {
     const present = new Set(result.rows.map((r) => r.table_name))
     return REQUIRED_TABLES.filter((t) => !present.has(t))
   } finally {
-    await pool.end()
+    try {
+      await client.end()
+    } catch {
+      /* ignore */
+    }
   }
 }
 
-const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 5)
+const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 8)
 
-const missing = await missingTables()
+let missing: string[]
+try {
+  missing = await missingTables()
+} catch (error) {
+  console.warn('Pre-check of tables failed (will attempt schema:push anyway):', errorText(error))
+  missing = [...REQUIRED_TABLES]
+}
 
 if (missing.length === 0) {
   console.log('Schema already up to date (all required tables present); skipping schema:push.')
@@ -109,25 +133,32 @@ if (process.env.PAYLOAD_FORCE_SCHEMA_PUSH === 'true') {
   console.log('Running schema:push to create/update them…')
 }
 
+// Give the pooler a moment to recycle the pre-check session before Payload opens its pool.
+await sleep(Number(process.env.SCHEMA_PUSH_PAUSE_MS || 2000))
+
 let lastError: unknown
 
 for (let attempt = 1; attempt <= attempts; attempt++) {
   try {
+    console.log(`schema:push attempt ${attempt}/${attempts} (PG_POOL_MAX=${process.env.PG_POOL_MAX || 'default'})`)
     const payload = await getPayload({ config })
     payload.logger.info('Database schema push complete.')
     await payload.destroy()
+    // Extra settle so the next CI step (seed) does not race the same pooler slots.
+    await sleep(1500)
     process.exit(0)
   } catch (error) {
     lastError = error
 
-    if (!isPoolExhausted(error) || attempt === attempts) {
+    if (!isRetryableDbError(error) || attempt === attempts) {
       break
     }
 
-    const waitMs = 3000 * attempt
+    const waitMs = 4000 * attempt
     console.warn(
-      `schema:push hit Supabase pool limit (attempt ${attempt}/${attempts}); retrying in ${waitMs}ms…`,
+      `schema:push failed with retryable DB error (attempt ${attempt}/${attempts}); retrying in ${waitMs}ms…`,
     )
+    console.warn(errorText(error).slice(0, 400))
     await sleep(waitMs)
   }
 }

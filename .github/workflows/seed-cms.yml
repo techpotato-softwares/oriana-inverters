@@ -85,28 +85,37 @@ jobs:
       - name: Bootstrap schema (push tables)
         working-directory: apps/cms
         env:
-          NODE_OPTIONS: "--dns-result-order=ipv4first"
+          NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
+          PG_POOL_MAX: "3"
+          PG_CONNECT_TIMEOUT_MS: "120000"
+          SCHEMA_PUSH_RETRIES: "8"
         run: npm run schema:push
 
       - name: Seed site content (pages, globals, chrome + catalogue)
         if: ${{ github.event.inputs.seed_type == 'site' || github.event.inputs.seed_type == 'full' }}
         working-directory: apps/cms
         env:
-          NODE_OPTIONS: "--dns-result-order=ipv4first"
+          NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
+          PG_POOL_MAX: "2"
+          PG_CONNECT_TIMEOUT_MS: "120000"
         run: npm run seed:site
 
       - name: Seed catalogue only
         if: ${{ github.event.inputs.seed_type == 'catalogue' }}
         working-directory: apps/cms
         env:
-          NODE_OPTIONS: "--dns-result-order=ipv4first"
+          NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
+          PG_POOL_MAX: "2"
+          PG_CONNECT_TIMEOUT_MS: "120000"
         run: npm run seed:catalogue
 
       - name: Seed admin user
         if: ${{ github.event.inputs.seed_type == 'admin' || github.event.inputs.seed_type == 'full' }}
         working-directory: apps/cms
         env:
-          NODE_OPTIONS: "--dns-result-order=ipv4first"
+          NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
+          PG_POOL_MAX: "2"
+          PG_CONNECT_TIMEOUT_MS: "120000"
           ADMIN_EMAIL: ${{ github.event.inputs.admin_email }}
           ADMIN_PASSWORD: ${{ github.event.inputs.admin_password }}
           ADMIN_NAME: ${{ github.event.inputs.admin_name || 'Admin' }}
