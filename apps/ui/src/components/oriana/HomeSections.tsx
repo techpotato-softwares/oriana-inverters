@@ -49,7 +49,8 @@ const whyOrianaIcons: Record<string, LucideIcon> = {
 }
 
 /** Full-bleed atmospheric hero — brand first, international energy brand */
-export function HomeHero({ hero = staticHome.hero }: { hero?: HomeContent['hero'] }) {
+export function HomeHero({ hero }: { hero?: HomeContent['hero'] | null }) {
+  const content = hero ?? staticHome.hero
   const reduce = useReducedMotion()
 
   return (
@@ -66,36 +67,36 @@ export function HomeHero({ hero = staticHome.hero }: { hero?: HomeContent['hero'
         <div>
           <FadeIn>
             <p className="font-display text-sm font-semibold uppercase tracking-[0.28em] text-oriana-sky">
-              {hero.eyebrow}
+              {content.eyebrow}
             </p>
           </FadeIn>
 
           <FadeIn delay={0.08}>
             <h1 className="mt-5 max-w-xl font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.6rem]">
-              {hero.title}
+              {content.title}
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.16}>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-white/70 md:text-lg">
-              {hero.description}
+              {content.description}
             </p>
           </FadeIn>
 
           <FadeIn delay={0.24}>
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <Link
-                href={hero.primaryCta.href}
+                href={content.primaryCta.href}
                 className="group inline-flex items-center gap-2 rounded-md bg-oriana-sky px-7 py-3.5 text-sm font-semibold text-oriana-navy transition hover:bg-white"
               >
-                {hero.primaryCta.label}
+                {content.primaryCta.label}
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </Link>
               <Link
-                href={hero.secondaryCta.href}
+                href={content.secondaryCta.href}
                 className="inline-flex items-center gap-2 rounded-md border border-white/25 px-7 py-3.5 text-sm font-semibold text-white transition hover:border-oriana-sky hover:text-oriana-sky"
               >
-                {hero.secondaryCta.label}
+                {content.secondaryCta.label}
               </Link>
             </div>
           </FadeIn>
@@ -127,10 +128,11 @@ export function HomeHero({ hero = staticHome.hero }: { hero?: HomeContent['hero'
 
 /** Strategy section — mascots for each go-to-market path */
 export function StrategiesSection({
-  strategies = staticHome.strategies,
+  strategies,
 }: {
-  strategies?: HomeContent['strategies']
+  strategies?: HomeContent['strategies'] | null
 }) {
+  const content = strategies ?? staticHome.strategies
   return (
     <section className="relative bg-white py-20 lg:py-28">
       <div
@@ -145,19 +147,19 @@ export function StrategiesSection({
         <FadeIn>
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              {strategies.eyebrow}
+              {content.eyebrow}
             </p>
             <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl lg:text-[2.75rem]">
-              {strategies.title}
+              {content.title}
             </h2>
             <p className="mt-5 text-base leading-relaxed text-oriana-muted md:text-lg">
-              {strategies.description}
+              {content.description}
             </p>
           </div>
         </FadeIn>
 
         <Stagger className="mt-14 grid gap-8 sm:grid-cols-2 xl:grid-cols-4" delay={0.1}>
-          {strategies.items.map((item) => {
+          {content.items.map((item) => {
             const Mascot = strategyMascots[item.id] ?? OriHome
             return (
               <StaggerItem key={item.id}>
@@ -192,7 +194,8 @@ export function StrategiesSection({
   )
 }
 
-export function ImpactStats({ impact = staticHome.impact }: { impact?: HomeContent['impact'] }) {
+export function ImpactStats({ impact }: { impact?: HomeContent['impact'] | null }) {
+  const content = impact ?? staticHome.impact
   return (
     <section className="relative overflow-hidden border-y border-oriana-navy/6 bg-oriana-surface py-16 lg:py-20">
       <div className="container">
@@ -200,24 +203,24 @@ export function ImpactStats({ impact = staticHome.impact }: { impact?: HomeConte
           <div className="mb-12 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <div className="max-w-xl">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-                {impact.eyebrow}
+                {content.eyebrow}
               </p>
               <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
-                {impact.title}
+                {content.title}
               </h2>
             </div>
             <Link
-              href={impact.ctaHref}
+              href={content.ctaHref}
               className="inline-flex items-center gap-2 text-sm font-semibold text-oriana-blue transition hover:gap-3"
             >
-              {impact.ctaLabel}
+              {content.ctaLabel}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </FadeIn>
 
         <Stagger className="grid grid-cols-2 gap-8 lg:grid-cols-4 lg:gap-6">
-          {impact.stats.map((stat) => {
+          {content.stats.map((stat) => {
             const Icon = impactIcons[stat.icon] ?? Globe2
             return (
               <StaggerItem key={stat.label}>
@@ -239,28 +242,29 @@ export function ImpactStats({ impact = staticHome.impact }: { impact?: HomeConte
 }
 
 export function WhyOrianaSection({
-  whyOriana = staticHome.whyOriana,
+  whyOriana,
 }: {
-  whyOriana?: HomeContent['whyOriana']
+  whyOriana?: HomeContent['whyOriana'] | null
 }) {
+  const content = whyOriana ?? staticHome.whyOriana
   return (
     <section className="bg-white py-20 lg:py-28">
       <div className="container">
         <div className="grid items-end gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <FadeIn>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              {whyOriana.eyebrow}
+              {content.eyebrow}
             </p>
             <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl lg:text-[2.75rem]">
-              {whyOriana.title}
+              {content.title}
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-oriana-muted">
-              {whyOriana.description}
+              {content.description}
             </p>
           </FadeIn>
 
           <Stagger className="grid gap-6 sm:grid-cols-2" delay={0.08}>
-            {whyOriana.items.map((item) => {
+            {content.items.map((item) => {
               const Icon = whyOrianaIcons[item.icon] ?? Microscope
               return (
                 <StaggerItem key={item.title}>
@@ -292,10 +296,11 @@ export function WhyOrianaSection({
 }
 
 export function GlobalReachSection({
-  globalReach = staticHome.globalReach,
+  globalReach,
 }: {
-  globalReach?: HomeContent['globalReach']
+  globalReach?: HomeContent['globalReach'] | null
 }) {
+  const content = globalReach ?? staticHome.globalReach
   return (
     <section className="relative overflow-hidden bg-oriana-navy py-20 lg:py-24">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(77,163,255,0.18),transparent)]" />
@@ -305,19 +310,19 @@ export function GlobalReachSection({
         <FadeIn>
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">
-              {globalReach.eyebrow}
+              {content.eyebrow}
             </p>
             <h2 className="mt-4 font-display text-3xl font-semibold text-white md:text-4xl">
-              {globalReach.title}
+              {content.title}
             </h2>
             <p className="mt-5 text-base leading-relaxed text-white/65">
-              {globalReach.description}
+              {content.description}
             </p>
           </div>
         </FadeIn>
 
         <Stagger className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" delay={0.1}>
-          {globalReach.regions.map((region) => (
+          {content.regions.map((region) => (
             <StaggerItem key={region.name}>
               <div className="border border-white/10 bg-white/5 px-6 py-5 backdrop-blur-sm transition hover:border-oriana-sky/40 hover:bg-white/8">
                 <p className="font-display text-lg font-semibold text-white">{region.name}</p>
@@ -330,10 +335,10 @@ export function GlobalReachSection({
         <FadeIn delay={0.2}>
           <div className="mt-12 flex justify-center">
             <Link
-              href={globalReach.ctaHref}
+              href={content.ctaHref}
               className="inline-flex items-center gap-2 rounded-md bg-oriana-sky px-7 py-3.5 text-sm font-semibold text-oriana-navy transition hover:bg-white"
             >
-              {globalReach.ctaLabel}
+              {content.ctaLabel}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -343,31 +348,32 @@ export function GlobalReachSection({
   )
 }
 
-export function NewsEventsSection({ news = staticHome.news }: { news?: HomeContent['news'] }) {
+export function NewsEventsSection({ news }: { news?: HomeContent['news'] | null }) {
+  const content = news ?? staticHome.news
   return (
     <section className="bg-oriana-surface py-20 lg:py-24">
       <div className="container">
         <div className="flex items-end justify-between gap-6">
           <FadeIn>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              {news.eyebrow}
+              {content.eyebrow}
             </p>
             <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
-              {news.title}
+              {content.title}
             </h2>
           </FadeIn>
           <FadeIn delay={0.08}>
             <Link
-              href={news.viewAllHref}
+              href={content.viewAllHref}
               className="hidden text-sm font-semibold text-oriana-blue transition hover:underline sm:inline"
             >
-              {news.viewAllLabel}
+              {content.viewAllLabel}
             </Link>
           </FadeIn>
         </div>
 
         <Stagger className="mt-10 grid gap-6 md:grid-cols-3" delay={0.05}>
-          {news.items.map((item) => (
+          {content.items.map((item) => (
             <StaggerItem key={item.title}>
               <Link
                 href={item.href}
@@ -390,36 +396,37 @@ export function NewsEventsSection({ news = staticHome.news }: { news?: HomeConte
 }
 
 export function CaseStudiesSection({
-  caseStudiesIntro = staticHome.caseStudiesIntro,
+  caseStudiesIntro,
   caseStudies,
 }: {
-  caseStudiesIntro?: HomeContent['caseStudiesIntro']
+  caseStudiesIntro?: HomeContent['caseStudiesIntro'] | null
   caseStudies: CaseStudy[]
 }) {
+  const intro = caseStudiesIntro ?? staticHome.caseStudiesIntro
   return (
     <section className="bg-white py-20 lg:py-24">
       <div className="container">
         <div className="flex items-end justify-between gap-6">
           <FadeIn>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              {caseStudiesIntro.eyebrow}
+              {intro.eyebrow}
             </p>
             <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
-              {caseStudiesIntro.title}
+              {intro.title}
             </h2>
           </FadeIn>
           <FadeIn delay={0.08}>
             <Link
-              href={caseStudiesIntro.viewAllHref}
+              href={intro.viewAllHref}
               className="hidden text-sm font-semibold text-oriana-blue transition hover:underline sm:inline"
             >
-              {caseStudiesIntro.viewAllLabel}
+              {intro.viewAllLabel}
             </Link>
           </FadeIn>
         </div>
 
         <Stagger className="mt-10 grid gap-8 md:grid-cols-3" delay={0.05}>
-          {caseStudies.slice(0, 3).map((study) => (
+          {(caseStudies ?? []).slice(0, 3).map((study) => (
             <StaggerItem key={study.slug}>
               <Link
                 href={`/case-studies/${study.slug}`}
@@ -447,37 +454,38 @@ export function CaseStudiesSection({
 }
 
 export function SupportDownloadStrip({
-  supportStrip = staticHome.supportStrip,
+  supportStrip,
 }: {
-  supportStrip?: HomeContent['supportStrip']
+  supportStrip?: HomeContent['supportStrip'] | null
 }) {
+  const content = supportStrip ?? staticHome.supportStrip
   return (
     <section className="relative overflow-hidden border-t border-oriana-navy/8 bg-gradient-to-br from-oriana-silver via-white to-oriana-sky/10 py-16 lg:py-20">
       <div className="container">
         <Stagger className="grid gap-12 md:grid-cols-3" delay={0.05}>
           <StaggerItem>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              {supportStrip.service.eyebrow}
+              {content.service.eyebrow}
             </p>
             <p className="mt-4 font-display text-2xl font-semibold text-oriana-navy">
-              {supportStrip.service.title}
+              {content.service.title}
             </p>
-            <p className="mt-3 text-sm text-oriana-muted">{supportStrip.service.hotline}</p>
+            <p className="mt-3 text-sm text-oriana-muted">{content.service.hotline}</p>
             <Link
-              href={supportStrip.service.linkHref}
+              href={content.service.linkHref}
               className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-oriana-blue hover:underline"
             >
-              {supportStrip.service.linkLabel}
+              {content.service.linkLabel}
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </StaggerItem>
 
           <StaggerItem>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              {supportStrip.downloads.eyebrow}
+              {content.downloads.eyebrow}
             </p>
             <ul className="mt-5 space-y-3 text-sm">
-              {supportStrip.downloads.links.map((doc) => (
+              {content.downloads.links.map((doc) => (
                 <li key={doc.label}>
                   <Link
                     href={doc.href}
@@ -492,16 +500,16 @@ export function SupportDownloadStrip({
 
           <StaggerItem>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              {supportStrip.partner.eyebrow}
+              {content.partner.eyebrow}
             </p>
             <p className="mt-4 text-sm leading-relaxed text-oriana-muted">
-              {supportStrip.partner.description}
+              {content.partner.description}
             </p>
             <Link
-              href={supportStrip.partner.ctaHref}
+              href={content.partner.ctaHref}
               className="mt-6 inline-flex rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-oriana-navy"
             >
-              {supportStrip.partner.ctaLabel}
+              {content.partner.ctaLabel}
             </Link>
           </StaggerItem>
         </Stagger>

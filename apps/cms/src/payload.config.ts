@@ -90,7 +90,7 @@ export default buildConfig({
       // Keep modest for Supabase session pooler (shared pool_size ≈15).
       max: Number(process.env.PG_POOL_MAX || 3),
       idleTimeoutMillis: process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1000 : 10_000,
-      connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 60_000),
+      connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 15_000),
       allowExitOnIdle: true,
       // GitHub Actions → Supabase pooler: avoid hanging on cert chain verification
       ...(process.env.DATABASE_URL?.includes('sslmode=require')

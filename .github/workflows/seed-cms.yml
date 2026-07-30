@@ -20,6 +20,11 @@ on:
         required: false
         type: boolean
         default: false
+      pause_lambda:
+        description: Pause CMS Lambda (concurrency=0) during seed — leaves site down; restore runs in finally
+        required: false
+        type: boolean
+        default: false
       admin_email:
         description: Admin email (required for admin/full)
         required: false
@@ -100,15 +105,16 @@ jobs:
             echo "LAMBDA_FN=oriana-invertors-web-$ENV"
           } >> "$GITHUB_ENV"
 
-      - name: Pause Lambda (free Supabase session slots)
+      - name: Pause Lambda (optional — frees Supabase session slots)
+        if: ${{ github.event.inputs.pause_lambda == 'true' }}
         run: |
           FN="${{ env.LAMBDA_FN }}"
           if aws lambda get-function --function-name "$FN" >/dev/null 2>&1; then
-            echo "Setting reserved concurrency=0 on $FN to free DB pooler sessions"
+            echo "PAUSING $FN (reserved concurrency=0) — site will return Rate Exceeded until restore"
             aws lambda put-function-concurrency \
               --function-name "$FN" \
               --reserved-concurrent-executions 0
-            # Warm containers can hold sessions briefly after concurrency=0
+            echo "LAMBDA_PAUSED=true" >> "$GITHUB_ENV"
             sleep 20
           else
             echo "Lambda $FN not found — continuing without pause"
@@ -197,10 +203,19 @@ jobs:
       - name: Restore Lambda concurrency
         if: always()
         run: |
+          ENV="${{ github.event.inputs.environment }}"
+          # Always try env-derived name even if LAMBDA_FN was never set (e.g. cancelled early)
           FN="${{ env.LAMBDA_FN }}"
-          if [ -n "$FN" ] && aws lambda get-function --function-name "$FN" >/dev/null 2>&1; then
-            echo "Removing reserved concurrency cap on $FN"
-            aws lambda delete-function-concurrency --function-name "$FN" || true
+          if [ -z "$FN" ]; then
+            FN="oriana-invertors-web-$ENV"
+          fi
+          echo "Restoring concurrency on $FN (clears reserved=0 throttle)"
+          if aws lambda get-function --function-name "$FN" >/dev/null 2>&1; then
+            aws lambda delete-function-concurrency --function-name "$FN"
+            echo "Restored — concurrency config:"
+            aws lambda get-function-concurrency --function-name "$FN" || echo "(none = unlimited / account default)"
+          else
+            echo "Lambda $FN not found — nothing to restore"
           fi
 
       - name: Summary
@@ -211,4 +226,10 @@ jobs:
           echo "- Environment: \`$ENV\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Seed type: \`${{ github.event.inputs.seed_type }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Skip schema push: \`${{ github.event.inputs.skip_schema_push }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Pause Lambda: \`${{ github.event.inputs.pause_lambda }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- PG_POOL_MAX: \`${{ env.PG_POOL_MAX }}\` (must be ≥2 — Payload holds 1 client)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "If the site returns \`ReservedFunctionConcurrentInvocationLimitExceeded\`, run:" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "aws lambda delete-function-concurrency --function-name oriana-invertors-web-$ENV --region ${{ env.AWS_REGION }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"

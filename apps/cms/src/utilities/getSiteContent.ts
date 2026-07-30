@@ -37,6 +37,51 @@ async function getPayloadSafe() {
   }
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/** Payload global metadata — never treat as content overrides */
+const GLOBAL_META_KEYS = new Set([
+  'id',
+  'updatedAt',
+  'createdAt',
+  'globalType',
+  '_status',
+])
+
+/**
+ * Deep-merge CMS doc onto static fallback.
+ * - null/undefined CMS fields keep the static value (empty globals after schema:push)
+ * - empty CMS arrays keep the static array when fallback has items
+ */
+function coalesceMerge<T>(fallback: T, doc: unknown): T {
+  if (!isPlainObject(doc)) return fallback
+
+  const merge = (base: unknown, over: unknown): unknown => {
+    if (over === null || over === undefined) return base
+
+    if (Array.isArray(over)) {
+      if (over.length === 0 && Array.isArray(base) && base.length > 0) return base
+      return over
+    }
+
+    if (isPlainObject(over)) {
+      const baseObj = isPlainObject(base) ? base : {}
+      const out: Record<string, unknown> = { ...baseObj }
+      for (const [key, value] of Object.entries(over)) {
+        if (GLOBAL_META_KEYS.has(key)) continue
+        out[key] = merge(baseObj[key], value)
+      }
+      return out
+    }
+
+    return over
+  }
+
+  return merge(fallback, doc) as T
+}
+
 function mediaUrl(media: unknown, fallback?: string | null): string | undefined {
   if (media && typeof media === 'object' && 'url' in media && typeof (media as { url?: string }).url === 'string') {
     return getMediaUrl((media as { url: string }).url) || fallback || undefined
@@ -50,7 +95,7 @@ async function fetchGlobal<T>(slug: string, fallback: T): Promise<T> {
   try {
     const doc = await payload.findGlobal({ slug: slug as never, depth: 2 })
     if (!doc) return fallback
-    return { ...fallback, ...(doc as object) } as T
+    return coalesceMerge(fallback, doc)
   } catch (error) {
     console.error(`[getSiteContent] global ${slug} failed:`, error)
     return fallback
