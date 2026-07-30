@@ -1,22 +1,25 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
-import { caseStudies } from '@/data/caseStudies'
+import { getCaseStudiesContent, getPageIntros } from '@/utilities/getSiteContent'
 
-export const metadata = {
-  title: 'Case Studies',
-  description: 'Customer success stories and reference projects powered by Oriana solar inverters.',
+export async function generateMetadata(): Promise<Metadata> {
+  const intros = await getPageIntros()
+  return {
+    title: intros.caseStudies.title,
+    description: intros.caseStudies.description,
+  }
 }
 
-export default function CaseStudiesPage() {
+export default async function CaseStudiesPage() {
+  const [intros, caseStudies] = await Promise.all([getPageIntros(), getCaseStudiesContent()])
+  const intro = intros.caseStudies
+
   return (
     <main>
-      <PageHero
-        eyebrow="Solutions"
-        title="Case Studies"
-        description="Real-world deployments demonstrating Oriana reliability across residential, commercial, and utility applications."
-      />
+      <PageHero eyebrow={intro.eyebrow} title={intro.title} description={intro.description} />
       <Breadcrumbs items={[{ label: 'Solutions', href: '/solutions/residential' }, { label: 'Case Studies' }]} />
 
       <section className="py-12 lg:py-16">

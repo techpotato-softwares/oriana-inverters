@@ -1,0 +1,104 @@
+/**
+ * Oriana Payload admin branding
+ * Navy #071525 · Blue #1a428a · Sky #4da3ff · Sun #f5b942
+ */
+
+:root {
+  --oriana-navy: #071525;
+  --oriana-blue: #1a428a;
+  --oriana-sky: #4da3ff;
+  --oriana-sun: #f5b942;
+  --oriana-silver: #eef2f8;
+}
+
+/* Nav active / accent */
+html[data-theme='light'] .nav__link:hover,
+html[data-theme='light'] .nav__link--active,
+html[data-theme='dark'] .nav__link:hover,
+html[data-theme='dark'] .nav__link--active {
+  color: var(--oriana-sky) !important;
+}
+
+html[data-theme='light'] .nav__link::before,
+html[data-theme='dark'] .nav__link::before {
+  background: var(--oriana-sky) !important;
+}
+
+/* Primary buttons */
+.btn--style-primary,
+button.btn.btn--style-primary,
+.btn.btn--style-primary {
+  background: var(--oriana-blue) !important;
+  border-color: var(--oriana-blue) !important;
+  color: #fff !important;
+}
+
+.btn--style-primary:hover,
+button.btn.btn--style-primary:hover {
+  background: var(--oriana-navy) !important;
+  border-color: var(--oriana-navy) !important;
+}
+
+/* Links */
+a:not(.btn):not(.nav__link) {
+  --theme-success-500: var(--oriana-blue);
+}
+
+.template-default a,
+.doc-controls a {
+  color: var(--oriana-blue);
+}
+
+/* Dashboard banner / before-dashboard */
+.before-dashboard {
+  border-left: 4px solid var(--oriana-sky);
+  padding-left: 1rem;
+}
+
+.before-dashboard__banner {
+  background: linear-gradient(135deg, var(--oriana-navy) 0%, var(--oriana-blue) 100%) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.before-dashboard__banner h4 {
+  color: #fff !important;
+}
+
+.before-dashboard a {
+  color: var(--oriana-blue);
+  font-weight: 600;
+}
+
+.before-dashboard .seedButton {
+  background: var(--oriana-sky);
+  color: var(--oriana-navy);
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.before-dashboard .seedButton:hover {
+  background: #fff;
+  box-shadow: 0 0 0 2px var(--oriana-blue);
+}
+
+/* Collection group labels */
+.nav-group__toggle {
+  font-weight: 600;
+}
+
+/* Focus rings */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--oriana-sky) !important;
+  box-shadow: 0 0 0 2px rgba(77, 163, 255, 0.25) !important;
+}
+
+/* Login accent */
+.login__brand {
+  border-bottom: 3px solid var(--oriana-sun);
+}

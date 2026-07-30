@@ -10,24 +10,29 @@ import {
   SupportDownloadStrip,
   WhyOrianaSection,
 } from '@/components/oriana/HomeSections'
+import { getCaseStudiesContent, getHomeContent } from '@/utilities/getSiteContent'
 
-export const metadata: Metadata = {
-  title: 'Oriana Inverters | Solar Inverter & Energy Storage Solutions',
-  description:
-    'Oriana manufactures high-efficiency string, hybrid, and utility-scale solar inverters for residential, commercial, and utility partners worldwide.',
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getHomeContent()
+  return {
+    title: content.seo?.metaTitle,
+    description: content.seo?.metaDescription,
+  }
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [content, caseStudies] = await Promise.all([getHomeContent(), getCaseStudiesContent()])
+
   return (
     <main className="bg-white">
-      <HomeHero />
-      <StrategiesSection />
-      <ImpactStats />
-      <WhyOrianaSection />
-      <GlobalReachSection />
-      <CaseStudiesSection />
-      <NewsEventsSection />
-      <SupportDownloadStrip />
+      <HomeHero hero={content.hero} />
+      <StrategiesSection strategies={content.strategies} />
+      <ImpactStats impact={content.impact} />
+      <WhyOrianaSection whyOriana={content.whyOriana} />
+      <GlobalReachSection globalReach={content.globalReach} />
+      <CaseStudiesSection caseStudiesIntro={content.caseStudiesIntro} caseStudies={caseStudies} />
+      <NewsEventsSection news={content.news} />
+      <SupportDownloadStrip supportStrip={content.supportStrip} />
     </main>
   )
 }

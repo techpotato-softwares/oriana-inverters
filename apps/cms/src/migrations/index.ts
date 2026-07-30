@@ -1,13 +1,18 @@
 /**
  * Postgres migrations for Payload.
  *
- * SQLite migrations were removed — they are not portable.
- * Create the first Postgres migration against your DB:
+ * After adding Oriana site collections/globals, bootstrap schema once:
  *
  *   cd apps/cms
- *   DATABASE_URL="postgresql://..." PAYLOAD_SECRET="..." npx payload migrate:create
+ *   DATABASE_URL="postgresql://..." PAYLOAD_SECRET="..." npm run schema:push
  *
- * Or bootstrap schema once with PAYLOAD_DATABASE_PUSH=true, then create migrations.
+ * Then seed existing website content:
+ *
+ *   npm run seed:site
+ *
+ * Prefer creating a migration for CI/CD:
+ *
+ *   npx payload migrate:create
  */
 export const migrations: {
   up: (args: unknown) => Promise<void>

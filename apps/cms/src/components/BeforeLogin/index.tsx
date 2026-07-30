@@ -4,8 +4,10 @@ const BeforeLogin: React.FC = () => {
   return (
     <div>
       <p>
-        <b>Welcome to Oriana Inverters CMS</b>
-        {' — log in to manage products, media, pages, and blog content.'}
+        <b>Welcome to Oriana CMS</b>
+        {
+          ' — manage page copy, products, partners, and downloads for orianainverters.com.'
+        }
       </p>
     </div>
   )

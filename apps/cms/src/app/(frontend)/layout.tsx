@@ -7,6 +7,7 @@ import { SiteFooter } from '@/components/oriana/SiteFooter'
 import { SiteHeader } from '@/components/oriana/SiteHeader'
 import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { getFooterChrome, getHeaderChrome } from '@/utilities/getSiteContent'
 import { draftMode } from 'next/headers'
 
 import './globals.css'
@@ -26,6 +27,7 @@ const outfit = Outfit({
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
+  const [headerChrome, footerChrome] = await Promise.all([getHeaderChrome(), getFooterChrome()])
 
   return (
     <html
@@ -45,9 +47,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               preview: isEnabled,
             }}
           />
-          <SiteHeader />
+          <SiteHeader chrome={headerChrome} />
           {children}
-          <SiteFooter />
+          <SiteFooter chrome={footerChrome} />
         </Providers>
       </body>
     </html>

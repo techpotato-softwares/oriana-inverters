@@ -1,40 +1,32 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { ContentPage } from '@/components/oriana/ContentPage'
+import { getContentPageBySlug } from '@/utilities/getSiteContent'
 
-export const metadata = {
-  title: 'Security Incident Response',
-  description: 'Report a cybersecurity incident related to Oriana products or services.',
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getContentPageBySlug('security')
+  return {
+    title: content?.seo?.metaTitle ?? content?.title,
+    description: content?.seo?.metaDescription ?? content?.description,
+  }
 }
 
-export default function SecurityPage() {
+export default async function SecurityPage() {
+  const content = await getContentPageBySlug('security')
+  if (!content) notFound()
+
   return (
     <>
       <ContentPage
-        eyebrow="Support"
-        title="Security Incident Response"
-        description="Oriana takes product and platform security seriously. Use this page to report vulnerabilities or incidents."
-        breadcrumb={[{ label: 'Support', href: '/support' }, { label: 'Security' }]}
-        sections={[
-          {
-            heading: 'Reporting a Vulnerability',
-            paragraphs: [
-              'If you discover a security vulnerability in Oriana hardware, firmware, or cloud monitoring services, please report it to security@orianainverters.com. Include a detailed description, affected product model, and steps to reproduce.',
-              'We aim to acknowledge reports within 2 business days and provide status updates throughout our investigation.',
-            ],
-          },
-          {
-            heading: 'Coordinated Disclosure',
-            paragraphs: [
-              'We follow responsible disclosure practices. Please allow 90 days for remediation before public disclosure unless otherwise agreed. We recognize researchers who help improve our security posture.',
-            ],
-          },
-          {
-            heading: 'Product Security Updates',
-            paragraphs: [
-              'Firmware security patches are distributed through the Oriana Monitoring app and our Download Center. Register your products to receive automatic update notifications.',
-            ],
-          },
-        ]}
+        eyebrow={content.eyebrow}
+        title={content.title}
+        description={content.description}
+        breadcrumb={content.breadcrumb}
+        sections={content.sections.map((s: { heading?: string; paragraphs: { text: string }[] }) => ({
+          heading: s.heading,
+          paragraphs: s.paragraphs.map((p: { text: string }) => p.text),
+        }))}
       />
       <section className="border-t border-oriana-navy/8 bg-oriana-silver/40 py-10">
         <div className="container max-w-3xl text-center">

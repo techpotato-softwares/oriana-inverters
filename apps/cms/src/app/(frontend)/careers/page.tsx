@@ -1,49 +1,29 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { MapPin } from 'lucide-react'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { FadeIn } from '@/components/oriana/FadeIn'
 import { PageHero } from '@/components/oriana/PageHero'
+import { getCareersContent, getJobsContent } from '@/utilities/getSiteContent'
 
-export const metadata = {
-  title: 'Careers',
-  description: 'Join Oriana Inverters — engineering, manufacturing, sales, and support careers in clean energy.',
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getCareersContent()
+  return {
+    title: content.seo?.metaTitle,
+    description: content.seo?.metaDescription,
+  }
 }
 
-const openings = [
-  {
-    title: 'Power Electronics Engineer',
-    location: 'San Jose, CA',
-    department: 'R&D',
-    type: 'Full-time',
-  },
-  {
-    title: 'Applications Engineer — Utility-Scale',
-    location: 'Austin, TX',
-    department: 'Technical Sales',
-    type: 'Full-time',
-  },
-  {
-    title: 'Quality Assurance Specialist',
-    location: 'Phoenix, AZ',
-    department: 'Manufacturing',
-    type: 'Full-time',
-  },
-  {
-    title: 'Customer Support Specialist',
-    location: 'Remote — US',
-    department: 'Service',
-    type: 'Full-time',
-  },
-]
+export default async function CareersPage() {
+  const [content, openings] = await Promise.all([getCareersContent(), getJobsContent()])
 
-export default function CareersPage() {
   return (
     <main>
       <PageHero
-        eyebrow="About"
-        title="Careers at Oriana"
-        description="Build the future of clean power conversion with a global team of engineers, makers, and problem-solvers."
+        eyebrow={content.hero.eyebrow}
+        title={content.hero.title}
+        description={content.hero.description}
       />
       <Breadcrumbs items={[{ label: 'About', href: '/about' }, { label: 'Careers' }]} />
 
@@ -53,7 +33,7 @@ export default function CareersPage() {
             <FadeIn>
               <div className="relative aspect-[16/10] overflow-hidden rounded border border-oriana-navy/8">
                 <Image
-                  src="/assets/illustrations/careers.svg"
+                  src={content.why.imageUrl}
                   alt="Oriana team at work"
                   fill
                   className="object-cover"
@@ -62,16 +42,12 @@ export default function CareersPage() {
               </div>
             </FadeIn>
             <FadeIn delay={0.1}>
-              <h2 className="font-display text-2xl font-bold text-oriana-navy">Why Oriana</h2>
-              <p className="mt-4 text-sm leading-relaxed text-oriana-muted">
-                We offer competitive benefits, hybrid work options for eligible roles, and the opportunity to
-                work on products deployed across 25 countries. Our culture values engineering rigour,
-                customer partnership, and environmental responsibility.
-              </p>
+              <h2 className="font-display text-2xl font-bold text-oriana-navy">{content.why.title}</h2>
+              <p className="mt-4 text-sm leading-relaxed text-oriana-muted">{content.why.description}</p>
             </FadeIn>
           </div>
 
-          <h2 className="mt-16 font-display text-xl font-bold text-oriana-navy">Open Positions</h2>
+          <h2 className="mt-16 font-display text-xl font-bold text-oriana-navy">{content.openingsTitle}</h2>
           <div className="mt-6 space-y-4">
             {openings.map((job, i) => (
               <FadeIn key={job.title} delay={i * 0.05}>
@@ -84,7 +60,7 @@ export default function CareersPage() {
                     </p>
                   </div>
                   <Link
-                    href="/contact"
+                    href={job.applyUrl}
                     className="shrink-0 rounded-full border border-oriana-blue px-5 py-2 text-sm font-semibold text-oriana-blue hover:bg-oriana-blue hover:text-white"
                   >
                     Apply Now
@@ -95,9 +71,8 @@ export default function CareersPage() {
           </div>
 
           <p className="mt-10 text-center text-sm text-oriana-muted">
-            Don&apos;t see a fit?{' '}
-            <Link href="/contact" className="font-semibold text-oriana-blue hover:underline">
-              Send us your résumé
+            <Link href={content.fallbackCtaHref} className="font-semibold text-oriana-blue hover:underline">
+              {content.fallbackCtaLabel}
             </Link>
           </p>
         </div>

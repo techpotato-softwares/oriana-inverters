@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { Facebook, Instagram, Linkedin, Youtube } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { ScrollToTop } from '@/components/oriana/ScrollToTop'
-import { footerNav, socialLinks } from '@/config/footer'
+import { footerNav, socialLinks as defaultSocial } from '@/config/footer'
+import type { FooterChrome } from '@/types/chrome'
 
 const socialIcons = {
   LinkedIn: Linkedin,
@@ -11,18 +12,39 @@ const socialIcons = {
   Instagram: Instagram,
 } as const
 
-export function SiteFooter() {
+type SiteFooterProps = {
+  chrome?: FooterChrome
+}
+
+export function SiteFooter({ chrome }: SiteFooterProps) {
+  const columns =
+    chrome?.columns ??
+    footerNav.map((c) => ({
+      title: c.title,
+      links: c.links.map((l) => ({ label: l.label, href: l.href })),
+    }))
+  const socialLinks = chrome?.socialLinks ?? defaultSocial.map((s) => ({ label: s.label, href: s.href }))
+  const legalLinks = chrome?.legalLinks ?? [
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Disclaimer', href: '/disclaimer' },
+    { label: 'Terms of Use', href: '/terms' },
+  ]
+  const copyright = (chrome?.copyright ?? '© {year} Oriana Inverters. All rights reserved.').replace(
+    '{year}',
+    String(new Date().getFullYear()),
+  )
+
   return (
     <>
       <footer className="mt-auto border-t border-oriana-navy/8 bg-oriana-surface">
         <div className="container py-14 lg:py-16">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
-            {footerNav.map((col) => (
+            {columns.map((col) => (
               <div key={col.title}>
                 <h3 className="text-sm font-semibold text-oriana-navy">{col.title}</h3>
                 <ul className="mt-4 space-y-2.5">
                   {col.links.map((link) => (
-                    <li key={link.href}>
+                    <li key={`${link.href}-${link.label}`}>
                       <Link
                         href={link.href}
                         className="text-sm text-oriana-muted transition hover:text-oriana-blue"
@@ -39,14 +61,13 @@ export function SiteFooter() {
           <div className="mt-14 flex flex-col items-start justify-between gap-8 border-t border-oriana-navy/8 pt-10 md:flex-row md:items-center">
             <div>
               <Logo variant="light" />
-              <p className="mt-4 text-xs text-oriana-muted">
-                © {new Date().getFullYear()} Oriana Inverters. All rights reserved.
-              </p>
+              <p className="mt-4 text-xs text-oriana-muted">{copyright}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
               {socialLinks.map((s) => {
                 const Icon = socialIcons[s.label as keyof typeof socialIcons]
+                if (!Icon) return null
                 return (
                   <a
                     key={s.label}
@@ -64,15 +85,11 @@ export function SiteFooter() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-6 text-xs text-oriana-muted">
-            <Link href="/privacy" className="hover:text-oriana-blue">
-              Privacy Policy
-            </Link>
-            <Link href="/disclaimer" className="hover:text-oriana-blue">
-              Disclaimer
-            </Link>
-            <Link href="/terms" className="hover:text-oriana-blue">
-              Terms of Use
-            </Link>
+            {legalLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="hover:text-oriana-blue">
+                {link.label}
+              </Link>
+            ))}
             <Link href="/sitemap.xml" className="hover:text-oriana-blue">
               Sitemap
             </Link>

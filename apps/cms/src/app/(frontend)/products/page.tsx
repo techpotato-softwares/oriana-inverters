@@ -9,11 +9,14 @@ import {
   getCatalogueCategories,
   getCatalogueProducts,
 } from '@/utilities/getCatalogue'
+import { getPageIntros } from '@/utilities/getSiteContent'
 
-export const metadata = {
-  title: 'Inverters',
-  description:
-    'Browse Oriana solar inverters — residential & C&I grid-tied, utility-scale, and hybrid energy storage.',
+export async function generateMetadata() {
+  const intros = await getPageIntros()
+  return {
+    title: intros.products.title,
+    description: intros.products.description,
+  }
 }
 
 /** Legacy query-param / old category slug redirects */
@@ -37,9 +40,10 @@ export default async function ProductsPage({ searchParams }: Props) {
     redirect(`/products/category/${legacyCategoryRedirects[cat]}`)
   }
 
-  const [products, categories] = await Promise.all([
+  const [products, categories, intros] = await Promise.all([
     getCatalogueProducts(),
     getCatalogueCategories(),
+    getPageIntros(),
   ])
 
   const categoryMap = Object.fromEntries(categories.map((c) => [c.slug, c]))
@@ -47,9 +51,9 @@ export default async function ProductsPage({ searchParams }: Props) {
   return (
     <main>
       <PageHero
-        eyebrow="Products"
-        title="Solar Inverter Catalogue"
-        description="High-efficiency power conversion solutions for every application — from residential rooftops to gigawatt-scale solar farms."
+        eyebrow={intros.products.eyebrow}
+        title={intros.products.title}
+        description={intros.products.description}
       />
       <Breadcrumbs items={[{ label: 'Inverters' }]} />
 

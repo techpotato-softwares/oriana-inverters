@@ -1,28 +1,27 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FileText } from 'lucide-react'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { getSustainabilityReportsContent } from '@/utilities/getSiteContent'
 
-export const metadata = {
-  title: 'Reports & Policies',
-  description: 'Oriana sustainability reports, environmental policies, and compliance documents.',
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getSustainabilityReportsContent()
+  return {
+    title: content.seo?.metaTitle,
+    description: content.seo?.metaDescription,
+  }
 }
 
-const reports = [
-  { title: '2025 ESG & Sustainability Report', year: '2025', size: '4.8 MB' },
-  { title: 'Environmental Policy', year: '2024', size: '620 KB' },
-  { title: 'Supplier Code of Conduct', year: '2024', size: '480 KB' },
-  { title: 'Conflict Minerals Statement', year: '2025', size: '310 KB' },
-  { title: 'ISO 14001 Certificate', year: '2024', size: '520 KB' },
-]
+export default async function SustainabilityReportsPage() {
+  const content = await getSustainabilityReportsContent()
 
-export default function SustainabilityReportsPage() {
   return (
     <main>
       <PageHero
-        eyebrow="Sustainability"
-        title="Reports & Policies"
-        description="Download our latest environmental, social, and governance disclosures."
+        eyebrow={content.hero.eyebrow}
+        title={content.hero.title}
+        description={content.hero.description}
       />
       <Breadcrumbs
         items={[{ label: 'Sustainability', href: '/sustainability' }, { label: 'Reports' }]}
@@ -31,10 +30,10 @@ export default function SustainabilityReportsPage() {
       <section className="py-12 lg:py-16">
         <div className="container max-w-2xl">
           <ul className="divide-y divide-oriana-navy/8 border border-oriana-navy/8 bg-white">
-            {reports.map((doc) => (
+            {content.reports.map((doc) => (
               <li key={doc.title}>
                 <Link
-                  href="/resources/downloads"
+                  href={doc.href}
                   className="flex items-center justify-between gap-4 px-6 py-5 transition hover:bg-oriana-silver/40"
                 >
                   <div className="flex items-start gap-3">

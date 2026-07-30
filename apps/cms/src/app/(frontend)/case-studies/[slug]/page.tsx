@@ -4,24 +4,25 @@ import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { FadeIn } from '@/components/oriana/FadeIn'
 import { PageHero } from '@/components/oriana/PageHero'
-import { caseStudies, getAllCaseStudySlugs, getCaseStudyBySlug } from '@/data/caseStudies'
+import { getCaseStudiesContent, getCaseStudyBySlugContent } from '@/utilities/getSiteContent'
 
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateStaticParams() {
-  return getAllCaseStudySlugs().map((slug) => ({ slug }))
+  const all = await getCaseStudiesContent()
+  return all.map((c) => ({ slug: c.slug }))
 }
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params
-  const study = getCaseStudyBySlug(slug)
+  const study = await getCaseStudyBySlugContent(slug)
   if (!study) return {}
   return { title: study.title, description: study.summary }
 }
 
 export default async function CaseStudyDetailPage({ params }: Props) {
   const { slug } = await params
-  const study = getCaseStudyBySlug(slug)
+  const study = await getCaseStudyBySlugContent(slug)
   if (!study) notFound()
 
   return (

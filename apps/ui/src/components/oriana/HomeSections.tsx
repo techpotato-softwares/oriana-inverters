@@ -10,8 +10,10 @@ import {
   Leaf,
   Microscope,
   ShieldCheck,
+  type LucideIcon,
 } from 'lucide-react'
-import { caseStudies } from '@/data/caseStudies'
+import type { CaseStudy } from '@/data/caseStudies'
+import { staticHome } from '@/data/siteContent'
 import { AnimatedCounter } from './AnimatedCounter'
 import { EnergyMesh } from './EnergyMesh'
 import { FadeIn, Stagger, StaggerItem } from './FadeIn'
@@ -23,8 +25,31 @@ import {
   OriUtility,
 } from './Mascots'
 
+type HomeContent = typeof staticHome
+
+const strategyMascots: Record<string, typeof OriHome> = {
+  home: OriHome,
+  business: OriBusiness,
+  utility: OriUtility,
+  storage: OriStorage,
+}
+
+const impactIcons: Record<string, LucideIcon> = {
+  globe: Globe2,
+  award: Award,
+  leaf: Leaf,
+  microscope: Microscope,
+}
+
+const whyOrianaIcons: Record<string, LucideIcon> = {
+  microscope: Microscope,
+  shield: ShieldCheck,
+  globe: Globe2,
+  headphones: Headphones,
+}
+
 /** Full-bleed atmospheric hero — brand first, international energy brand */
-export function HomeHero() {
+export function HomeHero({ hero = staticHome.hero }: { hero?: HomeContent['hero'] }) {
   const reduce = useReducedMotion()
 
   return (
@@ -41,37 +66,36 @@ export function HomeHero() {
         <div>
           <FadeIn>
             <p className="font-display text-sm font-semibold uppercase tracking-[0.28em] text-oriana-sky">
-              Oriana
+              {hero.eyebrow}
             </p>
           </FadeIn>
 
           <FadeIn delay={0.08}>
             <h1 className="mt-5 max-w-xl font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.6rem]">
-              Clean power that crosses borders
+              {hero.title}
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.16}>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-white/70 md:text-lg">
-              High-efficiency inverters and storage platforms for homes, industry, and utility grids —
-              engineered for partners who ship projects worldwide.
+              {hero.description}
             </p>
           </FadeIn>
 
           <FadeIn delay={0.24}>
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <Link
-                href="/solutions/residential"
+                href={hero.primaryCta.href}
                 className="group inline-flex items-center gap-2 rounded-md bg-oriana-sky px-7 py-3.5 text-sm font-semibold text-oriana-navy transition hover:bg-white"
               >
-                Explore solutions
+                {hero.primaryCta.label}
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </Link>
               <Link
-                href="/contact"
+                href={hero.secondaryCta.href}
                 className="inline-flex items-center gap-2 rounded-md border border-white/25 px-7 py-3.5 text-sm font-semibold text-white transition hover:border-oriana-sky hover:text-oriana-sky"
               >
-                Become a partner
+                {hero.secondaryCta.label}
               </Link>
             </div>
           </FadeIn>
@@ -101,47 +125,12 @@ export function HomeHero() {
   )
 }
 
-const strategies = [
-  {
-    id: 'home',
-    label: 'For Home',
-    title: 'Residential energy independence',
-    description:
-      'Hybrid inverters and storage that keep households powered — quietly, efficiently, every day.',
-    href: '/solutions/residential',
-    Mascot: OriHome,
-  },
-  {
-    id: 'business',
-    label: 'For Business',
-    title: 'Commercial & industrial scale',
-    description:
-      'Rooftop and carport platforms built for uptime, bankability, and fast commissioning.',
-    href: '/solutions/commercial',
-    Mascot: OriBusiness,
-  },
-  {
-    id: 'utility',
-    label: 'For Utility',
-    title: 'Utility-scale grid strength',
-    description:
-      'Central and string architectures for multi-megawatt farms and IPP portfolios.',
-    href: '/solutions/utility',
-    Mascot: OriUtility,
-  },
-  {
-    id: 'storage',
-    label: 'For Storage',
-    title: 'Flexible energy services',
-    description:
-      'Hybrid conversion for peak shaving, backup, and emerging grid-service markets.',
-    href: '/solutions/storage',
-    Mascot: OriStorage,
-  },
-]
-
 /** Strategy section — mascots for each go-to-market path */
-export function StrategiesSection() {
+export function StrategiesSection({
+  strategies = staticHome.strategies,
+}: {
+  strategies?: HomeContent['strategies']
+}) {
   return (
     <section className="relative bg-white py-20 lg:py-28">
       <div
@@ -156,75 +145,54 @@ export function StrategiesSection() {
         <FadeIn>
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              Go-to-market strategies
+              {strategies.eyebrow}
             </p>
             <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl lg:text-[2.75rem]">
-              One platform. Four ways to win.
+              {strategies.title}
             </h2>
             <p className="mt-5 text-base leading-relaxed text-oriana-muted md:text-lg">
-              Meet Ori&apos;s crew — each strategy tailored for the partners and projects shaping the
-              global energy transition.
+              {strategies.description}
             </p>
           </div>
         </FadeIn>
 
         <Stagger className="mt-14 grid gap-8 sm:grid-cols-2 xl:grid-cols-4" delay={0.1}>
-          {strategies.map((item) => (
-            <StaggerItem key={item.id}>
-              <Link
-                href={item.href}
-                className="group flex h-full flex-col text-left transition"
-              >
-                <div className="relative mb-6 aspect-square overflow-hidden rounded-2xl bg-oriana-surface">
-                  <item.Mascot className="p-6 transition duration-500 group-hover:scale-105" />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-oriana-navy/5 to-transparent opacity-0 transition group-hover:opacity-100" />
-                </div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-oriana-blue">
-                  {item.label}
-                </p>
-                <h3 className="mt-2 font-display text-xl font-semibold text-oriana-navy transition group-hover:text-oriana-blue">
-                  {item.title}
-                </h3>
-                <p className="mt-3 flex-1 text-sm leading-relaxed text-oriana-muted">
-                  {item.description}
-                </p>
-                <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-oriana-blue">
-                  View solution
-                  <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
-                </span>
-              </Link>
-            </StaggerItem>
-          ))}
+          {strategies.items.map((item) => {
+            const Mascot = strategyMascots[item.id] ?? OriHome
+            return (
+              <StaggerItem key={item.id}>
+                <Link
+                  href={item.href}
+                  className="group flex h-full flex-col text-left transition"
+                >
+                  <div className="relative mb-6 aspect-square overflow-hidden rounded-2xl bg-oriana-surface">
+                    <Mascot className="p-6 transition duration-500 group-hover:scale-105" />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-oriana-navy/5 to-transparent opacity-0 transition group-hover:opacity-100" />
+                  </div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-oriana-blue">
+                    {item.label}
+                  </p>
+                  <h3 className="mt-2 font-display text-xl font-semibold text-oriana-navy transition group-hover:text-oriana-blue">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-oriana-muted">
+                    {item.description}
+                  </p>
+                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-oriana-blue">
+                    View solution
+                    <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              </StaggerItem>
+            )
+          })}
         </Stagger>
       </div>
     </section>
   )
 }
 
-const impactStats = [
-  {
-    icon: Globe2,
-    value: '25+',
-    label: 'Countries served',
-  },
-  {
-    icon: Award,
-    value: '1M+',
-    label: 'Converters installed',
-  },
-  {
-    icon: Leaf,
-    value: '99.6%',
-    label: 'Peak efficiency',
-  },
-  {
-    icon: Microscope,
-    value: '3',
-    label: 'Global R&D centers',
-  },
-]
-
-export function ImpactStats() {
+export function ImpactStats({ impact = staticHome.impact }: { impact?: HomeContent['impact'] }) {
   return (
     <section className="relative overflow-hidden border-y border-oriana-navy/6 bg-oriana-surface py-16 lg:py-20">
       <div className="container">
@@ -232,108 +200,90 @@ export function ImpactStats() {
           <div className="mb-12 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <div className="max-w-xl">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-                Global footprint
+                {impact.eyebrow}
               </p>
               <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
-                Built for international partners
+                {impact.title}
               </h2>
             </div>
             <Link
-              href="/about"
+              href={impact.ctaHref}
               className="inline-flex items-center gap-2 text-sm font-semibold text-oriana-blue transition hover:gap-3"
             >
-              Discover who we are
+              {impact.ctaLabel}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </FadeIn>
 
         <Stagger className="grid grid-cols-2 gap-8 lg:grid-cols-4 lg:gap-6">
-          {impactStats.map((stat) => (
-            <StaggerItem key={stat.label}>
-              <div className="relative">
-                <stat.icon className="h-7 w-7 stroke-[1.4] text-oriana-blue" aria-hidden />
-                <AnimatedCounter
-                  value={stat.value}
-                  className="mt-5 block font-display text-4xl font-semibold tracking-tight text-oriana-navy md:text-5xl"
-                />
-                <p className="mt-2 text-sm text-oriana-muted">{stat.label}</p>
-              </div>
-            </StaggerItem>
-          ))}
+          {impact.stats.map((stat) => {
+            const Icon = impactIcons[stat.icon] ?? Globe2
+            return (
+              <StaggerItem key={stat.label}>
+                <div className="relative">
+                  <Icon className="h-7 w-7 stroke-[1.4] text-oriana-blue" aria-hidden />
+                  <AnimatedCounter
+                    value={stat.value}
+                    className="mt-5 block font-display text-4xl font-semibold tracking-tight text-oriana-navy md:text-5xl"
+                  />
+                  <p className="mt-2 text-sm text-oriana-muted">{stat.label}</p>
+                </div>
+              </StaggerItem>
+            )
+          })}
         </Stagger>
       </div>
     </section>
   )
 }
 
-const commitments = [
-  {
-    icon: Microscope,
-    title: 'Technological innovation',
-    copy: 'Continuous R&D across conversion efficiency, grid codes, and intelligent monitoring.',
-    href: '/about',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Bankable manufacturing',
-    copy: 'Certified production, rigorous QA, and supply chains ready for multi-region delivery.',
-    href: '/about/certifications',
-  },
-  {
-    icon: Globe2,
-    title: 'Local presence, global reach',
-    copy: 'Distributor networks and support coverage that follow your projects across borders.',
-    href: '/where-to-buy',
-  },
-  {
-    icon: Headphones,
-    title: 'Partner-grade service',
-    copy: 'Training, documentation, and responsive after-sales for installers and EPCs.',
-    href: '/support',
-  },
-]
-
-export function WhyOrianaSection() {
+export function WhyOrianaSection({
+  whyOriana = staticHome.whyOriana,
+}: {
+  whyOriana?: HomeContent['whyOriana']
+}) {
   return (
     <section className="bg-white py-20 lg:py-28">
       <div className="container">
         <div className="grid items-end gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <FadeIn>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              Why Oriana
+              {whyOriana.eyebrow}
             </p>
             <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl lg:text-[2.75rem]">
-              Excellence that travels with every shipment
+              {whyOriana.title}
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-oriana-muted">
-              From first sample to fleet deployment, we help international clients specify, certify,
-              and scale clean power conversion with confidence.
+              {whyOriana.description}
             </p>
           </FadeIn>
 
           <Stagger className="grid gap-6 sm:grid-cols-2" delay={0.08}>
-            {commitments.map((item) => (
-              <StaggerItem key={item.title}>
-                <Link
-                  href={item.href}
-                  className="group block border-t border-oriana-navy/10 pt-6 transition hover:border-oriana-blue"
-                >
-                  <item.icon
-                    className="h-8 w-8 stroke-[1.25] text-oriana-blue transition group-hover:text-oriana-sky"
-                    aria-hidden
-                  />
-                  <h3 className="mt-4 font-display text-lg font-semibold text-oriana-navy group-hover:text-oriana-blue">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-oriana-muted">{item.copy}</p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-oriana-blue">
-                    Learn more
-                    <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
-                  </span>
-                </Link>
-              </StaggerItem>
-            ))}
+            {whyOriana.items.map((item) => {
+              const Icon = whyOrianaIcons[item.icon] ?? Microscope
+              return (
+                <StaggerItem key={item.title}>
+                  <Link
+                    href={item.href}
+                    className="group block border-t border-oriana-navy/10 pt-6 transition hover:border-oriana-blue"
+                  >
+                    <Icon
+                      className="h-8 w-8 stroke-[1.25] text-oriana-blue transition group-hover:text-oriana-sky"
+                      aria-hidden
+                    />
+                    <h3 className="mt-4 font-display text-lg font-semibold text-oriana-navy group-hover:text-oriana-blue">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-oriana-muted">{item.copy}</p>
+                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-oriana-blue">
+                      Learn more
+                      <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                    </span>
+                  </Link>
+                </StaggerItem>
+              )
+            })}
           </Stagger>
         </div>
       </div>
@@ -341,16 +291,11 @@ export function WhyOrianaSection() {
   )
 }
 
-const regions = [
-  { name: 'North America', focus: 'UL / NEC ready platforms' },
-  { name: 'Europe & UK', focus: 'Grid-code compliant portfolios' },
-  { name: 'Middle East', focus: 'High-irradiance utility lines' },
-  { name: 'Asia Pacific', focus: 'C&I + storage growth markets' },
-  { name: 'Latin America', focus: 'Distributed generation & EPCs' },
-  { name: 'Africa', focus: 'Resilient off-grid & hybrid' },
-]
-
-export function GlobalReachSection() {
+export function GlobalReachSection({
+  globalReach = staticHome.globalReach,
+}: {
+  globalReach?: HomeContent['globalReach']
+}) {
   return (
     <section className="relative overflow-hidden bg-oriana-navy py-20 lg:py-24">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(77,163,255,0.18),transparent)]" />
@@ -360,20 +305,19 @@ export function GlobalReachSection() {
         <FadeIn>
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">
-              International clients
+              {globalReach.eyebrow}
             </p>
             <h2 className="mt-4 font-display text-3xl font-semibold text-white md:text-4xl">
-              Ready wherever your next project lands
+              {globalReach.title}
             </h2>
             <p className="mt-5 text-base leading-relaxed text-white/65">
-              Regional documentation, certification pathways, and partner enablement — so cross-border
-              deals move from RFQ to commissioning without friction.
+              {globalReach.description}
             </p>
           </div>
         </FadeIn>
 
         <Stagger className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" delay={0.1}>
-          {regions.map((region) => (
+          {globalReach.regions.map((region) => (
             <StaggerItem key={region.name}>
               <div className="border border-white/10 bg-white/5 px-6 py-5 backdrop-blur-sm transition hover:border-oriana-sky/40 hover:bg-white/8">
                 <p className="font-display text-lg font-semibold text-white">{region.name}</p>
@@ -386,10 +330,10 @@ export function GlobalReachSection() {
         <FadeIn delay={0.2}>
           <div className="mt-12 flex justify-center">
             <Link
-              href="/where-to-buy"
+              href={globalReach.ctaHref}
               className="inline-flex items-center gap-2 rounded-md bg-oriana-sky px-7 py-3.5 text-sm font-semibold text-oriana-navy transition hover:bg-white"
             >
-              Find a distributor
+              {globalReach.ctaLabel}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -399,52 +343,31 @@ export function GlobalReachSection() {
   )
 }
 
-const newsItems = [
-  {
-    title: 'Oriana launches next-gen hybrid series for US residential market',
-    date: 'Mar 15, 2026',
-    href: '/posts',
-    type: 'News',
-  },
-  {
-    title: 'ORI-GU250K ranks among top utility-scale inverters globally',
-    date: 'Feb 28, 2026',
-    href: '/posts',
-    type: 'News',
-  },
-  {
-    title: '2025 ESG & Sustainability Report now available',
-    date: 'Jan 10, 2026',
-    href: '/resources/downloads',
-    type: 'Report',
-  },
-]
-
-export function NewsEventsSection() {
+export function NewsEventsSection({ news = staticHome.news }: { news?: HomeContent['news'] }) {
   return (
     <section className="bg-oriana-surface py-20 lg:py-24">
       <div className="container">
         <div className="flex items-end justify-between gap-6">
           <FadeIn>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              News & media
+              {news.eyebrow}
             </p>
             <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
-              Latest from Oriana
+              {news.title}
             </h2>
           </FadeIn>
           <FadeIn delay={0.08}>
             <Link
-              href="/posts"
+              href={news.viewAllHref}
               className="hidden text-sm font-semibold text-oriana-blue transition hover:underline sm:inline"
             >
-              Newsroom →
+              {news.viewAllLabel}
             </Link>
           </FadeIn>
         </div>
 
         <Stagger className="mt-10 grid gap-6 md:grid-cols-3" delay={0.05}>
-          {newsItems.map((item) => (
+          {news.items.map((item) => (
             <StaggerItem key={item.title}>
               <Link
                 href={item.href}
@@ -466,25 +389,31 @@ export function NewsEventsSection() {
   )
 }
 
-export function CaseStudiesSection() {
+export function CaseStudiesSection({
+  caseStudiesIntro = staticHome.caseStudiesIntro,
+  caseStudies,
+}: {
+  caseStudiesIntro?: HomeContent['caseStudiesIntro']
+  caseStudies: CaseStudy[]
+}) {
   return (
     <section className="bg-white py-20 lg:py-24">
       <div className="container">
         <div className="flex items-end justify-between gap-6">
           <FadeIn>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              Case studies
+              {caseStudiesIntro.eyebrow}
             </p>
             <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
-              Projects that prove the promise
+              {caseStudiesIntro.title}
             </h2>
           </FadeIn>
           <FadeIn delay={0.08}>
             <Link
-              href="/case-studies"
+              href={caseStudiesIntro.viewAllHref}
               className="hidden text-sm font-semibold text-oriana-blue transition hover:underline sm:inline"
             >
-              All case studies →
+              {caseStudiesIntro.viewAllLabel}
             </Link>
           </FadeIn>
         </div>
@@ -517,61 +446,62 @@ export function CaseStudiesSection() {
   )
 }
 
-export function SupportDownloadStrip() {
+export function SupportDownloadStrip({
+  supportStrip = staticHome.supportStrip,
+}: {
+  supportStrip?: HomeContent['supportStrip']
+}) {
   return (
     <section className="relative overflow-hidden border-t border-oriana-navy/8 bg-gradient-to-br from-oriana-silver via-white to-oriana-sky/10 py-16 lg:py-20">
       <div className="container">
         <Stagger className="grid gap-12 md:grid-cols-3" delay={0.05}>
           <StaggerItem>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              Service & support
+              {supportStrip.service.eyebrow}
             </p>
             <p className="mt-4 font-display text-2xl font-semibold text-oriana-navy">
-              Bankable. Reliable. Local.
+              {supportStrip.service.title}
             </p>
-            <p className="mt-3 text-sm text-oriana-muted">Customer hotline: +1 (800) ORIANA-1</p>
+            <p className="mt-3 text-sm text-oriana-muted">{supportStrip.service.hotline}</p>
             <Link
-              href="/support"
+              href={supportStrip.service.linkHref}
               className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-oriana-blue hover:underline"
             >
-              Online service
+              {supportStrip.service.linkLabel}
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </StaggerItem>
 
           <StaggerItem>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              Download center
+              {supportStrip.downloads.eyebrow}
             </p>
             <ul className="mt-5 space-y-3 text-sm">
-              {['Datasheets', 'Installation manuals', 'Certificates', 'Warranty documents'].map(
-                (doc) => (
-                  <li key={doc}>
-                    <Link
-                      href="/resources/downloads"
-                      className="text-oriana-muted transition hover:text-oriana-blue"
-                    >
-                      {doc} →
-                    </Link>
-                  </li>
-                ),
-              )}
+              {supportStrip.downloads.links.map((doc) => (
+                <li key={doc.label}>
+                  <Link
+                    href={doc.href}
+                    className="text-oriana-muted transition hover:text-oriana-blue"
+                  >
+                    {doc.label} →
+                  </Link>
+                </li>
+              ))}
             </ul>
           </StaggerItem>
 
           <StaggerItem>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              Partner with us
+              {supportStrip.partner.eyebrow}
             </p>
             <p className="mt-4 text-sm leading-relaxed text-oriana-muted">
-              Looking to distribute Oriana across a new market? Let&apos;s talk territory, training,
-              and co-marketing.
+              {supportStrip.partner.description}
             </p>
             <Link
-              href="/contact"
+              href={supportStrip.partner.ctaHref}
               className="mt-6 inline-flex rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-oriana-navy"
             >
-              Request partnership
+              {supportStrip.partner.ctaLabel}
             </Link>
           </StaggerItem>
         </Stagger>

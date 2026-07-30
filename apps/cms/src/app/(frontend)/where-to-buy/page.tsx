@@ -1,23 +1,28 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { DistributorLocator } from '@/components/oriana/DistributorLocator'
 import { PageHero } from '@/components/oriana/PageHero'
 import { getDistributors } from '@/utilities/getDistributors'
+import { getWhereToBuyContent } from '@/utilities/getSiteContent'
 
-export const metadata = {
-  title: 'Where to Buy',
-  description: 'Find authorized Oriana inverter distributors and installers in your region.',
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getWhereToBuyContent()
+  return {
+    title: content.seo?.metaTitle,
+    description: content.seo?.metaDescription,
+  }
 }
 
 export default async function WhereToBuyPage() {
-  const distributors = await getDistributors()
+  const [content, distributors] = await Promise.all([getWhereToBuyContent(), getDistributors()])
 
   return (
     <main>
       <PageHero
-        eyebrow="Sales"
-        title="Where to Buy"
-        description="Purchase Oriana inverters through our authorized distributor network or certified installer partners."
+        eyebrow={content.hero.eyebrow}
+        title={content.hero.title}
+        description={content.hero.description}
       />
       <Breadcrumbs items={[{ label: 'Where to Buy' }]} />
 
@@ -26,16 +31,15 @@ export default async function WhereToBuyPage() {
           <DistributorLocator distributors={distributors} />
 
           <div className="mt-16 rounded border border-oriana-blue/20 bg-oriana-silver/50 p-8 text-center">
-            <h2 className="font-display text-xl font-bold text-oriana-navy">Become a Distributor</h2>
+            <h2 className="font-display text-xl font-bold text-oriana-navy">{content.becomeDistributor.title}</h2>
             <p className="mx-auto mt-3 max-w-lg text-sm text-oriana-muted">
-              Join the Oriana partner network with co-marketing support, technical training, and competitive
-              commercial terms.
+              {content.becomeDistributor.description}
             </p>
             <Link
-              href="/contact"
+              href={content.becomeDistributor.cta.href}
               className="mt-6 inline-block rounded bg-oriana-blue px-6 py-3 text-sm font-bold text-white hover:bg-oriana-navy"
             >
-              Partner Inquiry
+              {content.becomeDistributor.cta.label}
             </Link>
           </div>
         </div>

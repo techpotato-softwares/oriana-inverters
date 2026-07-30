@@ -10,11 +10,11 @@ on:
         options: [dev, qa, prod]
         default: qa
       seed_type:
-        description: What to seed
+        description: What to seed (site = pages/globals + catalogue; full = site + admin)
         required: true
         type: choice
-        options: [catalogue, admin, full]
-        default: catalogue
+        options: [site, catalogue, admin, full]
+        default: site
       admin_email:
         description: Admin email (required for admin/full)
         required: false
@@ -88,8 +88,15 @@ jobs:
           NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run schema:push
 
-      - name: Seed catalogue
-        if: ${{ github.event.inputs.seed_type == 'catalogue' || github.event.inputs.seed_type == 'full' }}
+      - name: Seed site content (pages, globals, chrome + catalogue)
+        if: ${{ github.event.inputs.seed_type == 'site' || github.event.inputs.seed_type == 'full' }}
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+        run: npm run seed:site
+
+      - name: Seed catalogue only
+        if: ${{ github.event.inputs.seed_type == 'catalogue' }}
         working-directory: apps/cms
         env:
           NODE_OPTIONS: "--dns-result-order=ipv4first"

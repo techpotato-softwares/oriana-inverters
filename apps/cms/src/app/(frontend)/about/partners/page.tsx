@@ -1,49 +1,52 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
+
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { getPageIntros, getPartnersContent } from '@/utilities/getSiteContent'
 
-export const metadata = {
-  title: 'Partners',
-  description: 'Oriana strategic partners — distributors, EPCs, and technology alliances.',
+export async function generateMetadata(): Promise<Metadata> {
+  const intros = await getPageIntros()
+  return {
+    title: intros.partners.title,
+    description: intros.partners.description,
+  }
 }
 
-const partnerTypes = [
-  {
-    category: 'Distribution Partners',
-    partners: ['SolarEdge Distribution NA', 'GreenPower Wholesale', 'EuroSolar Components', 'APAC Energy Solutions'],
-  },
-  {
-    category: 'Technology Alliances',
-    partners: ['Leading Battery OEMs', 'Monitoring Platform Integrators', 'EV Charger Manufacturers', 'Smart Home Ecosystems'],
-  },
-  {
-    category: 'EPC & Developer Partners',
-    partners: ['Tier-1 Solar Developers', 'Commercial Rooftop Specialists', 'Utility-Scale EPC Firms', 'Microgrid Integrators'],
-  },
-]
+export default async function PartnersPage() {
+  const [intros, partners] = await Promise.all([getPageIntros(), getPartnersContent()])
+  const intro = intros.partners
 
-export default function PartnersPage() {
+  const groups: { category: string; partners: typeof partners }[] = []
+  for (const partner of partners) {
+    let group = groups.find((g) => g.category === partner.category)
+    if (!group) {
+      group = { category: partner.category, partners: [] }
+      groups.push(group)
+    }
+    group.partners.push(partner)
+  }
+  for (const group of groups) {
+    group.partners.sort((a, b) => a.sortOrder - b.sortOrder)
+  }
+
   return (
     <main>
-      <PageHero
-        eyebrow="About"
-        title="Partners"
-        description="We work with a global network of distributors, installers, and technology partners to deliver bankable solar solutions."
-      />
+      <PageHero eyebrow={intro.eyebrow} title={intro.title} description={intro.description} />
       <Breadcrumbs items={[{ label: 'About', href: '/about' }, { label: 'Partners' }]} />
 
       <section className="py-12 lg:py-16">
         <div className="container">
-          {partnerTypes.map((group) => (
+          {groups.map((group) => (
             <div key={group.category} className="mb-12">
               <h2 className="font-display text-xl font-bold text-oriana-navy">{group.category}</h2>
               <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {group.partners.map((partner) => (
                   <div
-                    key={partner}
+                    key={partner.name}
                     className="flex items-center justify-center rounded border border-oriana-navy/8 bg-oriana-silver/30 px-6 py-8 text-center text-sm font-medium text-oriana-navy"
                   >
-                    {partner}
+                    {partner.name}
                   </div>
                 ))}
               </div>
@@ -51,23 +54,20 @@ export default function PartnersPage() {
           ))}
 
           <div className="rounded border border-oriana-blue/20 bg-oriana-navy p-8 text-white lg:p-12">
-            <h2 className="font-display text-2xl font-bold">Partner with Oriana</h2>
-            <p className="mt-3 max-w-xl text-white/70">
-              Access technical training, co-marketing resources, and dedicated commercial support as an authorized
-              Oriana partner.
-            </p>
+            <h2 className="font-display text-2xl font-bold">{intro.cta.title}</h2>
+            <p className="mt-3 max-w-xl text-white/70">{intro.cta.description}</p>
             <div className="mt-6 flex flex-wrap gap-4">
               <Link
-                href="/contact"
+                href={intro.cta.primaryCta.href}
                 className="rounded bg-white px-6 py-3 text-sm font-bold text-oriana-navy hover:bg-oriana-silver"
               >
-                Become a Partner
+                {intro.cta.primaryCta.label}
               </Link>
               <Link
-                href="/where-to-buy"
+                href={intro.cta.secondaryCta.href}
                 className="rounded border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10"
               >
-                Find a Distributor
+                {intro.cta.secondaryCta.label}
               </Link>
             </div>
           </div>

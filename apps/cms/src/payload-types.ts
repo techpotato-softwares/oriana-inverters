@@ -73,6 +73,15 @@ export interface Config {
     downloads: Download;
     media: Media;
     categories: Category;
+    'case-studies': CaseStudy;
+    faqs: Faq;
+    videos: Video;
+    distributors: Distributor;
+    jobs: Job;
+    partners: Partner;
+    certifications: Certification;
+    solutions: Solution;
+    'content-pages': ContentPage;
     users: User;
     redirects: Redirect;
     forms: Form;
@@ -92,6 +101,15 @@ export interface Config {
     downloads: DownloadsSelect<false> | DownloadsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
+    videos: VideosSelect<false> | VideosSelect<true>;
+    distributors: DistributorsSelect<false> | DistributorsSelect<true>;
+    jobs: JobsSelect<false> | JobsSelect<true>;
+    partners: PartnersSelect<false> | PartnersSelect<true>;
+    certifications: CertificationsSelect<false> | CertificationsSelect<true>;
+    solutions: SolutionsSelect<false> | SolutionsSelect<true>;
+    'content-pages': ContentPagesSelect<false> | ContentPagesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -110,10 +128,32 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    'site-settings': SiteSetting;
+    home: Home;
+    about: About;
+    contact: Contact;
+    careers: Career;
+    support: Support;
+    warranty: Warranty;
+    sustainability: Sustainability;
+    'sustainability-reports': SustainabilityReport;
+    'where-to-buy': WhereToBuy;
+    'page-intros': PageIntro;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    home: HomeSelect<false> | HomeSelect<true>;
+    about: AboutSelect<false> | AboutSelect<true>;
+    contact: ContactSelect<false> | ContactSelect<true>;
+    careers: CareersSelect<false> | CareersSelect<true>;
+    support: SupportSelect<false> | SupportSelect<true>;
+    warranty: WarrantySelect<false> | WarrantySelect<true>;
+    sustainability: SustainabilitySelect<false> | SustainabilitySelect<true>;
+    'sustainability-reports': SustainabilityReportsSelect<false> | SustainabilityReportsSelect<true>;
+    'where-to-buy': WhereToBuySelect<false> | WhereToBuySelect<true>;
+    'page-intros': PageIntrosSelect<false> | PageIntrosSelect<true>;
   };
   locale: null;
   widgets: {
@@ -871,6 +911,240 @@ export interface Download {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "case-studies".
+ */
+export interface CaseStudy {
+  id: number;
+  title: string;
+  slug: string;
+  segment: string;
+  capacity?: string | null;
+  /**
+   * Display label for products used
+   */
+  products?: string | null;
+  productSlugs?:
+    | {
+        slug: string;
+        id?: string | null;
+      }[]
+    | null;
+  location?: string | null;
+  year?: string | null;
+  image?: (number | null) | Media;
+  /**
+   * Fallback public path if no upload
+   */
+  imageUrl?: string | null;
+  summary: string;
+  challenge?: string | null;
+  solution?: string | null;
+  results?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  stats?:
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  title: string;
+  /**
+   * Lower numbers appear first
+   */
+  sortOrder?: number | null;
+  items: {
+    question: string;
+    answer: string;
+    id?: string | null;
+  }[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  title: string;
+  category: string;
+  /**
+   * e.g. 8:42
+   */
+  duration?: string | null;
+  /**
+   * External video URL (YouTube, Vimeo, etc.)
+   */
+  videoUrl?: string | null;
+  thumbnail?: (number | null) | Media;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "distributors".
+ */
+export interface Distributor {
+  id: number;
+  /**
+   * Stable id for seeding
+   */
+  externalId?: string | null;
+  name: string;
+  type: 'Distributor' | 'Certified Installer' | 'Service Center';
+  city: string;
+  state?: string | null;
+  country: string;
+  region: string;
+  email?: string | null;
+  phone?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs".
+ */
+export interface Job {
+  id: number;
+  title: string;
+  location: string;
+  department: string;
+  type: string;
+  applyUrl?: string | null;
+  sortOrder?: number | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners".
+ */
+export interface Partner {
+  id: number;
+  name: string;
+  category: 'Distribution Partners' | 'Technology Alliances' | 'EPC & Developer Partners';
+  logo?: (number | null) | Media;
+  website?: string | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certifications".
+ */
+export interface Certification {
+  id: number;
+  kind: 'certification' | 'award';
+  name: string;
+  scope?: string | null;
+  region?: string | null;
+  year?: string | null;
+  organization?: string | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "solutions".
+ */
+export interface Solution {
+  id: number;
+  title: string;
+  slug: 'residential' | 'commercial' | 'utility' | 'storage';
+  description: string;
+  benefits?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  products?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  image?: (number | null) | Media;
+  /**
+   * Fallback public path if no upload
+   */
+  imageUrl?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "content-pages".
+ */
+export interface ContentPage {
+  id: number;
+  title: string;
+  /**
+   * privacy | terms | disclaimer | security | strategy
+   */
+  slug: string;
+  eyebrow?: string | null;
+  description?: string | null;
+  breadcrumb?:
+    | {
+        label: string;
+        href?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  sections: {
+    heading?: string | null;
+    paragraphs: {
+      text: string;
+      id?: string | null;
+    }[];
+    id?: string | null;
+  }[];
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1082,6 +1356,42 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categories';
         value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'case-studies';
+        value: number | CaseStudy;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
+      } | null)
+    | ({
+        relationTo: 'videos';
+        value: number | Video;
+      } | null)
+    | ({
+        relationTo: 'distributors';
+        value: number | Distributor;
+      } | null)
+    | ({
+        relationTo: 'jobs';
+        value: number | Job;
+      } | null)
+    | ({
+        relationTo: 'partners';
+        value: number | Partner;
+      } | null)
+    | ({
+        relationTo: 'certifications';
+        value: number | Certification;
+      } | null)
+    | ({
+        relationTo: 'solutions';
+        value: number | Solution;
+      } | null)
+    | ({
+        relationTo: 'content-pages';
+        value: number | ContentPage;
       } | null)
     | ({
         relationTo: 'users';
@@ -1499,6 +1809,219 @@ export interface CategoriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "case-studies_select".
+ */
+export interface CaseStudiesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  segment?: T;
+  capacity?: T;
+  products?: T;
+  productSlugs?:
+    | T
+    | {
+        slug?: T;
+        id?: T;
+      };
+  location?: T;
+  year?: T;
+  image?: T;
+  imageUrl?: T;
+  summary?: T;
+  challenge?: T;
+  solution?: T;
+  results?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  stats?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  title?: T;
+  sortOrder?: T;
+  items?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos_select".
+ */
+export interface VideosSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  duration?: T;
+  videoUrl?: T;
+  thumbnail?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "distributors_select".
+ */
+export interface DistributorsSelect<T extends boolean = true> {
+  externalId?: T;
+  name?: T;
+  type?: T;
+  city?: T;
+  state?: T;
+  country?: T;
+  region?: T;
+  email?: T;
+  phone?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs_select".
+ */
+export interface JobsSelect<T extends boolean = true> {
+  title?: T;
+  location?: T;
+  department?: T;
+  type?: T;
+  applyUrl?: T;
+  sortOrder?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners_select".
+ */
+export interface PartnersSelect<T extends boolean = true> {
+  name?: T;
+  category?: T;
+  logo?: T;
+  website?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certifications_select".
+ */
+export interface CertificationsSelect<T extends boolean = true> {
+  kind?: T;
+  name?: T;
+  scope?: T;
+  region?: T;
+  year?: T;
+  organization?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "solutions_select".
+ */
+export interface SolutionsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  benefits?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  products?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  image?: T;
+  imageUrl?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "content-pages_select".
+ */
+export interface ContentPagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  eyebrow?: T;
+  description?: T;
+  breadcrumb?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  sections?:
+    | T
+    | {
+        heading?: T;
+        paragraphs?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
@@ -1789,23 +2312,39 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Header {
   id: number;
-  navItems?:
+  hotlineLabel?: string | null;
+  hotline?: string | null;
+  languageLabel?: string | null;
+  searchPlaceholder?: string | null;
+  loginLabel?: string | null;
+  loginHref?: string | null;
+  whereToBuyLabel?: string | null;
+  whereToBuyHref?: string | null;
+  quoteLabel?: string | null;
+  quoteHref?: string | null;
+  logo?: (number | null) | Media;
+  logoAlt?: string | null;
+  navMenus?:
     | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
+        /**
+         * about | home | business | utility | products | support
+         */
+        key: string;
+        label: string;
+        columns?:
+          | {
+              title: string;
+              href?: string | null;
+              links?:
+                | {
+                    label: string;
+                    href: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -1818,26 +2357,539 @@ export interface Header {
  */
 export interface Footer {
   id: number;
-  navItems?:
+  columns?:
     | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
+        title: string;
+        links?:
+          | {
+              label: string;
+              href: string;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
+  socialLinks?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  legalLinks?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  copyright?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  brandName?: string | null;
+  supportEmail?: string | null;
+  infoEmail?: string | null;
+  securityEmail?: string | null;
+  privacyEmail?: string | null;
+  hotline?: string | null;
+  defaultMetaTitle?: string | null;
+  defaultMetaDescription?: string | null;
+  ogImage?: (number | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home".
+ */
+export interface Home {
+  id: number;
+  hero: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+    primaryCta: {
+      label: string;
+      href: string;
+    };
+    secondaryCta: {
+      label: string;
+      href: string;
+    };
+  };
+  strategies?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    description?: string | null;
+    items?:
+      | {
+          /**
+           * home | business | utility | storage
+           */
+          id: string;
+          label: string;
+          title: string;
+          description: string;
+          href: string;
+        }[]
+      | null;
+  };
+  impact?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    ctaLabel?: string | null;
+    ctaHref?: string | null;
+    stats?:
+      | {
+          /**
+           * globe | award | leaf | microscope
+           */
+          icon?: string | null;
+          value: string;
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  whyOriana?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    description?: string | null;
+    items?:
+      | {
+          /**
+           * microscope | shield | globe | headphones
+           */
+          icon?: string | null;
+          title: string;
+          copy: string;
+          href: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  globalReach?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    description?: string | null;
+    ctaLabel?: string | null;
+    ctaHref?: string | null;
+    regions?:
+      | {
+          name: string;
+          focus: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  news?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    viewAllLabel?: string | null;
+    viewAllHref?: string | null;
+    items?:
+      | {
+          title: string;
+          date?: string | null;
+          href: string;
+          type?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  caseStudiesIntro?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    viewAllLabel?: string | null;
+    viewAllHref?: string | null;
+  };
+  supportStrip?: {
+    service?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      hotline?: string | null;
+      linkLabel?: string | null;
+      linkHref?: string | null;
+    };
+    downloads?: {
+      eyebrow?: string | null;
+      links?:
+        | {
+            label: string;
+            href: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    partner?: {
+      eyebrow?: string | null;
+      description?: string | null;
+      ctaLabel?: string | null;
+      ctaHref?: string | null;
+    };
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about".
+ */
+export interface About {
+  id: number;
+  hero: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+  };
+  story?: {
+    title?: string | null;
+    paragraphs?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  stats?:
+    | {
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  values?:
+    | {
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact".
+ */
+export interface Contact {
+  id: number;
+  hero: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+  };
+  sidebarTitle?: string | null;
+  contactItems?:
+    | {
+        /**
+         * mail | phone | map
+         */
+        icon?: string | null;
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  form?: {
+    nameLabel?: string | null;
+    emailLabel?: string | null;
+    companyLabel?: string | null;
+    messageLabel?: string | null;
+    submitLabel?: string | null;
+    successTitle?: string | null;
+    successMessage?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "careers".
+ */
+export interface Career {
+  id: number;
+  hero: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+  };
+  why?: {
+    title?: string | null;
+    description?: string | null;
+    image?: (number | null) | Media;
+    imageUrl?: string | null;
+  };
+  openingsTitle?: string | null;
+  fallbackCtaLabel?: string | null;
+  fallbackCtaHref?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "support".
+ */
+export interface Support {
+  id: number;
+  hero: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+  };
+  channels?:
+    | {
+        /**
+         * phone | mail | headphones | map
+         */
+        icon?: string | null;
+        title: string;
+        detail: string;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  resourcesTitle?: string | null;
+  resourceLinks?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  ticketCta: {
+    title?: string | null;
+    description?: string | null;
+    cta: {
+      label: string;
+      href: string;
+    };
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "warranty".
+ */
+export interface Warranty {
+  id: number;
+  hero: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+  };
+  tiersTitle?: string | null;
+  tiers?:
+    | {
+        product: string;
+        standard: string;
+        extended: string;
+        id?: string | null;
+      }[]
+    | null;
+  register?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  claim?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  primaryCta: {
+    label: string;
+    href: string;
+  };
+  secondaryCta: {
+    label: string;
+    href: string;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sustainability".
+ */
+export interface Sustainability {
+  id: number;
+  hero: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+  };
+  highlights?:
+    | {
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  approach: {
+    title?: string | null;
+    description?: string | null;
+    image?: (number | null) | Media;
+    imageUrl?: string | null;
+    primaryCta: {
+      label: string;
+      href: string;
+    };
+    secondaryCta: {
+      label: string;
+      href: string;
+    };
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sustainability-reports".
+ */
+export interface SustainabilityReport {
+  id: number;
+  hero: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+  };
+  reports?:
+    | {
+        title: string;
+        year?: string | null;
+        size?: string | null;
+        href?: string | null;
+        file?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "where-to-buy".
+ */
+export interface WhereToBuy {
+  id: number;
+  hero: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+  };
+  becomeDistributor: {
+    title?: string | null;
+    description?: string | null;
+    cta: {
+      label: string;
+      href: string;
+    };
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-intros".
+ */
+export interface PageIntro {
+  id: number;
+  faqs: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+    ctaPrompt?: string | null;
+    ctaLabel?: string | null;
+    ctaHref?: string | null;
+  };
+  videos: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+    footerNote?: string | null;
+  };
+  certifications: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+    certsHeading?: string | null;
+    awardsHeading?: string | null;
+  };
+  partners: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+    cta: {
+      title?: string | null;
+      description?: string | null;
+      primaryCta: {
+        label: string;
+        href: string;
+      };
+      secondaryCta: {
+        label: string;
+        href: string;
+      };
+    };
+  };
+  caseStudies: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+  };
+  products: {
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1846,17 +2898,36 @@ export interface Footer {
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
-  navItems?:
+  hotlineLabel?: T;
+  hotline?: T;
+  languageLabel?: T;
+  searchPlaceholder?: T;
+  loginLabel?: T;
+  loginHref?: T;
+  whereToBuyLabel?: T;
+  whereToBuyHref?: T;
+  quoteLabel?: T;
+  quoteHref?: T;
+  logo?: T;
+  logoAlt?: T;
+  navMenus?:
     | T
     | {
-        link?:
+        key?: T;
+        label?: T;
+        columns?:
           | T
           | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
+              title?: T;
+              href?: T;
+              links?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              id?: T;
             };
         id?: T;
       };
@@ -1869,19 +2940,631 @@ export interface HeaderSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
-  navItems?:
+  columns?:
     | T
     | {
-        link?:
+        title?: T;
+        links?:
           | T
           | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
               label?: T;
+              href?: T;
+              id?: T;
             };
         id?: T;
+      };
+  socialLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  legalLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  copyright?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  brandName?: T;
+  supportEmail?: T;
+  infoEmail?: T;
+  securityEmail?: T;
+  privacyEmail?: T;
+  hotline?: T;
+  defaultMetaTitle?: T;
+  defaultMetaDescription?: T;
+  ogImage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home_select".
+ */
+export interface HomeSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        primaryCta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        secondaryCta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  strategies?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        items?:
+          | T
+          | {
+              id?: T;
+              label?: T;
+              title?: T;
+              description?: T;
+              href?: T;
+            };
+      };
+  impact?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+        stats?:
+          | T
+          | {
+              icon?: T;
+              value?: T;
+              label?: T;
+              id?: T;
+            };
+      };
+  whyOriana?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        items?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              copy?: T;
+              href?: T;
+              id?: T;
+            };
+      };
+  globalReach?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+        regions?:
+          | T
+          | {
+              name?: T;
+              focus?: T;
+              id?: T;
+            };
+      };
+  news?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        viewAllLabel?: T;
+        viewAllHref?: T;
+        items?:
+          | T
+          | {
+              title?: T;
+              date?: T;
+              href?: T;
+              type?: T;
+              id?: T;
+            };
+      };
+  caseStudiesIntro?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        viewAllLabel?: T;
+        viewAllHref?: T;
+      };
+  supportStrip?:
+    | T
+    | {
+        service?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              hotline?: T;
+              linkLabel?: T;
+              linkHref?: T;
+            };
+        downloads?:
+          | T
+          | {
+              eyebrow?: T;
+              links?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    id?: T;
+                  };
+            };
+        partner?:
+          | T
+          | {
+              eyebrow?: T;
+              description?: T;
+              ctaLabel?: T;
+              ctaHref?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about_select".
+ */
+export interface AboutSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  story?:
+    | T
+    | {
+        title?: T;
+        paragraphs?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+      };
+  stats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  values?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact_select".
+ */
+export interface ContactSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  sidebarTitle?: T;
+  contactItems?:
+    | T
+    | {
+        icon?: T;
+        label?: T;
+        value?: T;
+        id?: T;
+      };
+  form?:
+    | T
+    | {
+        nameLabel?: T;
+        emailLabel?: T;
+        companyLabel?: T;
+        messageLabel?: T;
+        submitLabel?: T;
+        successTitle?: T;
+        successMessage?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "careers_select".
+ */
+export interface CareersSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  why?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        imageUrl?: T;
+      };
+  openingsTitle?: T;
+  fallbackCtaLabel?: T;
+  fallbackCtaHref?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "support_select".
+ */
+export interface SupportSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  channels?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        detail?: T;
+        note?: T;
+        id?: T;
+      };
+  resourcesTitle?: T;
+  resourceLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  ticketCta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "warranty_select".
+ */
+export interface WarrantySelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  tiersTitle?: T;
+  tiers?:
+    | T
+    | {
+        product?: T;
+        standard?: T;
+        extended?: T;
+        id?: T;
+      };
+  register?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  claim?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  primaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  secondaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sustainability_select".
+ */
+export interface SustainabilitySelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  highlights?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  approach?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        imageUrl?: T;
+        primaryCta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        secondaryCta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sustainability-reports_select".
+ */
+export interface SustainabilityReportsSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  reports?:
+    | T
+    | {
+        title?: T;
+        year?: T;
+        size?: T;
+        href?: T;
+        file?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "where-to-buy_select".
+ */
+export interface WhereToBuySelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  becomeDistributor?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-intros_select".
+ */
+export interface PageIntrosSelect<T extends boolean = true> {
+  faqs?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        ctaPrompt?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+      };
+  videos?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        footerNote?: T;
+      };
+  certifications?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        certsHeading?: T;
+        awardsHeading?: T;
+      };
+  partners?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        cta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              primaryCta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              secondaryCta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+            };
+      };
+  caseStudies?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  products?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
       };
   updatedAt?: T;
   createdAt?: T;

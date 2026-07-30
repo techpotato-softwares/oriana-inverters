@@ -4,15 +4,35 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { CaseStudies } from './collections/CaseStudies'
 import { Categories } from './collections/Categories'
+import { Certifications } from './collections/Certifications'
+import { ContentPages } from './collections/ContentPages'
+import { Distributors } from './collections/Distributors'
 import { Downloads } from './collections/Downloads'
+import { Faqs } from './collections/Faqs'
+import { Jobs } from './collections/Jobs'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
+import { Partners } from './collections/Partners'
 import { Posts } from './collections/Posts'
 import { Products } from './collections/Products'
+import { Solutions } from './collections/Solutions'
 import { Users } from './collections/Users'
+import { Videos } from './collections/Videos'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
+import { About } from './globals/About'
+import { Careers } from './globals/Careers'
+import { Contact } from './globals/Contact'
+import { Home } from './globals/Home'
+import { PageIntros } from './globals/PageIntros'
+import { SiteSettings } from './globals/SiteSettings'
+import { Support } from './globals/Support'
+import { Sustainability } from './globals/Sustainability'
+import { SustainabilityReports } from './globals/SustainabilityReports'
+import { Warranty } from './globals/Warranty'
+import { WhereToBuy } from './globals/WhereToBuy'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -29,6 +49,10 @@ export default buildConfig({
     components: {
       beforeLogin: ['@/components/BeforeLogin'],
       beforeDashboard: ['@/components/BeforeDashboard'],
+      graphics: {
+        Logo: '@/components/AdminLogo#Logo',
+        Icon: '@/components/AdminIcon#Icon',
+      },
     },
     importMap: {
       baseDir: path.resolve(dirname),
@@ -75,10 +99,41 @@ export default buildConfig({
     push: process.env.PAYLOAD_DATABASE_PUSH === 'true',
     prodMigrations: migrations,
   }),
-  collections: [Pages, Posts, Products, Downloads, Media, Categories, Users],
+  collections: [
+    Pages,
+    Posts,
+    Products,
+    Downloads,
+    Media,
+    Categories,
+    CaseStudies,
+    Faqs,
+    Videos,
+    Distributors,
+    Jobs,
+    Partners,
+    Certifications,
+    Solutions,
+    ContentPages,
+    Users,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   serverURL: getServerSideURL(),
-  globals: [Header, Footer],
+  globals: [
+    Header,
+    Footer,
+    SiteSettings,
+    Home,
+    About,
+    Contact,
+    Careers,
+    Support,
+    Warranty,
+    Sustainability,
+    SustainabilityReports,
+    WhereToBuy,
+    PageIntros,
+  ],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,

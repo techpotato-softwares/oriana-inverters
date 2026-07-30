@@ -1,15 +1,14 @@
-import { createLocalReq, getPayload } from 'payload'
-import { seed } from '@/endpoints/seed'
+import { getPayload } from 'payload'
+import { seedSite } from '@/endpoints/seed/site'
 import config from '@payload-config'
 import { headers } from 'next/headers'
 
-export const maxDuration = 60 // This function can run for a maximum of 60 seconds
+export const maxDuration = 120
 
 export async function POST(): Promise<Response> {
   const payload = await getPayload({ config })
   const requestHeaders = await headers()
 
-  // Authenticate by passing request headers
   const { user } = await payload.auth({ headers: requestHeaders })
 
   if (!user) {
@@ -17,15 +16,10 @@ export async function POST(): Promise<Response> {
   }
 
   try {
-    // Create a Payload request object to pass to the Local API for transactions
-    // At this point you should pass in a user, locale, and any other context you need for the Local API
-    const payloadReq = await createLocalReq({ user }, payload)
-
-    await seed({ payload, req: payloadReq })
-
+    await seedSite({ payload })
     return Response.json({ success: true })
   } catch (e) {
-    payload.logger.error({ err: e, message: 'Error seeding data' })
+    payload.logger.error({ err: e, message: 'Error seeding Oriana site data' })
     return new Response('Error seeding data.', { status: 500 })
   }
 }

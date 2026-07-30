@@ -1,40 +1,30 @@
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { ContentPage } from '@/components/oriana/ContentPage'
+import { getContentPageBySlug } from '@/utilities/getSiteContent'
 
-export const metadata = {
-  title: 'Sustainability Strategy',
-  description: 'Oriana Inverters environmental strategy and 2030 sustainability targets.',
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getContentPageBySlug('strategy')
+  return {
+    title: content?.seo?.metaTitle ?? content?.title,
+    description: content?.seo?.metaDescription ?? content?.description,
+  }
 }
 
-export default function SustainabilityStrategyPage() {
+export default async function SustainabilityStrategyPage() {
+  const content = await getContentPageBySlug('strategy')
+  if (!content) notFound()
+
   return (
     <ContentPage
-      eyebrow="Sustainability"
-      title="Sustainability Strategy"
-      description="Our roadmap to net-zero operations and responsible product lifecycle management."
-      breadcrumb={[{ label: 'Sustainability', href: '/sustainability' }, { label: 'Strategy' }]}
-      sections={[
-        {
-          heading: '2030 Targets',
-          paragraphs: [
-            'Reduce Scope 1 and 2 greenhouse gas emissions by 50% versus 2020 baseline across all manufacturing facilities.',
-            'Achieve 80% renewable electricity consumption at major production sites.',
-            'Design 100% of new products for RoHS compliance and improved recyclability.',
-          ],
-        },
-        {
-          heading: 'Product Lifecycle',
-          paragraphs: [
-            'We conduct lifecycle assessments on flagship inverter platforms to identify opportunities to reduce embodied carbon in enclosures, semiconductors, and logistics.',
-            'Extended warranty programmes and modular serviceability extend product life in the field, reducing e-waste.',
-          ],
-        },
-        {
-          heading: 'Supply Chain',
-          paragraphs: [
-            'Key suppliers are audited against our Supplier Code of Conduct covering labour practices, environmental management, and conflict minerals due diligence.',
-          ],
-        },
-      ]}
+      eyebrow={content.eyebrow}
+      title={content.title}
+      description={content.description}
+      breadcrumb={content.breadcrumb}
+      sections={content.sections.map((s: { heading?: string; paragraphs: { text: string }[] }) => ({
+        heading: s.heading,
+        paragraphs: s.paragraphs.map((p: { text: string }) => p.text),
+      }))}
     />
   )
 }

@@ -7,14 +7,21 @@ import { Globe, Menu, Search, X } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { cn } from '@/utilities/ui'
 import {
-  megaMenus,
-  primaryNav,
+  megaMenus as defaultMegaMenus,
+  primaryNav as defaultPrimaryNav,
   type MegaMenuKey,
 } from '@/config/navigation'
 import { ProductsMegaMenuPanel } from '@/components/oriana/ProductsMegaMenu'
+import type { HeaderChrome } from '@/types/chrome'
 
-function MegaMenuPanel({ menuKey }: { menuKey: MegaMenuKey }) {
-  const menu = megaMenus[menuKey]
+function MegaMenuPanel({
+  menuKey,
+  menus,
+}: {
+  menuKey: MegaMenuKey
+  menus: HeaderChrome['menus']
+}) {
+  const menu = menus[menuKey]
 
   return (
     <div
@@ -24,7 +31,6 @@ function MegaMenuPanel({ menuKey }: { menuKey: MegaMenuKey }) {
     >
       <div className="container py-10 lg:py-12">
         <div className="flex gap-8 lg:gap-12">
-          {/* Sungrow-style ghost watermark */}
           <div className="hidden w-48 shrink-0 items-center lg:flex xl:w-56">
             <p
               className="font-display text-4xl font-light leading-tight text-oriana-navy/[0.07] xl:text-5xl"
@@ -56,7 +62,7 @@ function MegaMenuPanel({ menuKey }: { menuKey: MegaMenuKey }) {
                 )}
                 <ul className="mt-4 space-y-2.5">
                   {col.links.map((link) => (
-                    <li key={link.href}>
+                    <li key={`${link.href}-${link.label}`}>
                       <Link
                         href={link.href}
                         className="text-sm text-oriana-muted transition hover:text-oriana-blue"
@@ -75,13 +81,29 @@ function MegaMenuPanel({ menuKey }: { menuKey: MegaMenuKey }) {
   )
 }
 
-export function SiteHeader() {
+type SiteHeaderProps = {
+  chrome?: HeaderChrome
+}
+
+export function SiteHeader({ chrome }: SiteHeaderProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<MegaMenuKey | null>(null)
   const [scrolled, setScrolled] = useState(false)
   const isHome = pathname === '/'
   const overHero = isHome && !scrolled && !openMenu && !mobileOpen
+
+  const navKeys = chrome?.navKeys ?? defaultPrimaryNav
+  const menus = chrome?.menus ?? defaultMegaMenus
+  const hotlineLabel = chrome?.hotlineLabel ?? 'Customer Hotline:'
+  const hotline = chrome?.hotline ?? '+1 (800) ORIANA-1'
+  const languageLabel = chrome?.languageLabel ?? 'USA · English'
+  const loginLabel = chrome?.loginLabel ?? 'Login'
+  const loginHref = chrome?.loginHref ?? '/admin'
+  const whereToBuyLabel = chrome?.whereToBuyLabel ?? 'Where to Buy'
+  const whereToBuyHref = chrome?.whereToBuyHref ?? '/where-to-buy'
+  const quoteLabel = chrome?.quoteLabel ?? 'Request Quote'
+  const quoteHref = chrome?.quoteHref ?? '/contact'
 
   useEffect(() => {
     setMobileOpen(false)
@@ -97,9 +119,7 @@ export function SiteHeader() {
 
   const linkClass = cn(
     'relative px-3 py-5 text-sm font-medium transition-colors',
-    overHero
-      ? 'text-white/85 hover:text-white'
-      : 'text-oriana-navy hover:text-oriana-blue',
+    overHero ? 'text-white/85 hover:text-white' : 'text-oriana-navy hover:text-oriana-blue',
   )
 
   return (
@@ -112,7 +132,6 @@ export function SiteHeader() {
       )}
       onMouseLeave={() => setOpenMenu(null)}
     >
-      {/* Utility bar */}
       <div
         className={cn(
           'hidden border-b text-xs lg:block',
@@ -122,14 +141,16 @@ export function SiteHeader() {
         )}
       >
         <div className="container flex h-9 items-center justify-between">
-          <span>Customer Hotline: +1 (800) ORIANA-1</span>
+          <span>
+            {hotlineLabel} {hotline}
+          </span>
           <div className="flex items-center gap-5">
             <button
               type="button"
               className={cn('flex items-center gap-1.5', overHero ? 'hover:text-white' : 'hover:text-oriana-blue')}
             >
               <Globe className="h-3.5 w-3.5" />
-              USA · English
+              {languageLabel}
             </button>
             <Link
               href="/search"
@@ -139,13 +160,13 @@ export function SiteHeader() {
               <Search className="h-3.5 w-3.5" />
             </Link>
             <Link
-              href="/admin"
+              href={loginHref}
               className={cn(
                 'font-semibold uppercase tracking-wide',
                 overHero ? 'hover:text-white' : 'hover:text-oriana-blue',
               )}
             >
-              Login
+              {loginLabel}
             </Link>
           </div>
         </div>
@@ -158,9 +179,8 @@ export function SiteHeader() {
               <Logo priority variant={overHero ? 'dark' : 'light'} />
             </Link>
 
-            {/* Sungrow-style centred nav triggers */}
             <nav className="hidden flex-1 items-center justify-center gap-1 xl:flex">
-              {primaryNav.map((key) => {
+              {navKeys.map((key) => {
                 const open = openMenu === key
                 return (
                   <button
@@ -172,7 +192,7 @@ export function SiteHeader() {
                     aria-expanded={open}
                     aria-haspopup="true"
                   >
-                    {megaMenus[key].label}
+                    {menus[key].label}
                     <span
                       className={cn(
                         'absolute inset-x-3 bottom-0 h-0.5 origin-center transition-transform duration-300',
@@ -186,11 +206,11 @@ export function SiteHeader() {
             </nav>
 
             <div className="hidden shrink-0 items-center gap-2 xl:flex">
-              <Link href="/where-to-buy" className={linkClass}>
-                Where to Buy
+              <Link href={whereToBuyHref} className={linkClass}>
+                {whereToBuyLabel}
               </Link>
               <Link
-                href="/contact"
+                href={quoteHref}
                 className={cn(
                   'ml-1 rounded-md px-5 py-2 text-sm font-semibold transition',
                   overHero
@@ -198,7 +218,7 @@ export function SiteHeader() {
                     : 'bg-oriana-blue text-white hover:bg-oriana-navy',
                 )}
               >
-                Request Quote
+                {quoteLabel}
               </Link>
             </div>
 
@@ -213,31 +233,33 @@ export function SiteHeader() {
           </div>
         </div>
 
-        {/* Full-width drop panel — Sungrow hover pattern */}
         {openMenu && (
           <div className="hidden xl:block">
             {openMenu === 'products' ? (
               <ProductsMegaMenuPanel />
             ) : (
-              <MegaMenuPanel menuKey={openMenu} />
+              <MegaMenuPanel menuKey={openMenu} menus={menus} />
             )}
           </div>
         )}
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
         <div className="max-h-[80vh] overflow-y-auto border-t border-oriana-navy/10 bg-white px-4 py-4 xl:hidden">
-          {primaryNav.map((key) => (
+          {navKeys.map((key) => (
             <div key={key} className="mb-6">
               <p className="mb-2 text-xs font-bold uppercase tracking-widest text-oriana-blue">
-                {megaMenus[key].label}
+                {menus[key].label}
               </p>
-              {megaMenus[key].columns.map((col) => (
+              {menus[key].columns.map((col) => (
                 <div key={col.title} className="mb-3">
                   <p className="text-sm font-semibold text-oriana-navy">{col.title}</p>
                   {col.links.map((l) => (
-                    <Link key={l.href} href={l.href} className="block py-1.5 pl-2 text-sm text-oriana-muted">
+                    <Link
+                      key={`${l.href}-${l.label}`}
+                      href={l.href}
+                      className="block py-1.5 pl-2 text-sm text-oriana-muted"
+                    >
                       {l.label}
                     </Link>
                   ))}
@@ -245,14 +267,14 @@ export function SiteHeader() {
               ))}
             </div>
           ))}
-          <Link href="/where-to-buy" className="block py-2 text-sm font-semibold text-oriana-blue">
-            Where to Buy
+          <Link href={whereToBuyHref} className="block py-2 text-sm font-semibold text-oriana-blue">
+            {whereToBuyLabel}
           </Link>
           <Link
-            href="/contact"
+            href={quoteHref}
             className="mt-4 block rounded-md bg-oriana-blue py-3 text-center text-sm font-semibold text-white"
           >
-            Request a Quote
+            {quoteLabel}
           </Link>
         </div>
       )}

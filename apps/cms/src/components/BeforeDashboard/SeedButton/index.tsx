@@ -7,9 +7,9 @@ import './index.scss'
 
 const SuccessMessage: React.FC = () => (
   <div>
-    Database seeded! You can now{' '}
+    Oriana site content seeded!{' '}
     <a target="_blank" href="/">
-      visit your website
+      Visit your website
     </a>
   </div>
 )
@@ -59,7 +59,7 @@ export const SeedButton: React.FC = () => {
             }
           }),
           {
-            loading: 'Seeding with data....',
+            loading: 'Seeding Oriana site content…',
             success: <SuccessMessage />,
             error: 'An error occurred while seeding.',
           },
@@ -80,7 +80,7 @@ export const SeedButton: React.FC = () => {
   return (
     <Fragment>
       <button className="seedButton" onClick={handleClick}>
-        Seed your database
+        Seed Oriana site content
       </button>
       {message}
     </Fragment>
