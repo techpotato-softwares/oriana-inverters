@@ -145,7 +145,7 @@ for (let attempt = 1; attempt <= attempts; attempt++) {
     payload.logger.info('Database schema push complete.')
     await payload.destroy()
     // Extra settle so the next CI step (seed) does not race the same pooler slots.
-    await sleep(1500)
+    await sleep(Number(process.env.SCHEMA_PUSH_SETTLE_MS || 5000))
     process.exit(0)
   } catch (error) {
     lastError = error

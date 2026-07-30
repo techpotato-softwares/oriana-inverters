@@ -85,8 +85,9 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
-      // Supabase session pooler is tiny (often pool_size=15 shared). Keep this low so
-      // schema:push / Lambda don't exhaust EMAXCONNSESSION during Drizzle introspect.
+      // Payload permanently checks out 1 client on connect — PG_POOL_MAX must be ≥2
+      // or every query waits forever ("timeout exceeded when trying to connect").
+      // Keep modest for Supabase session pooler (shared pool_size ≈15).
       max: Number(process.env.PG_POOL_MAX || 3),
       idleTimeoutMillis: process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1000 : 10_000,
       connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 60_000),

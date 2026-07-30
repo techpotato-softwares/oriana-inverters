@@ -8,6 +8,7 @@ import { staticDistributors } from '@/data/distributors'
 import { megaMenus, primaryNav } from '@/config/navigation'
 import { footerNav, socialLinks } from '@/config/footer'
 import { seedProducts } from './products'
+import { sleep, withRetry } from './dbRetry'
 import {
   staticAbout,
   staticCareers,
@@ -32,36 +33,6 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 const publicAssets = path.resolve(dirname, '../../../public/assets')
 
 const seedOpts = { overrideAccess: true as const, context: { disableRevalidate: true } }
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
-function isRetryable(error: unknown): boolean {
-  const text = String(error) + (error && typeof error === 'object' && 'cause' in error ? String((error as { cause: unknown }).cause) : '')
-  return (
-    text.includes('timeout exceeded when trying to connect') ||
-    text.includes('EMAXCONNSESSION') ||
-    text.includes('too many clients') ||
-    text.includes('Connection terminated') ||
-    text.includes('ECONNRESET') ||
-    text.includes('ETIMEDOUT')
-  )
-}
-
-async function withRetry<T>(label: string, fn: () => Promise<T>, attempts = 5): Promise<T> {
-  let last: unknown
-  for (let i = 1; i <= attempts; i++) {
-    try {
-      return await fn()
-    } catch (error) {
-      last = error
-      if (!isRetryable(error) || i === attempts) break
-      const wait = 2000 * i
-      console.warn(`[seed] ${label} failed (attempt ${i}/${attempts}), retrying in ${wait}ms…`)
-      await sleep(wait)
-    }
-  }
-  throw last
-}
 
 function readAsset(relativePath: string, mimetype: string): File | null {
   const filePath = path.join(publicAssets, relativePath)
@@ -111,8 +82,32 @@ async function upsertMedia(
   }
 }
 
+async function upsertBySlug(
+  payload: Payload,
+  collection: 'solutions' | 'case-studies' | 'content-pages',
+  slug: string,
+  data: Record<string, unknown>,
+) {
+  await withRetry(`${collection}:${slug}`, async () => {
+    const existing = await payload.find({
+      collection,
+      where: { slug: { equals: slug } },
+      limit: 1,
+      ...seedOpts,
+    })
+    if (existing.docs[0]) {
+      await payload.update({ collection, id: existing.docs[0].id, data, ...seedOpts })
+    } else {
+      await payload.create({ collection, data, ...seedOpts })
+    }
+  })
+}
+
 export async function seedSite({ payload }: { payload: Payload }) {
   payload.logger.info('— Seeding Oriana site content...')
+  payload.logger.info(
+    `— PG_POOL_MAX=${process.env.PG_POOL_MAX || 'default'} (Payload holds 1 client; need ≥2)`,
+  )
 
   // Session-mode poolers often time out on media uploads from CI — skip by default.
   // Set SEED_SKIP_MEDIA=false to upload assets into the media collection.
@@ -139,7 +134,6 @@ export async function seedSite({ payload }: { payload: Payload }) {
     }
   }
 
-  // Site settings
   await withRetry('global:site-settings', () =>
     payload.updateGlobal({
       slug: 'site-settings',
@@ -158,96 +152,98 @@ export async function seedSite({ payload }: { payload: Payload }) {
     }),
   )
 
-  // Header
-  await payload.updateGlobal({
-    slug: 'header',
-    data: {
-      hotlineLabel: 'Customer Hotline:',
-      hotline: '+1 (800) ORIANA-1',
-      languageLabel: 'USA · English',
-      searchPlaceholder: 'Search',
-      loginLabel: 'Login',
-      loginHref: '/admin',
-      whereToBuyLabel: 'Where to Buy',
-      whereToBuyHref: '/where-to-buy',
-      quoteLabel: 'Request Quote',
-      quoteHref: '/contact',
-      ...(mediaIds['logo-light.png'] ? { logo: mediaIds['logo-light.png'] } : {}),
-      logoAlt: 'Oriana Inverters',
-      navMenus: primaryNav.map((key) => {
-        const menu = megaMenus[key]
-        return {
-          key,
-          label: menu.label,
-          columns: menu.columns.map((col) => ({
-            title: col.title,
-            href: col.href,
-            links: col.links.map((l) => ({ label: l.label, href: l.href })),
-          })),
-        }
-      }),
-    },
-    ...seedOpts,
-  })
-
-  // Footer
-  await payload.updateGlobal({
-    slug: 'footer',
-    data: {
-      columns: footerNav.map((col) => ({
-        title: col.title,
-        links: col.links.map((l) => ({ label: l.label, href: l.href })),
-      })),
-      socialLinks: socialLinks.map((s) => ({ label: s.label, href: s.href })),
-      legalLinks: [
-        { label: 'Privacy Policy', href: '/privacy' },
-        { label: 'Disclaimer', href: '/disclaimer' },
-        { label: 'Terms of Use', href: '/terms' },
-      ],
-      copyright: '© {year} Oriana Inverters. All rights reserved.',
-    },
-    ...seedOpts,
-  })
-
-  // Page globals
-  await payload.updateGlobal({ slug: 'home', data: staticHome as never, ...seedOpts })
-  await payload.updateGlobal({ slug: 'about', data: staticAbout as never, ...seedOpts })
-  await payload.updateGlobal({ slug: 'contact', data: staticContact as never, ...seedOpts })
-  await payload.updateGlobal({
-    slug: 'careers',
-    data: {
-      ...staticCareers,
-      why: {
-        ...staticCareers.why,
-        ...(mediaIds['careers.svg'] ? { image: mediaIds['careers.svg'] } : {}),
+  await withRetry('global:header', () =>
+    payload.updateGlobal({
+      slug: 'header',
+      data: {
+        hotlineLabel: 'Customer Hotline:',
+        hotline: '+1 (800) ORIANA-1',
+        languageLabel: 'USA · English',
+        searchPlaceholder: 'Search',
+        loginLabel: 'Login',
+        loginHref: '/admin',
+        whereToBuyLabel: 'Where to Buy',
+        whereToBuyHref: '/where-to-buy',
+        quoteLabel: 'Request Quote',
+        quoteHref: '/contact',
+        ...(mediaIds['logo-light.png'] ? { logo: mediaIds['logo-light.png'] } : {}),
+        logoAlt: 'Oriana Inverters',
+        navMenus: primaryNav.map((key) => {
+          const menu = megaMenus[key]
+          return {
+            key,
+            label: menu.label,
+            columns: menu.columns.map((col) => ({
+              title: col.title,
+              href: col.href,
+              links: col.links.map((l) => ({ label: l.label, href: l.href })),
+            })),
+          }
+        }),
       },
-    } as never,
-    ...seedOpts,
-  })
-  await payload.updateGlobal({ slug: 'support', data: staticSupport as never, ...seedOpts })
-  await payload.updateGlobal({ slug: 'warranty', data: staticWarranty as never, ...seedOpts })
-  await payload.updateGlobal({
-    slug: 'sustainability',
-    data: {
-      ...staticSustainability,
-      approach: {
-        ...staticSustainability.approach,
-        ...(mediaIds['sustainability.svg']
-          ? { image: mediaIds['sustainability.svg'] }
-          : {}),
-      },
-    } as never,
-    ...seedOpts,
-  })
-  await payload.updateGlobal({
-    slug: 'sustainability-reports',
-    data: staticSustainabilityReports as never,
-    ...seedOpts,
-  })
-  await payload.updateGlobal({ slug: 'where-to-buy', data: staticWhereToBuy as never, ...seedOpts })
-  await payload.updateGlobal({ slug: 'page-intros', data: staticPageIntros as never, ...seedOpts })
+      ...seedOpts,
+    }),
+  )
 
-  // Solutions
+  await withRetry('global:footer', () =>
+    payload.updateGlobal({
+      slug: 'footer',
+      data: {
+        columns: footerNav.map((col) => ({
+          title: col.title,
+          links: col.links.map((l) => ({ label: l.label, href: l.href })),
+        })),
+        socialLinks: socialLinks.map((s) => ({ label: s.label, href: s.href })),
+        legalLinks: [
+          { label: 'Privacy Policy', href: '/privacy' },
+          { label: 'Disclaimer', href: '/disclaimer' },
+          { label: 'Terms of Use', href: '/terms' },
+        ],
+        copyright: '© {year} Oriana Inverters. All rights reserved.',
+      },
+      ...seedOpts,
+    }),
+  )
+
+  const pageGlobals: [string, unknown][] = [
+    ['home', staticHome],
+    ['about', staticAbout],
+    ['contact', staticContact],
+    [
+      'careers',
+      {
+        ...staticCareers,
+        why: {
+          ...staticCareers.why,
+          ...(mediaIds['careers.svg'] ? { image: mediaIds['careers.svg'] } : {}),
+        },
+      },
+    ],
+    ['support', staticSupport],
+    ['warranty', staticWarranty],
+    [
+      'sustainability',
+      {
+        ...staticSustainability,
+        approach: {
+          ...staticSustainability.approach,
+          ...(mediaIds['sustainability.svg']
+            ? { image: mediaIds['sustainability.svg'] }
+            : {}),
+        },
+      },
+    ],
+    ['sustainability-reports', staticSustainabilityReports],
+    ['where-to-buy', staticWhereToBuy],
+    ['page-intros', staticPageIntros],
+  ]
+
+  for (const [slug, data] of pageGlobals) {
+    await withRetry(`global:${slug}`, () =>
+      payload.updateGlobal({ slug: slug as 'home', data: data as never, ...seedOpts }),
+    )
+  }
+
   payload.logger.info('— Seeding solutions...')
   const solutionImageMap: Record<string, string> = {
     residential: 'single-phase.svg',
@@ -256,26 +252,14 @@ export async function seedSite({ payload }: { payload: Payload }) {
     storage: 'hybrid-storage.svg',
   }
   for (const sol of staticSolutions) {
-    const existing = await payload.find({
-      collection: 'solutions',
-      where: { slug: { equals: sol.slug } },
-      limit: 1,
-      ...seedOpts,
-    })
-    const data = {
+    await upsertBySlug(payload, 'solutions', sol.slug, {
       ...sol,
       ...(mediaIds[solutionImageMap[sol.slug]]
         ? { image: mediaIds[solutionImageMap[sol.slug]] }
         : {}),
-    }
-    if (existing.docs[0]) {
-      await payload.update({ collection: 'solutions', id: existing.docs[0].id, data, ...seedOpts })
-    } else {
-      await payload.create({ collection: 'solutions', data, ...seedOpts })
-    }
+    })
   }
 
-  // Case studies
   payload.logger.info('— Seeding case studies...')
   const caseImageMap: Record<string, string> = {
     '/assets/products/three-phase.svg': 'three-phase.svg',
@@ -283,13 +267,7 @@ export async function seedSite({ payload }: { payload: Payload }) {
     '/assets/products/hybrid-storage.svg': 'hybrid-storage.svg',
   }
   for (const cs of caseStudies) {
-    const existing = await payload.find({
-      collection: 'case-studies',
-      where: { slug: { equals: cs.slug } },
-      limit: 1,
-      ...seedOpts,
-    })
-    const data = {
+    await upsertBySlug(payload, 'case-studies', cs.slug, {
       title: cs.title,
       slug: cs.slug,
       segment: cs.segment,
@@ -307,153 +285,157 @@ export async function seedSite({ payload }: { payload: Payload }) {
       solution: cs.solution,
       results: cs.results.map((text) => ({ text })),
       stats: cs.stats,
-    }
-    if (existing.docs[0]) {
-      await payload.update({ collection: 'case-studies', id: existing.docs[0].id, data, ...seedOpts })
-    } else {
-      await payload.create({ collection: 'case-studies', data, ...seedOpts })
-    }
+    })
   }
 
-  // FAQs
   payload.logger.info('— Seeding FAQs...')
   for (const group of staticFaqGroups) {
-    const existing = await payload.find({
-      collection: 'faqs',
-      where: { title: { equals: group.title } },
-      limit: 1,
-      ...seedOpts,
+    await withRetry(`faqs:${group.title}`, async () => {
+      const existing = await payload.find({
+        collection: 'faqs',
+        where: { title: { equals: group.title } },
+        limit: 1,
+        ...seedOpts,
+      })
+      if (existing.docs[0]) {
+        await payload.update({
+          collection: 'faqs',
+          id: existing.docs[0].id,
+          data: group,
+          ...seedOpts,
+        })
+      } else {
+        await payload.create({ collection: 'faqs', data: group, ...seedOpts })
+      }
     })
-    if (existing.docs[0]) {
-      await payload.update({ collection: 'faqs', id: existing.docs[0].id, data: group, ...seedOpts })
-    } else {
-      await payload.create({ collection: 'faqs', data: group, ...seedOpts })
-    }
   }
 
-  // Videos
   payload.logger.info('— Seeding videos...')
   for (const video of staticVideos) {
-    const existing = await payload.find({
-      collection: 'videos',
-      where: { title: { equals: video.title } },
-      limit: 1,
-      ...seedOpts,
+    await withRetry(`videos:${video.title}`, async () => {
+      const existing = await payload.find({
+        collection: 'videos',
+        where: { title: { equals: video.title } },
+        limit: 1,
+        ...seedOpts,
+      })
+      if (existing.docs[0]) {
+        await payload.update({
+          collection: 'videos',
+          id: existing.docs[0].id,
+          data: video,
+          ...seedOpts,
+        })
+      } else {
+        await payload.create({ collection: 'videos', data: video, ...seedOpts })
+      }
     })
-    if (existing.docs[0]) {
-      await payload.update({ collection: 'videos', id: existing.docs[0].id, data: video, ...seedOpts })
-    } else {
-      await payload.create({ collection: 'videos', data: video, ...seedOpts })
-    }
   }
 
-  // Jobs
   payload.logger.info('— Seeding jobs...')
   for (const job of staticJobs) {
-    const existing = await payload.find({
-      collection: 'jobs',
-      where: { title: { equals: job.title } },
-      limit: 1,
-      ...seedOpts,
+    await withRetry(`jobs:${job.title}`, async () => {
+      const existing = await payload.find({
+        collection: 'jobs',
+        where: { title: { equals: job.title } },
+        limit: 1,
+        ...seedOpts,
+      })
+      const data = { ...job, applyUrl: '/contact', active: true }
+      if (existing.docs[0]) {
+        await payload.update({ collection: 'jobs', id: existing.docs[0].id, data, ...seedOpts })
+      } else {
+        await payload.create({ collection: 'jobs', data, ...seedOpts })
+      }
     })
-    const data = { ...job, applyUrl: '/contact', active: true }
-    if (existing.docs[0]) {
-      await payload.update({ collection: 'jobs', id: existing.docs[0].id, data, ...seedOpts })
-    } else {
-      await payload.create({ collection: 'jobs', data, ...seedOpts })
-    }
   }
 
-  // Partners
   payload.logger.info('— Seeding partners...')
   for (const partner of staticPartners) {
-    const existing = await payload.find({
-      collection: 'partners',
-      where: {
-        and: [{ name: { equals: partner.name } }, { category: { equals: partner.category } }],
-      },
-      limit: 1,
-      ...seedOpts,
+    await withRetry(`partners:${partner.name}`, async () => {
+      const existing = await payload.find({
+        collection: 'partners',
+        where: {
+          and: [{ name: { equals: partner.name } }, { category: { equals: partner.category } }],
+        },
+        limit: 1,
+        ...seedOpts,
+      })
+      if (existing.docs[0]) {
+        await payload.update({
+          collection: 'partners',
+          id: existing.docs[0].id,
+          data: partner,
+          ...seedOpts,
+        })
+      } else {
+        await payload.create({ collection: 'partners', data: partner, ...seedOpts })
+      }
     })
-    if (existing.docs[0]) {
-      await payload.update({ collection: 'partners', id: existing.docs[0].id, data: partner, ...seedOpts })
-    } else {
-      await payload.create({ collection: 'partners', data: partner, ...seedOpts })
-    }
   }
 
-  // Certifications
   payload.logger.info('— Seeding certifications...')
   for (const cert of staticCertifications) {
-    const existing = await payload.find({
-      collection: 'certifications',
-      where: {
-        and: [{ name: { equals: cert.name } }, { kind: { equals: cert.kind } }],
-      },
-      limit: 1,
-      ...seedOpts,
-    })
-    if (existing.docs[0]) {
-      await payload.update({
+    await withRetry(`certifications:${cert.name}`, async () => {
+      const existing = await payload.find({
         collection: 'certifications',
-        id: existing.docs[0].id,
-        data: cert,
+        where: {
+          and: [{ name: { equals: cert.name } }, { kind: { equals: cert.kind } }],
+        },
+        limit: 1,
         ...seedOpts,
       })
-    } else {
-      await payload.create({ collection: 'certifications', data: cert, ...seedOpts })
-    }
+      if (existing.docs[0]) {
+        await payload.update({
+          collection: 'certifications',
+          id: existing.docs[0].id,
+          data: cert,
+          ...seedOpts,
+        })
+      } else {
+        await payload.create({ collection: 'certifications', data: cert, ...seedOpts })
+      }
+    })
   }
 
-  // Distributors
   payload.logger.info('— Seeding distributors...')
   for (const d of staticDistributors) {
-    const existing = await payload.find({
-      collection: 'distributors',
-      where: { externalId: { equals: d.id } },
-      limit: 1,
-      ...seedOpts,
-    })
-    const data = {
-      externalId: d.id,
-      name: d.name,
-      type: d.type,
-      city: d.city,
-      state: d.state,
-      country: d.country,
-      region: d.region,
-      email: d.email,
-      phone: d.phone,
-    }
-    if (existing.docs[0]) {
-      await payload.update({ collection: 'distributors', id: existing.docs[0].id, data, ...seedOpts })
-    } else {
-      await payload.create({ collection: 'distributors', data, ...seedOpts })
-    }
-  }
-
-  // Content pages
-  payload.logger.info('— Seeding content pages...')
-  for (const page of staticContentPages) {
-    const existing = await payload.find({
-      collection: 'content-pages',
-      where: { slug: { equals: page.slug } },
-      limit: 1,
-      ...seedOpts,
-    })
-    if (existing.docs[0]) {
-      await payload.update({
-        collection: 'content-pages',
-        id: existing.docs[0].id,
-        data: page,
+    await withRetry(`distributors:${d.id}`, async () => {
+      const existing = await payload.find({
+        collection: 'distributors',
+        where: { externalId: { equals: d.id } },
+        limit: 1,
         ...seedOpts,
       })
-    } else {
-      await payload.create({ collection: 'content-pages', data: page, ...seedOpts })
-    }
+      const data = {
+        externalId: d.id,
+        name: d.name,
+        type: d.type,
+        city: d.city,
+        state: d.state,
+        country: d.country,
+        region: d.region,
+        email: d.email,
+        phone: d.phone,
+      }
+      if (existing.docs[0]) {
+        await payload.update({
+          collection: 'distributors',
+          id: existing.docs[0].id,
+          data,
+          ...seedOpts,
+        })
+      } else {
+        await payload.create({ collection: 'distributors', data, ...seedOpts })
+      }
+    })
   }
 
-  // Catalogue
+  payload.logger.info('— Seeding content pages...')
+  for (const page of staticContentPages) {
+    await upsertBySlug(payload, 'content-pages', page.slug, page as unknown as Record<string, unknown>)
+  }
+
   await seedProducts({ payload })
 
   payload.logger.info('✓ Oriana site seed complete')

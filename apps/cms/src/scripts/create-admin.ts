@@ -9,6 +9,9 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
+import { withRetry } from '@/endpoints/seed/dbRetry'
+import { warmDb } from './warm-db'
+
 const email = process.env.ADMIN_EMAIL
 const password = process.env.ADMIN_PASSWORD
 const name = process.env.ADMIN_NAME || 'Admin'
@@ -28,27 +31,35 @@ if (!process.env.DATABASE_URL) {
   process.exit(1)
 }
 
+await warmDb()
+
 const payload = await getPayload({ config })
+try {
+  const existing = await withRetry('admin:find', () =>
+    payload.find({
+      collection: 'users',
+      where: { email: { equals: email } },
+      limit: 1,
+      overrideAccess: true,
+    }),
+  )
 
-const existing = await payload.find({
-  collection: 'users',
-  where: { email: { equals: email } },
-  limit: 1,
-})
-
-if (existing.docs.length > 0) {
-  console.log(`Admin user already exists: ${email}`)
-  process.exit(0)
+  if (existing.docs.length > 0) {
+    console.log(`Admin user already exists: ${email}`)
+  } else {
+    await withRetry('admin:create', () =>
+      payload.create({
+        collection: 'users',
+        data: {
+          email,
+          password,
+          name,
+        },
+        overrideAccess: true,
+      }),
+    )
+    console.log(`Created admin user: ${email}`)
+  }
+} finally {
+  await payload.destroy()
 }
-
-await payload.create({
-  collection: 'users',
-  data: {
-    email,
-    password,
-    name,
-  },
-})
-
-console.log(`Created admin user: ${email}`)
-process.exit(0)
