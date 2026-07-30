@@ -15,6 +15,11 @@ on:
         type: choice
         options: [site, catalogue, admin, full]
         default: site
+      skip_schema_push:
+        description: Skip schema:push (use if tables already exist / push hung previously)
+        required: false
+        type: boolean
+        default: false
       admin_email:
         description: Admin email (required for admin/full)
         required: false
@@ -38,6 +43,8 @@ env:
 jobs:
   seed:
     runs-on: ubuntu-latest
+    # Whole job must not hang forever on pooler/Drizzle
+    timeout-minutes: 25
     environment: ${{ github.event.inputs.environment }}
     steps:
       - name: Checkout
@@ -75,38 +82,108 @@ jobs:
           echo "::add-mask::$PAYLOAD_SECRET"
           echo "::add-mask::$DATABASE_URL"
 
+          # Fail TCP connect quickly instead of hanging on a saturated pooler
+          case "$DATABASE_URL" in
+            *\?*) DATABASE_URL="${DATABASE_URL}&connect_timeout=15" ;;
+            *)    DATABASE_URL="${DATABASE_URL}?connect_timeout=15" ;;
+          esac
+
           {
             echo "PAYLOAD_SECRET=$PAYLOAD_SECRET"
             echo "CRON_SECRET=$CRON_SECRET"
             echo "PREVIEW_SECRET=$PREVIEW_SECRET"
             echo "DATABASE_URL=$DATABASE_URL"
+            echo "LAMBDA_FN=oriana-invertors-web-$ENV"
           } >> "$GITHUB_ENV"
 
-      - name: Bootstrap schema (push tables)
+      - name: Pause Lambda (free Supabase session slots)
+        if: ${{ github.event.inputs.skip_schema_push != 'true' }}
+        run: |
+          FN="${{ env.LAMBDA_FN }}"
+          if aws lambda get-function --function-name "$FN" >/dev/null 2>&1; then
+            echo "Setting reserved concurrency=0 on $FN to free DB pooler sessions"
+            aws lambda put-function-concurrency \
+              --function-name "$FN" \
+              --reserved-concurrent-executions 0
+            sleep 5
+          else
+            echo "Lambda $FN not found — continuing without pause"
+          fi
+
+      - name: Probe DB connectivity
+        if: ${{ github.event.inputs.skip_schema_push != 'true' }}
         working-directory: apps/cms
         env:
           NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
-          PG_POOL_MAX: "3"
-          PG_CONNECT_TIMEOUT_MS: "120000"
-          SCHEMA_PUSH_RETRIES: "8"
-        run: npm run schema:push
+        run: |
+          node --input-type=module <<'EOF'
+          import pg from 'pg'
+          const url = process.env.DATABASE_URL
+          if (!url) {
+            console.error('DATABASE_URL missing')
+            process.exit(1)
+          }
+          const client = new pg.Client({
+            connectionString: url,
+            connectionTimeoutMillis: 15_000,
+            ssl: url.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
+          })
+          try {
+            await client.connect()
+            const r = await client.query('select 1 as ok')
+            console.log('DB probe ok:', r.rows[0])
+          } catch (e) {
+            console.error('DB probe failed — Supabase pooler likely saturated or unreachable from GHA.')
+            console.error(String(e))
+            console.error('Fix: wait a few minutes, pause other clients, or run schema:push locally, then re-run with skip_schema_push=true')
+            process.exit(1)
+          } finally {
+            try { await client.end() } catch { /* ignore */ }
+          }
+          EOF
+
+      - name: Bootstrap schema (push tables)
+        if: ${{ github.event.inputs.skip_schema_push != 'true' }}
+        working-directory: apps/cms
+        timeout-minutes: 8
+        env:
+          NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
+          # Drizzle introspect is sequential; keep pool tiny on Supabase session mode
+          PG_POOL_MAX: "1"
+          PG_CONNECT_TIMEOUT_MS: "20000"
+          SCHEMA_PUSH_RETRIES: "3"
+          SCHEMA_PUSH_PAUSE_MS: "3000"
+        run: |
+          # Hard shell timeout so the step cannot hang past ~6 minutes
+          timeout 360 npm run schema:push
+
+      - name: Restore Lambda concurrency
+        if: ${{ always() && github.event.inputs.skip_schema_push != 'true' }}
+        run: |
+          FN="${{ env.LAMBDA_FN }}"
+          if aws lambda get-function --function-name "$FN" >/dev/null 2>&1; then
+            echo "Removing reserved concurrency cap on $FN"
+            aws lambda delete-function-concurrency --function-name "$FN" || true
+          fi
 
       - name: Seed site content (pages, globals, chrome + catalogue)
         if: ${{ github.event.inputs.seed_type == 'site' || github.event.inputs.seed_type == 'full' }}
         working-directory: apps/cms
+        timeout-minutes: 10
         env:
           NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
-          PG_POOL_MAX: "2"
-          PG_CONNECT_TIMEOUT_MS: "120000"
+          PG_POOL_MAX: "1"
+          PG_CONNECT_TIMEOUT_MS: "30000"
         run: npm run seed:site
 
       - name: Seed catalogue only
         if: ${{ github.event.inputs.seed_type == 'catalogue' }}
         working-directory: apps/cms
+        timeout-minutes: 10
         env:
           NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
-          PG_POOL_MAX: "2"
-          PG_CONNECT_TIMEOUT_MS: "120000"
+          PG_POOL_MAX: "1"
+          PG_CONNECT_TIMEOUT_MS: "30000"
         run: npm run seed:catalogue
 
       - name: Seed admin user
@@ -114,8 +191,8 @@ jobs:
         working-directory: apps/cms
         env:
           NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
-          PG_POOL_MAX: "2"
-          PG_CONNECT_TIMEOUT_MS: "120000"
+          PG_POOL_MAX: "1"
+          PG_CONNECT_TIMEOUT_MS: "30000"
           ADMIN_EMAIL: ${{ github.event.inputs.admin_email }}
           ADMIN_PASSWORD: ${{ github.event.inputs.admin_password }}
           ADMIN_NAME: ${{ github.event.inputs.admin_name || 'Admin' }}
@@ -133,3 +210,4 @@ jobs:
           echo "### Seed complete" >> "$GITHUB_STEP_SUMMARY"
           echo "- Environment: \`$ENV\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Seed type: \`${{ github.event.inputs.seed_type }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Skip schema push: \`${{ github.event.inputs.skip_schema_push }}\`" >> "$GITHUB_STEP_SUMMARY"

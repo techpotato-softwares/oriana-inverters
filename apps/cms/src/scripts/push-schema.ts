@@ -110,7 +110,7 @@ async function missingTables(): Promise<string[]> {
   }
 }
 
-const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 8)
+const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 3)
 
 let missing: string[]
 try {
@@ -154,7 +154,7 @@ for (let attempt = 1; attempt <= attempts; attempt++) {
       break
     }
 
-    const waitMs = 4000 * attempt
+    const waitMs = 5000 * attempt
     console.warn(
       `schema:push failed with retryable DB error (attempt ${attempt}/${attempts}); retrying in ${waitMs}ms…`,
     )
