@@ -8,6 +8,7 @@ export const Downloads: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'documentType', 'updatedAt'],
+    group: 'Catalogue',
   },
   access: {
     create: authenticated,

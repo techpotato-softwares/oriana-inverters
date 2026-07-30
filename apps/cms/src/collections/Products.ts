@@ -10,6 +10,7 @@ export const Products: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'category', 'featured', 'updatedAt'],
+    group: 'Catalogue',
   },
   access: {
     create: authenticated,
