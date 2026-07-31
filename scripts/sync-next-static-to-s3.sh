@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # Sync Next.js static assets to the S3 bucket used by CloudFront for /_next/static/*.
 #
-# Default: copy assets referenced by the live Lambda HTML (source of truth for the
-# running container image). Optional --source-dir uses a local folder instead.
+# Default: union assets referenced by live Lambda HTML across marketing + admin
+# pages (source of truth for the running container image). Stopping at /admin/login
+# alone misses app/(frontend)/* chunks and causes CloudFront→S3 403 / ChunkLoadError.
+#
+# Optional --source-dir uses a local folder instead (must match the deployed build).
 #
 # Usage:
 #   ./scripts/sync-next-static-to-s3.sh qa
@@ -150,14 +153,13 @@ for p in paths:
 '
 }
 
-wait_for_lambda_html() {
+wait_for_lambda_ready() {
   local deadline=$((SECONDS + WAIT_SECONDS))
   local page html
-  : > /tmp/static-paths.txt
   while [ "$SECONDS" -lt "$deadline" ]; do
     for page in /admin/login /admin /; do
       if html=$(curl -fsSL --max-time 30 "${LAMBDA_URL}${page}" 2>/dev/null); then
-        if printf '%s' "$html" | extract_paths_from_html >/tmp/static-paths.txt 2>/dev/null; then
+        if printf '%s' "$html" | extract_paths_from_html >/dev/null 2>&1; then
           echo "  healthy: ${LAMBDA_URL}${page}" >&2
           return 0
         fi
@@ -169,6 +171,38 @@ wait_for_lambda_html() {
   return 1
 }
 
+# Collect /_next/static refs from multiple routes and union them.
+# IMPORTANT: do not stop at the first healthy page — /admin/login never references
+# app/(frontend)/* chunks, so syncing only those leaves the marketing site 403ing
+# on CloudFront→S3 (missing object).
+collect_static_paths() {
+  local page html tmp
+  tmp=$(mktemp)
+  : > /tmp/static-paths.txt
+
+  # Cover Payload admin + marketing shell (route-group chunks live under (frontend)/)
+  for page in / /admin/login /admin /products /about /contact; do
+    if html=$(curl -fsSL --max-time 30 "${LAMBDA_URL}${page}" 2>/dev/null); then
+      if printf '%s' "$html" | extract_paths_from_html >"$tmp" 2>/dev/null; then
+        echo "  collected $(wc -l <"$tmp" | tr -d ' ') asset(s) from ${page}" >&2
+        cat "$tmp" >> /tmp/static-paths.txt
+      else
+        echo "  skip ${page} (no /_next/static refs)" >&2
+      fi
+    else
+      echo "  skip ${page} (request failed)" >&2
+    fi
+  done
+  rm -f "$tmp"
+
+  if [ ! -s /tmp/static-paths.txt ]; then
+    return 1
+  fi
+
+  sort -u /tmp/static-paths.txt -o /tmp/static-paths.txt
+  echo "  unique assets: $(wc -l </tmp/static-paths.txt | tr -d ' ')" >&2
+}
+
 sync_from_lambda_html() {
   if [ -z "$LAMBDA_URL" ] || [ "$LAMBDA_URL" = "None" ]; then
     echo "Lambda Function URL not found for $FN" >&2
@@ -176,9 +210,13 @@ sync_from_lambda_html() {
   fi
 
   echo "  source: Lambda HTML (${LAMBDA_URL})"
-  wait_for_lambda_html || {
+  wait_for_lambda_ready || {
     echo "Lambda did not return HTML with /_next/static assets within ${WAIT_SECONDS}s" >&2
     echo "Check CloudWatch logs for /aws/lambda/${FN}" >&2
+    return 1
+  }
+  collect_static_paths || {
+    echo "No /_next/static asset paths found across sampled pages" >&2
     return 1
   }
   PATHS="$(cat /tmp/static-paths.txt)"
@@ -194,7 +232,8 @@ sync_from_lambda_html() {
     [[ "$asset_path" == /_next/static/* ]] || continue
 
     s3_key="${asset_path#/}"
-    local_file="$TMP_DIR/$(basename "$asset_path" | tr '/[]' '___')"
+    # Keep a stable unique local name (paths include (frontend)/[slug]/ etc.)
+    local_file="$TMP_DIR/$(printf '%s' "$asset_path" | tr '/[]()' '______')"
 
     if ! curl -fsSL --max-time 60 "${LAMBDA_URL}${asset_path}" -o "$local_file"; then
       echo "Failed to download ${asset_path}" >&2
