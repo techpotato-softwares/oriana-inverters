@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { FadeIn } from '@/components/oriana/FadeIn'
 import { PageHero } from '@/components/oriana/PageHero'
-import { caseStudies, getAllCaseStudySlugs, getCaseStudyBySlug } from '@/data/caseStudies'
+import { getAllCaseStudySlugs, getCaseStudyBySlug } from '@/data/caseStudies'
 
 type Props = { params: Promise<{ slug: string }> }
 
