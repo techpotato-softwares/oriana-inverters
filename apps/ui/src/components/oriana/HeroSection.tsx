@@ -88,7 +88,7 @@ export function HeroSection() {
               <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8 backdrop-blur-md">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-widest text-oriana-sky">Featured Series</p>
-                  <h2 className="mt-2 font-display text-3xl font-bold text-white">ORI-S6 Hybrid</h2>
+                  <h2 className="mt-2 font-display text-3xl font-bold text-white">OG6 Hybrid Series</h2>
                   <p className="mt-2 text-sm text-white/50">3.8 – 11.4 kW · Single Phase</p>
                 </div>
 

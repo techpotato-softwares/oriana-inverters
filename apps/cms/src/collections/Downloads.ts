@@ -5,9 +5,15 @@ import { authenticated } from '../access/authenticated'
 
 export const Downloads: CollectionConfig = {
   slug: 'downloads',
+  labels: {
+    singular: 'Download',
+    plural: 'Downloads',
+  },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'documentType', 'updatedAt'],
+    defaultColumns: ['title', 'documentType', 'relatedProduct', 'updatedAt'],
+    group: 'Catalogue',
+    description: 'Datasheets, manuals, certificates, and other product documents.',
   },
   access: {
     create: authenticated,

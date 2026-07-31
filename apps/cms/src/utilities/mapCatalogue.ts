@@ -27,12 +27,23 @@ export function mapCategory(doc: Category): CatalogueCategory {
     slug: doc.slug,
     title: doc.title,
     description: doc.description ?? '',
+    sortOrder: doc.sortOrder ?? 100,
   }
 }
 
 export function mapProduct(doc: Product): CatalogueProduct {
   const category = doc.category
   const categoryDoc = category && typeof category === 'object' ? category : null
+  const specs =
+    doc.keySpecs?.map((s) => ({
+      label: s.label,
+      value: s.unit ? `${s.value} ${s.unit}`.trim() : s.value,
+    })) ?? []
+
+  const modelSeries =
+    doc.modelSeries ||
+    specs.find((s) => s.label.toLowerCase() === 'model series')?.value ||
+    null
 
   return {
     id: doc.id,
@@ -48,11 +59,8 @@ export function mapProduct(doc: Product): CatalogueProduct {
     warranty: doc.warranty ?? '10 Years',
     featured: doc.featured ?? false,
     description: doc.shortDescription ?? '',
-    specs:
-      doc.keySpecs?.map((s) => ({
-        label: s.label,
-        value: s.unit ? `${s.value} ${s.unit}`.trim() : s.value,
-      })) ?? [],
+    modelSeries,
+    specs,
     heroImageUrl: mediaUrl(doc.heroImage),
     heroImageAlt:
       doc.heroImage && typeof doc.heroImage === 'object' ? doc.heroImage.alt ?? doc.name : doc.name,

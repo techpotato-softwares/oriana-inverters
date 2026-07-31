@@ -371,11 +371,16 @@ export interface Media {
   };
 }
 /**
+ * Product families (e.g. Residential Grid-Tied). Create these first, then assign products to them.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
 export interface Category {
   id: number;
+  /**
+   * Category / product-family name shown in nav and on /products.
+   */
   title: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
@@ -383,11 +388,15 @@ export interface Category {
   generateSlug?: boolean | null;
   slug: string;
   /**
+   * Lower numbers appear first in the Products menu and catalogue grid.
+   */
+  sortOrder?: number | null;
+  /**
    * Short description for category cards and mega-menu.
    */
   description?: string | null;
   /**
-   * Keyword-rich intro copy for category landing pages (SEO).
+   * Optional longer intro copy for the category landing page (SEO).
    */
   categoryIntroBody?: {
     root: {
@@ -785,16 +794,90 @@ export interface Form {
   createdAt: string;
 }
 /**
+ * Inverter models shown on the public product catalogue. Publish to appear on the website.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products".
  */
 export interface Product {
   id: number;
+  /**
+   * Exact model name as shown on the website (e.g. OG6-GR1P2K01-NV-YD).
+   */
   name: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
   slug: string;
+  /**
+   * Product family / category. Create categories first under Catalogue → Categories.
+   */
   category: number | Category;
+  /**
+   * Datasheet model series (e.g. OG6-GR1P(2-3)K01-NV-YD). Used to group models on category pages.
+   */
+  modelSeries?: string | null;
+  /**
+   * Primary market segment for filtering and solutions pages.
+   */
   segment?: ('residential' | 'commercial' | 'utility' | 'storage') | null;
+  /**
+   * Short summary shown on the product detail page.
+   */
   shortDescription?: string | null;
+  /**
+   * Show in the Featured Models table on /products.
+   */
+  featured?: boolean | null;
+  /**
+   * e.g. 5 kW or 3.8 – 11.4 kW
+   */
+  powerRange?: string | null;
+  /**
+   * e.g. 98.7%
+   */
+  efficiency?: string | null;
+  /**
+   * e.g. Single Phase / Three Phase
+   */
+  phases?: string | null;
+  /**
+   * e.g. 10 Years
+   */
+  warranty?: string | null;
+  /**
+   * Additional rows on the product detail specs table (weight, dimensions, MPPT, etc.).
+   */
+  keySpecs?:
+    | {
+        label: string;
+        value: string;
+        unit?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Main product image on the detail page.
+   */
+  heroImage?: (number | null) | Media;
+  gallery?:
+    | {
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Product datasheet PDF.
+   */
+  datasheetPdf?: (number | null) | Media;
+  /**
+   * User / installation manual PDF.
+   */
+  manualPdf?: (number | null) | Media;
+  /**
+   * Long-form product content (optional).
+   */
   fullDescription?: {
     root: {
       type: string;
@@ -810,40 +893,6 @@ export interface Product {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * e.g. 3.8 – 11.4 kW
-   */
-  powerRange?: string | null;
-  /**
-   * e.g. 98.7%
-   */
-  efficiency?: string | null;
-  /**
-   * e.g. Single Phase
-   */
-  phases?: string | null;
-  /**
-   * e.g. 10 Years
-   */
-  warranty?: string | null;
-  heroImage?: (number | null) | Media;
-  gallery?:
-    | {
-        image?: (number | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  keySpecs?:
-    | {
-        label: string;
-        value: string;
-        unit?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  datasheetPdf?: (number | null) | Media;
-  manualPdf?: (number | null) | Media;
-  featured?: boolean | null;
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -856,6 +905,8 @@ export interface Product {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Datasheets, manuals, certificates, and other product documents.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "downloads".
  */
@@ -1317,22 +1368,17 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   name?: T;
+  generateSlug?: T;
   slug?: T;
   category?: T;
+  modelSeries?: T;
   segment?: T;
   shortDescription?: T;
-  fullDescription?: T;
+  featured?: T;
   powerRange?: T;
   efficiency?: T;
   phases?: T;
   warranty?: T;
-  heroImage?: T;
-  gallery?:
-    | T
-    | {
-        image?: T;
-        id?: T;
-      };
   keySpecs?:
     | T
     | {
@@ -1341,9 +1387,16 @@ export interface ProductsSelect<T extends boolean = true> {
         unit?: T;
         id?: T;
       };
+  heroImage?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
   datasheetPdf?: T;
   manualPdf?: T;
-  featured?: T;
+  fullDescription?: T;
   seo?:
     | T
     | {
@@ -1483,6 +1536,7 @@ export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   generateSlug?: T;
   slug?: T;
+  sortOrder?: T;
   description?: T;
   categoryIntroBody?: T;
   parent?: T;

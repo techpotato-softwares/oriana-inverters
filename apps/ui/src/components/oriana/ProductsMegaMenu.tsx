@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { ChevronRight } from 'lucide-react'
-import { inverterMegaMenu } from '@/config/navigation'
+import type { CatalogueNavItem } from '@/types/catalogue'
 import { cn } from '@/utilities/ui'
 
 const categoryPlaceholders: Record<string, string> = {
@@ -24,13 +24,33 @@ function categorySlugFromHref(href: string) {
   return href.split('/').pop() ?? 'residential-grid-tied'
 }
 
-/** Solis / Sungrow two-panel products megamenu — categories left, product cards right */
-export function ProductsMegaMenuPanel() {
+function placeholderFor(href: string, imageUrl?: string | null) {
+  if (imageUrl) return imageUrl
+  const slug = categorySlugFromHref(href)
+  return categoryPlaceholders[slug] ?? categoryPlaceholders['residential-grid-tied']
+}
+
+/** Products megamenu — categories and models come from Payload admin */
+export function ProductsMegaMenuPanel({ menu }: { menu: CatalogueNavItem[] }) {
   const [activeIndex, setActiveIndex] = useState(0)
-  const active = inverterMegaMenu[activeIndex]
-  const categorySlug = categorySlugFromHref(active.href)
-  const placeholder =
-    categoryPlaceholders[categorySlug] ?? categoryPlaceholders['residential-grid-tied']
+  const items = menu.length ? menu : []
+  const active = items[activeIndex] ?? items[0]
+
+  if (!active) {
+    return (
+      <div className="absolute left-0 right-0 top-full z-40 border-t border-white/40 bg-white/90 px-6 py-10 shadow-lg backdrop-blur-xl">
+        <p className="text-sm text-oriana-muted">
+          No published products yet. Add categories and products in{' '}
+          <Link href="/admin" className="font-semibold text-oriana-blue hover:underline">
+            Admin → Catalogue
+          </Link>
+          .
+        </p>
+      </div>
+    )
+  }
+
+  const categoryPlaceholder = placeholderFor(active.href)
 
   return (
     <div
@@ -39,7 +59,6 @@ export function ProductsMegaMenuPanel() {
       aria-label="Products menu"
     >
       <div className="container flex min-h-[300px] gap-0 py-8 lg:py-10">
-        {/* Left — category sidebar (Solis / Sungrow) */}
         <aside className="w-52 shrink-0 border-r border-oriana-navy/8 pr-6 lg:w-60">
           <Link
             href="/products"
@@ -49,7 +68,7 @@ export function ProductsMegaMenuPanel() {
             <ChevronRight className="h-4 w-4" />
           </Link>
           <ul className="space-y-0">
-            {inverterMegaMenu.map((cat, i) => {
+            {items.map((cat, i) => {
               const isActive = activeIndex === i
               return (
                 <li key={cat.href}>
@@ -73,7 +92,6 @@ export function ProductsMegaMenuPanel() {
           </ul>
         </aside>
 
-        {/* Right — product image grid for active category */}
         <div className="min-w-0 flex-1 pl-8 lg:pl-12">
           <div className="mb-4 flex items-center justify-between">
             <Link
@@ -87,29 +105,37 @@ export function ProductsMegaMenuPanel() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 lg:gap-8">
-            {active.products.map((product) => (
-              <Link
-                key={product.href}
-                href={product.href}
-                className="group flex flex-col items-center text-center"
-              >
-                <div className="relative flex h-32 w-full max-w-[180px] items-center justify-center bg-gradient-to-b from-oriana-silver/60 to-white transition group-hover:from-oriana-silver">
-                  <Image
-                    src={placeholder}
-                    alt={product.label}
-                    width={140}
-                    height={100}
-                    className="h-auto max-h-[88px] w-auto max-w-[130px] object-contain p-2 transition group-hover:scale-105"
-                    unoptimized
-                  />
-                </div>
-                <p className="mt-3 max-w-[180px] font-mono text-[11px] leading-snug text-oriana-navy transition group-hover:text-oriana-blue lg:text-xs">
-                  {product.label}
-                </p>
-              </Link>
-            ))}
-          </div>
+          {active.products.length === 0 ? (
+            <p className="text-sm text-oriana-muted">No published models in this category yet.</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 lg:gap-8">
+              {active.products.slice(0, 8).map((product) => {
+                const src = placeholderFor(active.href, product.imageUrl)
+                const isSvg = src.endsWith('.svg')
+                return (
+                  <Link
+                    key={product.href}
+                    href={product.href}
+                    className="group flex flex-col items-center text-center"
+                  >
+                    <div className="relative flex h-32 w-full max-w-[180px] items-center justify-center bg-gradient-to-b from-oriana-silver/60 to-white transition group-hover:from-oriana-silver">
+                      <Image
+                        src={src}
+                        alt={product.label}
+                        width={140}
+                        height={100}
+                        className="h-auto max-h-[88px] w-auto max-w-[130px] object-contain p-2 transition group-hover:scale-105"
+                        unoptimized={isSvg}
+                      />
+                    </div>
+                    <p className="mt-3 max-w-[180px] font-mono text-[11px] leading-snug text-oriana-navy transition group-hover:text-oriana-blue lg:text-xs">
+                      {product.label}
+                    </p>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

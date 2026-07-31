@@ -10,7 +10,7 @@ export const metadata = {
 
 const videos = [
   {
-    title: 'ORI-S6 Hybrid — Unboxing & Wall Mount',
+    title: 'Residential Hybrid — Unboxing & Wall Mount',
     category: 'Installation',
     duration: '8:42',
   },
@@ -20,12 +20,12 @@ const videos = [
     duration: '12:15',
   },
   {
-    title: 'ORI-S5 Three-Phase — Rooftop Installation',
+    title: 'C&I Three-Phase — Rooftop Installation',
     category: 'Installation',
     duration: '15:30',
   },
   {
-    title: 'ORI-GU250K — Utility Plant Overview',
+    title: 'Utility Grid-Tied — Plant Overview',
     category: 'Product Overview',
     duration: '6:20',
   },

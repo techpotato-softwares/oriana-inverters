@@ -21,7 +21,11 @@ const legacyCategorySlugs: Record<string, string> = {
 }
 
 function seriesOf(product: CatalogueProduct): string {
-  return product.specs.find((s) => s.label === 'Model Series')?.value ?? 'Other'
+  return (
+    product.modelSeries ||
+    product.specs.find((s) => s.label.toLowerCase() === 'model series')?.value ||
+    'Other'
+  )
 }
 
 function groupBySeries(products: CatalogueProduct[]) {

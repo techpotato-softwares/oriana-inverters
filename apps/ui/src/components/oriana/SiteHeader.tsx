@@ -12,6 +12,7 @@ import {
   type MegaMenuKey,
 } from '@/config/navigation'
 import { ProductsMegaMenuPanel } from '@/components/oriana/ProductsMegaMenu'
+import type { CatalogueNavItem } from '@/types/catalogue'
 
 function MegaMenuPanel({ menuKey }: { menuKey: MegaMenuKey }) {
   const menu = megaMenus[menuKey]
@@ -75,7 +76,7 @@ function MegaMenuPanel({ menuKey }: { menuKey: MegaMenuKey }) {
   )
 }
 
-export function SiteHeader() {
+export function SiteHeader({ catalogueMenu = [] }: { catalogueMenu?: CatalogueNavItem[] }) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<MegaMenuKey | null>(null)
@@ -217,7 +218,7 @@ export function SiteHeader() {
         {openMenu && (
           <div className="hidden xl:block">
             {openMenu === 'products' ? (
-              <ProductsMegaMenuPanel />
+              <ProductsMegaMenuPanel menu={catalogueMenu} />
             ) : (
               <MegaMenuPanel menuKey={openMenu} />
             )}
@@ -228,23 +229,58 @@ export function SiteHeader() {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="max-h-[80vh] overflow-y-auto border-t border-oriana-navy/10 bg-white px-4 py-4 xl:hidden">
-          {primaryNav.map((key) => (
-            <div key={key} className="mb-6">
-              <p className="mb-2 text-xs font-bold uppercase tracking-widest text-oriana-blue">
-                {megaMenus[key].label}
-              </p>
-              {megaMenus[key].columns.map((col) => (
-                <div key={col.title} className="mb-3">
-                  <p className="text-sm font-semibold text-oriana-navy">{col.title}</p>
-                  {col.links.map((l) => (
-                    <Link key={l.href} href={l.href} className="block py-1.5 pl-2 text-sm text-oriana-muted">
-                      {l.label}
-                    </Link>
+          {primaryNav.map((key) => {
+            if (key === 'products') {
+              return (
+                <div key={key} className="mb-6">
+                  <p className="mb-2 text-xs font-bold uppercase tracking-widest text-oriana-blue">
+                    Products
+                  </p>
+                  {catalogueMenu.map((cat) => (
+                    <div key={cat.href} className="mb-3">
+                      <Link
+                        href={cat.href}
+                        className="text-sm font-semibold text-oriana-navy hover:text-oriana-blue"
+                      >
+                        {cat.title}
+                      </Link>
+                      {cat.products.slice(0, 4).map((l) => (
+                        <Link
+                          key={l.href}
+                          href={l.href}
+                          className="block py-1.5 pl-2 text-sm text-oriana-muted"
+                        >
+                          {l.label}
+                        </Link>
+                      ))}
+                    </div>
                   ))}
                 </div>
-              ))}
-            </div>
-          ))}
+              )
+            }
+
+            return (
+              <div key={key} className="mb-6">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-oriana-blue">
+                  {megaMenus[key].label}
+                </p>
+                {megaMenus[key].columns.map((col) => (
+                  <div key={col.title} className="mb-3">
+                    <p className="text-sm font-semibold text-oriana-navy">{col.title}</p>
+                    {col.links.map((l) => (
+                      <Link
+                        key={l.href}
+                        href={l.href}
+                        className="block py-1.5 pl-2 text-sm text-oriana-muted"
+                      >
+                        {l.label}
+                      </Link>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )
+          })}
           <Link href="/where-to-buy" className="block py-2 text-sm font-semibold text-oriana-blue">
             Where to Buy
           </Link>

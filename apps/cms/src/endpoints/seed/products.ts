@@ -51,7 +51,7 @@ export async function seedProducts({ payload }: { payload: Payload }) {
 
   const categoryIds: Record<string, number> = {}
 
-  for (const cat of staticCategories) {
+  for (const [index, cat] of staticCategories.entries()) {
     const existing = await payload.find({
       collection: 'categories',
       where: { slug: { equals: cat.slug } },
@@ -67,6 +67,7 @@ export async function seedProducts({ payload }: { payload: Payload }) {
         data: {
           title: cat.title,
           description: cat.description,
+          sortOrder: index * 10 + 10,
         },
         ...seedOpts,
       })
@@ -79,6 +80,7 @@ export async function seedProducts({ payload }: { payload: Payload }) {
         title: cat.title,
         slug: cat.slug,
         description: cat.description,
+        sortOrder: index * 10 + 10,
       },
       ...seedOpts,
     })
@@ -87,6 +89,12 @@ export async function seedProducts({ payload }: { payload: Payload }) {
   }
 
   payload.logger.info('— Seeding products...')
+
+  if (!staticProducts.length) {
+    payload.logger.info(
+      '— No static products to seed. Add products in Admin → Catalogue → Products.',
+    )
+  }
 
   for (const product of staticProducts) {
     const existing = await payload.find({
@@ -127,6 +135,10 @@ export async function seedProducts({ payload }: { payload: Payload }) {
       efficiency: product.efficiency,
       phases: product.phases,
       warranty: product.warranty,
+      modelSeries:
+        product.modelSeries ??
+        product.specs.find((s) => s.label === 'Model Series')?.value ??
+        undefined,
       featured: product.featured ?? false,
       keySpecs: product.specs.map((s) => ({ label: s.label, value: s.value })),
       heroImage: heroImageId,
@@ -152,10 +164,10 @@ export async function seedProducts({ payload }: { payload: Payload }) {
   payload.logger.info('— Seeding downloads...')
 
   const sampleDownloads = [
-    { title: 'ORI-S6 Hybrid Series Datasheet', type: 'datasheet' as const },
-    { title: 'ORI-S5 Three-Phase Datasheet', type: 'datasheet' as const },
-    { title: 'ORI-GU250K Utility Datasheet', type: 'datasheet' as const },
-    { title: 'ORI-S6 Hybrid Installation Guide', type: 'manual' as const },
+    { title: 'Residential Grid-Tied Series Datasheet', type: 'datasheet' as const },
+    { title: 'C&I Grid-Tied Series Datasheet', type: 'datasheet' as const },
+    { title: 'Utility Grid-Tied Datasheet', type: 'datasheet' as const },
+    { title: 'Residential Hybrid Installation Guide', type: 'manual' as const },
     { title: 'UL 1741 SA Certificate', type: 'certificate' as const },
     { title: 'ISO 9001 Quality Certificate', type: 'certificate' as const },
   ]

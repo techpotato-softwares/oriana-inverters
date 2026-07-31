@@ -10,22 +10,22 @@ const stats = [
 
 const featuredProducts = [
   {
-    name: 'ORI-S6 Hybrid Series',
+    name: 'OG6 Hybrid Series',
     segment: 'Residential / Storage',
-    power: '3.8 – 11.4 kW',
-    href: '/products',
+    power: '3 – 8 kW',
+    href: '/products/category/residential-hybrid',
   },
   {
-    name: 'ORI-T75 Commercial',
+    name: 'OG6 C&I Grid-Tied',
     segment: 'Commercial & Industrial',
-    power: '50 – 110 kW',
-    href: '/products',
+    power: '25 – 125 kW',
+    href: '/products/category/ci-grid-tied',
   },
   {
-    name: 'ORI-U2500 Utility',
+    name: 'OG6 Utility',
     segment: 'Utility-Scale',
-    power: '2.5 MW',
-    href: '/products',
+    power: '350 kW',
+    href: '/products/category/utility-grid-tied',
   },
 ]
 

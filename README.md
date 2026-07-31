@@ -32,7 +32,37 @@ Optional repo variable: `AWS_REGION` (default `ap-south-1`).
 
 ### 2. Environment file (no passwords in git)
 
+<<<<<<< Updated upstream
 Edit [`config/deploy.env`](config/deploy.env) with Supabase **host**, **port**, **database name**, **user** only:
+=======
+## Project Structure
+
+```
+src/
+├── app/(frontend)/     # Public website routes
+├── app/(payload)/      # Payload CMS admin + API
+├── collections/        # Products, Media, Posts, Pages...
+├── components/oriana/  # Oriana-branded UI (hero, gallery, video)
+└── payload.config.ts
+```
+
+## Media & Video
+
+Upload 4K videos and high-res images via Payload admin (`/admin` → Media). The `VideoBackground` component supports multiple sources with resolution-based `media` queries (1080p / 4K).
+
+## Catalogue data (Payload CMS)
+
+**Products are managed only in Admin** — there is no hardcoded ORI product catalogue in code.
+
+1. Open **http://localhost:3000/admin**
+2. **Catalogue → Categories** — create product families
+3. **Catalogue → Products** — add models, assign category, **Publish**
+4. **Catalogue → Downloads** / **Media** — attach datasheets and images
+
+Published items appear on `/products`, category pages, solutions pages, and the Products mega-menu.
+
+Optional: seed default category shells only:
+>>>>>>> Stashed changes
 
 ```bash
 QA_DB_HOST=db.xxxx.supabase.co
@@ -42,7 +72,11 @@ QA_DB_USER=postgres
 QA_DB_SSL=true
 ```
 
+<<<<<<< Updated upstream
 Copy from [`config/deploy.env.example`](config/deploy.env.example) for other envs.
+=======
+(This no longer inserts demo products — add those in Admin.)
+>>>>>>> Stashed changes
 
 ### 3. Run deploy workflow
 

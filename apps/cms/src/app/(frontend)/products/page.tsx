@@ -4,9 +4,9 @@ import { ArrowUpRight } from 'lucide-react'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
 import { FadeIn } from '@/components/oriana/FadeIn'
-import { inverterMegaMenu } from '@/config/navigation'
 import {
   getCatalogueCategories,
+  getCatalogueNav,
   getCatalogueProducts,
 } from '@/utilities/getCatalogue'
 
@@ -37,12 +37,22 @@ export default async function ProductsPage({ searchParams }: Props) {
     redirect(`/products/category/${legacyCategoryRedirects[cat]}`)
   }
 
-  const [products, categories] = await Promise.all([
+  const [products, categories, nav] = await Promise.all([
     getCatalogueProducts(),
     getCatalogueCategories(),
+    getCatalogueNav(),
   ])
 
-  const categoryMap = Object.fromEntries(categories.map((c) => [c.slug, c]))
+  const categoryCards = nav.length
+    ? nav
+    : categories.map((c) => ({
+        title: c.title,
+        href: `/products/category/${c.slug}`,
+        description: c.description,
+        products: products
+          .filter((p) => p.categorySlug === c.slug)
+          .map((p) => ({ label: p.name, href: `/products/${p.slug}` })),
+      }))
 
   return (
     <main>
@@ -55,30 +65,45 @@ export default async function ProductsPage({ searchParams }: Props) {
 
       <section className="py-12 lg:py-20">
         <div className="container">
+          {categoryCards.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-oriana-navy/20 bg-oriana-surface px-8 py-16 text-center">
+              <h2 className="font-display text-2xl font-semibold text-oriana-navy">
+                Catalogue coming soon
+              </h2>
+              <p className="mx-auto mt-3 max-w-lg text-sm text-oriana-muted">
+                Products and categories are managed in the CMS. Create a category, then add and
+                publish products to list them here.
+              </p>
+              <Link
+                href="/admin/collections/products"
+                className="mt-6 inline-flex rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white hover:bg-oriana-navy"
+              >
+                Open Admin → Products
+              </Link>
+            </div>
+          ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {inverterMegaMenu.map((cat, i) => {
-              const slug = cat.href.split('/').pop()!
-              const meta = categoryMap[slug]
-              const count = products.filter((p) => p.categorySlug === slug).length
+            {categoryCards.map((catCard, i) => {
+              const count = catCard.products.length
               return (
-                <FadeIn key={cat.title} delay={i * 0.05}>
+                <FadeIn key={catCard.href} delay={i * 0.05}>
                   <Link
-                    href={cat.href}
+                    href={catCard.href}
                     className="group flex h-full flex-col rounded border border-oriana-navy/8 bg-white p-8 transition hover:-translate-y-0.5 hover:border-oriana-blue/25 hover:shadow-lg"
                   >
                     <h2 className="font-display text-xl font-bold text-oriana-navy group-hover:text-oriana-blue">
-                      {cat.title}
+                      {catCard.title}
                     </h2>
-                    {meta && (
+                    {catCard.description && (
                       <p className="mt-3 flex-1 text-sm leading-relaxed text-oriana-muted">
-                        {meta.description}
+                        {catCard.description}
                       </p>
                     )}
                     <p className="mt-4 text-xs font-medium text-oriana-muted">
-                      {count > 0 ? `${count} models` : `${cat.products.length} models listed`}
+                      {count} {count === 1 ? 'model' : 'models'}
                     </p>
                     <ul className="mt-4 space-y-1 border-t border-oriana-navy/8 pt-4">
-                      {cat.products.slice(0, 3).map((p) => (
+                      {catCard.products.slice(0, 3).map((p) => (
                         <li key={p.href} className="truncate font-mono text-xs text-oriana-navy/70">
                           {p.label}
                         </li>
@@ -92,6 +117,7 @@ export default async function ProductsPage({ searchParams }: Props) {
               )
             })}
           </div>
+          )}
 
           <div className="mt-20">
             <h2 className="font-display text-2xl font-bold text-oriana-navy">Featured Models</h2>
@@ -107,21 +133,37 @@ export default async function ProductsPage({ searchParams }: Props) {
                   </tr>
                 </thead>
                 <tbody>
-                  {products
-                    .filter((p) => p.featured)
-                    .map((p) => (
-                      <tr key={p.slug} className="border-b border-oriana-navy/8 hover:bg-oriana-silver/30">
-                        <td className="px-4 py-4 font-mono font-medium text-oriana-navy">{p.name}</td>
-                        <td className="px-4 py-4 text-oriana-muted">{p.category}</td>
-                        <td className="px-4 py-4 text-oriana-muted">{p.powerRange}</td>
-                        <td className="px-4 py-4 text-oriana-muted">{p.efficiency}</td>
-                        <td className="px-4 py-4">
-                          <Link href={`/products/${p.slug}`} className="font-semibold text-oriana-blue hover:underline">
-                            Details →
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
+                  {products.filter((p) => p.featured).length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-oriana-muted">
+                        Mark products as Featured in Admin to show them here.
+                      </td>
+                    </tr>
+                  ) : (
+                    products
+                      .filter((p) => p.featured)
+                      .map((p) => (
+                        <tr
+                          key={p.slug}
+                          className="border-b border-oriana-navy/8 hover:bg-oriana-silver/30"
+                        >
+                          <td className="px-4 py-4 font-mono font-medium text-oriana-navy">
+                            {p.name}
+                          </td>
+                          <td className="px-4 py-4 text-oriana-muted">{p.category}</td>
+                          <td className="px-4 py-4 text-oriana-muted">{p.powerRange}</td>
+                          <td className="px-4 py-4 text-oriana-muted">{p.efficiency}</td>
+                          <td className="px-4 py-4">
+                            <Link
+                              href={`/products/${p.slug}`}
+                              className="font-semibold text-oriana-blue hover:underline"
+                            >
+                              Details →
+                            </Link>
+                          </td>
+                        </tr>
+                      ))
+                  )}
                 </tbody>
               </table>
             </div>

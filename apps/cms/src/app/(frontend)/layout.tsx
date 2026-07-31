@@ -7,6 +7,7 @@ import { SiteFooter } from '@/components/oriana/SiteFooter'
 import { SiteHeader } from '@/components/oriana/SiteHeader'
 import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { getCatalogueNav } from '@/utilities/getCatalogue'
 import { draftMode } from 'next/headers'
 
 import './globals.css'
@@ -26,6 +27,7 @@ const outfit = Outfit({
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
+  const catalogueMenu = await getCatalogueNav()
 
   return (
     <html
@@ -45,7 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               preview: isEnabled,
             }}
           />
-          <SiteHeader />
+          <SiteHeader catalogueMenu={catalogueMenu} />
           {children}
           <SiteFooter />
         </Providers>

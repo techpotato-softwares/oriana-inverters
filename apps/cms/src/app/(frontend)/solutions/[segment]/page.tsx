@@ -4,23 +4,30 @@ import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
 import { FadeIn } from '@/components/oriana/FadeIn'
+import { getCatalogueProducts } from '@/utilities/getCatalogue'
 
 const segments: Record<
   string,
-  { title: string; description: string; benefits: string[]; products: string[]; image: string }
+  {
+    title: string
+    description: string
+    benefits: string[]
+    segmentKeys: Array<'residential' | 'commercial' | 'utility' | 'storage'>
+    image: string
+  }
 > = {
   residential: {
     title: 'Residential Solutions',
     description:
       'Power your home with Oriana single-phase string and hybrid inverters — engineered for maximum rooftop energy harvest, battery integration, and decades of reliable operation.',
     benefits: [
-      'Single-phase string inverters from 1 – 11.4 kW',
+      'Single-phase and three-phase residential grid-tied inverters',
       'Hybrid models with seamless battery backup switching',
       'WiFi monitoring with homeowner-friendly app',
       'Quiet operation with fanless or low-noise designs',
       '10-year standard warranty with extension options',
     ],
-    products: ['ORI-S3 String Series', 'ORI-S6 Hybrid Series', 'ORI-M300 Microinverter'],
+    segmentKeys: ['residential', 'storage'],
     image: '/assets/products/single-phase.svg',
   },
   commercial: {
@@ -28,27 +35,27 @@ const segments: Record<
     description:
       'Scale your business energy independence with three-phase inverter systems designed for warehouses, factories, data centers, and commercial rooftops.',
     benefits: [
-      'Three-phase string inverters up to 110 kW',
+      'C&I grid-tied string inverters for rooftops and carports',
       'Multi-MPPT for complex rooftop geometries',
       'Fleet monitoring and SCADA integration',
       'AFCI and rapid shutdown compliance',
       'Dedicated C&I technical support team',
     ],
-    products: ['ORI-T50 Series', 'ORI-T75 Commercial', 'ORI-T110 Three-Phase'],
+    segmentKeys: ['commercial'],
     image: '/assets/products/three-phase.svg',
   },
   utility: {
     title: 'Utility-Scale Solutions',
     description:
-      'Deploy megawatt-class solar plants with Oriana central inverter platforms — built for 99.6% efficiency, grid code compliance, and 25+ year operational life.',
+      'Deploy megawatt-class solar plants with Oriana utility platforms — built for high efficiency, grid code compliance, and long operational life.',
     benefits: [
-      'Central inverters from 1 – 3.5 MW',
-      'Outdoor-rated IP65 enclosures',
-      'Grid-forming capability for weak grids',
-      'Modular serviceability and hot-swap design',
-      'Global grid code pre-certification',
+      'Utility grid-tied inverters for large plants',
+      'Outdoor-rated enclosures',
+      'Advanced grid-support functions',
+      'Modular serviceability',
+      'Global grid code readiness',
     ],
-    products: ['ORI-U1000', 'ORI-U2500 Central', 'ORI-U3500 Utility Platform'],
+    segmentKeys: ['utility'],
     image: '/assets/products/utility-scale.svg',
   },
   storage: {
@@ -57,12 +64,12 @@ const segments: Record<
       'Integrate battery storage seamlessly with Oriana hybrid inverters — enabling backup power, peak shaving, time-of-use optimization, and grid services revenue.',
     benefits: [
       'Compatible with leading lithium battery brands',
-      'UPS-level switching under 10 ms',
+      'Fast backup switching',
       'Time-of-use and self-consumption optimization',
       'Virtual power plant (VPP) ready',
       'Black start and islanding capability',
     ],
-    products: ['ORI-S6 Hybrid', 'ORI-H50 Storage Series', 'ORI-EMS Energy Manager'],
+    segmentKeys: ['storage', 'residential'],
     image: '/assets/products/hybrid-storage.svg',
   },
 }
@@ -81,10 +88,17 @@ export default async function SolutionPage({ params }: Props) {
   const data = segments[segment]
   if (!data) notFound()
 
+  const allProducts = await getCatalogueProducts()
+  const recommended = allProducts
+    .filter((p) => data.segmentKeys.includes(p.segmentKey))
+    .slice(0, 6)
+
   return (
     <main>
       <PageHero eyebrow="Solutions" title={data.title} description={data.description} />
-      <Breadcrumbs items={[{ label: 'Solutions', href: '/solutions/residential' }, { label: data.title }]} />
+      <Breadcrumbs
+        items={[{ label: 'Solutions', href: '/solutions/residential' }, { label: data.title }]}
+      />
 
       <section className="py-20 lg:py-28">
         <div className="container">
@@ -115,18 +129,30 @@ export default async function SolutionPage({ params }: Props) {
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <h2 className="font-display text-2xl font-bold text-oriana-navy">Recommended Products</h2>
+              <h2 className="font-display text-2xl font-bold text-oriana-navy">
+                Recommended Products
+              </h2>
               <div className="mt-8 space-y-3">
-                {data.products.map((product) => (
-                  <Link
-                    key={product}
-                    href="/products"
-                    className="flex items-center justify-between rounded-xl border border-oriana-navy/8 bg-oriana-silver/50 px-6 py-4 transition hover:border-oriana-blue/20 hover:bg-white"
-                  >
-                    <span className="font-semibold text-oriana-navy">{product}</span>
-                    <span className="text-sm text-oriana-blue">View →</span>
-                  </Link>
-                ))}
+                {recommended.length === 0 ? (
+                  <p className="text-sm text-oriana-muted">
+                    Products for this segment will appear here once published in{' '}
+                    <Link href="/admin/collections/products" className="text-oriana-blue hover:underline">
+                      Admin → Products
+                    </Link>
+                    .
+                  </p>
+                ) : (
+                  recommended.map((product) => (
+                    <Link
+                      key={product.slug}
+                      href={`/products/${product.slug}`}
+                      className="flex items-center justify-between rounded-xl border border-oriana-navy/8 bg-oriana-silver/50 px-6 py-4 transition hover:border-oriana-blue/20 hover:bg-white"
+                    >
+                      <span className="font-semibold text-oriana-navy">{product.name}</span>
+                      <span className="text-sm text-oriana-blue">View →</span>
+                    </Link>
+                  ))
+                )}
               </div>
 
               <div className="mt-10 flex gap-4">

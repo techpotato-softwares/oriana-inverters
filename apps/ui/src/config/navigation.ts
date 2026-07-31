@@ -1,48 +1,30 @@
-/** Site IA — benchmarked against Solis + Sungrow (plan §2, §5) */
+/** Site IA — category hrefs used as static fallbacks; live Products menu comes from CMS. */
 
 export const inverterMegaMenu = [
   {
     title: 'Residential Grid-Tied PV Inverter',
     href: '/products/category/residential-grid-tied',
-    products: [
-      { label: 'OG6-GR1P(2-3)K01-NV-YD', href: '/products/og6-gr1p2k01-nv-yd' },
-      { label: 'OG6-GR1P(4-5)K-S(21A)', href: '/products/og6-gr1p5k-s-21a' },
-      { label: 'OG6-GR3P(3-10)K02-NV-ND', href: '/products/og6-gr3p5k02-nv-nd' },
-      { label: 'OG5-GR3P(3-25)K(21A)', href: '/products/og5-gr3p12k-21a' },
-    ],
+    products: [] as { label: string; href: string }[],
   },
   {
     title: 'C&I Grid-Tied PV Inverter',
     href: '/products/category/ci-grid-tied',
-    products: [
-      { label: 'OG6-GC3P(25-40)K03-NV-ND', href: '/products/og6-gc3p25k03-nv-nd' },
-      { label: 'OG6-GC3P(40-60)K-NV-ND', href: '/products/og6-gc3p40k04-nv-nd' },
-      { label: 'OG6-GC(80-125)K', href: '/products/og6-gc80k' },
-      { label: 'OG6-GC3P(150-200)K07-NV-ND', href: '/products/og6-gc3p150k07-nv-nd' },
-    ],
+    products: [] as { label: string; href: string }[],
   },
   {
     title: 'Utility Grid-Tied PV Inverter',
     href: '/products/category/utility-grid-tied',
-    products: [
-      { label: 'OG6-GU3P350K06-EV-ND', href: '/products/og6-gu3p350k06-ev-nd' },
-    ],
+    products: [] as { label: string; href: string }[],
   },
   {
     title: 'Residential Hybrid Inverter',
     href: '/products/category/residential-hybrid',
-    products: [
-      { label: 'OG6-EH1P(3-8)K-L-PLUS', href: '/products/og6-eh1p3k-l-plus' },
-      { label: 'OG6-EH3P(8-18)K02-NV-YD-L', href: '/products/og6-eh3p8k02-nv-yd-l' },
-      { label: 'OG6-EH3P(30-60)K-H(21A)', href: '/products/og6-eh3p30k-h-21a' },
-    ],
+    products: [] as { label: string; href: string }[],
   },
   {
     title: 'C&I Hybrid Inverter',
     href: '/products/category/ci-hybrid',
-    products: [
-      { label: 'OG6-EH3P(80-125)K10-NV-YD-H', href: '/products/og6-eh3p80k10-nv-yd-h' },
-    ],
+    products: [] as { label: string; href: string }[],
   },
 ]
 
@@ -214,9 +196,9 @@ export const megaMenus: Record<
       {
         title: 'Products',
         links: [
-          { label: 'OG6-GU3P350K', href: '/products/og6-gu3p350k06-ev-nd' },
-          { label: 'C&I Grid-Tied 80–125K', href: '/products/og6-gc80k' },
-          { label: 'All Utility Products', href: '/products/category/utility-grid-tied' },
+          { label: 'Utility Catalogue', href: '/products/category/utility-grid-tied' },
+          { label: 'All Products', href: '/products' },
+          { label: 'Request a Quote', href: '/contact' },
         ],
       },
       {

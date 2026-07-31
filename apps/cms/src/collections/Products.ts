@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { slugField } from 'payload'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
@@ -7,9 +8,15 @@ import { defaultLexical } from '@/fields/defaultLexical'
 
 export const Products: CollectionConfig = {
   slug: 'products',
+  labels: {
+    singular: 'Product',
+    plural: 'Products',
+  },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'category', 'featured', 'updatedAt'],
+    defaultColumns: ['name', 'category', 'modelSeries', 'powerRange', 'featured', '_status', 'updatedAt'],
+    group: 'Catalogue',
+    description: 'Inverter models shown on the public product catalogue. Publish to appear on the website.',
   },
   access: {
     create: authenticated,
@@ -28,11 +35,17 @@ export const Products: CollectionConfig = {
           payload.logger.info(`Revalidating product: /products/${doc.slug}`)
           revalidatePath(`/products/${doc.slug}`)
           revalidatePath('/products')
+          if (doc.category && typeof doc.category === 'object' && 'slug' in doc.category) {
+            revalidatePath(`/products/category/${(doc.category as { slug: string }).slug}`)
+          }
           revalidateTag('products')
+          revalidateTag('categories')
         }
 
         if (previousDoc?._status === 'published' && doc._status !== 'published') {
           revalidatePath(`/products/${previousDoc.slug}`)
+          revalidatePath('/products')
+          revalidateTag('products')
         }
 
         return doc
@@ -45,109 +58,171 @@ export const Products: CollectionConfig = {
         revalidatePath(`/products/${doc.slug}`)
         revalidatePath('/products')
         revalidateTag('products')
+        revalidateTag('categories')
         return doc
       },
     ],
   },
   fields: [
     {
-      name: 'name',
-      type: 'text',
-      required: true,
-    },
-    {
-      name: 'slug',
-      type: 'text',
-      required: true,
-      unique: true,
-      index: true,
-    },
-    {
-      name: 'category',
-      type: 'relationship',
-      relationTo: 'categories',
-      required: true,
-    },
-    {
-      name: 'segment',
-      type: 'select',
-      options: [
-        { label: 'Residential', value: 'residential' },
-        { label: 'Commercial & Industrial', value: 'commercial' },
-        { label: 'Utility-Scale', value: 'utility' },
-        { label: 'Energy Storage', value: 'storage' },
-      ],
-    },
-    {
-      name: 'shortDescription',
-      type: 'textarea',
-    },
-    {
-      name: 'fullDescription',
-      type: 'richText',
-      editor: defaultLexical,
-    },
-    {
-      name: 'powerRange',
-      type: 'text',
-      admin: { description: 'e.g. 3.8 – 11.4 kW' },
-    },
-    {
-      name: 'efficiency',
-      type: 'text',
-      admin: { description: 'e.g. 98.7%' },
-    },
-    {
-      name: 'phases',
-      type: 'text',
-      admin: { description: 'e.g. Single Phase' },
-    },
-    {
-      name: 'warranty',
-      type: 'text',
-      admin: { description: 'e.g. 10 Years' },
-    },
-    {
-      name: 'heroImage',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'gallery',
-      type: 'array',
-      fields: [
+      type: 'tabs',
+      tabs: [
         {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
+          label: 'Overview',
+          fields: [
+            {
+              name: 'name',
+              type: 'text',
+              required: true,
+              admin: {
+                description: 'Exact model name as shown on the website (e.g. OG6-GR1P2K01-NV-YD).',
+              },
+            },
+            slugField({ fieldToUse: 'name' }),
+            {
+              name: 'category',
+              type: 'relationship',
+              relationTo: 'categories',
+              required: true,
+              admin: {
+                description: 'Product family / category. Create categories first under Catalogue → Categories.',
+              },
+            },
+            {
+              name: 'modelSeries',
+              type: 'text',
+              admin: {
+                description: 'Datasheet model series (e.g. OG6-GR1P(2-3)K01-NV-YD). Used to group models on category pages.',
+              },
+            },
+            {
+              name: 'segment',
+              type: 'select',
+              options: [
+                { label: 'Residential', value: 'residential' },
+                { label: 'Commercial & Industrial', value: 'commercial' },
+                { label: 'Utility-Scale', value: 'utility' },
+                { label: 'Energy Storage', value: 'storage' },
+              ],
+              admin: {
+                description: 'Primary market segment for filtering and solutions pages.',
+              },
+            },
+            {
+              name: 'shortDescription',
+              type: 'textarea',
+              admin: {
+                description: 'Short summary shown on the product detail page.',
+              },
+            },
+            {
+              name: 'featured',
+              type: 'checkbox',
+              defaultValue: false,
+              admin: {
+                description: 'Show in the Featured Models table on /products.',
+              },
+            },
+          ],
+        },
+        {
+          label: 'Specs',
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'powerRange',
+                  type: 'text',
+                  admin: { description: 'e.g. 5 kW or 3.8 – 11.4 kW', width: '50%' },
+                },
+                {
+                  name: 'efficiency',
+                  type: 'text',
+                  admin: { description: 'e.g. 98.7%', width: '50%' },
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'phases',
+                  type: 'text',
+                  admin: { description: 'e.g. Single Phase / Three Phase', width: '50%' },
+                },
+                {
+                  name: 'warranty',
+                  type: 'text',
+                  admin: { description: 'e.g. 10 Years', width: '50%' },
+                },
+              ],
+            },
+            {
+              name: 'keySpecs',
+              type: 'array',
+              labels: { singular: 'Spec', plural: 'Key Specs' },
+              admin: {
+                description: 'Additional rows on the product detail specs table (weight, dimensions, MPPT, etc.).',
+              },
+              fields: [
+                { name: 'label', type: 'text', required: true },
+                { name: 'value', type: 'text', required: true },
+                { name: 'unit', type: 'text' },
+              ],
+            },
+          ],
+        },
+        {
+          label: 'Media & Docs',
+          fields: [
+            {
+              name: 'heroImage',
+              type: 'upload',
+              relationTo: 'media',
+              admin: { description: 'Main product image on the detail page.' },
+            },
+            {
+              name: 'gallery',
+              type: 'array',
+              fields: [
+                {
+                  name: 'image',
+                  type: 'upload',
+                  relationTo: 'media',
+                },
+              ],
+            },
+            {
+              name: 'datasheetPdf',
+              type: 'upload',
+              relationTo: 'media',
+              admin: { description: 'Product datasheet PDF.' },
+            },
+            {
+              name: 'manualPdf',
+              type: 'upload',
+              relationTo: 'media',
+              admin: { description: 'User / installation manual PDF.' },
+            },
+          ],
+        },
+        {
+          label: 'Content & SEO',
+          fields: [
+            {
+              name: 'fullDescription',
+              type: 'richText',
+              editor: defaultLexical,
+              admin: {
+                description: 'Long-form product content (optional).',
+              },
+            },
+            seoFields,
+          ],
         },
       ],
     },
-    {
-      name: 'keySpecs',
-      type: 'array',
-      fields: [
-        { name: 'label', type: 'text', required: true },
-        { name: 'value', type: 'text', required: true },
-        { name: 'unit', type: 'text' },
-      ],
-    },
-    {
-      name: 'datasheetPdf',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'manualPdf',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'featured',
-      type: 'checkbox',
-      defaultValue: false,
-    },
-    seoFields,
   ],
   versions: {
     drafts: true,

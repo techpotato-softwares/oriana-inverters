@@ -401,13 +401,13 @@ export function GlobalReachSection() {
 
 const newsItems = [
   {
-    title: 'Oriana launches next-gen hybrid series for US residential market',
+    title: 'Oriana expands hybrid inverter lineup for residential partners',
     date: 'Mar 15, 2026',
     href: '/posts',
     type: 'News',
   },
   {
-    title: 'ORI-GU250K ranks among top utility-scale inverters globally',
+    title: 'Utility grid-tied platform achieves strong global project uptake',
     date: 'Feb 28, 2026',
     href: '/posts',
     type: 'News',

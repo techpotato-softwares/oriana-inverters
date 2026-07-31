@@ -12,6 +12,7 @@ export type CatalogueProduct = {
   warranty: string
   featured?: boolean
   description: string
+  modelSeries?: string | null
   specs: { label: string; value: string }[]
   heroImageUrl?: string | null
   heroImageAlt?: string | null
@@ -22,6 +23,14 @@ export type CatalogueCategory = {
   slug: string
   title: string
   description: string
+  sortOrder?: number | null
+}
+
+export type CatalogueNavItem = {
+  title: string
+  href: string
+  description?: string
+  products: { label: string; href: string; imageUrl?: string | null }[]
 }
 
 export type CatalogueDownload = {

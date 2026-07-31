@@ -9,12 +9,21 @@
     }
   }
 
+  &__intro {
+    margin: base(0.75) 0;
+  }
+
   &__instructions {
     list-style: decimal;
     margin-bottom: base(0.5);
 
     & li {
       width: 100%;
+      margin-bottom: base(0.35);
+    }
+
+    & code {
+      font-size: 0.9em;
     }
   }
 

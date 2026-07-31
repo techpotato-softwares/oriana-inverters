@@ -2,28 +2,34 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
 
-import { staticCategories, staticProducts } from '@/data/products'
+import { staticCategories } from '@/data/products'
 import { mapCategory, mapDownload, mapProduct } from '@/utilities/mapCatalogue'
-import type { CatalogueCategory, CatalogueDownload, CatalogueProduct } from '@/types/catalogue'
+import type {
+  CatalogueCategory,
+  CatalogueDownload,
+  CatalogueNavItem,
+  CatalogueProduct,
+} from '@/types/catalogue'
 
 async function getPayloadSafe() {
   try {
     return await getPayload({ config: configPromise })
   } catch (error) {
-    console.error('[getCatalogue] Payload init failed, using static fallback:', error)
+    console.error('[getCatalogue] Payload init failed:', error)
     return null
   }
 }
 
+/** Products come only from Payload Admin (published). No hardcoded product fallback. */
 async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
   const payload = await getPayloadSafe()
-  if (!payload) return staticProducts
+  if (!payload) return []
 
   try {
     const result = await payload.find({
       collection: 'products',
       depth: 2,
-      limit: 200,
+      limit: 500,
       pagination: false,
       where: {
         _status: { equals: 'published' },
@@ -31,42 +37,33 @@ async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
       sort: 'name',
     })
 
-    if (!result.docs.length) {
-      return staticProducts
-    }
-
-    const cmsProducts = result.docs.map(mapProduct)
-    const merged = new Map<string, CatalogueProduct>()
-    for (const p of staticProducts) merged.set(p.slug, p)
-    for (const p of cmsProducts) merged.set(p.slug, p)
-    return Array.from(merged.values())
+    return result.docs.map(mapProduct)
   } catch (error) {
-    console.error('[getCatalogue] products query failed, using static fallback:', error)
-    return staticProducts
+    console.error('[getCatalogue] products query failed:', error)
+    return []
   }
 }
 
+/** Categories come from Admin; empty CMS returns no categories (create them in Admin). */
 async function fetchCategories(): Promise<CatalogueCategory[]> {
   const payload = await getPayloadSafe()
-  if (!payload) return staticCategories
+  if (!payload) return []
 
   try {
     const result = await payload.find({
       collection: 'categories',
       depth: 0,
-      limit: 50,
+      limit: 100,
       pagination: false,
-      sort: 'title',
+      sort: 'sortOrder',
     })
 
-    if (!result.docs.length) {
-      return staticCategories
-    }
+    if (!result.docs.length) return []
 
-    return result.docs.map(mapCategory)
+    return result.docs.map(mapCategory).sort((a, b) => (a.sortOrder ?? 100) - (b.sortOrder ?? 100))
   } catch (error) {
-    console.error('[getCatalogue] categories query failed, using static fallback:', error)
-    return staticCategories
+    console.error('[getCatalogue] categories query failed:', error)
+    return []
   }
 }
 
@@ -102,6 +99,26 @@ export const getCatalogueDownloads = unstable_cache(fetchDownloads, ['catalogue-
   tags: ['downloads'],
 })
 
+export async function getCatalogueNav(): Promise<CatalogueNavItem[]> {
+  const [categories, products] = await Promise.all([
+    getCatalogueCategories(),
+    getCatalogueProducts(),
+  ])
+
+  return categories.map((cat) => ({
+    title: cat.title,
+    href: `/products/category/${cat.slug}`,
+    description: cat.description,
+    products: products
+      .filter((p) => p.categorySlug === cat.slug)
+      .map((p) => ({
+        label: p.name,
+        href: `/products/${p.slug}`,
+        imageUrl: p.heroImageUrl,
+      })),
+  }))
+}
+
 export async function getProductBySlug(slug: string): Promise<CatalogueProduct | null> {
   const products = await getCatalogueProducts()
   return products.find((p) => p.slug === slug) ?? null
@@ -112,11 +129,13 @@ export async function getProductsByCategory(categorySlug: string): Promise<Catal
   return products.filter((p) => p.categorySlug === categorySlug)
 }
 
-export async function getCategoryMeta(
-  slug: string,
-): Promise<CatalogueCategory | null> {
+export async function getCategoryMeta(slug: string): Promise<CatalogueCategory | null> {
   const categories = await getCatalogueCategories()
-  return categories.find((c) => c.slug === slug) ?? staticCategories.find((c) => c.slug === slug) ?? null
+  return (
+    categories.find((c) => c.slug === slug) ??
+    staticCategories.find((c) => c.slug === slug) ??
+    null
+  )
 }
 
 export async function getAllProductSlugs(): Promise<string[]> {
