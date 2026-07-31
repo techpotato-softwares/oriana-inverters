@@ -23,8 +23,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV NEXT_IMAGE_UNOPTIMIZED=true
 
-# Build args for public URL (CloudFront) — can be empty at image build
-ARG NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+# Build args for public URL (CloudFront). Prefer leaving unset at image build —
+# NEXT_PUBLIC_* is inlined by Next; runtime uses PAYLOAD_SERVER_URL on Lambda.
+ARG NEXT_PUBLIC_SERVER_URL=
 ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
 
 # Always build inside Docker so standalone includes traced node_modules.

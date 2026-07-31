@@ -11,13 +11,23 @@ export const normalizeServerURL = (url: string): string => {
 }
 
 export const getServerSideURL = () => {
-  const url =
-    process.env.NEXT_PUBLIC_SERVER_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : 'http://localhost:3000')
+  // Prefer runtime-only env vars. Next.js inlines process.env.NEXT_PUBLIC_* at
+  // build time, so Docker builds bake localhost forever unless we read a
+  // non-NEXT_PUBLIC name (or use bracket access) that Lambda can set after deploy.
+  const runtimeUrl =
+    process.env.PAYLOAD_SERVER_URL ||
+    process.env.SERVER_URL ||
+    process.env['NEXT_PUBLIC_SERVER_URL']
 
-  return normalizeServerURL(url)
+  if (runtimeUrl) {
+    return normalizeServerURL(runtimeUrl)
+  }
+
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return normalizeServerURL(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`)
+  }
+
+  return 'http://localhost:3000'
 }
 
 export const getClientSideURL = () => {
@@ -29,12 +39,16 @@ export const getClientSideURL = () => {
     return `${protocol}//${domain}${port ? `:${port}` : ''}`
   }
 
+  if (process.env.PAYLOAD_SERVER_URL) {
+    return normalizeServerURL(process.env.PAYLOAD_SERVER_URL)
+  }
+
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
     return normalizeServerURL(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`)
   }
 
-  if (process.env.NEXT_PUBLIC_SERVER_URL) {
-    return normalizeServerURL(process.env.NEXT_PUBLIC_SERVER_URL)
+  if (process.env['NEXT_PUBLIC_SERVER_URL']) {
+    return normalizeServerURL(process.env['NEXT_PUBLIC_SERVER_URL'])
   }
 
   return ''

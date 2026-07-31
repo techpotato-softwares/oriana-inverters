@@ -83,15 +83,16 @@ const nextConfig: NextConfig = {
 
 const payloadConfig = withPayload(nextConfig, { devBundleServerPackages: false })
 
-// withPayload appends Critical-CH, which forces browsers to retry the document and
-// leaves /admin RSC Suspense dehydrated (blank white page). Strip it after wrap.
+// withPayload appends Critical-CH / Accept-CH. Critical-CH forces browsers to
+// retry the document and leaves /admin RSC Suspense dehydrated (blank white page).
 const payloadHeaders = payloadConfig.headers
 payloadConfig.headers = async () => {
   const headers = (await payloadHeaders?.()) ?? []
+  const strip = new Set(['critical-ch', 'accept-ch'])
   return headers.map((entry) => ({
     ...entry,
     headers: (entry.headers ?? []).filter(
-      (header) => header.key.toLowerCase() !== 'critical-ch',
+      (header) => !strip.has(header.key.toLowerCase()),
     ),
   }))
 }

@@ -95,6 +95,11 @@ export class OrianaInvertorsWebStack extends Stack {
       NEXT_PUBLIC_SERVER_URL:
         process.env.NEXT_PUBLIC_SERVER_URL ||
         "https://placeholder.cloudfront.net",
+      // Runtime (not build-inlined). Deploy workflow overwrites with CloudFront URL.
+      PAYLOAD_SERVER_URL:
+        process.env.PAYLOAD_SERVER_URL ||
+        process.env.NEXT_PUBLIC_SERVER_URL ||
+        "https://placeholder.cloudfront.net",
     };
 
     if (rdsConstruct) {
