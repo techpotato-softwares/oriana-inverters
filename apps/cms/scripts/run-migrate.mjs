@@ -21,7 +21,8 @@ import { fileURLToPath } from 'node:url'
 const require = createRequire(import.meta.url)
 const pg = require('pg')
 
-const cmsRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
+const cmsRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+// apps/cms/scripts → apps/cms (NOT repo root — Payload config lives in apps/cms/src)
 
 async function clearDevPushMarker() {
   const url = process.env.DATABASE_URL
@@ -74,23 +75,24 @@ async function clearDevPushMarker() {
 
 await clearDevPushMarker()
 
+console.log(`Running payload migrate from ${cmsRoot}`)
+
 const result = spawnSync(
   'npx',
-  [
-    'cross-env',
-    'NODE_OPTIONS=--no-deprecation --dns-result-order=ipv4first',
-    'PAYLOAD_MIGRATING=true',
-    `PG_POOL_MAX=${process.env.PG_POOL_MAX || '3'}`,
-    `PG_CONNECT_TIMEOUT_MS=${process.env.PG_CONNECT_TIMEOUT_MS || '60000'}`,
-    'payload',
-    'migrate',
-  ],
+  ['payload', 'migrate'],
   {
     cwd: cmsRoot,
     stdio: 'inherit',
     env: {
       ...process.env,
       PAYLOAD_MIGRATING: 'true',
+      // Absolute path so findConfig cannot wander to the monorepo root
+      PAYLOAD_CONFIG_PATH: path.join(cmsRoot, 'src/payload.config.ts'),
+      NODE_OPTIONS:
+        process.env.NODE_OPTIONS ||
+        '--no-deprecation --dns-result-order=ipv4first',
+      PG_POOL_MAX: process.env.PG_POOL_MAX || '3',
+      PG_CONNECT_TIMEOUT_MS: process.env.PG_CONNECT_TIMEOUT_MS || '60000',
     },
     shell: process.platform === 'win32',
   },
