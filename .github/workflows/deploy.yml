@@ -168,5 +168,26 @@ jobs:
       - name: Sync Next.js static assets to S3
         run: |
           chmod +x ./scripts/sync-next-static-to-s3.sh
-          # Pull from live Lambda (same build as container), not CI .next hashes
-          ./scripts/sync-next-static-to-s3.sh "${{ steps.env.outputs.environment }}" --wait-seconds 240
+          ENV="${{ steps.env.outputs.environment }}"
+          FN="oriana-invertors-web-$ENV"
+
+          # Docker rebuilds Next inside the image, so CI .next hashes do not match.
+          # Extract the exact static tree from the deployed Lambda image.
+          IMAGE_URI=$(aws lambda get-function --function-name "$FN" --query 'Code.ImageUri' --output text)
+          if [ -z "$IMAGE_URI" ] || [ "$IMAGE_URI" = "None" ]; then
+            echo "Lambda image URI not found; falling back to HTML scrape sync"
+            ./scripts/sync-next-static-to-s3.sh "$ENV" --wait-seconds 240
+            exit 0
+          fi
+
+          REGISTRY="${IMAGE_URI%%/*}"
+          aws ecr get-login-password --region "$AWS_REGION" \
+            | docker login --username AWS --password-stdin "$REGISTRY"
+
+          docker pull "$IMAGE_URI"
+          CONTAINER_ID=$(docker create "$IMAGE_URI")
+          rm -rf /tmp/lambda-next-static
+          docker cp "$CONTAINER_ID:/app/apps/cms/.next/static" /tmp/lambda-next-static
+          docker rm "$CONTAINER_ID"
+
+          ./scripts/sync-next-static-to-s3.sh "$ENV" --source-dir /tmp/lambda-next-static

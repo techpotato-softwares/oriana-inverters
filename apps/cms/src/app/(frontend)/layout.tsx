@@ -3,6 +3,7 @@ import { Outfit, Plus_Jakarta_Sans } from 'next/font/google'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
+import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery'
 import { SiteFooter } from '@/components/oriana/SiteFooter'
 import { SiteHeader } from '@/components/oriana/SiteHeader'
 import { Providers } from '@/providers'
@@ -42,6 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="font-sans antialiased">
         <Providers>
+          <ChunkLoadRecovery />
           <AdminBar
             adminBarProps={{
               preview: isEnabled,
