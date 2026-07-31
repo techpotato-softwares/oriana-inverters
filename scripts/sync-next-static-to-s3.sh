@@ -75,6 +75,8 @@ echo "  bucket: s3://$STATIC_BUCKET"
 upload_encoded_aliases() {
   # CloudFront/S3 OAC may request keys with URL-encoded [ ] ( ) from Next route segments.
   # Keep literal keys and create encoded alias objects so both forms resolve.
+  # Important: pass the literal source key to --copy-source. The AWS CLI encodes it;
+  # pre-encoding causes NoSuchKey (%28 looked up as a literal key name).
   python3 - <<'PY' "$STATIC_BUCKET"
 import json
 import subprocess
@@ -100,22 +102,34 @@ def encoded_alias_key(key: str) -> str:
             encoded_parts.append(part)
     return "/".join(encoded_parts)
 
-result = subprocess.run(
-    ["aws", "s3api", "list-objects-v2", "--bucket", bucket, "--prefix", "_next/static/"],
-    capture_output=True,
-    text=True,
-    check=True,
-)
-contents = json.loads(result.stdout).get("Contents") or []
-keys = [item["Key"] for item in contents]
+def list_keys(prefix: str) -> list[str]:
+    keys: list[str] = []
+    token = None
+    while True:
+        cmd = [
+            "aws", "s3api", "list-objects-v2",
+            "--bucket", bucket,
+            "--prefix", prefix,
+        ]
+        if token:
+            cmd.extend(["--continuation-token", token])
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        payload = json.loads(result.stdout)
+        keys.extend(item["Key"] for item in payload.get("Contents") or [])
+        if not payload.get("IsTruncated"):
+            break
+        token = payload.get("NextContinuationToken")
+    return keys
+
+keys = list_keys("_next/static/")
+# Only alias literal route-segment keys — skip existing %XX alias objects.
+literal_keys = [k for k in keys if any(ch in k for ch in SPECIAL)]
 created = 0
 
-for key in keys:
+for key in literal_keys:
     encoded_key = encoded_alias_key(key)
     if encoded_key == key:
         continue
-    # copy-source must encode special chars in the source key path
-    copy_source = f"{bucket}/{key}".replace("(", "%28").replace(")", "%29").replace("[", "%5B").replace("]", "%5D")
     subprocess.run(
         [
             "aws",
@@ -124,7 +138,7 @@ for key in keys:
             "--bucket",
             bucket,
             "--copy-source",
-            copy_source,
+            f"{bucket}/{key}",
             "--key",
             encoded_key,
             "--metadata-directive",
