@@ -67,8 +67,17 @@ export class WebCloudFrontConstruct extends Construct {
       this.staticAssetsBucket,
     );
 
+    // S3 OAC returns 403 for missing keys. Fall back to Lambda (which always has
+    // the image's .next/static) so a partial/stale S3 sync cannot ChunkLoadError
+    // the marketing site when HTML references app/(frontend)/* hashes.
+    const staticWithLambdaFailover = new origins.OriginGroup({
+      primaryOrigin: staticOrigin,
+      fallbackOrigin: lambdaOrigin,
+      fallbackStatusCodes: [403, 404],
+    });
+
     additionalBehaviors["/_next/static/*"] = {
-      origin: staticOrigin,
+      origin: staticWithLambdaFailover,
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
       cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,

@@ -176,7 +176,7 @@ wait_for_lambda_ready() {
 # app/(frontend)/* chunks, so syncing only those leaves the marketing site 403ing
 # on CloudFront→S3 (missing object).
 collect_static_paths() {
-  local page html tmp
+  local page html tmp home_ok=0
   tmp=$(mktemp)
   : > /tmp/static-paths.txt
 
@@ -186,6 +186,9 @@ collect_static_paths() {
       if printf '%s' "$html" | extract_paths_from_html >"$tmp" 2>/dev/null; then
         echo "  collected $(wc -l <"$tmp" | tr -d ' ') asset(s) from ${page}" >&2
         cat "$tmp" >> /tmp/static-paths.txt
+        if [ "$page" = "/" ]; then
+          home_ok=1
+        fi
       else
         echo "  skip ${page} (no /_next/static refs)" >&2
       fi
@@ -196,6 +199,17 @@ collect_static_paths() {
   rm -f "$tmp"
 
   if [ ! -s /tmp/static-paths.txt ]; then
+    return 1
+  fi
+
+  if [ "$home_ok" -ne 1 ]; then
+    echo "Homepage (/) did not yield /_next/static refs — refusing admin-only sync" >&2
+    echo "Without / we miss app/(frontend)/* chunks and CloudFront returns 403." >&2
+    return 1
+  fi
+
+  if ! grep -q '/_next/static/chunks/app/(frontend)/' /tmp/static-paths.txt; then
+    echo "No app/(frontend)/* assets in collected set — refusing sync" >&2
     return 1
   fi
 
@@ -261,6 +275,14 @@ sync_from_lambda_html() {
       aws s3 cp "$local_file" "s3://${STATIC_BUCKET}/${decoded_key}" \
         --content-type "$content_type" \
         --cache-control "public,max-age=31536000,immutable" >/dev/null
+    fi
+
+    # Confirm the object is readable under the exact key CloudFront will request
+    if ! aws s3api head-object --bucket "$STATIC_BUCKET" --key "$s3_key" >/dev/null 2>&1; then
+      echo "Upload reported OK but head-object missing for ${s3_key}" >&2
+      failed=$((failed + 1))
+      rm -f "$local_file"
+      continue
     fi
 
     echo "uploaded ${asset_path}"
