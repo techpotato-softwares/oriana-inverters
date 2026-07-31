@@ -96,9 +96,9 @@ async function upsertBySlug(
       ...seedOpts,
     })
     if (existing.docs[0]) {
-      await payload.update({ collection, id: existing.docs[0].id, data, ...seedOpts })
+      await payload.update({ collection, id: existing.docs[0].id, data, ...seedOpts } as never)
     } else {
-      await payload.create({ collection, data, ...seedOpts })
+      await payload.create({ collection, data, ...seedOpts } as never)
     }
   })
 }

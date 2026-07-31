@@ -1,6 +1,7 @@
 /**
  * Shared list of Postgres tables required for Oriana CMS + site seed.
- * Used by schema:push pre-check and by seed scripts to auto-ensure schema.
+ * Used by ensure-schema.ts (runs `payload migrate`) to verify migrations applied,
+ * and by push-schema.ts (local dev only, not used by CI).
  */
 import pg from 'pg'
 

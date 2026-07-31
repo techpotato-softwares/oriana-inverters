@@ -1,7 +1,16 @@
 /**
+ * LOCAL DEV ONLY — not used by CI.
+ *
  * Bootstrap Postgres schema via Drizzle push (PAYLOAD_DATABASE_PUSH=true).
  *
- * Re-pushes when required tables are missing (e.g. after CMS content model expansion).
+ * CI/production use committed migrations instead (`npm run migrate`, see
+ * src/migrations/ and src/scripts/ensure-schema.ts). drizzle-kit's push can
+ * prompt interactively to disambiguate create-vs-rename for enums/tables
+ * (e.g. "Is enum_x created or renamed from another enum?") and there is no
+ * flag to auto-answer it — in a non-interactive shell (CI) this hangs forever.
+ *
+ * Use this only for quick local prototyping before running
+ * `payload migrate:create` to capture the change as a real migration.
  *
  * Supabase session poolers are tiny and flake under Drizzle introspect (many catalog
  * queries). We:

@@ -15,8 +15,8 @@ on:
         type: choice
         options: [site, catalogue, admin, full]
         default: site
-      skip_schema_push:
-        description: Skip dedicated schema:push step (seed still auto-creates missing tables)
+      skip_migrate:
+        description: Skip dedicated migrate step (seed still auto-runs pending migrations)
         required: false
         type: boolean
         default: false
@@ -144,29 +144,29 @@ jobs:
           } catch (e) {
             console.error('DB probe failed — Supabase pooler likely saturated or unreachable from GHA.')
             console.error(String(e))
-            console.error('Fix: wait a few minutes, pause other clients, or run schema:push locally, then re-run with skip_schema_push=true')
+            console.error('Fix: wait a few minutes, pause other clients, or run migrate locally, then re-run with skip_migrate=true')
             process.exit(1)
           } finally {
             try { await client.end() } catch { /* ignore */ }
           }
           EOF
 
-      - name: Bootstrap schema (push tables)
-        if: ${{ github.event.inputs.skip_schema_push != 'true' }}
+      # Committed Payload migrations (src/migrations) — plain SQL, no interactive
+      # prompts. Do NOT use `schema:push` (drizzle-kit) in CI: it can prompt to
+      # disambiguate create-vs-rename for enums/tables and hangs forever with no TTY.
+      - name: Apply Payload migrations
+        if: ${{ github.event.inputs.skip_migrate != 'true' }}
         working-directory: apps/cms
         timeout-minutes: 8
         env:
           NODE_OPTIONS: "--no-deprecation --dns-result-order=ipv4first"
-          SCHEMA_PUSH_RETRIES: "3"
-          SCHEMA_PUSH_PAUSE_MS: "5000"
         run: |
-          # Hard shell timeout so the step cannot hang past ~6 minutes
-          timeout 360 npm run schema:push
+          timeout 300 npm run migrate
           # Let pooler recycle Payload's held session before the seed step
-          sleep 15
+          sleep 10
 
-      # Seed always runs ensureSchema() — creates site_settings etc. even when the
-      # dedicated push step was skipped (common when only legacy tables existed).
+      # Seed always runs ensureSchema() — applies pending migrations even when the
+      # dedicated step above was skipped.
       - name: Seed site content (pages, globals, chrome + catalogue)
         if: ${{ github.event.inputs.seed_type == 'site' || github.event.inputs.seed_type == 'full' }}
         working-directory: apps/cms
@@ -225,7 +225,7 @@ jobs:
           echo "### Seed complete" >> "$GITHUB_STEP_SUMMARY"
           echo "- Environment: \`$ENV\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Seed type: \`${{ github.event.inputs.seed_type }}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Skip schema push: \`${{ github.event.inputs.skip_schema_push }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Skip migrate: \`${{ github.event.inputs.skip_migrate }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Pause Lambda: \`${{ github.event.inputs.pause_lambda }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- PG_POOL_MAX: \`${{ env.PG_POOL_MAX }}\` (must be ≥2 — Payload holds 1 client)" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
