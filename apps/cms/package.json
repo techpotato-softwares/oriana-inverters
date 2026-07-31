@@ -12,7 +12,7 @@
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
     "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create",
-    "schema:push": "cross-env NODE_OPTIONS=--no-deprecation PAYLOAD_DATABASE_PUSH=true payload run src/scripts/push-schema.ts",
+    "schema:push": "cross-env NODE_OPTIONS=--no-deprecation PAYLOAD_DATABASE_PUSH=true PG_POOL_MAX=1 payload run src/scripts/push-schema.ts",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types && cp src/payload-types.ts ../../packages/shared/src/payload-types.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",

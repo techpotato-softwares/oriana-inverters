@@ -67,7 +67,10 @@ export class WebLambdaConstruct extends Construct {
         NODE_ENV: "production",
         AWS_LAMBDA_EXEC_WRAPPER: "/opt/bootstrap",
         PORT: "3000",
-        AWS_LWA_ENABLE_COMPRESSION: "true",
+        // Buffered mode + no LWA compression: response streaming was truncating
+        // Next.js RSC flight data, leaving Payload admin with an empty shell.
+        AWS_LWA_ENABLE_COMPRESSION: "false",
+        AWS_LWA_INVOKE_MODE: "buffered",
         NEXT_TELEMETRY_DISABLED: "1",
         NEXT_IMAGE_UNOPTIMIZED: "true",
         ...environment,
@@ -103,7 +106,9 @@ export class WebLambdaConstruct extends Construct {
 
     this.functionUrl = this.fn.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE,
-      invokeMode: lambda.InvokeMode.RESPONSE_STREAM,
+      // BUFFERED: RESPONSE_STREAM was truncating Next.js RSC payloads behind CloudFront
+      // (admin HTML shell loaded, but later __next_f pushes with LoginForm were missing).
+      invokeMode: lambda.InvokeMode.BUFFERED,
     });
 
     new CfnOutput(this, "FunctionUrl", {
