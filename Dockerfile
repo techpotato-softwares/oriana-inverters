@@ -23,8 +23,9 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# Build args for public URL (CloudFront) — can be empty at image build
-ARG NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+# Prefer leaving unset at image build — NEXT_PUBLIC_* is inlined by Next.js.
+# Runtime uses PAYLOAD_SERVER_URL on Lambda (synced to CloudFront after deploy).
+ARG NEXT_PUBLIC_SERVER_URL=
 ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
 # Dummy secrets so Next/Payload can compile; runtime overrides via Lambda env
 ARG PAYLOAD_SECRET=build-time-secret-change-me

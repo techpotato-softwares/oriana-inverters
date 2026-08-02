@@ -133,7 +133,7 @@ export class OrianaInvertorsWebStack extends Stack {
     new CfnOutput(this, "RecommendedServerURL", {
       value: cf.distributionUrl,
       description:
-        "Set NEXT_PUBLIC_SERVER_URL on the Lambda to this value after deploy",
+        "Set PAYLOAD_SERVER_URL (and NEXT_PUBLIC_SERVER_URL) on the Lambda to this value after deploy",
       exportName: `${APP_NAME}-RecommendedServerURL-${config.environment}`,
     });
 
