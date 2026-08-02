@@ -75,7 +75,7 @@ export const Products: CollectionConfig = {
               type: 'text',
               required: true,
               admin: {
-                description: 'Exact model name as shown on the website (e.g. OG6-GR1P2K01-NV-YD).',
+                description: 'Website label (Excel col J), e.g. "5kW OG6-GR1P5K-S(21A)".',
               },
             },
             slugField({ fieldToUse: 'name' }),

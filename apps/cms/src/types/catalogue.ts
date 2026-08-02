@@ -19,6 +19,22 @@ export type CatalogueProduct = {
   datasheetUrl?: string | null
 }
 
+/** Datasheet model series (Excel col F) with capacity variants (cols H/I/J). */
+export type CatalogueSeries = {
+  series: string
+  slug: string
+  category: string
+  categorySlug: string
+  segment: string
+  segmentKey: CatalogueProduct['segmentKey']
+  phases: string
+  powerRange: string
+  description: string
+  heroImageUrl?: string | null
+  heroImageAlt?: string | null
+  variants: CatalogueProduct[]
+}
+
 export type CatalogueCategory = {
   slug: string
   title: string

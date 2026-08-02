@@ -4,11 +4,13 @@ import { unstable_cache } from 'next/cache'
 
 import { staticCategories } from '@/data/products'
 import { mapCategory, mapDownload, mapProduct } from '@/utilities/mapCatalogue'
+import { groupProductsIntoSeries, seriesNameOf, slugifySeries } from '@/utilities/series'
 import type {
   CatalogueCategory,
   CatalogueDownload,
   CatalogueNavItem,
   CatalogueProduct,
+  CatalogueSeries,
 } from '@/types/catalogue'
 
 async function getPayloadSafe() {
@@ -99,22 +101,27 @@ export const getCatalogueDownloads = unstable_cache(fetchDownloads, ['catalogue-
   tags: ['downloads'],
 })
 
+export async function getCatalogueSeries(): Promise<CatalogueSeries[]> {
+  const products = await getCatalogueProducts()
+  return groupProductsIntoSeries(products)
+}
+
 export async function getCatalogueNav(): Promise<CatalogueNavItem[]> {
-  const [categories, products] = await Promise.all([
+  const [categories, seriesList] = await Promise.all([
     getCatalogueCategories(),
-    getCatalogueProducts(),
+    getCatalogueSeries(),
   ])
 
   return categories.map((cat) => ({
     title: cat.title,
     href: `/products/category/${cat.slug}`,
     description: cat.description,
-    products: products
-      .filter((p) => p.categorySlug === cat.slug)
-      .map((p) => ({
-        label: p.name,
-        href: `/products/${p.slug}`,
-        imageUrl: p.heroImageUrl,
+    products: seriesList
+      .filter((s) => s.categorySlug === cat.slug)
+      .map((s) => ({
+        label: s.series,
+        href: `/products/${s.slug}`,
+        imageUrl: s.heroImageUrl,
       })),
   }))
 }
@@ -124,9 +131,25 @@ export async function getProductBySlug(slug: string): Promise<CatalogueProduct |
   return products.find((p) => p.slug === slug) ?? null
 }
 
+export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | null> {
+  const seriesList = await getCatalogueSeries()
+  const bySeriesSlug = seriesList.find((s) => s.slug === slug)
+  if (bySeriesSlug) return bySeriesSlug
+
+  // Deep link: model slug → parent series
+  const product = await getProductBySlug(slug)
+  if (!product) return null
+  return seriesList.find((s) => s.series === seriesNameOf(product)) ?? null
+}
+
 export async function getProductsByCategory(categorySlug: string): Promise<CatalogueProduct[]> {
   const products = await getCatalogueProducts()
   return products.filter((p) => p.categorySlug === categorySlug)
+}
+
+export async function getSeriesByCategory(categorySlug: string): Promise<CatalogueSeries[]> {
+  const seriesList = await getCatalogueSeries()
+  return seriesList.filter((s) => s.categorySlug === categorySlug)
 }
 
 export async function getCategoryMeta(slug: string): Promise<CatalogueCategory | null> {
@@ -139,11 +162,17 @@ export async function getCategoryMeta(slug: string): Promise<CatalogueCategory |
 }
 
 export async function getAllProductSlugs(): Promise<string[]> {
-  const products = await getCatalogueProducts()
-  return products.map((p) => p.slug)
+  const [seriesList, products] = await Promise.all([
+    getCatalogueSeries(),
+    getCatalogueProducts(),
+  ])
+  // Prefer series URLs; keep model slugs so old links still resolve.
+  return [...new Set([...seriesList.map((s) => s.slug), ...products.map((p) => p.slug)])]
 }
 
 export async function getAllCategorySlugs(): Promise<string[]> {
   const categories = await getCatalogueCategories()
   return categories.map((c) => c.slug)
 }
+
+export { slugifySeries, seriesNameOf }

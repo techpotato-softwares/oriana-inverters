@@ -100,7 +100,7 @@ export default async function ProductsPage({ searchParams }: Props) {
                       </p>
                     )}
                     <p className="mt-4 text-xs font-medium text-oriana-muted">
-                      {count} {count === 1 ? 'model' : 'models'}
+                      {count} {count === 1 ? 'series' : 'series'}
                     </p>
                     <ul className="mt-4 space-y-1 border-t border-oriana-navy/8 pt-4">
                       {catCard.products.slice(0, 3).map((p) => (

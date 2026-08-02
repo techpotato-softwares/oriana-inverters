@@ -2,12 +2,12 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { ProductImage } from '@/components/oriana/ProductImage'
 import {
   getAllCategorySlugs,
   getCategoryMeta,
-  getProductsByCategory,
+  getSeriesByCategory,
 } from '@/utilities/getCatalogue'
-import type { CatalogueProduct } from '@/types/catalogue'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -18,30 +18,6 @@ const legacyCategorySlugs: Record<string, string> = {
   'utility-scale': 'utility-grid-tied',
   'energy-storage': 'residential-hybrid',
   accessories: 'ci-grid-tied',
-}
-
-function seriesOf(product: CatalogueProduct): string {
-  return (
-    product.modelSeries ||
-    product.specs.find((s) => s.label.toLowerCase() === 'model series')?.value ||
-    'Other'
-  )
-}
-
-function groupBySeries(products: CatalogueProduct[]) {
-  const groups: { series: string; items: CatalogueProduct[] }[] = []
-  const index = new Map<string, number>()
-  for (const product of products) {
-    const series = seriesOf(product)
-    const existing = index.get(series)
-    if (existing === undefined) {
-      index.set(series, groups.length)
-      groups.push({ series, items: [product] })
-    } else {
-      groups[existing].items.push(product)
-    }
-  }
-  return groups
 }
 
 export async function generateStaticParams() {
@@ -66,77 +42,50 @@ export default async function ProductCategoryPage({ params }: Props) {
   const meta = await getCategoryMeta(slug)
   if (!meta) notFound()
 
-  const categoryProducts = await getProductsByCategory(slug)
-  const seriesGroups = groupBySeries(categoryProducts)
+  const seriesList = await getSeriesByCategory(slug)
 
   return (
     <main>
       <PageHero eyebrow="Inverters" title={meta.title} description={meta.description} />
       <Breadcrumbs items={[{ label: 'Inverters', href: '/products' }, { label: meta.title }]} />
 
-      <section className="py-12">
-        <div className="container space-y-12">
-          {categoryProducts.length === 0 ? (
+      <section className="py-12 lg:py-16">
+        <div className="container">
+          {seriesList.length === 0 ? (
             <p className="text-oriana-muted">Products coming soon for this category.</p>
           ) : (
-            seriesGroups.map((group) => (
-              <div key={group.series}>
-                <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-oriana-navy/10 pb-3">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-oriana-blue">
-                      Model series
-                    </p>
-                    <h2 className="mt-1 font-display text-xl font-semibold text-oriana-navy md:text-2xl">
-                      {group.series}
-                    </h2>
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {seriesList.map((series) => (
+                <Link
+                  key={series.slug}
+                  href={`/products/${series.slug}`}
+                  className="group overflow-hidden rounded-2xl border border-oriana-navy/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-oriana-blue/30 hover:shadow-lg"
+                >
+                  <div className="border-b border-oriana-navy/8 bg-gradient-to-br from-oriana-silver/70 to-white p-6">
+                    <ProductImage
+                      name={series.series}
+                      categorySlug={series.categorySlug}
+                      src={series.heroImageUrl}
+                      alt={series.heroImageAlt}
+                      className="mx-auto max-h-40"
+                    />
                   </div>
-                  <p className="text-sm text-oriana-muted">
-                    {group.items.length} {group.items.length === 1 ? 'model' : 'models'}
-                  </p>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[720px] border-collapse text-sm">
-                    <thead>
-                      <tr className="border-b-2 border-oriana-navy/15 bg-oriana-silver/50 text-left">
-                        <th className="px-4 py-3 font-semibold text-oriana-navy">Model</th>
-                        <th className="px-4 py-3 font-semibold text-oriana-navy">Capacity</th>
-                        <th className="px-4 py-3 font-semibold text-oriana-navy">Phase</th>
-                        <th className="px-4 py-3 font-semibold text-oriana-navy">Weight</th>
-                        <th className="px-4 py-3 font-semibold text-oriana-navy"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {group.items.map((p) => {
-                        const weight =
-                          p.specs.find((s) => s.label === 'Weight')?.value ?? '—'
-                        return (
-                          <tr
-                            key={p.slug}
-                            className="border-b border-oriana-navy/8 hover:bg-oriana-silver/30"
-                          >
-                            <td className="px-4 py-4 font-mono font-medium text-oriana-navy">
-                              {p.name}
-                            </td>
-                            <td className="px-4 py-4 text-oriana-muted">{p.powerRange}</td>
-                            <td className="px-4 py-4 text-oriana-muted">{p.phases}</td>
-                            <td className="px-4 py-4 text-oriana-muted">{weight}</td>
-                            <td className="px-4 py-4">
-                              <Link
-                                href={`/products/${p.slug}`}
-                                className="font-semibold text-oriana-blue hover:underline"
-                              >
-                                Details →
-                              </Link>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))
+                  <div className="p-6">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-oriana-blue">
+                      {series.phases}
+                    </p>
+                    <h2 className="mt-2 font-display text-lg font-bold text-oriana-navy group-hover:text-oriana-blue">
+                      {series.series}
+                    </h2>
+                    <p className="mt-2 text-sm text-oriana-muted">
+                      {series.powerRange} · {series.variants.length}{' '}
+                      {series.variants.length === 1 ? 'variant' : 'variants'}
+                    </p>
+                    <p className="mt-4 text-sm font-semibold text-oriana-blue">View series →</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
           )}
         </div>
       </section>
