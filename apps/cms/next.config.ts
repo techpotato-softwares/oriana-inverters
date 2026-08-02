@@ -29,6 +29,11 @@ const NEXT_PUBLIC_SERVER_URL = normalizeServerURL(
 )
 
 const nextConfig: NextConfig = {
+  // Bake into the server bundle so Payload can wrap async layout work in
+  // Suspense. Runtime-only env is not enough — Next may inline at build time.
+  env: {
+    PAYLOAD_CACHE_COMPONENTS_ENABLED: 'true',
+  },
   output: 'standalone',
   // Monorepo: include workspace deps in the standalone output for Lambda.
   outputFileTracingRoot: path.resolve(dirname, '../..'),

@@ -22,6 +22,8 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV NEXT_IMAGE_UNOPTIMIZED=true
+# Must be present at build time so Next inlines it into the server bundle.
+ENV PAYLOAD_CACHE_COMPONENTS_ENABLED=true
 
 # Build args for public URL (CloudFront). Prefer leaving unset at image build —
 # NEXT_PUBLIC_* is inlined by Next; runtime uses PAYLOAD_SERVER_URL on Lambda.
@@ -34,6 +36,7 @@ ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
 RUN PAYLOAD_SECRET=build-time-placeholder \
     DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres \
     BUILD_SKIP_DB=true \
+    PAYLOAD_CACHE_COMPONENTS_ENABLED=true \
     npm run build:next -w @oriana/cms
 
 FROM base AS runner
@@ -45,6 +48,8 @@ ENV NEXT_IMAGE_UNOPTIMIZED=true
 ENV PORT=3000
 ENV AWS_LWA_ENABLE_COMPRESSION=false
 ENV AWS_LWA_INVOKE_MODE=buffered
+# Keeps admin LayoutRouter from serializing as null under LWA buffered mode.
+ENV PAYLOAD_CACHE_COMPONENTS_ENABLED=true
 
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 

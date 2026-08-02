@@ -145,7 +145,7 @@ jobs:
             --arg prs "$PREVIEW_SECRET" \
             --arg bucket "${MEDIA_BUCKET:-}" \
             --arg region "$AWS_REGION" \
-            '{Variables: (. + {PAYLOAD_SERVER_URL: $url, NEXT_PUBLIC_SERVER_URL: $url, DATABASE_URL: $db, PAYLOAD_SECRET: $ps, CRON_SECRET: $cs, PREVIEW_SECRET: $prs, S3_BUCKET: $bucket, S3_REGION: $region, NEXT_IMAGE_UNOPTIMIZED: "true", NEXT_TELEMETRY_DISABLED: "1", AWS_LWA_ENABLE_COMPRESSION: "false", AWS_LWA_INVOKE_MODE: "buffered"})}' \
+            '{Variables: (. + {PAYLOAD_SERVER_URL: $url, NEXT_PUBLIC_SERVER_URL: $url, DATABASE_URL: $db, PAYLOAD_SECRET: $ps, CRON_SECRET: $cs, PREVIEW_SECRET: $prs, S3_BUCKET: $bucket, S3_REGION: $region, NEXT_IMAGE_UNOPTIMIZED: "true", NEXT_TELEMETRY_DISABLED: "1", AWS_LWA_ENABLE_COMPRESSION: "false", AWS_LWA_INVOKE_MODE: "buffered", PAYLOAD_CACHE_COMPONENTS_ENABLED: "true"})}' \
             /tmp/env.json > /tmp/lambda-env.json
 
           # Pass via file to avoid shell quoting issues with nested JSON
