@@ -96,22 +96,30 @@ export async function seedProducts({ payload }: { payload: Payload }) {
     )
   }
 
+  const canonicalSlugs = new Set(staticProducts.map((p) => p.slug))
+
   for (const product of staticProducts) {
+    // Prefer canonical model slug; also reclaim any name-based duplicate slug.
     const existing = await payload.find({
       collection: 'products',
-      where: { slug: { equals: product.slug } },
-      limit: 1,
+      where: {
+        or: [{ slug: { equals: product.slug } }, { name: { equals: product.name } }],
+      },
+      limit: 50,
       ...seedOpts,
     })
+
+    const preferred =
+      existing.docs.find((doc) => doc.slug === product.slug) ?? existing.docs[0] ?? null
 
     // Skip uploading seed media unless S3 is configured. Local disk uploads break
     // Lambda media populate and hide the whole catalogue.
     const canUploadMedia = Boolean(process.env.S3_BUCKET)
     let heroImageId: number | undefined =
-      existing.docs[0]?.heroImage && typeof existing.docs[0].heroImage === 'object'
-        ? existing.docs[0].heroImage.id
-        : typeof existing.docs[0]?.heroImage === 'number'
-          ? existing.docs[0].heroImage
+      preferred?.heroImage && typeof preferred.heroImage === 'object'
+        ? preferred.heroImage.id
+        : typeof preferred?.heroImage === 'number'
+          ? preferred.heroImage
           : undefined
 
     if (canUploadMedia && !heroImageId) {
@@ -137,6 +145,7 @@ export async function seedProducts({ payload }: { payload: Payload }) {
     const data = {
       name: product.name,
       slug: product.slug,
+      generateSlug: false,
       category: categoryIds[product.categorySlug],
       segment: product.segmentKey,
       shortDescription: product.description,
@@ -155,10 +164,10 @@ export async function seedProducts({ payload }: { payload: Payload }) {
       _status: 'published' as const,
     }
 
-    if (existing.docs[0]) {
+    if (preferred) {
       await payload.update({
         collection: 'products',
-        id: existing.docs[0].id,
+        id: preferred.id,
         data,
         ...seedOpts,
       })
@@ -168,6 +177,39 @@ export async function seedProducts({ payload }: { payload: Payload }) {
         data,
         ...seedOpts,
       })
+    }
+
+    // Remove duplicate rows for the same display name / non-canonical slugs.
+    for (const doc of existing.docs) {
+      if (preferred && doc.id === preferred.id) continue
+      if (doc.name === product.name || !canonicalSlugs.has(doc.slug)) {
+        await payload.delete({
+          collection: 'products',
+          id: doc.id,
+          ...seedOpts,
+        })
+        payload.logger.info(`— Removed duplicate product ${doc.slug} (#${doc.id})`)
+      }
+    }
+  }
+
+  // Final sweep: delete leftover capacity-prefixed slug copies (e.g. 5kw-og6-...).
+  const leftovers = await payload.find({
+    collection: 'products',
+    depth: 0,
+    limit: 500,
+    pagination: false,
+    ...seedOpts,
+  })
+  for (const doc of leftovers.docs) {
+    const slug = doc.slug ?? ''
+    if (/^\d+(\.\d+)?kw-/i.test(slug) && !canonicalSlugs.has(slug)) {
+      await payload.delete({
+        collection: 'products',
+        id: doc.id,
+        ...seedOpts,
+      })
+      payload.logger.info(`— Removed leftover duplicate ${slug} (#${doc.id})`)
     }
   }
 
