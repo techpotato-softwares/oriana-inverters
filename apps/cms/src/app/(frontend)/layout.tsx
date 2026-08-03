@@ -14,6 +14,9 @@ import { draftMode } from 'next/headers'
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 
+// Catalogue mega-menu must reflect live CMS data, not an empty build-time snapshot.
+export const dynamic = 'force-dynamic'
+
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   variable: '--font-jakarta',

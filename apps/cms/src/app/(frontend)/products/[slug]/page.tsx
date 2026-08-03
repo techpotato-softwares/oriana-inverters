@@ -1,30 +1,23 @@
 import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ProductSeriesDetail } from '@/components/oriana/ProductSeriesDetail'
-import {
-  getAllProductSlugs,
-  getProductBySlug,
-  getSeriesBySlug,
-} from '@/utilities/getCatalogue'
+import { getProductBySlug, getSeriesBySlug } from '@/utilities/getCatalogue'
 
 type Props = {
   params: Promise<{ slug: string }>
-  searchParams: Promise<{ model?: string }>
 }
 
-export async function generateStaticParams() {
-  const slugs = await getAllProductSlugs()
-  return slugs.map((slug) => ({ slug }))
-}
+// Live CMS data + dynamic routes. generateStaticParams + searchParams caused
+// DYNAMIC_SERVER_USAGE 500s in production when the page was treated as SSG.
+export const dynamic = 'force-dynamic'
 
-export async function generateMetadata({ params, searchParams }: Props) {
+export async function generateMetadata({ params }: Props) {
   const { slug } = await params
-  const { model } = await searchParams
   const series = await getSeriesBySlug(slug)
   if (!series) return {}
 
   const selected =
-    series.variants.find((v) => v.slug === model || v.slug === slug) ?? series.variants[0]
+    series.variants.find((v) => v.slug === slug) ?? series.variants[0]
 
   return {
     title: selected ? `${series.series} · ${selected.powerRange}` : series.series,
@@ -32,18 +25,16 @@ export async function generateMetadata({ params, searchParams }: Props) {
   }
 }
 
-export default async function ProductDetailPage({ params, searchParams }: Props) {
+export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params
-  const { model } = await searchParams
   const series = await getSeriesBySlug(slug)
   if (!series) notFound()
 
   const deepLinkedProduct = await getProductBySlug(slug)
   const initialModelSlug =
-    model ||
-    (deepLinkedProduct && series.variants.some((v) => v.slug === deepLinkedProduct.slug)
+    deepLinkedProduct && series.variants.some((v) => v.slug === deepLinkedProduct.slug)
       ? deepLinkedProduct.slug
-      : series.variants[0]?.slug)
+      : series.variants[0]?.slug
 
   return (
     <main className="bg-[linear-gradient(180deg,#f7f9fc_0%,#ffffff_28%)]">

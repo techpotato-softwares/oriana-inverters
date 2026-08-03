@@ -15,16 +15,20 @@ type Props = {
 
 export function ProductSeriesDetail({ series, initialModelSlug }: Props) {
   const router = useRouter()
-  const initial =
-    series.variants.find((v) => v.slug === initialModelSlug) ?? series.variants[0]
 
-  const [selectedSlug, setSelectedSlug] = useState(initial?.slug ?? '')
+  const resolveSlug = (preferred?: string | null) =>
+    series.variants.find((v) => v.slug === preferred)?.slug ?? series.variants[0]?.slug ?? ''
+
+  const [selectedSlug, setSelectedSlug] = useState(() => resolveSlug(initialModelSlug))
 
   useEffect(() => {
-    const next =
-      series.variants.find((v) => v.slug === initialModelSlug) ?? series.variants[0]
-    if (next) setSelectedSlug(next.slug)
-  }, [initialModelSlug, series.variants])
+    const modelFromUrl =
+      typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search).get('model')
+        : null
+    setSelectedSlug(resolveSlug(modelFromUrl || initialModelSlug))
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- resolve against latest series variants
+  }, [initialModelSlug, series.slug])
 
   const selected: CatalogueProduct | undefined =
     series.variants.find((v) => v.slug === selectedSlug) ?? series.variants[0]
