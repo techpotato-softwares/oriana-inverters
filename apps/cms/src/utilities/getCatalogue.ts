@@ -28,18 +28,44 @@ async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
   if (!payload) return []
 
   try {
-    const result = await payload.find({
-      collection: 'products',
-      depth: 2,
-      limit: 500,
-      pagination: false,
-      where: {
-        _status: { equals: 'published' },
-      },
-      sort: 'name',
-    })
+    // depth:0 — populating media (depth≥1) throws on Lambda when seed files aren't in S3,
+    // which made the whole catalogue empty even though products were published.
+    const [result, categoriesResult] = await Promise.all([
+      payload.find({
+        collection: 'products',
+        depth: 0,
+        limit: 500,
+        pagination: false,
+        where: {
+          _status: { equals: 'published' },
+        },
+        sort: 'name',
+      }),
+      payload.find({
+        collection: 'categories',
+        depth: 0,
+        limit: 100,
+        pagination: false,
+      }),
+    ])
 
-    return result.docs.map(mapProduct)
+    const categoriesById = new Map(categoriesResult.docs.map((doc) => [doc.id, doc]))
+
+    return result.docs.map((doc) => {
+      const categoryId =
+        typeof doc.category === 'object' && doc.category !== null
+          ? doc.category.id
+          : doc.category
+      const categoryDoc =
+        typeof categoryId === 'number' || typeof categoryId === 'string'
+          ? categoriesById.get(categoryId)
+          : null
+
+      return mapProduct({
+        ...doc,
+        category: categoryDoc ?? doc.category,
+      })
+    })
   } catch (error) {
     console.error('[getCatalogue] products query failed:', error)
     return []
@@ -76,7 +102,7 @@ async function fetchDownloads(): Promise<CatalogueDownload[]> {
   try {
     const result = await payload.find({
       collection: 'downloads',
-      depth: 2,
+      depth: 0,
       limit: 200,
       pagination: false,
       sort: 'title',

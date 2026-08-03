@@ -104,7 +104,9 @@ export async function seedProducts({ payload }: { payload: Payload }) {
       ...seedOpts,
     })
 
-    const imageFile = readLocalSvg(categoryImages[product.categorySlug] ?? 'single-phase.svg')
+    // Skip uploading seed media unless S3 is configured. Local disk uploads break
+    // Lambda media populate and hide the whole catalogue.
+    const canUploadMedia = Boolean(process.env.S3_BUCKET)
     let heroImageId: number | undefined =
       existing.docs[0]?.heroImage && typeof existing.docs[0].heroImage === 'object'
         ? existing.docs[0].heroImage.id
@@ -112,17 +114,24 @@ export async function seedProducts({ payload }: { payload: Payload }) {
           ? existing.docs[0].heroImage
           : undefined
 
-    if (!heroImageId) {
-      const hero = await payload.create({
-        collection: 'media',
-        data: {
-          alt: product.name,
-          mediaType: 'image',
-        },
-        file: imageFile,
-        ...seedOpts,
-      })
-      heroImageId = hero.id
+    if (canUploadMedia && !heroImageId) {
+      try {
+        const imageFile = readLocalSvg(categoryImages[product.categorySlug] ?? 'single-phase.svg')
+        const hero = await payload.create({
+          collection: 'media',
+          data: {
+            alt: product.name,
+            mediaType: 'image',
+          },
+          file: imageFile,
+          ...seedOpts,
+        })
+        heroImageId = hero.id
+      } catch (error) {
+        payload.logger.warn(
+          `— Skipping hero image for ${product.slug}: ${error instanceof Error ? error.message : error}`,
+        )
+      }
     }
 
     const data = {
@@ -141,7 +150,8 @@ export async function seedProducts({ payload }: { payload: Payload }) {
         undefined,
       featured: product.featured ?? false,
       keySpecs: product.specs.map((s) => ({ label: s.label, value: s.value })),
-      heroImage: heroImageId,
+      // Clear broken local-disk media refs when S3 isn't available (Lambda-safe).
+      heroImage: canUploadMedia ? heroImageId : null,
       _status: 'published' as const,
     }
 
