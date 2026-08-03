@@ -138,18 +138,21 @@ export async function getCatalogueNav(): Promise<CatalogueNavItem[]> {
     getCatalogueSeries(),
   ])
 
-  return categories.map((cat) => ({
-    title: cat.title,
-    href: `/products/category/${cat.slug}`,
-    description: cat.description,
-    products: seriesList
-      .filter((s) => s.categorySlug === cat.slug)
-      .map((s) => ({
-        label: s.series,
-        href: `/products/${s.slug}`,
-        imageUrl: s.heroImageUrl,
-      })),
-  }))
+  return categories
+    .map((cat) => ({
+      title: cat.title,
+      href: `/products/category/${cat.slug}`,
+      description: cat.description,
+      products: seriesList
+        .filter((s) => s.categorySlug === cat.slug)
+        .map((s) => ({
+          label: s.series,
+          href: `/products/${s.slug}`,
+          imageUrl: s.heroImageUrl,
+        })),
+    }))
+    // Hide empty families (e.g. "Test category") from the Products mega-menu.
+    .filter((cat) => cat.products.length > 0)
 }
 
 export async function getProductBySlug(slug: string): Promise<CatalogueProduct | null> {

@@ -10,6 +10,8 @@ type Props = {
 // Live CMS data + dynamic routes. generateStaticParams + searchParams caused
 // DYNAMIC_SERVER_USAGE 500s in production when the page was treated as SSG.
 export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+export const revalidate = 0
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params

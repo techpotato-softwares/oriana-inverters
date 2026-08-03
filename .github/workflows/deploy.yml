@@ -106,6 +106,15 @@ jobs:
           NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run schema:push
 
+      # Cheap safety net: older DBs were pushed without S3, so media.prefix is missing
+      # and /api/media 500s (admin image upload hangs). Idempotent ALTER COLUMN.
+      - name: Ensure media.prefix column
+        if: ${{ steps.secrets.outputs.db_ready == 'true' }}
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+        run: npm run ensure:media-prefix
+
       - name: Build CMS
         working-directory: apps/cms
         env:

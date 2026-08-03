@@ -31,6 +31,8 @@ const legacyCategoryRedirects: Record<string, string> = {
 
 type Props = { searchParams: Promise<{ cat?: string }> }
 
+export const dynamic = 'force-dynamic'
+
 export default async function ProductsPage({ searchParams }: Props) {
   const { cat } = await searchParams
   if (cat && legacyCategoryRedirects[cat]) {

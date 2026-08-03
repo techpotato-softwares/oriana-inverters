@@ -24,7 +24,11 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
   return doc?.slug ? `${url}/${doc.slug}` : url
 }
 
-const s3Bucket = process.env.S3_BUCKET
+// Always register the plugin so `prefix` (and related upload fields) stay in the
+// collection schema even when S3_BUCKET is unset locally. Without that column,
+// Lambda (which has S3_BUCKET) 500s on every /api/media query → admin image
+// upload spins forever.
+const s3Bucket = process.env.S3_BUCKET?.trim() || ''
 
 export const plugins: Plugin[] = [
   redirectsPlugin({
@@ -92,27 +96,26 @@ export const plugins: Plugin[] = [
       },
     },
   }),
-  ...(s3Bucket
-    ? [
-        s3Storage({
-          collections: {
-            media: {
-              prefix: 'media',
+  s3Storage({
+    enabled: Boolean(s3Bucket),
+    alwaysInsertFields: true,
+    collections: {
+      media: {
+        prefix: 'media',
+      },
+    },
+    // Required by the plugin type even when disabled; unused unless enabled.
+    bucket: s3Bucket || 'oriana-media-placeholder',
+    config: {
+      region: process.env.S3_REGION || process.env.AWS_REGION || 'ap-south-1',
+      ...(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+        ? {
+            credentials: {
+              accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+              secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
             },
-          },
-          bucket: s3Bucket,
-          config: {
-            region: process.env.S3_REGION || process.env.AWS_REGION || 'ap-south-1',
-            ...(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
-              ? {
-                  credentials: {
-                    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-                    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-                  },
-                }
-              : {}),
-          },
-        }),
-      ]
-    : []),
+          }
+        : {}),
+    },
+  }),
 ]

@@ -44,7 +44,25 @@ async function schemaAlreadyPresent(): Promise<boolean> {
     const result = await pool.query<{ present: boolean }>(
       `SELECT to_regclass('public.users') IS NOT NULL AS present`,
     )
-    return Boolean(result.rows[0]?.present)
+    if (!result.rows[0]?.present) return false
+
+    // Media.prefix is required by @payloadcms/storage-s3. Older DBs were pushed
+    // without S3 enabled, so the column is missing and /api/media 500s in prod.
+    const prefixCol = await pool.query<{ present: boolean }>(
+      `SELECT EXISTS (
+         SELECT 1
+         FROM information_schema.columns
+         WHERE table_schema = 'public'
+           AND table_name = 'media'
+           AND column_name = 'prefix'
+       ) AS present`,
+    )
+    if (!prefixCol.rows[0]?.present) {
+      console.log('media.prefix column missing — will push schema to add it.')
+      return false
+    }
+
+    return true
   } finally {
     await pool.end()
   }

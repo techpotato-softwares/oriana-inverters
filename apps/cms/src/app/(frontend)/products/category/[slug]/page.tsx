@@ -4,12 +4,13 @@ import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
 import { ProductImage } from '@/components/oriana/ProductImage'
 import {
-  getAllCategorySlugs,
   getCategoryMeta,
   getSeriesByCategory,
 } from '@/utilities/getCatalogue'
 
 type Props = { params: Promise<{ slug: string }> }
+
+export const dynamic = 'force-dynamic'
 
 /** Old catalogue slugs → Excel product-family slugs */
 const legacyCategorySlugs: Record<string, string> = {
@@ -18,11 +19,6 @@ const legacyCategorySlugs: Record<string, string> = {
   'utility-scale': 'utility-grid-tied',
   'energy-storage': 'residential-hybrid',
   accessories: 'ci-grid-tied',
-}
-
-export async function generateStaticParams() {
-  const slugs = await getAllCategorySlugs()
-  return [...slugs, ...Object.keys(legacyCategorySlugs)].map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: Props) {

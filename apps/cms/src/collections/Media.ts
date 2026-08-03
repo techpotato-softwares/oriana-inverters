@@ -27,6 +27,16 @@ export const Media: CollectionConfig = {
       name: 'alt',
       type: 'text',
     },
+    // Kept in schema even when S3 plugin is disabled locally so Drizzle/Postgres
+    // always has the column. Missing `prefix` makes /api/media 500 in production.
+    {
+      name: 'prefix',
+      type: 'text',
+      admin: {
+        hidden: true,
+        readOnly: true,
+      },
+    },
     {
       name: 'mediaType',
       type: 'select',

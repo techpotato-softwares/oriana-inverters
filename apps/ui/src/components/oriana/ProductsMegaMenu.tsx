@@ -30,10 +30,15 @@ function placeholderFor(href: string, imageUrl?: string | null) {
   return categoryPlaceholders[slug] ?? categoryPlaceholders['residential-grid-tied']
 }
 
+function firstIndexWithProducts(items: CatalogueNavItem[]) {
+  const i = items.findIndex((cat) => cat.products.length > 0)
+  return i >= 0 ? i : 0
+}
+
 /** Products megamenu — categories and models come from Payload admin */
 export function ProductsMegaMenuPanel({ menu }: { menu: CatalogueNavItem[] }) {
-  const [activeIndex, setActiveIndex] = useState(0)
-  const items = menu.length ? menu : []
+  const items = menu
+  const [activeIndex, setActiveIndex] = useState(() => firstIndexWithProducts(items))
   const active = items[activeIndex] ?? items[0]
 
   if (!active) {

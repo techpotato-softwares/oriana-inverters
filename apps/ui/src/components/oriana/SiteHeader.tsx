@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import { Globe, Menu, Search, X } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { cn } from '@/utilities/ui'
@@ -78,6 +78,8 @@ function MegaMenuPanel({ menuKey }: { menuKey: MegaMenuKey }) {
 
 export function SiteHeader({ catalogueMenu = [] }: { catalogueMenu?: CatalogueNavItem[] }) {
   const pathname = usePathname()
+  const router = useRouter()
+  const refreshedEmptyMenu = useRef(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<MegaMenuKey | null>(null)
   const [scrolled, setScrolled] = useState(false)
@@ -88,6 +90,14 @@ export function SiteHeader({ catalogueMenu = [] }: { catalogueMenu?: CatalogueNa
     setMobileOpen(false)
     setOpenMenu(null)
   }, [pathname])
+
+  // Homepage was prerendered with an empty catalogue; soft-nav keeps that shell.
+  // Refresh once so a dynamic layout can replace the empty mega-menu.
+  useEffect(() => {
+    if (catalogueMenu.length > 0 || refreshedEmptyMenu.current) return
+    refreshedEmptyMenu.current = true
+    router.refresh()
+  }, [catalogueMenu.length, router])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
