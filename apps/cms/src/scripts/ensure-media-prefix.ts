@@ -1,22 +1,31 @@
 /**
- * One-off / deploy-safe fix: ensure media.prefix exists.
- * Prefer `npm run schema:push` (now detects the missing column). This script is
- * a lightweight ALTER when you only need the column without a full Drizzle push.
+ * Ensure media.prefix exists without a full Drizzle schema push.
+ * Full schema:push against Supabase from GitHub Actions often times out; this
+ * single ALTER is enough for @payloadcms/storage-s3.
  *
- *   cd apps/cms && npx tsx src/scripts/ensure-media-prefix.ts
+ *   npm run ensure:media-prefix -w @oriana/cms
  */
 import pg from 'pg'
 
-async function main() {
-  const connectionString = process.env.DATABASE_URL
-  if (!connectionString) {
-    throw new Error('DATABASE_URL is required')
-  }
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
+const isRetryable = (error: unknown): boolean => {
+  const text = String(error)
+  return (
+    text.includes('timeout') ||
+    text.includes('ECONNRESET') ||
+    text.includes('ECONNREFUSED') ||
+    text.includes('EMAXCONNSESSION') ||
+    text.includes('max clients reached') ||
+    text.includes('too many clients')
+  )
+}
+
+async function ensurePrefix(connectionString: string) {
   const pool = new pg.Pool({
     connectionString,
     max: 1,
-    connectionTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 60_000,
     idleTimeoutMillis: 1000,
     allowExitOnIdle: true,
   })
@@ -38,6 +47,33 @@ async function main() {
   } finally {
     await pool.end()
   }
+}
+
+async function main() {
+  const connectionString = process.env.DATABASE_URL
+  if (!connectionString) {
+    throw new Error('DATABASE_URL is required')
+  }
+
+  const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 5)
+  let lastError: unknown
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      await ensurePrefix(connectionString)
+      return
+    } catch (error) {
+      lastError = error
+      if (!isRetryable(error) || attempt === attempts) break
+      const waitMs = 3000 * attempt
+      console.warn(
+        `ensure:media-prefix connection issue (attempt ${attempt}/${attempts}); retrying in ${waitMs}ms…`,
+      )
+      await sleep(waitMs)
+    }
+  }
+
+  throw lastError
 }
 
 main().catch((error) => {

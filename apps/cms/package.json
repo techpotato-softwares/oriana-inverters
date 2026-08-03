@@ -13,7 +13,7 @@
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
     "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create",
     "schema:push": "cross-env NODE_OPTIONS=--no-deprecation PAYLOAD_DATABASE_PUSH=true PG_POOL_MAX=1 payload run src/scripts/push-schema.ts",
-    "ensure:media-prefix": "cross-env NODE_OPTIONS=--no-deprecation PG_POOL_MAX=1 payload run src/scripts/ensure-media-prefix.ts",
+    "ensure:media-prefix": "cross-env NODE_OPTIONS=\"--no-deprecation --dns-result-order=ipv4first\" node --import tsx src/scripts/ensure-media-prefix.ts",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types && cp src/payload-types.ts ../../packages/shared/src/payload-types.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
