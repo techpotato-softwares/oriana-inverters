@@ -157,7 +157,12 @@ export async function getCatalogueNav(): Promise<CatalogueNavItem[]> {
 
 export async function getProductBySlug(slug: string): Promise<CatalogueProduct | null> {
   const products = await getCatalogueProducts()
-  return products.find((p) => p.slug === slug) ?? null
+  const cached = products.find((p) => p.slug === slug)
+  if (cached) return cached
+
+  // Recovery path for stale/empty unstable_cache entries.
+  const fresh = await fetchPublishedProducts()
+  return fresh.find((p) => p.slug === slug) ?? null
 }
 
 export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | null> {
@@ -168,7 +173,18 @@ export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | n
   // Deep link: model slug → parent series
   const product = await getProductBySlug(slug)
   if (!product) return null
-  return seriesList.find((s) => s.series === seriesNameOf(product)) ?? null
+  const byDeepLink = seriesList.find((s) => s.series === seriesNameOf(product))
+  if (byDeepLink) return byDeepLink
+
+  // Recovery path: if cache was populated during a transient Payload init
+  // failure, unstable_cache can hold an empty catalogue and produce false 404s.
+  const freshSeriesList = groupProductsIntoSeries(await fetchPublishedProducts())
+  const freshBySeriesSlug = freshSeriesList.find((s) => s.slug === slug)
+  if (freshBySeriesSlug) return freshBySeriesSlug
+  return (
+    freshSeriesList.find((s) => s.series === seriesNameOf(product)) ??
+    null
+  )
 }
 
 export async function getProductsByCategory(categorySlug: string): Promise<CatalogueProduct[]> {
