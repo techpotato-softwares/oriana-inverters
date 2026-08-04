@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { jwtVerify } from 'jose'
 
 /**
- * Unauthenticated visits to /admin (and collection routes) used to throw
+ * Unauthenticated (or expired-token) visits to /admin used to throw
  * NEXT_REDIRECT inside Payload's RSC tree. Under our AdminRootShell Suspense
- * workaround for Lambda, that digest often surfaces as:
+ * workaround for Lambda, that digest surfaces as:
  *   "An error occurred in the Server Components render"
- * Handle the auth gate with a normal HTTP redirect instead.
+ *
+ * Gate with a normal HTTP redirect. Also verify the JWT — a stale
+ * `payload-token` cookie is truthy but invalid, and Payload still RSC-redirects.
  */
 const PUBLIC_ADMIN_ROUTES = [
   '/admin/login',
@@ -18,7 +21,25 @@ const PUBLIC_ADMIN_ROUTES = [
   '/admin/unauthorized',
 ]
 
-export function middleware(request: NextRequest) {
+async function hasValidPayloadToken(request: NextRequest): Promise<boolean> {
+  const token = request.cookies.get('payload-token')?.value
+  if (!token) return false
+
+  const secret = process.env.PAYLOAD_SECRET
+  if (!secret) {
+    // Can't verify in this runtime; allow through and let Payload decide.
+    return true
+  }
+
+  try {
+    await jwtVerify(token, new TextEncoder().encode(secret))
+    return true
+  } catch {
+    return false
+  }
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   if (!pathname.startsWith('/admin')) {
@@ -32,8 +53,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const token = request.cookies.get('payload-token')
-  if (token?.value) {
+  if (await hasValidPayloadToken(request)) {
     return NextResponse.next()
   }
 
@@ -44,7 +64,15 @@ export function middleware(request: NextRequest) {
     loginUrl.searchParams.set('redirect', pathname)
   }
 
-  return NextResponse.redirect(loginUrl)
+  const response = NextResponse.redirect(loginUrl)
+  // Drop expired/invalid token so Payload doesn't keep RSC-redirecting.
+  response.cookies.set({
+    name: 'payload-token',
+    value: '',
+    path: '/',
+    maxAge: 0,
+  })
+  return response
 }
 
 export const config = {

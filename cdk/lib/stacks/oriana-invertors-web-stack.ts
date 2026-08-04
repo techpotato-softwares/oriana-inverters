@@ -92,6 +92,8 @@ export class OrianaInvertorsWebStack extends Stack {
         "CHANGE_ME",
       S3_BUCKET: mediaBucket?.bucketName || "",
       S3_REGION: Stack.of(this).region,
+      // Supabase session poolers are tiny; keep Lambda pools at 1.
+      PG_POOL_MAX: "1",
       NEXT_PUBLIC_SERVER_URL:
         process.env.NEXT_PUBLIC_SERVER_URL ||
         "https://placeholder.cloudfront.net",
