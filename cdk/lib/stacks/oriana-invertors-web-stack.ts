@@ -1,6 +1,8 @@
 import { Stack, StackProps, Tags, CfnOutput } from "aws-cdk-lib";
 import { Construct } from "constructs";
+import * as iam from "aws-cdk-lib/aws-iam";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
+import * as cr from "aws-cdk-lib/custom-resources";
 import * as path from "path";
 import { EnvironmentConfig, APP_NAME } from "../config/environment";
 import { S3Construct } from "../constructs/storage/s3-construct";
@@ -132,9 +134,10 @@ export class OrianaInvertorsWebStack extends Stack {
       mediaBucket,
     });
 
-    // Payload clientUploads PUTs directly to S3 from the browser; CORS must allow
-    // the admin origin (CloudFront / custom domain), not just the __AUTO__ placeholder.
-    if (s3Construct && mediaBucket) {
+    // Pin media-bucket CORS to the CloudFront/admin origin for clientUploads (presigned PUT).
+    // Must be an AwsCustomResource — putting the CF domain on the bucket CORS property
+    // creates a CloudFormation cycle (bucket ↔ distribution).
+    if (mediaBucket) {
       const corsOrigins = [cf.distributionUrl];
       if (config.customDomain) {
         corsOrigins.push(`https://${config.customDomain}`);
@@ -142,7 +145,39 @@ export class OrianaInvertorsWebStack extends Stack {
       if (config.environment === "dev") {
         corsOrigins.push("http://localhost:3000");
       }
-      s3Construct.setCorsOrigins("media", corsOrigins);
+
+      const putCors = {
+        service: "S3",
+        action: "putBucketCors",
+        parameters: {
+          Bucket: mediaBucket.bucketName,
+          CORSConfiguration: {
+            CORSRules: [
+              {
+                AllowedHeaders: ["*"],
+                AllowedMethods: ["GET", "PUT", "POST", "DELETE", "HEAD"],
+                AllowedOrigins: corsOrigins,
+                ExposeHeaders: ["ETag"],
+                MaxAgeSeconds: 3600,
+              },
+            ],
+          },
+        },
+        physicalResourceId: cr.PhysicalResourceId.of(
+          `${mediaBucket.bucketName}-client-upload-cors`,
+        ),
+      };
+
+      new cr.AwsCustomResource(this, "MediaBucketClientUploadCors", {
+        onCreate: putCors,
+        onUpdate: putCors,
+        policy: cr.AwsCustomResourcePolicy.fromStatements([
+          new iam.PolicyStatement({
+            actions: ["s3:PutBucketCors", "s3:GetBucketCors"],
+            resources: [mediaBucket.bucketArn],
+          }),
+        ]),
+      });
     }
 
     new CfnOutput(this, "RecommendedServerURL", {

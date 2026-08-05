@@ -221,40 +221,4 @@ export class S3Construct extends Construct {
   public getBucketNames(): string[] {
     return Object.values(this.buckets).map((b) => b.bucketName);
   }
-
-  /**
-   * Replace CORS allowed origins after CloudFront (or custom domain) exists.
-   * Call this once distribution URL tokens are available — S3 is created before CF
-   * in the web stack, so `__AUTO__` cannot be resolved at bucket construction time.
-   */
-  public setCorsOrigins(
-    bucketId: string,
-    origins: string[],
-    methods: ("GET" | "PUT" | "POST" | "DELETE" | "HEAD")[] = [
-      "GET",
-      "PUT",
-      "POST",
-      "DELETE",
-      "HEAD",
-    ],
-  ): void {
-    const bucket = this.buckets[bucketId];
-    if (!bucket) return;
-
-    const uniqueOrigins = [...new Set(origins.filter(Boolean))];
-    if (uniqueOrigins.length === 0) return;
-
-    const cfnBucket = bucket.node.defaultChild as s3.CfnBucket;
-    cfnBucket.corsConfiguration = {
-      corsRules: [
-        {
-          allowedHeaders: ["*"],
-          allowedMethods: methods,
-          allowedOrigins: uniqueOrigins,
-          exposedHeaders: ["ETag"],
-          maxAge: 3600,
-        },
-      ],
-    };
-  }
 }
