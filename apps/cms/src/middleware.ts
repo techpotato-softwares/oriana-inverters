@@ -10,6 +10,11 @@ import { jwtVerify } from 'jose'
  *
  * Gate with a normal HTTP redirect. Also verify the JWT — a stale
  * `payload-token` cookie is truthy but invalid, and Payload still RSC-redirects.
+ *
+ * IMPORTANT: Payload does not sign with the raw PAYLOAD_SECRET. It uses
+ * sha256(secret).digest('hex').slice(0, 32) — see payload/dist/index.js.
+ * Verifying with the raw secret rejects every valid login cookie and causes
+ * an immediate /admin → /admin/login redirect loop.
  */
 const PUBLIC_ADMIN_ROUTES = [
   '/admin/login',
@@ -20,6 +25,17 @@ const PUBLIC_ADMIN_ROUTES = [
   '/admin/logout-inactivity',
   '/admin/unauthorized',
 ]
+
+async function payloadJwtSecretKey(rawSecret: string): Promise<Uint8Array> {
+  // Match Payload's Node crypto.createHash('sha256').update(secret).digest('hex').slice(0, 32)
+  // using Web Crypto so this Edge middleware stays portable.
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rawSecret))
+  const hex = Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 32)
+  return new TextEncoder().encode(hex)
+}
 
 async function hasValidPayloadToken(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get('payload-token')?.value
@@ -32,7 +48,7 @@ async function hasValidPayloadToken(request: NextRequest): Promise<boolean> {
   }
 
   try {
-    await jwtVerify(token, new TextEncoder().encode(secret))
+    await jwtVerify(token, await payloadJwtSecretKey(secret))
     return true
   } catch {
     return false

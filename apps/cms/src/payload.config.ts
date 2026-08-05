@@ -68,7 +68,9 @@ export default buildConfig({
           (process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1 : 3),
       ),
       idleTimeoutMillis: process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1000 : 10_000,
-      connectionTimeoutMillis: 60_000,
+      // Keep well under CloudFront's 60s origin timeout so admin fails fast
+      // instead of hanging with an empty response.
+      connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 10_000),
       allowExitOnIdle: true,
     },
     // Set PAYLOAD_DATABASE_PUSH=true for first-time schema bootstrap; prefer migrations in CI/CD
