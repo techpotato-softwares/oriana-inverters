@@ -23,10 +23,27 @@ const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
+    theme: 'light',
     meta: {
       titleSuffix: '— Oriana Inverters',
+      icons: [
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          url: '/favicon.svg',
+        },
+        {
+          rel: 'icon',
+          type: 'image/x-icon',
+          url: '/favicon.ico',
+        },
+      ],
     },
     components: {
+      graphics: {
+        Logo: '@/components/AdminLogo',
+        Icon: '@/components/AdminIcon',
+      },
       beforeLogin: ['@/components/BeforeLogin'],
       beforeDashboard: ['@/components/BeforeDashboard'],
     },

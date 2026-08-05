@@ -29,6 +29,10 @@ import { slugField } from 'payload'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
+  labels: {
+    singular: 'Post',
+    plural: 'Posts',
+  },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -51,6 +55,7 @@ export const Posts: CollectionConfig = {
     },
   },
   admin: {
+    group: 'Content',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
