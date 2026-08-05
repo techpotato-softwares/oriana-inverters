@@ -174,7 +174,7 @@ export class S3Construct extends Construct {
 
     const statements: iam.PolicyStatement[] = [];
 
-    // Permission to read/write objects in buckets
+    // Permission to read/write objects in buckets (incl. multipart for large media)
     statements.push(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
@@ -185,16 +185,22 @@ export class S3Construct extends Construct {
           "s3:GetObjectVersion",
           "s3:GetObjectTagging",
           "s3:PutObjectTagging",
+          "s3:AbortMultipartUpload",
+          "s3:ListMultipartUploadParts",
         ],
         resources: this.bucketArns.map((arn) => `${arn}/*`),
       }),
     );
 
-    // Permission to list bucket contents
+    // Permission to list bucket contents / multipart uploads
     statements.push(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        actions: ["s3:ListBucket", "s3:GetBucketLocation"],
+        actions: [
+          "s3:ListBucket",
+          "s3:GetBucketLocation",
+          "s3:ListBucketMultipartUploads",
+        ],
         resources: this.bucketArns,
       }),
     );
@@ -214,5 +220,41 @@ export class S3Construct extends Construct {
    */
   public getBucketNames(): string[] {
     return Object.values(this.buckets).map((b) => b.bucketName);
+  }
+
+  /**
+   * Replace CORS allowed origins after CloudFront (or custom domain) exists.
+   * Call this once distribution URL tokens are available — S3 is created before CF
+   * in the web stack, so `__AUTO__` cannot be resolved at bucket construction time.
+   */
+  public setCorsOrigins(
+    bucketId: string,
+    origins: string[],
+    methods: ("GET" | "PUT" | "POST" | "DELETE" | "HEAD")[] = [
+      "GET",
+      "PUT",
+      "POST",
+      "DELETE",
+      "HEAD",
+    ],
+  ): void {
+    const bucket = this.buckets[bucketId];
+    if (!bucket) return;
+
+    const uniqueOrigins = [...new Set(origins.filter(Boolean))];
+    if (uniqueOrigins.length === 0) return;
+
+    const cfnBucket = bucket.node.defaultChild as s3.CfnBucket;
+    cfnBucket.corsConfiguration = {
+      corsRules: [
+        {
+          allowedHeaders: ["*"],
+          allowedMethods: methods,
+          allowedOrigins: uniqueOrigins,
+          exposedHeaders: ["ETag"],
+          maxAge: 3600,
+        },
+      ],
+    };
   }
 }

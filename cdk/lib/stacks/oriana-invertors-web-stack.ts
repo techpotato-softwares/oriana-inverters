@@ -132,6 +132,19 @@ export class OrianaInvertorsWebStack extends Stack {
       mediaBucket,
     });
 
+    // Payload clientUploads PUTs directly to S3 from the browser; CORS must allow
+    // the admin origin (CloudFront / custom domain), not just the __AUTO__ placeholder.
+    if (s3Construct && mediaBucket) {
+      const corsOrigins = [cf.distributionUrl];
+      if (config.customDomain) {
+        corsOrigins.push(`https://${config.customDomain}`);
+      }
+      if (config.environment === "dev") {
+        corsOrigins.push("http://localhost:3000");
+      }
+      s3Construct.setCorsOrigins("media", corsOrigins);
+    }
+
     new CfnOutput(this, "RecommendedServerURL", {
       value: cf.distributionUrl,
       description:

@@ -82,7 +82,8 @@ export const environmentConfigs: Record<Environment, EnvironmentConfig> = {
     payloadSecretId: `/${APP}/qa/payload`,
     logRetentionDays: 14,
     lambdaMemorySize: 1536,
-    lambdaTimeout: 60,
+    // Extra headroom for Sharp imageSizes after clientUploads lands the original in S3
+    lambdaTimeout: 120,
     enableXRay: true,
     tags: { ...baseConfig.tags, Environment: "qa" },
     features: { ...defaultFeatures, rds: false },
@@ -103,7 +104,7 @@ export const environmentConfigs: Record<Environment, EnvironmentConfig> = {
     payloadSecretId: `/${APP}/prod/payload`,
     logRetentionDays: 90,
     lambdaMemorySize: 2048,
-    lambdaTimeout: 60,
+    lambdaTimeout: 120,
     enableXRay: true,
     tags: { ...baseConfig.tags, Environment: "prod" },
     features: { ...defaultFeatures, rds: true },

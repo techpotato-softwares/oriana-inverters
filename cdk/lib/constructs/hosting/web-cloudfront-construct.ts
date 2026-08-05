@@ -38,6 +38,7 @@ export class WebCloudFrontConstruct extends Construct {
       : undefined;
 
     const lambdaOrigin = new origins.FunctionUrlOrigin(functionUrl, {
+      // Cap at 60s unless the account has an origin-response-timeout quota increase
       readTimeout: Duration.seconds(60),
       keepaliveTimeout: Duration.seconds(60),
     });

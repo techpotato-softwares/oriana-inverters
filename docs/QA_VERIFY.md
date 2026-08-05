@@ -17,6 +17,7 @@
 
 - [ ] CloudFront URL loads `/`
 - [ ] `/admin` works
-- [ ] Media uploads -> `oriana-invertors-web-media-qa`
+- [ ] Media uploads -> `oriana-invertors-web-media-qa` (browser PUTs via presigned URL; objects under `media/`)
+- [ ] Upload a file >6MB (e.g. short video) to confirm clientUploads bypasses Lambda body limit
 
 Share CloudFront URL + admin link with the team.
