@@ -94,9 +94,10 @@ export class OrianaInvertorsWebStack extends Stack {
         "CHANGE_ME",
       S3_BUCKET: mediaBucket?.bucketName || "",
       S3_REGION: Stack.of(this).region,
-      // Prefer Supabase transaction pooler (:6543). Payload needs ≥2 clients in-process;
-      // keep this small so warm Lambdas don't pin too many pooler slots.
-      PG_POOL_MAX: "2",
+      // Prefer Supabase transaction pooler (:6543). Publish needs several concurrent
+      // clients (locks + relations); keep modest so warm Lambdas don't exhaust pooler.
+      PG_POOL_MAX: "5",
+      PG_CONNECT_TIMEOUT_MS: "20000",
       NODE_OPTIONS: "--dns-result-order=ipv4first",
       NEXT_PUBLIC_SERVER_URL:
         process.env.NEXT_PUBLIC_SERVER_URL ||

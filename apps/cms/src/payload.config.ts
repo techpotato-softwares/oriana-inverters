@@ -80,15 +80,16 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
       // Prefer Supabase transaction pooler (:6543). Session mode (:5432) caps at
       // pool_size≈15 and returns EMAXCONNSESSION under Lambda concurrency → blank admin.
-      // Keep ≥2 so Payload can hold one client and still run a second query.
+      // Publish/save runs lock checks + media/S3 work concurrently; <5 clients
+      // frequently hit "timeout exceeded when trying to connect" on QA.
       max: Number(
         process.env.PG_POOL_MAX ||
-          (process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1 : 2),
+          (process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1 : 5),
       ),
       idleTimeoutMillis: process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1000 : 5_000,
       // Keep well under CloudFront's 60s origin timeout so admin fails fast
       // instead of hanging with an empty response.
-      connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 10_000),
+      connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 20_000),
       allowExitOnIdle: true,
     },
     // Set PAYLOAD_DATABASE_PUSH=true for first-time schema bootstrap; prefer migrations in CI/CD

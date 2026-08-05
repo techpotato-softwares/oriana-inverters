@@ -154,7 +154,7 @@ jobs:
             --arg prs "$PREVIEW_SECRET" \
             --arg bucket "${MEDIA_BUCKET:-}" \
             --arg region "$AWS_REGION" \
-            '{Variables: (. + {PAYLOAD_SERVER_URL: $url, NEXT_PUBLIC_SERVER_URL: $url, DATABASE_URL: $db, PAYLOAD_SECRET: $ps, CRON_SECRET: $cs, PREVIEW_SECRET: $prs, S3_BUCKET: $bucket, S3_REGION: $region, NEXT_IMAGE_UNOPTIMIZED: "true", NEXT_TELEMETRY_DISABLED: "1", AWS_LWA_ENABLE_COMPRESSION: "false", AWS_LWA_INVOKE_MODE: "buffered", PAYLOAD_CACHE_COMPONENTS_ENABLED: "true", PG_POOL_MAX: "2", NODE_OPTIONS: "--dns-result-order=ipv4first"})}' \
+            '{Variables: (. + {PAYLOAD_SERVER_URL: $url, NEXT_PUBLIC_SERVER_URL: $url, DATABASE_URL: $db, PAYLOAD_SECRET: $ps, CRON_SECRET: $cs, PREVIEW_SECRET: $prs, S3_BUCKET: $bucket, S3_REGION: $region, NEXT_IMAGE_UNOPTIMIZED: "true", NEXT_TELEMETRY_DISABLED: "1", AWS_LWA_ENABLE_COMPRESSION: "false", AWS_LWA_INVOKE_MODE: "buffered", PAYLOAD_CACHE_COMPONENTS_ENABLED: "true", PG_POOL_MAX: "5", PG_CONNECT_TIMEOUT_MS: "20000", NODE_OPTIONS: "--dns-result-order=ipv4first"})}' \
             /tmp/env.json > /tmp/lambda-env.json
 
           # Pass via file to avoid shell quoting issues with nested JSON
