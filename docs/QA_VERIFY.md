@@ -16,7 +16,7 @@
 ## Verify
 
 - [ ] CloudFront URL loads `/`
-- [ ] `/admin` works
+- [ ] `/admin` works (QA DB must use Supabase **transaction** pooler port `6543`, not session `5432`)
 - [ ] Media uploads -> `oriana-invertors-web-media-qa` (browser PUTs via presigned URL; objects under `media/`)
 - [ ] Upload a file >6MB (e.g. short video) to confirm clientUploads bypasses Lambda body limit
 

@@ -61,13 +61,14 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
-      // Supabase session pooler is tiny (often pool_size=15 shared). Keep this low so
-      // schema:push / Lambda don't exhaust EMAXCONNSESSION during Drizzle introspect.
+      // Prefer Supabase transaction pooler (:6543). Session mode (:5432) caps at
+      // pool_size≈15 and returns EMAXCONNSESSION under Lambda concurrency → blank admin.
+      // Keep ≥2 so Payload can hold one client and still run a second query.
       max: Number(
         process.env.PG_POOL_MAX ||
-          (process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1 : 3),
+          (process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1 : 2),
       ),
-      idleTimeoutMillis: process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1000 : 10_000,
+      idleTimeoutMillis: process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1000 : 5_000,
       // Keep well under CloudFront's 60s origin timeout so admin fails fast
       // instead of hanging with an empty response.
       connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 10_000),

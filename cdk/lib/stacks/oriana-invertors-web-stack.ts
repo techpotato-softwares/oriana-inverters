@@ -94,10 +94,9 @@ export class OrianaInvertorsWebStack extends Stack {
         "CHANGE_ME",
       S3_BUCKET: mediaBucket?.bucketName || "",
       S3_REGION: Stack.of(this).region,
-      // Supabase session poolers are small, but Payload holds one client during
-      // initReq/auth — PG_POOL_MAX=1 deadlocks every other query for 60s and
-      // CloudFront times out /admin with an empty response.
-      PG_POOL_MAX: "3",
+      // Prefer Supabase transaction pooler (:6543). Payload needs ≥2 clients in-process;
+      // keep this small so warm Lambdas don't pin too many pooler slots.
+      PG_POOL_MAX: "2",
       NODE_OPTIONS: "--dns-result-order=ipv4first",
       NEXT_PUBLIC_SERVER_URL:
         process.env.NEXT_PUBLIC_SERVER_URL ||
