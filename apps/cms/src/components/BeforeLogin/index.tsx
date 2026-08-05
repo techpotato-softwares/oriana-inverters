@@ -5,7 +5,7 @@ const BeforeLogin: React.FC = () => {
     <div>
       <p>
         <b>Welcome to Oriana Inverters CMS</b>
-        {' — log in to manage products, media, pages, and blog content.'}
+        {' — manage products, media, pages, and blog content.'}
       </p>
     </div>
   )

@@ -10,8 +10,10 @@ declare global {
       S3_BUCKET?: string
       S3_REGION?: string
       AWS_REGION?: string
-      AWS_ACCESS_KEY_ID?: string
-      AWS_SECRET_ACCESS_KEY?: string
+      /** Local/dev static keys only — never set these on Lambda (use IAM role). */
+      S3_ACCESS_KEY_ID?: string
+      S3_SECRET_ACCESS_KEY?: string
+      S3_SESSION_TOKEN?: string
       PAYLOAD_DATABASE_PUSH?: string
       ADMIN_EMAIL?: string
       ADMIN_PASSWORD?: string

@@ -15,6 +15,11 @@ import { jwtVerify } from 'jose'
  * sha256(secret).digest('hex').slice(0, 32) — see payload/dist/index.js.
  * Verifying with the raw secret rejects every valid login cookie and causes
  * an immediate /admin → /admin/login redirect loop.
+ *
+ * CloudFront → Lambda Function URL sets x-forwarded-host to the *.lambda-url.*
+ * hostname while the browser Origin is the CloudFront domain. Next.js Server
+ * Actions CSRF then aborts with "Invalid Server Actions request" (media save).
+ * Rewrite x-forwarded-host to the public host before Next handles the request.
  */
 const PUBLIC_ADMIN_ROUTES = [
   '/admin/login',
@@ -55,22 +60,72 @@ async function hasValidPayloadToken(request: NextRequest): Promise<boolean> {
   }
 }
 
+function resolvePublicHost(request: NextRequest): string | null {
+  const origin = request.headers.get('origin')
+  if (origin) {
+    try {
+      return new URL(origin).host
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const forwarded = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim()
+  if (forwarded && !forwarded.includes('lambda-url.') && !forwarded.includes('.on.aws')) {
+    return forwarded
+  }
+
+  for (const envName of ['PAYLOAD_SERVER_URL', 'NEXT_PUBLIC_SERVER_URL'] as const) {
+    const value = process.env[envName]
+    if (!value) continue
+    try {
+      return new URL(value).host
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return null
+}
+
+function withPublicForwardedHost(request: NextRequest): {
+  requestHeaders: Headers
+  next: () => NextResponse
+} {
+  const requestHeaders = new Headers(request.headers)
+  const publicHost = resolvePublicHost(request)
+  if (publicHost) {
+    requestHeaders.set('x-forwarded-host', publicHost)
+  }
+
+  return {
+    requestHeaders,
+    next: () =>
+      NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      }),
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const { next } = withPublicForwardedHost(request)
 
   if (!pathname.startsWith('/admin')) {
-    return NextResponse.next()
+    return next()
   }
 
   const isPublic = PUBLIC_ADMIN_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   )
   if (isPublic) {
-    return NextResponse.next()
+    return next()
   }
 
   if (await hasValidPayloadToken(request)) {
-    return NextResponse.next()
+    return next()
   }
 
   const loginUrl = request.nextUrl.clone()
@@ -92,5 +147,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin', '/admin/:path*'],
+  // Include non-admin routes so Server Actions CSRF host rewrite applies app-wide.
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map)$).*)',
+  ],
 }

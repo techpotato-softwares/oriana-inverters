@@ -112,11 +112,18 @@ export const plugins: Plugin[] = [
     bucket: s3Bucket || 'oriana-media-placeholder',
     config: {
       region: process.env.S3_REGION || process.env.AWS_REGION || 'ap-south-1',
-      ...(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+      // Do NOT read AWS_ACCESS_KEY_ID here. On Lambda those are temporary ASIA*
+      // role creds; passing them without AWS_SESSION_TOKEN makes S3 return
+      // InvalidAccessKeyId. Let the default provider chain use the IAM role.
+      // For local/dev static keys only, set S3_ACCESS_KEY_ID / S3_SECRET_ACCESS_KEY.
+      ...(process.env.S3_ACCESS_KEY_ID && process.env.S3_SECRET_ACCESS_KEY
         ? {
             credentials: {
-              accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-              secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+              accessKeyId: process.env.S3_ACCESS_KEY_ID,
+              secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+              ...(process.env.S3_SESSION_TOKEN
+                ? { sessionToken: process.env.S3_SESSION_TOKEN }
+                : {}),
             },
           }
         : {}),
