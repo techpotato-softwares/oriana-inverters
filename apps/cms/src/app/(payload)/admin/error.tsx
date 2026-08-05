@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect } from 'react'
 
 export default function AdminError({
@@ -51,7 +52,7 @@ export default function AdminError({
           >
             Try again
           </button>
-          <a
+          <Link
             href="/admin/login"
             style={{
               borderRadius: 8,
@@ -64,7 +65,7 @@ export default function AdminError({
             }}
           >
             Go to login
-          </a>
+          </Link>
         </div>
       </div>
     </div>
