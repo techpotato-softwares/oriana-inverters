@@ -30,10 +30,23 @@ export const Products: CollectionConfig = {
         if (context.disableRevalidate) return doc
 
         const { revalidatePath, revalidateTag } = await import('next/cache')
+        const { slugifySeries } = await import('@/utilities/series')
+
+        const seriesPaths = (product: typeof doc | typeof previousDoc) => {
+          if (!product) return [] as string[]
+          const seriesName =
+            product.modelSeries ||
+            product.keySpecs?.find((s) => s.label?.toLowerCase() === 'model series')?.value
+          const seriesSlug = seriesName ? slugifySeries(String(seriesName)) : null
+          return [
+            `/products/${product.slug}`,
+            ...(seriesSlug ? [`/products/${seriesSlug}`] : []),
+          ]
+        }
 
         if (doc._status === 'published') {
           payload.logger.info(`Revalidating product: /products/${doc.slug}`)
-          revalidatePath(`/products/${doc.slug}`)
+          for (const path of seriesPaths(doc)) revalidatePath(path)
           revalidatePath('/products')
           if (doc.category && typeof doc.category === 'object' && 'slug' in doc.category) {
             revalidatePath(`/products/category/${(doc.category as { slug: string }).slug}`)
@@ -43,7 +56,7 @@ export const Products: CollectionConfig = {
         }
 
         if (previousDoc?._status === 'published' && doc._status !== 'published') {
-          revalidatePath(`/products/${previousDoc.slug}`)
+          for (const path of seriesPaths(previousDoc)) revalidatePath(path)
           revalidatePath('/products')
           revalidateTag('products')
         }

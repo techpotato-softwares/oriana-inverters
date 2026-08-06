@@ -22,15 +22,25 @@ async function getPayloadSafe() {
   }
 }
 
+function relationId(value: unknown): number | string | null {
+  if (typeof value === 'number' || typeof value === 'string') return value
+  if (value && typeof value === 'object' && 'id' in value) {
+    const id = (value as { id: unknown }).id
+    if (typeof id === 'number' || typeof id === 'string') return id
+  }
+  return null
+}
+
 /** Products come only from Payload Admin (published). No hardcoded product fallback. */
 async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
   const payload = await getPayloadSafe()
   if (!payload) return []
 
   try {
-    // depth:0 — populating media (depth≥1) throws on Lambda when seed files aren't in S3,
-    // which made the whole catalogue empty even though products were published.
-    const [result, categoriesResult] = await Promise.all([
+    // depth:0 — populating media via depth≥1 used to throw on Lambda when seed
+    // files weren't in S3 and emptied the whole catalogue. Join categories +
+    // media separately so hero/datasheet URLs still resolve for the frontend.
+    const [result, categoriesResult, mediaResult] = await Promise.all([
       payload.find({
         collection: 'products',
         depth: 0,
@@ -47,23 +57,31 @@ async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
         limit: 100,
         pagination: false,
       }),
+      payload.find({
+        collection: 'media',
+        depth: 0,
+        limit: 500,
+        pagination: false,
+      }),
     ])
 
     const categoriesById = new Map(categoriesResult.docs.map((doc) => [doc.id, doc]))
+    const mediaById = new Map(mediaResult.docs.map((doc) => [doc.id, doc]))
 
     return result.docs.map((doc) => {
-      const categoryId =
-        typeof doc.category === 'object' && doc.category !== null
-          ? doc.category.id
-          : doc.category
+      const categoryId = relationId(doc.category)
       const categoryDoc =
-        typeof categoryId === 'number' || typeof categoryId === 'string'
-          ? categoriesById.get(categoryId)
-          : null
+        categoryId !== null ? categoriesById.get(categoryId) : null
+
+      const heroId = relationId(doc.heroImage)
+      const datasheetId = relationId(doc.datasheetPdf)
 
       return mapProduct({
         ...doc,
         category: categoryDoc ?? doc.category,
+        heroImage: (heroId !== null ? mediaById.get(heroId) : null) ?? doc.heroImage,
+        datasheetPdf:
+          (datasheetId !== null ? mediaById.get(datasheetId) : null) ?? doc.datasheetPdf,
       })
     })
   } catch (error) {
