@@ -22,11 +22,14 @@ async function getPayloadSafe() {
   }
 }
 
-function relationId(value: unknown): number | string | null {
-  if (typeof value === 'number' || typeof value === 'string') return value
+function relationId(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'string' && value !== '') {
+    const n = Number(value)
+    if (Number.isFinite(n)) return n
+  }
   if (value && typeof value === 'object' && 'id' in value) {
-    const id = (value as { id: unknown }).id
-    if (typeof id === 'number' || typeof id === 'string') return id
+    return relationId((value as { id: unknown }).id)
   }
   return null
 }
