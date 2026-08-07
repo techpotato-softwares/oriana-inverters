@@ -36,7 +36,10 @@ export const Products: CollectionConfig = {
           if (!product) return [] as string[]
           const seriesName =
             product.modelSeries ||
-            product.keySpecs?.find((s) => s.label?.toLowerCase() === 'model series')?.value
+            product.keySpecs?.find(
+              (s: { label?: string | null; value?: string | null }) =>
+                s.label?.toLowerCase() === 'model series',
+            )?.value
           const seriesSlug = seriesName ? slugifySeries(String(seriesName)) : null
           return [
             `/products/${product.slug}`,
