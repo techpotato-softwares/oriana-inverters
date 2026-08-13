@@ -129,8 +129,12 @@ const BeforeDashboard: React.FC = () => {
       </Banner>
 
       <p className={`${baseClass}__intro`}>
-        Jump into a collection to edit content. Published catalogue items appear on the public site
-        automatically.
+        Jump into a collection to edit content. Site-wide footer, SEO, analytics, and the hotline
+        live under{' '}
+        <Link href="/admin/globals/site-settings" prefetch={false}>
+          Site Settings
+        </Link>
+        .
       </p>
 
       <div className={`${baseClass}__grid`}>

@@ -115,6 +115,13 @@ jobs:
           NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run ensure:media-prefix
 
+      - name: Ensure site settings table
+        if: ${{ steps.secrets.outputs.db_ready == 'true' }}
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+        run: npm run ensure:site-settings
+
       - name: Build CMS
         working-directory: apps/cms
         env:

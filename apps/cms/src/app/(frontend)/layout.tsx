@@ -4,11 +4,13 @@ import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
 import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery'
+import { SiteAnalytics, SiteAnalyticsNoscript } from '@/components/SiteAnalytics'
 import { SiteFooter } from '@/components/oriana/SiteFooter'
 import { SiteHeader } from '@/components/oriana/SiteHeader'
 import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { getCatalogueNav } from '@/utilities/getCatalogue'
+import { getSiteSettings } from '@/utilities/getSiteSettings'
 import { draftMode } from 'next/headers'
 
 import './globals.css'
@@ -29,9 +31,31 @@ const outfit = Outfit({
   display: 'swap',
 })
 
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings()
+  return {
+    metadataBase: new URL(getServerSideURL()),
+    title: {
+      default: settings.seoTitle,
+      template: settings.seoTitleTemplate,
+    },
+    description: settings.seoDescription,
+    openGraph: mergeOpenGraph({
+      siteName: settings.siteName,
+      title: settings.seoTitle,
+      description: settings.seoDescription,
+      images: settings.ogImageUrl ? [{ url: settings.ogImageUrl }] : undefined,
+    }),
+    twitter: {
+      card: 'summary_large_image',
+      creator: settings.twitterHandle,
+    },
+  }
+}
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
-  const catalogueMenu = await getCatalogueNav()
+  const [catalogueMenu, settings] = await Promise.all([getCatalogueNav(), getSiteSettings()])
 
   return (
     <html
@@ -43,8 +67,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        <SiteAnalytics
+          googleAnalyticsId={settings.googleAnalyticsId}
+          googleTagManagerId={settings.googleTagManagerId}
+        />
       </head>
       <body className="font-sans antialiased">
+        <SiteAnalyticsNoscript googleTagManagerId={settings.googleTagManagerId} />
         <Providers>
           <ChunkLoadRecovery />
           <AdminBar
@@ -52,26 +81,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               preview: isEnabled,
             }}
           />
-          <SiteHeader catalogueMenu={catalogueMenu} />
+          <SiteHeader catalogueMenu={catalogueMenu} hotline={settings.hotline} />
           {children}
-          <SiteFooter />
+          <SiteFooter settings={settings} />
         </Providers>
       </body>
     </html>
   )
-}
-
-export const metadata: Metadata = {
-  metadataBase: new URL(getServerSideURL()),
-  title: {
-    default: 'Oriana Inverters | Advanced Solar Inverter Solutions',
-    template: '%s | Oriana Inverters',
-  },
-  description:
-    'High-efficiency string, hybrid, and utility-scale solar inverters for residential, commercial, and utility applications.',
-  openGraph: mergeOpenGraph(),
-  twitter: {
-    card: 'summary_large_image',
-    creator: '@OrianaInverters',
-  },
 }

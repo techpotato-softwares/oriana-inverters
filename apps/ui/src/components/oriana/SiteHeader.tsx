@@ -76,7 +76,13 @@ function MegaMenuPanel({ menuKey }: { menuKey: MegaMenuKey }) {
   )
 }
 
-export function SiteHeader({ catalogueMenu = [] }: { catalogueMenu?: CatalogueNavItem[] }) {
+export function SiteHeader({
+  catalogueMenu = [],
+  hotline = '+1 (800) ORIANA-1',
+}: {
+  catalogueMenu?: CatalogueNavItem[]
+  hotline?: string
+}) {
   const pathname = usePathname()
   const router = useRouter()
   const refreshedEmptyMenu = useRef(false)
@@ -133,7 +139,7 @@ export function SiteHeader({ catalogueMenu = [] }: { catalogueMenu?: CatalogueNa
         )}
       >
         <div className="container flex h-9 items-center justify-between">
-          <span>Customer Hotline: +1 (800) ORIANA-1</span>
+          <span>Customer Hotline: {hotline}</span>
           <div className="flex items-center gap-5">
             <button
               type="button"

@@ -110,10 +110,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    'site-settings': SiteSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'site-settings': SiteSettingSelect<false> | SiteSettingSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1884,6 +1886,70 @@ export interface Header {
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "footer".
  */
+export interface SiteSetting {
+  id: number;
+  siteName?: string | null;
+  hotline?: string | null;
+  copyrightText?: string | null;
+  seoTitle?: string | null;
+  seoTitleTemplate?: string | null;
+  seoDescription?: string | null;
+  twitterHandle?: string | null;
+  ogImage?: (number | null) | Media;
+  googleAnalyticsId?: string | null;
+  googleTagManagerId?: string | null;
+  footerColumns?:
+    | {
+        title: string;
+        links?:
+          | {
+              label: string;
+              href: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  legalLinks?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  socialLinks?:
+    | {
+        platform: 'linkedin' | 'facebook' | 'youtube' | 'instagram';
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingSelect<T extends boolean = true> {
+  siteName?: T;
+  hotline?: T;
+  copyrightText?: T;
+  seoTitle?: T;
+  seoTitleTemplate?: T;
+  seoDescription?: T;
+  twitterHandle?: T;
+  ogImage?: T;
+  googleAnalyticsId?: T;
+  googleTagManagerId?: T;
+  footerColumns?: T;
+  legalLinks?: T;
+  socialLinks?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
 export interface Footer {
   id: number;
   navItems?:
