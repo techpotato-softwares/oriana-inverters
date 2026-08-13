@@ -154,8 +154,9 @@ const BeforeDashboard: React.FC = () => {
 
       <div className={`${baseClass}__footer`}>
         <p>
-          Optional bootstrap: <SeedButton /> or run <code>npm run seed:catalogue</code> to import
-          products. Preview the{' '}
+          Homepage hero: open a Media image, enable <strong>Show on homepage hero</strong>, then
+          link it to a product or blog post. Optional bootstrap: <SeedButton /> or run{' '}
+          <code>npm run seed:catalogue</code> to import products. Preview the{' '}
           <a href="/" target="_blank" rel="noreferrer">
             live website
           </a>

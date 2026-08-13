@@ -41,9 +41,16 @@ async function ensurePrefix(connectionString: string) {
 
     await pool.query(`
       ALTER TABLE public.media
-      ADD COLUMN IF NOT EXISTS prefix varchar
+      ADD COLUMN IF NOT EXISTS prefix varchar,
+      ADD COLUMN IF NOT EXISTS use_as_home_hero boolean DEFAULT false,
+      ADD COLUMN IF NOT EXISTS home_hero_link_type varchar,
+      ADD COLUMN IF NOT EXISTS home_hero_product_id integer,
+      ADD COLUMN IF NOT EXISTS home_hero_post_id integer,
+      ADD COLUMN IF NOT EXISTS home_hero_headline varchar,
+      ADD COLUMN IF NOT EXISTS home_hero_cta varchar,
+      ADD COLUMN IF NOT EXISTS home_hero_sort numeric
     `)
-    console.log('Ensured public.media.prefix exists.')
+    console.log('Ensured public.media.prefix and homepage hero columns exist.')
   } finally {
     await pool.end()
   }

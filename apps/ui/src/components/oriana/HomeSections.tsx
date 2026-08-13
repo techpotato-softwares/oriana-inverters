@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight,
@@ -12,6 +14,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { caseStudies } from '@/data/caseStudies'
+import type { HomeHeroSlide } from '@/types/homeHero'
 import { AnimatedCounter } from './AnimatedCounter'
 import { EnergyMesh } from './EnergyMesh'
 import { FadeIn, Stagger, StaggerItem } from './FadeIn'
@@ -24,8 +27,78 @@ import {
 } from './Mascots'
 
 /** Full-bleed atmospheric hero — brand first, international energy brand */
-export function HomeHero() {
+export function HomeHero({ slides = [] }: { slides?: HomeHeroSlide[] }) {
   const reduce = useReducedMotion()
+  const [active, setActive] = useState(0)
+  const slide = slides[active]
+
+  useEffect(() => {
+    if (slides.length < 2 || reduce) return
+    const timer = window.setInterval(() => {
+      setActive((current) => (current + 1) % slides.length)
+    }, 7000)
+    return () => window.clearInterval(timer)
+  }, [slides.length, reduce])
+
+  if (slide) {
+    return (
+      <section className="relative flex min-h-[100svh] items-center overflow-hidden bg-oriana-navy">
+        <Image
+          src={slide.imageUrl}
+          alt={slide.imageAlt}
+          fill
+          priority
+          unoptimized
+          className="object-cover"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-oriana-navy/55" />
+        <div className="absolute inset-0 bg-gradient-to-r from-oriana-navy/80 via-oriana-navy/45 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-white via-white/80 to-transparent" />
+
+        <div className="container relative z-10 pb-28 pt-32 lg:pb-36 lg:pt-36">
+          <FadeIn>
+            <p className="font-display text-sm font-semibold uppercase tracking-[0.28em] text-oriana-sky">
+              {slide.linkType === 'post' ? 'From the blog' : 'Featured product'}
+            </p>
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]">
+              {slide.headline}
+            </h1>
+          </FadeIn>
+          <FadeIn delay={0.18}>
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <Link
+                href={slide.href}
+                className="group inline-flex items-center gap-2 rounded-md bg-oriana-sky px-7 py-3.5 text-sm font-semibold text-oriana-navy transition hover:bg-white"
+              >
+                {slide.ctaLabel}
+                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </Link>
+            </div>
+          </FadeIn>
+
+          {slides.length > 1 ? (
+            <div className="mt-10 flex gap-2">
+              {slides.map((item, index) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-label={`Show hero ${index + 1}`}
+                  aria-current={index === active}
+                  onClick={() => setActive(index)}
+                  className={`h-2.5 rounded-full transition ${
+                    index === active ? 'w-8 bg-oriana-sky' : 'w-2.5 bg-white/40 hover:bg-white/70'
+                  }`}
+                />
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="relative flex min-h-[100svh] items-center overflow-hidden bg-oriana-navy">

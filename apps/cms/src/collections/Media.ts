@@ -65,7 +65,99 @@ export const Media: CollectionConfig = {
         },
       }),
     },
+    {
+      type: 'collapsible',
+      label: 'Homepage hero',
+      admin: {
+        description:
+          'Use this image as a homepage hero slide, with a link to a product or blog post.',
+        initCollapsed: true,
+      },
+      fields: [
+        {
+          name: 'useAsHomeHero',
+          type: 'checkbox',
+          defaultValue: false,
+          label: 'Show on homepage hero',
+        },
+        {
+          name: 'homeHeroLinkType',
+          type: 'select',
+          options: [
+            { label: 'Product', value: 'product' },
+            { label: 'Blog post', value: 'post' },
+          ],
+          admin: {
+            condition: (_, siblingData) => Boolean(siblingData?.useAsHomeHero),
+            description: 'Where the hero image should take visitors.',
+          },
+        },
+        {
+          name: 'homeHeroProduct',
+          type: 'relationship',
+          relationTo: 'products',
+          admin: {
+            condition: (_, siblingData) =>
+              Boolean(siblingData?.useAsHomeHero) && siblingData?.homeHeroLinkType === 'product',
+          },
+        },
+        {
+          name: 'homeHeroPost',
+          type: 'relationship',
+          relationTo: 'posts',
+          admin: {
+            condition: (_, siblingData) =>
+              Boolean(siblingData?.useAsHomeHero) && siblingData?.homeHeroLinkType === 'post',
+          },
+        },
+        {
+          name: 'homeHeroHeadline',
+          type: 'text',
+          admin: {
+            condition: (_, siblingData) => Boolean(siblingData?.useAsHomeHero),
+            description: 'Optional overlay title. Defaults to the product or post name.',
+          },
+        },
+        {
+          name: 'homeHeroCta',
+          type: 'text',
+          admin: {
+            condition: (_, siblingData) => Boolean(siblingData?.useAsHomeHero),
+            description: 'Optional button label. Defaults to “View product” or “Read article”.',
+          },
+        },
+        {
+          name: 'homeHeroSort',
+          type: 'number',
+          defaultValue: 0,
+          admin: {
+            condition: (_, siblingData) => Boolean(siblingData?.useAsHomeHero),
+            description: 'Lower numbers appear first when several hero images are enabled.',
+          },
+        },
+      ],
+    },
   ],
+  hooks: {
+    afterChange: [
+      async ({ doc, req: { context } }) => {
+        if (context.disableRevalidate) return doc
+        const { revalidatePath, revalidateTag } = await import('next/cache')
+        revalidateTag('home-hero')
+        revalidatePath('/')
+        return doc
+      },
+    ],
+    afterDelete: [
+      async ({ doc, req: { context } }) => {
+        if (context.disableRevalidate) return doc
+        const { revalidatePath, revalidateTag } = await import('next/cache')
+        revalidateTag('home-hero')
+        revalidatePath('/')
+        return doc
+      },
+    ],
+  },
   upload: {
     staticDir: path.resolve(dirname, '../../public/media'),
     adminThumbnail: 'thumbnail',

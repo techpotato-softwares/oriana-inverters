@@ -277,6 +277,13 @@ export interface Media {
   alt?: string | null;
   mediaType?: ('image' | 'video' | 'document') | null;
   videoResolution?: ('1080p' | '4k') | null;
+  useAsHomeHero?: boolean | null;
+  homeHeroLinkType?: ('product' | 'post') | null;
+  homeHeroProduct?: (number | null) | Product;
+  homeHeroPost?: (number | null) | Post;
+  homeHeroHeadline?: string | null;
+  homeHeroCta?: string | null;
+  homeHeroSort?: number | null;
   caption?: {
     root: {
       type: string;
@@ -1432,6 +1439,13 @@ export interface MediaSelect<T extends boolean = true> {
   mediaType?: T;
   videoResolution?: T;
   caption?: T;
+  useAsHomeHero?: T;
+  homeHeroLinkType?: T;
+  homeHeroProduct?: T;
+  homeHeroPost?: T;
+  homeHeroHeadline?: T;
+  homeHeroCta?: T;
+  homeHeroSort?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

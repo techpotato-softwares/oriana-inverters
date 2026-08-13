@@ -10,6 +10,7 @@ import {
   SupportDownloadStrip,
   WhyOrianaSection,
 } from '@/components/oriana/HomeSections'
+import { getHomeHeroSlides } from '@/utilities/getHomeHero'
 
 export const metadata: Metadata = {
   title: 'Oriana Inverters | Solar Inverter & Energy Storage Solutions',
@@ -17,10 +18,12 @@ export const metadata: Metadata = {
     'Oriana manufactures high-efficiency string, hybrid, and utility-scale solar inverters for residential, commercial, and utility partners worldwide.',
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const heroSlides = await getHomeHeroSlides()
+
   return (
     <main className="bg-white">
-      <HomeHero />
+      <HomeHero slides={heroSlides} />
       <StrategiesSection />
       <ImpactStats />
       <WhyOrianaSection />
