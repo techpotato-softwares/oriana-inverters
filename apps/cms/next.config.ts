@@ -41,20 +41,22 @@ const nextConfig: NextConfig = {
   // CloudFront Origin is dq5fyy….cloudfront.net but Function URL sets
   // x-forwarded-host to *.lambda-url.*.on.aws — without this allow-list,
   // media create/save Server Actions abort with "Invalid Server Actions request".
-  serverActions: {
-    allowedOrigins: [
-      '*.cloudfront.net',
-      'localhost:3000',
-      ...(() => {
-        try {
-          return [new URL(NEXT_PUBLIC_SERVER_URL).host]
-        } catch {
-          return [] as string[]
-        }
-      })(),
-    ],
-    // Client uploads go to S3; metadata POSTs can still be large for rich text.
-    bodySizeLimit: '10mb',
+  experimental: {
+    serverActions: {
+      allowedOrigins: [
+        '*.cloudfront.net',
+        'localhost:3000',
+        ...(() => {
+          try {
+            return [new URL(NEXT_PUBLIC_SERVER_URL).host]
+          } catch {
+            return [] as string[]
+          }
+        })(),
+      ],
+      // Client uploads go to S3; metadata POSTs can still be large for rich text.
+      bodySizeLimit: '10mb',
+    },
   },
   sassOptions: {
     loadPaths: ['./node_modules/@payloadcms/ui/dist/scss/'],
