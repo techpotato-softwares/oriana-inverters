@@ -69,7 +69,7 @@ async function fetchHomeHeroSlides(): Promise<HomeHeroSlide[]> {
     const productsById = new Map(products.docs.map((doc) => [doc.id, doc]))
     const postsById = new Map(posts.docs.map((doc) => [doc.id, doc]))
 
-    return media.docs.flatMap((doc) => {
+    return media.docs.flatMap((doc): HomeHeroSlide[] => {
       if (!doc.url) return []
 
       if (doc.homeHeroLinkType === 'product') {
@@ -88,7 +88,7 @@ async function fetchHomeHeroSlides(): Promise<HomeHeroSlide[]> {
             href,
             headline: doc.homeHeroHeadline?.trim() || product.name,
             ctaLabel: doc.homeHeroCta?.trim() || 'View product',
-            linkType: 'product' as const,
+            linkType: 'product',
           },
         ]
       }
@@ -104,7 +104,7 @@ async function fetchHomeHeroSlides(): Promise<HomeHeroSlide[]> {
             href: `/posts/${post.slug}`,
             headline: doc.homeHeroHeadline?.trim() || post.title,
             ctaLabel: doc.homeHeroCta?.trim() || 'Read article',
-            linkType: 'post' as const,
+            linkType: 'post',
           },
         ]
       }
