@@ -7,15 +7,32 @@ import { Globe, Menu, Search, X } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { cn } from '@/utilities/ui'
 import {
-  megaMenus,
-  primaryNav,
+  megaMenus as defaultMegaMenus,
+  primaryNav as defaultPrimaryNav,
   type MegaMenuKey,
 } from '@/config/navigation'
 import { ProductsMegaMenuPanel } from '@/components/oriana/ProductsMegaMenu'
 import type { CatalogueNavItem } from '@/types/catalogue'
 
-function MegaMenuPanel({ menuKey }: { menuKey: MegaMenuKey }) {
-  const menu = megaMenus[menuKey]
+export type SiteHeaderNav = {
+  hotlineLabel?: string
+  localeLabel?: string
+  loginLabel?: string
+  loginHref?: string
+  whereToBuy?: { label: string; href: string }
+  requestQuote?: { label: string; href: string }
+  primaryNav?: MegaMenuKey[]
+  megaMenus?: typeof defaultMegaMenus
+}
+
+function MegaMenuPanel({
+  menuKey,
+  menus,
+}: {
+  menuKey: MegaMenuKey
+  menus: typeof defaultMegaMenus
+}) {
+  const menu = menus[menuKey]
 
   return (
     <div
@@ -25,7 +42,6 @@ function MegaMenuPanel({ menuKey }: { menuKey: MegaMenuKey }) {
     >
       <div className="container py-10 lg:py-12">
         <div className="flex gap-8 lg:gap-12">
-          {/* Sungrow-style ghost watermark */}
           <div className="hidden w-48 shrink-0 items-center lg:flex xl:w-56">
             <p
               className="font-display text-4xl font-light leading-tight text-oriana-navy/[0.07] xl:text-5xl"
@@ -79,9 +95,11 @@ function MegaMenuPanel({ menuKey }: { menuKey: MegaMenuKey }) {
 export function SiteHeader({
   catalogueMenu = [],
   hotline = '+1 (800) ORIANA-1',
+  nav,
 }: {
   catalogueMenu?: CatalogueNavItem[]
   hotline?: string
+  nav?: SiteHeaderNav
 }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -92,13 +110,20 @@ export function SiteHeader({
   const isHome = pathname === '/'
   const overHero = isHome && !scrolled && !openMenu && !mobileOpen
 
+  const megaMenus = nav?.megaMenus ?? defaultMegaMenus
+  const primaryNav = nav?.primaryNav ?? defaultPrimaryNav
+  const hotlineLabel = nav?.hotlineLabel ?? 'Customer Hotline'
+  const localeLabel = nav?.localeLabel ?? 'USA · English'
+  const loginLabel = nav?.loginLabel ?? 'Login'
+  const loginHref = nav?.loginHref ?? '/admin'
+  const whereToBuy = nav?.whereToBuy ?? { label: 'Where to Buy', href: '/where-to-buy' }
+  const requestQuote = nav?.requestQuote ?? { label: 'Request Quote', href: '/contact' }
+
   useEffect(() => {
     setMobileOpen(false)
     setOpenMenu(null)
   }, [pathname])
 
-  // Homepage was prerendered with an empty catalogue; soft-nav keeps that shell.
-  // Refresh once so a dynamic layout can replace the empty mega-menu.
   useEffect(() => {
     if (catalogueMenu.length > 0 || refreshedEmptyMenu.current) return
     refreshedEmptyMenu.current = true
@@ -129,7 +154,6 @@ export function SiteHeader({
       )}
       onMouseLeave={() => setOpenMenu(null)}
     >
-      {/* Utility bar */}
       <div
         className={cn(
           'hidden border-b text-xs lg:block',
@@ -139,14 +163,16 @@ export function SiteHeader({
         )}
       >
         <div className="container flex h-9 items-center justify-between">
-          <span>Customer Hotline: {hotline}</span>
+          <span>
+            {hotlineLabel}: {hotline}
+          </span>
           <div className="flex items-center gap-5">
             <button
               type="button"
               className={cn('flex items-center gap-1.5', overHero ? 'hover:text-white' : 'hover:text-oriana-blue')}
             >
               <Globe className="h-3.5 w-3.5" />
-              USA · English
+              {localeLabel}
             </button>
             <Link
               href="/search"
@@ -156,13 +182,13 @@ export function SiteHeader({
               <Search className="h-3.5 w-3.5" />
             </Link>
             <Link
-              href="/admin"
+              href={loginHref}
               className={cn(
                 'font-semibold uppercase tracking-wide',
                 overHero ? 'hover:text-white' : 'hover:text-oriana-blue',
               )}
             >
-              Login
+              {loginLabel}
             </Link>
           </div>
         </div>
@@ -175,7 +201,6 @@ export function SiteHeader({
               <Logo priority variant={overHero ? 'dark' : 'light'} />
             </Link>
 
-            {/* Sungrow-style centred nav triggers */}
             <nav className="hidden flex-1 items-center justify-center gap-1 xl:flex">
               {primaryNav.map((key) => {
                 const open = openMenu === key
@@ -203,11 +228,11 @@ export function SiteHeader({
             </nav>
 
             <div className="hidden shrink-0 items-center gap-2 xl:flex">
-              <Link href="/where-to-buy" className={linkClass}>
-                Where to Buy
+              <Link href={whereToBuy.href} className={linkClass}>
+                {whereToBuy.label}
               </Link>
               <Link
-                href="/contact"
+                href={requestQuote.href}
                 className={cn(
                   'ml-1 rounded-md px-5 py-2 text-sm font-semibold transition',
                   overHero
@@ -215,7 +240,7 @@ export function SiteHeader({
                     : 'bg-oriana-blue text-white hover:bg-oriana-navy',
                 )}
               >
-                Request Quote
+                {requestQuote.label}
               </Link>
             </div>
 
@@ -230,19 +255,17 @@ export function SiteHeader({
           </div>
         </div>
 
-        {/* Full-width drop panel — Sungrow hover pattern */}
         {openMenu && (
           <div className="hidden xl:block">
             {openMenu === 'products' ? (
               <ProductsMegaMenuPanel menu={catalogueMenu} />
             ) : (
-              <MegaMenuPanel menuKey={openMenu} />
+              <MegaMenuPanel menuKey={openMenu} menus={megaMenus} />
             )}
           </div>
         )}
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
         <div className="max-h-[80vh] overflow-y-auto border-t border-oriana-navy/10 bg-white px-4 py-4 xl:hidden">
           {primaryNav.map((key) => {
@@ -297,14 +320,14 @@ export function SiteHeader({
               </div>
             )
           })}
-          <Link href="/where-to-buy" className="block py-2 text-sm font-semibold text-oriana-blue">
-            Where to Buy
+          <Link href={whereToBuy.href} className="block py-2 text-sm font-semibold text-oriana-blue">
+            {whereToBuy.label}
           </Link>
           <Link
-            href="/contact"
+            href={requestQuote.href}
             className="mt-4 block rounded-md bg-oriana-blue py-3 text-center text-sm font-semibold text-white"
           >
-            Request a Quote
+            {requestQuote.label}
           </Link>
         </div>
       )}

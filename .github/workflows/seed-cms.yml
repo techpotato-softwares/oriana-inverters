@@ -13,7 +13,7 @@ on:
         description: What to seed
         required: true
         type: choice
-        options: [catalogue, admin, full]
+        options: [catalogue, content, admin, full]
         default: catalogue
       admin_email:
         description: Admin email (required for admin/full)
@@ -94,6 +94,13 @@ jobs:
         env:
           NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run seed:catalogue
+
+      - name: Seed marketing content
+        if: ${{ github.event.inputs.seed_type == 'content' || github.event.inputs.seed_type == 'full' }}
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+        run: npm run seed:content
 
       - name: Seed admin user
         if: ${{ github.event.inputs.seed_type == 'admin' || github.event.inputs.seed_type == 'full' }}

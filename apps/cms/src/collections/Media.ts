@@ -20,6 +20,7 @@ export const Media: CollectionConfig = {
     singular: 'Media',
     plural: 'Media',
   },
+  folders: true,
   access: {
     create: authenticated,
     delete: authenticated,
@@ -28,12 +29,15 @@ export const Media: CollectionConfig = {
   },
   admin: {
     group: 'Assets',
-    description: 'Images, videos, and documents used across the site.',
+    description: 'Images, videos, and documents. Organize with folders (Hero, Products, Icons, …).',
+    defaultColumns: ['filename', 'alt', 'mediaType', 'updatedAt'],
   },
   fields: [
     {
       name: 'alt',
       type: 'text',
+      required: true,
+      admin: { description: 'Required for accessibility and SEO.' },
     },
     {
       name: 'mediaType',
@@ -42,8 +46,19 @@ export const Media: CollectionConfig = {
         { label: 'Image', value: 'image' },
         { label: 'Video', value: 'video' },
         { label: 'Document', value: 'document' },
+        { label: 'Icon', value: 'icon' },
       ],
       defaultValue: 'image',
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'tags',
+      type: 'array',
+      labels: { singular: 'Tag', plural: 'Tags' },
+      admin: {
+        description: 'Optional labels for filtering (e.g. hero, product, partner).',
+      },
+      fields: [{ name: 'tag', type: 'text', required: true }],
     },
     {
       name: 'videoResolution',
@@ -65,84 +80,13 @@ export const Media: CollectionConfig = {
         },
       }),
     },
-    {
-      type: 'collapsible',
-      label: 'Homepage hero',
-      admin: {
-        description:
-          'Use this image as a homepage hero slide, with a link to a product or blog post.',
-        initCollapsed: true,
-      },
-      fields: [
-        {
-          name: 'useAsHomeHero',
-          type: 'checkbox',
-          defaultValue: false,
-          label: 'Show on homepage hero',
-        },
-        {
-          name: 'homeHeroLinkType',
-          type: 'select',
-          options: [
-            { label: 'Product', value: 'product' },
-            { label: 'Blog post', value: 'post' },
-          ],
-          admin: {
-            condition: (_, siblingData) => Boolean(siblingData?.useAsHomeHero),
-            description: 'Where the hero image should take visitors.',
-          },
-        },
-        {
-          name: 'homeHeroProduct',
-          type: 'relationship',
-          relationTo: 'products',
-          admin: {
-            condition: (_, siblingData) =>
-              Boolean(siblingData?.useAsHomeHero) && siblingData?.homeHeroLinkType === 'product',
-          },
-        },
-        {
-          name: 'homeHeroPost',
-          type: 'relationship',
-          relationTo: 'posts',
-          admin: {
-            condition: (_, siblingData) =>
-              Boolean(siblingData?.useAsHomeHero) && siblingData?.homeHeroLinkType === 'post',
-          },
-        },
-        {
-          name: 'homeHeroHeadline',
-          type: 'text',
-          admin: {
-            condition: (_, siblingData) => Boolean(siblingData?.useAsHomeHero),
-            description: 'Optional overlay title. Defaults to the product or post name.',
-          },
-        },
-        {
-          name: 'homeHeroCta',
-          type: 'text',
-          admin: {
-            condition: (_, siblingData) => Boolean(siblingData?.useAsHomeHero),
-            description: 'Optional button label. Defaults to “View product” or “Read article”.',
-          },
-        },
-        {
-          name: 'homeHeroSort',
-          type: 'number',
-          defaultValue: 0,
-          admin: {
-            condition: (_, siblingData) => Boolean(siblingData?.useAsHomeHero),
-            description: 'Lower numbers appear first when several hero images are enabled.',
-          },
-        },
-      ],
-    },
   ],
   hooks: {
     afterChange: [
       async ({ doc, req: { context } }) => {
         if (context.disableRevalidate) return doc
         const { revalidatePath, revalidateTag } = await import('next/cache')
+        revalidateTag('home')
         revalidateTag('home-hero')
         revalidatePath('/')
         return doc
@@ -152,6 +96,7 @@ export const Media: CollectionConfig = {
       async ({ doc, req: { context } }) => {
         if (context.disableRevalidate) return doc
         const { revalidatePath, revalidateTag } = await import('next/cache')
+        revalidateTag('home')
         revalidateTag('home-hero')
         revalidatePath('/')
         return doc

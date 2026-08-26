@@ -203,7 +203,7 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding pages...`)
 
-  const [_, contactPage] = await Promise.all([
+  const [_, _contactPage] = await Promise.all([
     payload.create({
       collection: 'pages',
       depth: 0,
@@ -216,66 +216,50 @@ export const seed = async ({
     }),
   ])
 
+  void _contactPage
+
   payload.logger.info(`— Seeding globals...`)
 
-  await Promise.all([
-    payload.updateGlobal({
-      slug: 'header',
-      data: {
-        navItems: [
-          {
-            link: {
-              type: 'custom',
-              label: 'Posts',
-              url: '/posts',
-            },
+  await payload.updateGlobal({
+    slug: 'footer',
+    data: {
+      navItems: [
+        {
+          link: {
+            type: 'custom',
+            label: 'Admin',
+            url: '/admin',
           },
-          {
-            link: {
-              type: 'reference',
-              label: 'Contact',
-              reference: {
-                relationTo: 'pages',
-                value: contactPage.id,
-              },
-            },
-          },
-        ],
-      },
-    }),
-    payload.updateGlobal({
-      slug: 'footer',
-      data: {
-        navItems: [
-          {
-            link: {
-              type: 'custom',
-              label: 'Admin',
-              url: '/admin',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Source Code',
-              newTab: true,
-              url: 'https://github.com/payloadcms/payload/tree/main/templates/website',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Payload',
-              newTab: true,
-              url: 'https://payloadcms.com/',
-            },
-          },
-        ],
-      },
-    }),
-  ])
+        },
+      ],
+    },
+  })
 
   await seedProducts({ payload })
+
+  const { seedOrianaContent } = await import('./oriana/seedContent')
+  await seedOrianaContent({ payload, req })
+
+  // Link contact form to contact global
+  try {
+    const forms = await payload.find({
+      collection: 'forms',
+      where: { title: { equals: 'Contact Form' } },
+      limit: 1,
+      overrideAccess: true,
+    })
+    const formDoc = forms.docs[0]
+    if (formDoc) {
+      await payload.updateGlobal({
+        slug: 'contact',
+        data: { form: formDoc.id } as never,
+        overrideAccess: true,
+        context: { disableRevalidate: true },
+      })
+    }
+  } catch (err) {
+    payload.logger.warn(`Could not link contact form: ${err}`)
+  }
 
   payload.logger.info('Seeded database successfully!')
 }

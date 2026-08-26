@@ -4,15 +4,32 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { Awards } from './collections/Awards'
+import { CaseStudies } from './collections/CaseStudies'
 import { Categories } from './collections/Categories'
+import { Certifications } from './collections/Certifications'
+import { Distributors } from './collections/Distributors'
 import { Downloads } from './collections/Downloads'
+import { Faqs } from './collections/Faqs'
+import { Jobs } from './collections/Jobs'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
+import { Partners } from './collections/Partners'
 import { Posts } from './collections/Posts'
 import { Products } from './collections/Products'
+import { Solutions } from './collections/Solutions'
+import { SustainabilityReports } from './collections/SustainabilityReports'
 import { Users } from './collections/Users'
+import { Videos } from './collections/Videos'
+import { WarrantyPlans } from './collections/WarrantyPlans'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
+import { About } from './globals/About/config'
+import { Careers } from './globals/Careers/config'
+import { Contact } from './globals/Contact/config'
+import { Home } from './globals/Home/config'
+import { Support } from './globals/Support/config'
+import { Sustainability } from './globals/Sustainability/config'
 import { SiteSettings } from './SiteSettings/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
@@ -79,28 +96,43 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
-      // Prefer Supabase transaction pooler (:6543). Session mode (:5432) caps at
-      // pool_size≈15 and returns EMAXCONNSESSION under Lambda concurrency → blank admin.
-      // Publish/save runs lock checks + media/S3 work concurrently; <5 clients
-      // frequently hit "timeout exceeded when trying to connect" on QA.
       max: Number(
         process.env.PG_POOL_MAX ||
           (process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1 : 5),
       ),
       idleTimeoutMillis: process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1000 : 5_000,
-      // Keep well under CloudFront's 60s origin timeout so admin fails fast
-      // instead of hanging with an empty response.
       connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 20_000),
       allowExitOnIdle: true,
     },
-    // Set PAYLOAD_DATABASE_PUSH=true for first-time schema bootstrap; prefer migrations in CI/CD
     push: process.env.PAYLOAD_DATABASE_PUSH === 'true',
     prodMigrations: migrations,
   }),
-  collections: [Pages, Posts, Products, Downloads, Media, Categories, Users],
+  folders: {
+    browseByFolder: true,
+  },
+  collections: [
+    Pages,
+    Posts,
+    Products,
+    Downloads,
+    Media,
+    Categories,
+    CaseStudies,
+    Faqs,
+    Videos,
+    Distributors,
+    Jobs,
+    Certifications,
+    Awards,
+    Partners,
+    Solutions,
+    WarrantyPlans,
+    SustainabilityReports,
+    Users,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   serverURL: getServerSideURL(),
-  globals: [Header, Footer, SiteSettings],
+  globals: [Header, Footer, SiteSettings, Home, About, Careers, Support, Sustainability, Contact],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,

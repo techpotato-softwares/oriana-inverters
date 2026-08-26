@@ -1,13 +1,15 @@
 import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { getFaqs } from '@/utilities/getMarketing'
+import type { Faq } from '@/payload-types'
 
 export const metadata = {
   title: 'FAQs',
   description: 'Frequently asked questions about Oriana solar inverters, installation, warranty, and monitoring.',
 }
 
-const faqGroups = [
+const fallbackFaqGroups = [
   {
     title: 'Product Selection',
     items: [
@@ -49,7 +51,27 @@ const faqGroups = [
   },
 ]
 
-export default function FaqsPage() {
+function groupFaqs(docs: Faq[]) {
+  const order: string[] = []
+  const map = new Map<string, { q: string; a: string }[]>()
+  for (const doc of docs) {
+    const group = doc.group || 'General'
+    if (!map.has(group)) {
+      map.set(group, [])
+      order.push(group)
+    }
+    map.get(group)!.push({ q: doc.question, a: doc.answer })
+  }
+  return order.map((title) => ({
+    title,
+    items: map.get(title) || [],
+  }))
+}
+
+export default async function FaqsPage() {
+  const docs = (await getFaqs()) as Faq[]
+  const faqGroups = docs.length > 0 ? groupFaqs(docs) : fallbackFaqGroups
+
   return (
     <main>
       <PageHero

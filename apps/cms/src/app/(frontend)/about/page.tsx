@@ -1,34 +1,69 @@
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
 import { FadeIn } from '@/components/oriana/FadeIn'
+import { getAbout } from '@/utilities/getMarketing'
+import type { Metadata } from 'next'
 
-export const metadata = {
-  title: 'About Us',
-  description: 'Learn about Oriana Inverters — our mission, technology, and commitment to clean energy.',
+export async function generateMetadata(): Promise<Metadata> {
+  const about = await getAbout()
+  return {
+    title: about?.seo?.metaTitle || 'About Us',
+    description:
+      about?.seo?.metaDescription ||
+      'Learn about Oriana Inverters — our mission, technology, and commitment to clean energy.',
+  }
 }
 
-const values = [
-  {
-    title: 'Engineering Excellence',
-    description: 'Every product undergoes rigorous design validation, environmental stress testing, and field trials before market release.',
-  },
-  {
-    title: 'Customer Partnership',
-    description: 'We work alongside installers, EPCs, and distributors with dedicated technical support, training, and co-marketing resources.',
-  },
-  {
-    title: 'Sustainable Future',
-    description: 'Our mission is to accelerate the global transition to clean energy through reliable, accessible power conversion technology.',
-  },
-]
+export default async function AboutPage() {
+  const about = await getAbout()
+  const hero = about?.hero
+  const storyParagraphs = about?.storyParagraphs?.length
+    ? about.storyParagraphs
+    : [
+        {
+          text: 'Founded by power electronics engineers with decades of experience in renewable energy, Oriana was built on a simple belief: the world needs inverters that are as reliable as the sun itself.',
+        },
+        {
+          text: 'Today, over one million Oriana inverters operate across 25 countries — on rooftops, in industrial parks, and across desert solar farms — converting sunlight into clean, dependable power for millions of people.',
+        },
+      ]
+  const stats = about?.stats?.length
+    ? about.stats
+    : [
+        { value: '2010', label: 'Founded' },
+        { value: '1M+', label: 'Units Deployed' },
+        { value: '25+', label: 'Countries' },
+        { value: '500+', label: 'Team Members' },
+      ]
+  const values = about?.values?.length
+    ? about.values
+    : [
+        {
+          title: 'Engineering Excellence',
+          description:
+            'Every product undergoes rigorous design validation, environmental stress testing, and field trials before market release.',
+        },
+        {
+          title: 'Customer Partnership',
+          description:
+            'We work alongside installers, EPCs, and distributors with dedicated technical support, training, and co-marketing resources.',
+        },
+        {
+          title: 'Sustainable Future',
+          description:
+            'Our mission is to accelerate the global transition to clean energy through reliable, accessible power conversion technology.',
+        },
+      ]
 
-export default function AboutPage() {
   return (
     <main>
       <PageHero
-        eyebrow="About"
-        title="Powering a Cleaner Tomorrow"
-        description="Oriana Inverters is a global manufacturer of solar inverter technology, serving residential, commercial, and utility markets with products engineered for performance and longevity."
+        eyebrow={hero?.eyebrow || 'About'}
+        title={hero?.title || 'Powering a Cleaner Tomorrow'}
+        description={
+          hero?.description ||
+          'Oriana Inverters is a global manufacturer of solar inverter technology, serving residential, commercial, and utility markets with products engineered for performance and longevity.'
+        }
       />
       <Breadcrumbs items={[{ label: 'About' }]} />
 
@@ -36,27 +71,22 @@ export default function AboutPage() {
         <div className="container">
           <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
             <FadeIn>
-              <h2 className="font-display text-3xl font-bold text-oriana-navy">Our Story</h2>
-              <p className="mt-6 leading-relaxed text-oriana-muted">
-                Founded by power electronics engineers with decades of experience in renewable energy,
-                Oriana was built on a simple belief: the world needs inverters that are as reliable as
-                the sun itself.
-              </p>
-              <p className="mt-4 leading-relaxed text-oriana-muted">
-                Today, over one million Oriana inverters operate across 25 countries — on rooftops,
-                in industrial parks, and across desert solar farms — converting sunlight into clean,
-                dependable power for millions of people.
-              </p>
+              <h2 className="font-display text-3xl font-bold text-oriana-navy">
+                {about?.storyTitle || 'Our Story'}
+              </h2>
+              {storyParagraphs.map((p, i) => (
+                <p
+                  key={i}
+                  className={`${i === 0 ? 'mt-6' : 'mt-4'} leading-relaxed text-oriana-muted`}
+                >
+                  {p.text}
+                </p>
+              ))}
             </FadeIn>
 
             <FadeIn delay={0.1}>
               <div className="grid grid-cols-2 gap-4">
-                {[
-                  { value: '2010', label: 'Founded' },
-                  { value: '1M+', label: 'Units Deployed' },
-                  { value: '25+', label: 'Countries' },
-                  { value: '500+', label: 'Team Members' },
-                ].map((stat) => (
+                {stats.map((stat) => (
                   <div
                     key={stat.label}
                     className="rounded-2xl border border-oriana-navy/8 bg-oriana-silver/50 p-6 text-center"

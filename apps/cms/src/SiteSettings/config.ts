@@ -36,6 +36,18 @@ export const SiteSettings: GlobalConfig = {
               admin: { description: 'Used in the footer copyright and default SEO titles.' },
             },
             {
+              name: 'logoLight',
+              type: 'upload',
+              relationTo: 'media',
+              admin: { description: 'Logo for dark backgrounds (header on navy, etc.).' },
+            },
+            {
+              name: 'logoDark',
+              type: 'upload',
+              relationTo: 'media',
+              admin: { description: 'Logo for light backgrounds.' },
+            },
+            {
               name: 'hotline',
               type: 'text',
               defaultValue: '+1 (800) ORIANA-1',

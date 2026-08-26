@@ -1,13 +1,19 @@
 /**
  * Postgres migrations for Payload.
  *
- * SQLite migrations were removed — they are not portable.
- * Create the first Postgres migration against your DB:
+ * After schema changes, bootstrap once then create a migration:
  *
  *   cd apps/cms
- *   DATABASE_URL="postgresql://..." PAYLOAD_SECRET="..." npx payload migrate:create
+ *   npm run schema:push
+ *   DATABASE_URL="postgresql://..." PAYLOAD_SECRET="..." npm run migrate:create
  *
- * Or bootstrap schema once with PAYLOAD_DATABASE_PUSH=true, then create migrations.
+ * Register generated migrations in this array for prod (`prodMigrations`).
+ *
+ * Full content CMS migration (2026-08): new collections (case-studies, faqs,
+ * videos, distributors, jobs, certifications, awards, partners, solutions,
+ * warranty-plans, sustainability-reports), globals (home, about, careers,
+ * support, sustainability, contact), Payload folders on media/downloads.
+ * Prefer `schema:push` on staging then `migrate:create` against that DB.
  */
 export const migrations: {
   up: (args: unknown) => Promise<void>

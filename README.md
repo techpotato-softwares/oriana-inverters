@@ -2,12 +2,12 @@
 
 Solar inverter manufacturer website: **Payload CMS** + **Next.js** public site, deployed to AWS as `oriana-invertors-web-{env}`.
 
-## Layout (ArcForge-style)
+## Layout
 
-| Path | Role (≈ ArcForge) |
-|------|-------------------|
-| [`apps/cms`](apps/cms) | Payload CMS + Next host (≈ `api/`) — **deployable** |
-| [`apps/ui`](apps/ui) | Public UI source (≈ `ui/`) — consumed by cms |
+| Path | Role |
+|------|------|
+| [`apps/cms`](apps/cms) | Payload CMS + Next host — **deployable** |
+| [`apps/ui`](apps/ui) | Public UI source — consumed by cms |
 | [`packages/shared`](packages/shared) | Shared types |
 | [`cdk`](cdk) | AWS CDK — stack `oriana-invertors-web-{env}` |
 
@@ -17,6 +17,51 @@ Solar inverter manufacturer website: **Payload CMS** + **Next.js** public site, 
 cp apps/cms/.env.example apps/cms/.env
 npm install && npm run dev
 ```
+
+Admin: **http://localhost:3000/admin**
+
+### Schema bootstrap
+
+On a fresh database:
+
+```bash
+cd apps/cms
+npm run schema:push
+```
+
+Then create a durable migration when ready:
+
+```bash
+DATABASE_URL="postgresql://..." PAYLOAD_SECRET="..." npm run migrate:create
+```
+
+### Seed workflows
+
+| Script | What it does |
+|--------|----------------|
+| `npm run seed:admin` | Creates admin user from `ADMIN_EMAIL` / `ADMIN_PASSWORD` |
+| `npm run seed:catalogue` | Categories + products |
+| `npm run seed:content` | Marketing globals, collections, media folders/assets, legal pages, contact form |
+| `npm run seed:full` | Catalogue + content (use `--force` to wipe marketing collections first) |
+
+From the repo root:
+
+```bash
+npm run seed:admin
+npm run seed:full
+# or
+npm run seed:content -- --force
+```
+
+GitHub Actions → **Seed Payload CMS** supports `catalogue` | `content` | `admin` | `full`.
+
+### CMS content model (hybrid)
+
+- **Globals:** Home, Header/Navigation, About, Careers, Support, Sustainability, Contact, Site Settings
+- **Collections:** Products, Categories, Downloads, Posts, Pages, Case Studies, FAQs, Videos, Distributors, Jobs, Certifications, Awards, Partners, Solutions, Warranty Plans, Sustainability Reports, Media (with folders)
+- **Drafts:** marketing collections/globals use draft + publish; public site only shows published content
+
+Edit copy, images, icons, and nav from Admin — no deploy required for content changes.
 
 ## Deploy via GitHub Actions (recommended)
 
@@ -32,37 +77,7 @@ Optional repo variable: `AWS_REGION` (default `ap-south-1`).
 
 ### 2. Environment file (no passwords in git)
 
-<<<<<<< Updated upstream
 Edit [`config/deploy.env`](config/deploy.env) with Supabase **host**, **port**, **database name**, **user** only:
-=======
-## Project Structure
-
-```
-src/
-├── app/(frontend)/     # Public website routes
-├── app/(payload)/      # Payload CMS admin + API
-├── collections/        # Products, Media, Posts, Pages...
-├── components/oriana/  # Oriana-branded UI (hero, gallery, video)
-└── payload.config.ts
-```
-
-## Media & Video
-
-Upload 4K videos and high-res images via Payload admin (`/admin` → Media). The `VideoBackground` component supports multiple sources with resolution-based `media` queries (1080p / 4K).
-
-## Catalogue data (Payload CMS)
-
-**Products are managed only in Admin** — there is no hardcoded ORI product catalogue in code.
-
-1. Open **http://localhost:3000/admin**
-2. **Catalogue → Categories** — create product families
-3. **Catalogue → Products** — add models, assign category, **Publish**
-4. **Catalogue → Downloads** / **Media** — attach datasheets and images
-
-Published items appear on `/products`, category pages, solutions pages, and the Products mega-menu.
-
-Optional: seed default category shells only:
->>>>>>> Stashed changes
 
 ```bash
 QA_DB_HOST=db.xxxx.supabase.co
@@ -72,11 +87,7 @@ QA_DB_USER=postgres
 QA_DB_SSL=true
 ```
 
-<<<<<<< Updated upstream
 Copy from [`config/deploy.env.example`](config/deploy.env.example) for other envs.
-=======
-(This no longer inserts demo products — add those in Admin.)
->>>>>>> Stashed changes
 
 ### 3. Run deploy workflow
 
@@ -92,14 +103,14 @@ Copy from [`config/deploy.env.example`](config/deploy.env.example) for other env
 
 AWS Console → **Secrets Manager** → `/oriana-invertors-web/qa/database` → Edit:
 
-- Set `DB_PASSWORD` to your Supabase database password  
+- Set `DB_PASSWORD` to your Supabase database password
 - Re-run **Deploy** (workflow rebuilds `DATABASE_URL` from host + password)
 
 You do **not** need to generate `PAYLOAD_SECRET` manually — it is created on first deploy.
 
 ### 5. Seed content
 
-**Actions → Seed Payload CMS** → choose env + `catalogue` / `admin` / `full` and optionally provide `admin_email` + `admin_password` inputs
+**Actions → Seed Payload CMS** → choose env + `catalogue` / `content` / `admin` / `full` and optionally provide `admin_email` + `admin_password` inputs.
 
 ## Secrets created automatically
 

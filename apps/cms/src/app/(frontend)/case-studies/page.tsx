@@ -3,13 +3,54 @@ import Image from 'next/image'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
 import { caseStudies } from '@/data/caseStudies'
+import { getCaseStudies } from '@/utilities/getMarketing'
+import type { CaseStudy as CmsCaseStudy, Media } from '@/payload-types'
 
 export const metadata = {
   title: 'Case Studies',
   description: 'Customer success stories and reference projects powered by Oriana solar inverters.',
 }
 
-export default function CaseStudiesPage() {
+function mediaUrl(v: unknown): string | null {
+  return v && typeof v === 'object' && 'url' in v && (v as Media).url ? (v as Media).url! : null
+}
+
+type DisplayCaseStudy = {
+  slug: string
+  title: string
+  segment: string
+  capacity: string
+  location: string
+  summary: string
+  products: string
+  image: string
+}
+
+export default async function CaseStudiesPage() {
+  const docs = (await getCaseStudies()) as CmsCaseStudy[]
+  const items: DisplayCaseStudy[] =
+    docs.length > 0
+      ? docs.map((doc) => ({
+          slug: doc.slug,
+          title: doc.title,
+          segment: doc.segment,
+          capacity: doc.capacity || '',
+          location: doc.location || '',
+          summary: doc.summary,
+          products: doc.products || '',
+          image: mediaUrl(doc.image) || '/assets/products/three-phase.svg',
+        }))
+      : caseStudies.map((cs) => ({
+          slug: cs.slug,
+          title: cs.title,
+          segment: cs.segment,
+          capacity: cs.capacity,
+          location: cs.location,
+          summary: cs.summary,
+          products: cs.products,
+          image: cs.image,
+        }))
+
   return (
     <main>
       <PageHero
@@ -22,7 +63,7 @@ export default function CaseStudiesPage() {
       <section className="py-12 lg:py-16">
         <div className="container">
           <div className="grid gap-8 lg:grid-cols-2">
-            {caseStudies.map((cs) => (
+            {items.map((cs) => (
               <article
                 key={cs.slug}
                 className="overflow-hidden rounded border border-oriana-navy/8 bg-white transition hover:border-oriana-blue/20 hover:shadow-lg"
@@ -43,12 +84,21 @@ export default function CaseStudiesPage() {
                       <span className="rounded-full bg-oriana-silver px-3 py-1 text-xs font-medium text-oriana-navy">
                         {cs.segment}
                       </span>
-                      <span className="rounded-full bg-oriana-blue/10 px-3 py-1 text-xs font-medium text-oriana-blue">
-                        {cs.capacity}
-                      </span>
+                      {cs.capacity ? (
+                        <span className="rounded-full bg-oriana-blue/10 px-3 py-1 text-xs font-medium text-oriana-blue">
+                          {cs.capacity}
+                        </span>
+                      ) : null}
+                      {cs.location ? (
+                        <span className="rounded-full bg-oriana-navy/5 px-3 py-1 text-xs font-medium text-oriana-muted">
+                          {cs.location}
+                        </span>
+                      ) : null}
                     </div>
                     <h2 className="mt-4 font-display text-xl font-bold text-oriana-navy">{cs.title}</h2>
-                    <p className="mt-1 text-xs font-mono text-oriana-muted">{cs.products}</p>
+                    {cs.products ? (
+                      <p className="mt-1 text-xs font-mono text-oriana-muted">{cs.products}</p>
+                    ) : null}
                     <p className="mt-4 text-sm leading-relaxed text-oriana-muted">{cs.summary}</p>
                     <span className="mt-6 inline-block text-sm font-semibold text-oriana-blue group-hover:underline">
                       Read case study →

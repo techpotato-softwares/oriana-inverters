@@ -10,6 +10,7 @@ import { SiteHeader } from '@/components/oriana/SiteHeader'
 import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { getCatalogueNav } from '@/utilities/getCatalogue'
+import { getHeaderNav } from '@/utilities/getMarketing'
 import { getSiteSettings } from '@/utilities/getSiteSettings'
 import { draftMode } from 'next/headers'
 
@@ -55,7 +56,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
-  const [catalogueMenu, settings] = await Promise.all([getCatalogueNav(), getSiteSettings()])
+  const [catalogueMenu, settings, headerNav] = await Promise.all([
+    getCatalogueNav(),
+    getSiteSettings(),
+    getHeaderNav(),
+  ])
 
   return (
     <html
@@ -81,7 +86,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               preview: isEnabled,
             }}
           />
-          <SiteHeader catalogueMenu={catalogueMenu} hotline={settings.hotline} />
+          <SiteHeader catalogueMenu={catalogueMenu} hotline={settings.hotline} nav={headerNav} />
           {children}
           <SiteFooter settings={settings} />
         </Providers>

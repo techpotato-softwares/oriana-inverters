@@ -6,8 +6,6 @@ import { SearchIcon } from 'lucide-react'
 
 import type { Header as HeaderType } from '@/payload-types'
 
-import { CMSLink } from '@/components/Link'
-
 const defaultNav = [
   { label: 'Products', href: '/products' },
   { label: 'Solutions', href: '/solutions/residential' },
@@ -17,12 +15,27 @@ const defaultNav = [
 ]
 
 export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
-  const navItems = data?.navItems || []
+  const items =
+    data?.primaryNav?.map((item) => ({
+      label: item?.label || '',
+      href:
+        item?.columns?.[0]?.href ||
+        item?.columns?.[0]?.links?.[0]?.href ||
+        '#',
+    })).filter((item) => item.label) || []
 
   return (
     <nav className="flex items-center gap-6">
-      {navItems.length > 0
-        ? navItems.map(({ link }, i) => <CMSLink key={i} {...link} appearance="link" />)
+      {items.length > 0
+        ? items.map((item) => (
+            <Link
+              key={`${item.label}-${item.href}`}
+              href={item.href}
+              className="text-sm font-medium text-white/90 transition hover:text-white"
+            >
+              {item.label}
+            </Link>
+          ))
         : defaultNav.map((item) => (
             <Link
               key={item.href}
@@ -33,10 +46,10 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
             </Link>
           ))}
       <Link
-        href="/contact"
+        href={data?.requestQuote?.href || '/contact'}
         className="hidden rounded-full bg-oriana-accent px-5 py-2 text-sm font-semibold text-oriana-navy transition hover:bg-white md:inline-flex"
       >
-        Get a Quote
+        {data?.requestQuote?.label || 'Get a Quote'}
       </Link>
       <Link href="/search">
         <span className="sr-only">Search</span>

@@ -18,6 +18,8 @@
     "generate:types": "npm run generate:types -w @oriana/cms",
     "generate:importmap": "npm run generate:importmap -w @oriana/cms",
     "seed:catalogue": "npm run seed:catalogue -w @oriana/cms",
+    "seed:content": "npm run seed:content -w @oriana/cms",
+    "seed:full": "npm run seed:full -w @oriana/cms",
     "seed:admin": "npm run seed:admin -w @oriana/cms",
     "migrate": "npm run migrate -w @oriana/cms",
     "lint": "npm run lint -w @oriana/cms",

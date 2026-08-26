@@ -1,8 +1,8 @@
 import type { CollectionConfig } from 'payload'
 import { slugField } from 'payload'
 
-import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import { publishedOnly } from '../access/publishedOnly'
 import { seoFields } from '../fields/seo'
 import { defaultLexical } from '@/fields/defaultLexical'
 
@@ -21,7 +21,7 @@ export const Products: CollectionConfig = {
   access: {
     create: authenticated,
     delete: authenticated,
-    read: anyone,
+    read: publishedOnly,
     update: authenticated,
   },
   hooks: {

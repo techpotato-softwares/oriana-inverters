@@ -13,7 +13,7 @@ import {
   Microscope,
   ShieldCheck,
 } from 'lucide-react'
-import { caseStudies } from '@/data/caseStudies'
+import { caseStudies, type CaseStudy } from '@/data/caseStudies'
 import type { HomeHeroSlide } from '@/types/homeHero'
 import { AnimatedCounter } from './AnimatedCounter'
 import { EnergyMesh } from './EnergyMesh'
@@ -26,8 +26,22 @@ import {
   OriUtility,
 } from './Mascots'
 
+type HomeHeroFallback = {
+  eyebrow?: string
+  headline?: string
+  subheadline?: string
+  primaryCta?: { label: string; href: string }
+  secondaryCta?: { label: string; href: string }
+}
+
 /** Full-bleed atmospheric hero — brand first, international energy brand */
-export function HomeHero({ slides = [] }: { slides?: HomeHeroSlide[] }) {
+export function HomeHero({
+  slides = [],
+  fallback,
+}: {
+  slides?: HomeHeroSlide[]
+  fallback?: HomeHeroFallback
+}) {
   const reduce = useReducedMotion()
   const [active, setActive] = useState(0)
   const slide = slides[active]
@@ -100,6 +114,20 @@ export function HomeHero({ slides = [] }: { slides?: HomeHeroSlide[] }) {
     )
   }
 
+  const eyebrow = fallback?.eyebrow || 'Oriana'
+  const headline = fallback?.headline || 'Clean power that crosses borders'
+  const subheadline =
+    fallback?.subheadline ||
+    'High-efficiency inverters and storage platforms for homes, industry, and utility grids — engineered for partners who ship projects worldwide.'
+  const primaryCta = fallback?.primaryCta || {
+    label: 'Explore solutions',
+    href: '/solutions/residential',
+  }
+  const secondaryCta = fallback?.secondaryCta || {
+    label: 'Become a partner',
+    href: '/contact',
+  }
+
   return (
     <section className="relative flex min-h-[100svh] items-center overflow-hidden bg-oriana-navy">
       <div className="absolute inset-0 bg-gradient-to-br from-[#041018] via-oriana-navy to-[#0f2f6b]" />
@@ -114,37 +142,36 @@ export function HomeHero({ slides = [] }: { slides?: HomeHeroSlide[] }) {
         <div>
           <FadeIn>
             <p className="font-display text-sm font-semibold uppercase tracking-[0.28em] text-oriana-sky">
-              Oriana
+              {eyebrow}
             </p>
           </FadeIn>
 
           <FadeIn delay={0.08}>
             <h1 className="mt-5 max-w-xl font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.6rem]">
-              Clean power that crosses borders
+              {headline}
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.16}>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-white/70 md:text-lg">
-              High-efficiency inverters and storage platforms for homes, industry, and utility grids —
-              engineered for partners who ship projects worldwide.
+              {subheadline}
             </p>
           </FadeIn>
 
           <FadeIn delay={0.24}>
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <Link
-                href="/solutions/residential"
+                href={primaryCta.href}
                 className="group inline-flex items-center gap-2 rounded-md bg-oriana-sky px-7 py-3.5 text-sm font-semibold text-oriana-navy transition hover:bg-white"
               >
-                Explore solutions
+                {primaryCta.label}
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </Link>
               <Link
-                href="/contact"
+                href={secondaryCta.href}
                 className="inline-flex items-center gap-2 rounded-md border border-white/25 px-7 py-3.5 text-sm font-semibold text-white transition hover:border-oriana-sky hover:text-oriana-sky"
               >
-                Become a partner
+                {secondaryCta.label}
               </Link>
             </div>
           </FadeIn>
@@ -213,8 +240,45 @@ const strategies = [
   },
 ]
 
+const strategyMascotById = {
+  home: OriHome,
+  business: OriBusiness,
+  utility: OriUtility,
+  storage: OriStorage,
+} as const
+
+type StrategyItem = {
+  id: string
+  label: string
+  title: string
+  description: string
+  href: string
+}
+
+function resolveStrategyMascot(id: string) {
+  return strategyMascotById[id as keyof typeof strategyMascotById] ?? OriHome
+}
+
 /** Strategy section — mascots for each go-to-market path */
-export function StrategiesSection() {
+export function StrategiesSection({
+  eyebrow,
+  title,
+  intro,
+  items,
+}: {
+  eyebrow?: string
+  title?: string
+  intro?: string
+  items?: StrategyItem[]
+} = {}) {
+  const resolved =
+    items && items.length > 0
+      ? items.map((item) => ({
+          ...item,
+          Mascot: resolveStrategyMascot(item.id),
+        }))
+      : strategies
+
   return (
     <section className="relative bg-white py-20 lg:py-28">
       <div
@@ -229,20 +293,24 @@ export function StrategiesSection() {
         <FadeIn>
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              Go-to-market strategies
+              {eyebrow || 'Go-to-market strategies'}
             </p>
             <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl lg:text-[2.75rem]">
-              One platform. Four ways to win.
+              {title || 'One platform. Four ways to win.'}
             </h2>
             <p className="mt-5 text-base leading-relaxed text-oriana-muted md:text-lg">
-              Meet Ori&apos;s crew — each strategy tailored for the partners and projects shaping the
-              global energy transition.
+              {intro || (
+                <>
+                  Meet Ori&apos;s crew — each strategy tailored for the partners and projects shaping
+                  the global energy transition.
+                </>
+              )}
             </p>
           </div>
         </FadeIn>
 
         <Stagger className="mt-14 grid gap-8 sm:grid-cols-2 xl:grid-cols-4" delay={0.1}>
-          {strategies.map((item) => (
+          {resolved.map((item) => (
             <StaggerItem key={item.id}>
               <Link
                 href={item.href}
@@ -297,7 +365,45 @@ const impactStats = [
   },
 ]
 
-export function ImpactStats() {
+const impactIconByKey = {
+  globe: Globe2,
+  award: Award,
+  leaf: Leaf,
+  microscope: Microscope,
+} as const
+
+type ImpactStatItem = {
+  iconKey: string
+  value: string
+  label: string
+}
+
+function resolveImpactIcon(iconKey: string) {
+  return impactIconByKey[iconKey as keyof typeof impactIconByKey] ?? Globe2
+}
+
+export function ImpactStats({
+  eyebrow,
+  title,
+  link,
+  stats,
+}: {
+  eyebrow?: string
+  title?: string
+  link?: { label: string; href: string }
+  stats?: ImpactStatItem[]
+} = {}) {
+  const resolved =
+    stats && stats.length > 0
+      ? stats.map((stat) => ({
+          icon: resolveImpactIcon(stat.iconKey),
+          value: stat.value,
+          label: stat.label,
+        }))
+      : impactStats
+
+  const resolvedLink = link || { label: 'Discover who we are', href: '/about' }
+
   return (
     <section className="relative overflow-hidden border-y border-oriana-navy/6 bg-oriana-surface py-16 lg:py-20">
       <div className="container">
@@ -305,24 +411,24 @@ export function ImpactStats() {
           <div className="mb-12 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <div className="max-w-xl">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-                Global footprint
+                {eyebrow || 'Global footprint'}
               </p>
               <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
-                Built for international partners
+                {title || 'Built for international partners'}
               </h2>
             </div>
             <Link
-              href="/about"
+              href={resolvedLink.href}
               className="inline-flex items-center gap-2 text-sm font-semibold text-oriana-blue transition hover:gap-3"
             >
-              Discover who we are
+              {resolvedLink.label}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </FadeIn>
 
         <Stagger className="grid grid-cols-2 gap-8 lg:grid-cols-4 lg:gap-6">
-          {impactStats.map((stat) => (
+          {resolved.map((stat) => (
             <StaggerItem key={stat.label}>
               <div className="relative">
                 <stat.icon className="h-7 w-7 stroke-[1.4] text-oriana-blue" aria-hidden />
@@ -367,26 +473,64 @@ const commitments = [
   },
 ]
 
-export function WhyOrianaSection() {
+const commitmentIconByKey = {
+  microscope: Microscope,
+  shield: ShieldCheck,
+  globe: Globe2,
+  headphones: Headphones,
+} as const
+
+type WhyOrianaItem = {
+  iconKey: string
+  title: string
+  copy: string
+  href: string
+}
+
+function resolveCommitmentIcon(iconKey: string) {
+  return commitmentIconByKey[iconKey as keyof typeof commitmentIconByKey] ?? Microscope
+}
+
+export function WhyOrianaSection({
+  eyebrow,
+  title,
+  body,
+  items,
+}: {
+  eyebrow?: string
+  title?: string
+  body?: string
+  items?: WhyOrianaItem[]
+} = {}) {
+  const resolved =
+    items && items.length > 0
+      ? items.map((item) => ({
+          icon: resolveCommitmentIcon(item.iconKey),
+          title: item.title,
+          copy: item.copy,
+          href: item.href,
+        }))
+      : commitments
+
   return (
     <section className="bg-white py-20 lg:py-28">
       <div className="container">
         <div className="grid items-end gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <FadeIn>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              Why Oriana
+              {eyebrow || 'Why Oriana'}
             </p>
             <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl lg:text-[2.75rem]">
-              Excellence that travels with every shipment
+              {title || 'Excellence that travels with every shipment'}
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-oriana-muted">
-              From first sample to fleet deployment, we help international clients specify, certify,
-              and scale clean power conversion with confidence.
+              {body ||
+                'From first sample to fleet deployment, we help international clients specify, certify, and scale clean power conversion with confidence.'}
             </p>
           </FadeIn>
 
           <Stagger className="grid gap-6 sm:grid-cols-2" delay={0.08}>
-            {commitments.map((item) => (
+            {resolved.map((item) => (
               <StaggerItem key={item.title}>
                 <Link
                   href={item.href}
@@ -423,7 +567,22 @@ const regions = [
   { name: 'Africa', focus: 'Resilient off-grid & hybrid' },
 ]
 
-export function GlobalReachSection() {
+export function GlobalReachSection({
+  eyebrow,
+  title,
+  body,
+  regions: regionsProp,
+  cta,
+}: {
+  eyebrow?: string
+  title?: string
+  body?: string
+  regions?: { name: string; focus: string }[]
+  cta?: { label: string; href: string }
+} = {}) {
+  const resolvedRegions = regionsProp && regionsProp.length > 0 ? regionsProp : regions
+  const resolvedCta = cta || { label: 'Find a distributor', href: '/where-to-buy' }
+
   return (
     <section className="relative overflow-hidden bg-oriana-navy py-20 lg:py-24">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(77,163,255,0.18),transparent)]" />
@@ -433,20 +592,20 @@ export function GlobalReachSection() {
         <FadeIn>
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">
-              International clients
+              {eyebrow || 'International clients'}
             </p>
             <h2 className="mt-4 font-display text-3xl font-semibold text-white md:text-4xl">
-              Ready wherever your next project lands
+              {title || 'Ready wherever your next project lands'}
             </h2>
             <p className="mt-5 text-base leading-relaxed text-white/65">
-              Regional documentation, certification pathways, and partner enablement — so cross-border
-              deals move from RFQ to commissioning without friction.
+              {body ||
+                'Regional documentation, certification pathways, and partner enablement — so cross-border deals move from RFQ to commissioning without friction.'}
             </p>
           </div>
         </FadeIn>
 
         <Stagger className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" delay={0.1}>
-          {regions.map((region) => (
+          {resolvedRegions.map((region) => (
             <StaggerItem key={region.name}>
               <div className="border border-white/10 bg-white/5 px-6 py-5 backdrop-blur-sm transition hover:border-oriana-sky/40 hover:bg-white/8">
                 <p className="font-display text-lg font-semibold text-white">{region.name}</p>
@@ -459,10 +618,10 @@ export function GlobalReachSection() {
         <FadeIn delay={0.2}>
           <div className="mt-12 flex justify-center">
             <Link
-              href="/where-to-buy"
+              href={resolvedCta.href}
               className="inline-flex items-center gap-2 rounded-md bg-oriana-sky px-7 py-3.5 text-sm font-semibold text-oriana-navy transition hover:bg-white"
             >
-              Find a distributor
+              {resolvedCta.label}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -493,31 +652,51 @@ const newsItems = [
   },
 ]
 
-export function NewsEventsSection() {
+type NewsItem = {
+  title: string
+  date: string
+  href: string
+  type: string
+}
+
+export function NewsEventsSection({
+  eyebrow,
+  title,
+  link,
+  items,
+}: {
+  eyebrow?: string
+  title?: string
+  link?: { label: string; href: string }
+  items?: NewsItem[]
+} = {}) {
+  const resolved = items && items.length > 0 ? items : newsItems
+  const resolvedLink = link || { label: 'Newsroom →', href: '/posts' }
+
   return (
     <section className="bg-oriana-surface py-20 lg:py-24">
       <div className="container">
         <div className="flex items-end justify-between gap-6">
           <FadeIn>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              News & media
+              {eyebrow || 'News & media'}
             </p>
             <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
-              Latest from Oriana
+              {title || 'Latest from Oriana'}
             </h2>
           </FadeIn>
           <FadeIn delay={0.08}>
             <Link
-              href="/posts"
+              href={resolvedLink.href}
               className="hidden text-sm font-semibold text-oriana-blue transition hover:underline sm:inline"
             >
-              Newsroom →
+              {resolvedLink.label}
             </Link>
           </FadeIn>
         </div>
 
         <Stagger className="mt-10 grid gap-6 md:grid-cols-3" delay={0.05}>
-          {newsItems.map((item) => (
+          {resolved.map((item) => (
             <StaggerItem key={item.title}>
               <Link
                 href={item.href}
@@ -539,31 +718,44 @@ export function NewsEventsSection() {
   )
 }
 
-export function CaseStudiesSection() {
+export function CaseStudiesSection({
+  eyebrow,
+  title,
+  link,
+  studies,
+}: {
+  eyebrow?: string
+  title?: string
+  link?: { label: string; href: string }
+  studies?: CaseStudy[]
+} = {}) {
+  const resolved = studies && studies.length > 0 ? studies : caseStudies.slice(0, 3)
+  const resolvedLink = link || { label: 'All case studies →', href: '/case-studies' }
+
   return (
     <section className="bg-white py-20 lg:py-24">
       <div className="container">
         <div className="flex items-end justify-between gap-6">
           <FadeIn>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              Case studies
+              {eyebrow || 'Case studies'}
             </p>
             <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
-              Projects that prove the promise
+              {title || 'Projects that prove the promise'}
             </h2>
           </FadeIn>
           <FadeIn delay={0.08}>
             <Link
-              href="/case-studies"
+              href={resolvedLink.href}
               className="hidden text-sm font-semibold text-oriana-blue transition hover:underline sm:inline"
             >
-              All case studies →
+              {resolvedLink.label}
             </Link>
           </FadeIn>
         </div>
 
         <Stagger className="mt-10 grid gap-8 md:grid-cols-3" delay={0.05}>
-          {caseStudies.slice(0, 3).map((study) => (
+          {resolved.map((study) => (
             <StaggerItem key={study.slug}>
               <Link
                 href={`/case-studies/${study.slug}`}
@@ -590,7 +782,30 @@ export function CaseStudiesSection() {
   )
 }
 
-export function SupportDownloadStrip() {
+const defaultDownloads = [
+  { label: 'Datasheets', href: '/resources/downloads' },
+  { label: 'Installation manuals', href: '/resources/downloads' },
+  { label: 'Certificates', href: '/resources/downloads' },
+  { label: 'Warranty documents', href: '/resources/downloads' },
+]
+
+export function SupportDownloadStrip({
+  hotlineNote,
+  downloads,
+  partner,
+}: {
+  hotlineNote?: string
+  downloads?: { label: string; href: string }[]
+  partner?: { title?: string; body?: string; label: string; href: string }
+} = {}) {
+  const resolvedDownloads = downloads && downloads.length > 0 ? downloads : defaultDownloads
+  const resolvedPartner = partner || {
+    title: 'Partner with us',
+    body: "Looking to distribute Oriana across a new market? Let's talk territory, training, and co-marketing.",
+    label: 'Request partnership',
+    href: '/contact',
+  }
+
   return (
     <section className="relative overflow-hidden border-t border-oriana-navy/8 bg-gradient-to-br from-oriana-silver via-white to-oriana-sky/10 py-16 lg:py-20">
       <div className="container">
@@ -602,7 +817,9 @@ export function SupportDownloadStrip() {
             <p className="mt-4 font-display text-2xl font-semibold text-oriana-navy">
               Bankable. Reliable. Local.
             </p>
-            <p className="mt-3 text-sm text-oriana-muted">Customer hotline: +1 (800) ORIANA-1</p>
+            <p className="mt-3 text-sm text-oriana-muted">
+              {hotlineNote || 'Customer hotline: +1 (800) ORIANA-1'}
+            </p>
             <Link
               href="/support"
               className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-oriana-blue hover:underline"
@@ -617,34 +834,36 @@ export function SupportDownloadStrip() {
               Download center
             </p>
             <ul className="mt-5 space-y-3 text-sm">
-              {['Datasheets', 'Installation manuals', 'Certificates', 'Warranty documents'].map(
-                (doc) => (
-                  <li key={doc}>
-                    <Link
-                      href="/resources/downloads"
-                      className="text-oriana-muted transition hover:text-oriana-blue"
-                    >
-                      {doc} →
-                    </Link>
-                  </li>
-                ),
-              )}
+              {resolvedDownloads.map((doc) => (
+                <li key={doc.label}>
+                  <Link
+                    href={doc.href}
+                    className="text-oriana-muted transition hover:text-oriana-blue"
+                  >
+                    {doc.label} →
+                  </Link>
+                </li>
+              ))}
             </ul>
           </StaggerItem>
 
           <StaggerItem>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-              Partner with us
+              {resolvedPartner.title || 'Partner with us'}
             </p>
             <p className="mt-4 text-sm leading-relaxed text-oriana-muted">
-              Looking to distribute Oriana across a new market? Let&apos;s talk territory, training,
-              and co-marketing.
+              {resolvedPartner.body || (
+                <>
+                  Looking to distribute Oriana across a new market? Let&apos;s talk territory,
+                  training, and co-marketing.
+                </>
+              )}
             </p>
             <Link
-              href="/contact"
+              href={resolvedPartner.href}
               className="mt-6 inline-flex rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-oriana-navy"
             >
-              Request partnership
+              {resolvedPartner.label}
             </Link>
           </StaggerItem>
         </Stagger>

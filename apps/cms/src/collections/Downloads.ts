@@ -9,6 +9,7 @@ export const Downloads: CollectionConfig = {
     singular: 'Download',
     plural: 'Downloads',
   },
+  folders: true,
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'documentType', 'relatedProduct', 'updatedAt'],

@@ -73,6 +73,17 @@ export interface Config {
     downloads: Download;
     media: Media;
     categories: Category;
+    'case-studies': CaseStudy;
+    faqs: Faq;
+    videos: Video;
+    distributors: Distributor;
+    jobs: Job;
+    certifications: Certification;
+    awards: Award;
+    partners: Partner;
+    solutions: Solution;
+    'warranty-plans': WarrantyPlan;
+    'sustainability-reports': SustainabilityReport;
     users: User;
     redirects: Redirect;
     forms: Form;
@@ -80,11 +91,16 @@ export interface Config {
     search: Search;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
+    'payload-folders': FolderInterface;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    'payload-folders': {
+      documentsAndFolders: 'payload-folders' | 'downloads' | 'media';
+    };
+  };
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
@@ -92,6 +108,17 @@ export interface Config {
     downloads: DownloadsSelect<false> | DownloadsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
+    videos: VideosSelect<false> | VideosSelect<true>;
+    distributors: DistributorsSelect<false> | DistributorsSelect<true>;
+    jobs: JobsSelect<false> | JobsSelect<true>;
+    certifications: CertificationsSelect<false> | CertificationsSelect<true>;
+    awards: AwardsSelect<false> | AwardsSelect<true>;
+    partners: PartnersSelect<false> | PartnersSelect<true>;
+    solutions: SolutionsSelect<false> | SolutionsSelect<true>;
+    'warranty-plans': WarrantyPlansSelect<false> | WarrantyPlansSelect<true>;
+    'sustainability-reports': SustainabilityReportsSelect<false> | SustainabilityReportsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -99,6 +126,7 @@ export interface Config {
     search: SearchSelect<false> | SearchSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
+    'payload-folders': PayloadFoldersSelect<false> | PayloadFoldersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -111,11 +139,23 @@ export interface Config {
     header: Header;
     footer: Footer;
     'site-settings': SiteSetting;
+    home: Home;
+    about: About;
+    careers: Career;
+    support: Support;
+    sustainability: Sustainability;
+    contact: Contact;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
-    'site-settings': SiteSettingSelect<false> | SiteSettingSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    home: HomeSelect<false> | HomeSelect<true>;
+    about: AboutSelect<false> | AboutSelect<true>;
+    careers: CareersSelect<false> | CareersSelect<true>;
+    support: SupportSelect<false> | SupportSelect<true>;
+    sustainability: SustainabilitySelect<false> | SustainabilitySelect<true>;
+    contact: ContactSelect<false> | ContactSelect<true>;
   };
   locale: null;
   widgets: {
@@ -201,7 +241,18 @@ export interface Page {
       | null;
     media?: (number | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
+    | StatsGridBlock
+    | CardGridBlock
+    | CtaBandBlock
+    | ContentPageBlock
+    | IconFeatureBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -271,21 +322,28 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Images, videos, and documents. Organize with folders (Hero, Products, Icons, …).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
   id: number;
-  alt?: string | null;
-  mediaType?: ('image' | 'video' | 'document') | null;
+  /**
+   * Required for accessibility and SEO.
+   */
+  alt: string;
+  mediaType?: ('image' | 'video' | 'document' | 'icon') | null;
+  /**
+   * Optional labels for filtering (e.g. hero, product, partner).
+   */
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
   videoResolution?: ('1080p' | '4k') | null;
-  useAsHomeHero?: boolean | null;
-  homeHeroLinkType?: ('product' | 'post') | null;
-  homeHeroProduct?: (number | null) | Product;
-  homeHeroPost?: (number | null) | Post;
-  homeHeroHeadline?: string | null;
-  homeHeroCta?: string | null;
-  homeHeroSort?: number | null;
   caption?: {
     root: {
       type: string;
@@ -301,6 +359,8 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
+  prefix?: string | null;
+  folder?: (number | null) | FolderInterface;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -378,6 +438,164 @@ export interface Media {
       filename?: string | null;
     };
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-folders".
+ */
+export interface FolderInterface {
+  id: number;
+  name: string;
+  folder?: (number | null) | FolderInterface;
+  documentsAndFolders?: {
+    docs?: (
+      | {
+          relationTo?: 'payload-folders';
+          value: number | FolderInterface;
+        }
+      | {
+          relationTo?: 'downloads';
+          value: number | Download;
+        }
+      | {
+          relationTo?: 'media';
+          value: number | Media;
+        }
+    )[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  folderType?: ('downloads' | 'media')[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Datasheets, manuals, certificates, and other product documents.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "downloads".
+ */
+export interface Download {
+  id: number;
+  title: string;
+  file: number | Media;
+  documentType: 'datasheet' | 'manual' | 'certificate' | 'warranty' | 'brochure' | 'software';
+  relatedProduct?: (number | null) | Product;
+  locale?: string | null;
+  folder?: (number | null) | FolderInterface;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Inverter models shown on the public product catalogue. Publish to appear on the website.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  /**
+   * Website label (Excel col J), e.g. "5kW OG6-GR1P5K-S(21A)".
+   */
+  name: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Product family / category. Create categories first under Catalogue → Categories.
+   */
+  category: number | Category;
+  /**
+   * Datasheet model series (e.g. OG6-GR1P(2-3)K01-NV-YD). Used to group models on category pages.
+   */
+  modelSeries?: string | null;
+  /**
+   * Primary market segment for filtering and solutions pages.
+   */
+  segment?: ('residential' | 'commercial' | 'utility' | 'storage') | null;
+  /**
+   * Short summary shown on the product detail page.
+   */
+  shortDescription?: string | null;
+  /**
+   * Show in the Featured Models table on /products.
+   */
+  featured?: boolean | null;
+  /**
+   * e.g. 5 kW or 3.8 – 11.4 kW
+   */
+  powerRange?: string | null;
+  /**
+   * e.g. 98.7%
+   */
+  efficiency?: string | null;
+  /**
+   * e.g. Single Phase / Three Phase
+   */
+  phases?: string | null;
+  /**
+   * e.g. 10 Years
+   */
+  warranty?: string | null;
+  /**
+   * Additional rows on the product detail specs table (weight, dimensions, MPPT, etc.).
+   */
+  keySpecs?:
+    | {
+        label: string;
+        value: string;
+        unit?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Main product image on the detail page.
+   */
+  heroImage?: (number | null) | Media;
+  gallery?:
+    | {
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Product datasheet PDF.
+   */
+  datasheetPdf?: (number | null) | Media;
+  /**
+   * User / installation manual PDF.
+   */
+  manualPdf?: (number | null) | Media;
+  /**
+   * Long-form product content (optional).
+   */
+  fullDescription?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * Product families (e.g. Residential Grid-Tied). Create these first, then assign products to them.
@@ -803,105 +1021,206 @@ export interface Form {
   createdAt: string;
 }
 /**
- * Inverter models shown on the public product catalogue. Publish to appear on the website.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products".
+ * via the `definition` "StatsGridBlock".
  */
-export interface Product {
-  id: number;
+export interface StatsGridBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  stats: {
+    /**
+     * Preferred: upload an SVG/PNG icon.
+     */
+    icon?: (number | null) | Media;
+    /**
+     * Fallback Lucide icon when no upload is set.
+     */
+    iconKey?:
+      | (
+          | 'award'
+          | 'globe'
+          | 'headphones'
+          | 'leaf'
+          | 'microscope'
+          | 'shield'
+          | 'phone'
+          | 'mail'
+          | 'mapPin'
+          | 'download'
+          | 'wrench'
+          | 'users'
+          | 'building'
+          | 'zap'
+          | 'checkCircle'
+        )
+      | null;
+    value: string;
+    label: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statsGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CardGridBlock".
+ */
+export interface CardGridBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  cards: {
+    /**
+     * Preferred: upload an SVG/PNG icon.
+     */
+    icon?: (number | null) | Media;
+    /**
+     * Fallback Lucide icon when no upload is set.
+     */
+    iconKey?:
+      | (
+          | 'award'
+          | 'globe'
+          | 'headphones'
+          | 'leaf'
+          | 'microscope'
+          | 'shield'
+          | 'phone'
+          | 'mail'
+          | 'mapPin'
+          | 'download'
+          | 'wrench'
+          | 'users'
+          | 'building'
+          | 'zap'
+          | 'checkCircle'
+        )
+      | null;
+    title: string;
+    body: string;
+    href?: string | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cardGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBandBlock".
+ */
+export interface CtaBandBlock {
+  title: string;
+  body?: string | null;
+  primaryCta: {
+    label: string;
+    /**
+     * Internal path (/about) or full URL (https://…).
+     */
+    href: string;
+  };
+  secondaryCta?: {
+    label?: string | null;
+    /**
+     * Internal path (/about) or full URL (https://…).
+     */
+    href?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'ctaBand';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContentPageBlock".
+ */
+export interface ContentPageBlock {
+  sections: {
+    heading: string;
+    body: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'contentPage';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IconFeatureBlock".
+ */
+export interface IconFeatureBlock {
   /**
-   * Exact model name as shown on the website (e.g. OG6-GR1P2K01-NV-YD).
+   * Preferred: upload an SVG/PNG icon.
    */
-  name: string;
+  icon?: (number | null) | Media;
+  /**
+   * Fallback Lucide icon when no upload is set.
+   */
+  iconKey?:
+    | (
+        | 'award'
+        | 'globe'
+        | 'headphones'
+        | 'leaf'
+        | 'microscope'
+        | 'shield'
+        | 'phone'
+        | 'mail'
+        | 'mapPin'
+        | 'download'
+        | 'wrench'
+        | 'users'
+        | 'building'
+        | 'zap'
+        | 'checkCircle'
+      )
+    | null;
+  title: string;
+  body: string;
+  href?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'iconFeature';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "case-studies".
+ */
+export interface CaseStudy {
+  id: number;
+  title: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
   slug: string;
+  segment: string;
+  capacity?: string | null;
   /**
-   * Product family / category. Create categories first under Catalogue → Categories.
+   * Display string of product names.
    */
-  category: number | Category;
-  /**
-   * Datasheet model series (e.g. OG6-GR1P(2-3)K01-NV-YD). Used to group models on category pages.
-   */
-  modelSeries?: string | null;
-  /**
-   * Primary market segment for filtering and solutions pages.
-   */
-  segment?: ('residential' | 'commercial' | 'utility' | 'storage') | null;
-  /**
-   * Short summary shown on the product detail page.
-   */
-  shortDescription?: string | null;
-  /**
-   * Show in the Featured Models table on /products.
-   */
-  featured?: boolean | null;
-  /**
-   * e.g. 5 kW or 3.8 – 11.4 kW
-   */
-  powerRange?: string | null;
-  /**
-   * e.g. 98.7%
-   */
-  efficiency?: string | null;
-  /**
-   * e.g. Single Phase / Three Phase
-   */
-  phases?: string | null;
-  /**
-   * e.g. 10 Years
-   */
-  warranty?: string | null;
-  /**
-   * Additional rows on the product detail specs table (weight, dimensions, MPPT, etc.).
-   */
-  keySpecs?:
+  products?: string | null;
+  relatedProducts?: (number | Product)[] | null;
+  location?: string | null;
+  image?: (number | null) | Media;
+  summary: string;
+  challenge?: string | null;
+  solution?: string | null;
+  results?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  stats?:
     | {
         label: string;
         value: string;
-        unit?: string | null;
         id?: string | null;
       }[]
     | null;
-  /**
-   * Main product image on the detail page.
-   */
-  heroImage?: (number | null) | Media;
-  gallery?:
-    | {
-        image?: (number | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Product datasheet PDF.
-   */
-  datasheetPdf?: (number | null) | Media;
-  /**
-   * User / installation manual PDF.
-   */
-  manualPdf?: (number | null) | Media;
-  /**
-   * Long-form product content (optional).
-   */
-  fullDescription?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  year?: string | null;
+  featured?: boolean | null;
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -914,20 +1233,205 @@ export interface Product {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Datasheets, manuals, certificates, and other product documents.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "downloads".
+ * via the `definition` "faqs".
  */
-export interface Download {
+export interface Faq {
   id: number;
-  title: string;
-  file: number | Media;
-  documentType: 'datasheet' | 'manual' | 'certificate' | 'warranty' | 'brochure' | 'software';
-  relatedProduct?: (number | null) | Product;
-  locale?: string | null;
+  group: string;
+  question: string;
+  answer: string;
+  sortOrder?: number | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  title: string;
+  category?: string | null;
+  duration?: string | null;
+  thumbnail?: (number | null) | Media;
+  /**
+   * YouTube/Vimeo embed or watch URL.
+   */
+  embedUrl?: string | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "distributors".
+ */
+export interface Distributor {
+  id: number;
+  name: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  type: 'Distributor' | 'Certified Installer' | 'Service Center';
+  city: string;
+  state?: string | null;
+  country: string;
+  region: string;
+  email?: string | null;
+  phone?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs".
+ */
+export interface Job {
+  id: number;
+  title: string;
+  location: string;
+  department?: string | null;
+  type?: ('Full-time' | 'Part-time' | 'Contract' | 'Internship') | null;
+  description?: string | null;
+  applyUrl?: string | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certifications".
+ */
+export interface Certification {
+  id: number;
+  name: string;
+  scope?: string | null;
+  region?: string | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "awards".
+ */
+export interface Award {
+  id: number;
+  year: string;
+  title: string;
+  org?: string | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners".
+ */
+export interface Partner {
+  id: number;
+  name: string;
+  /**
+   * e.g. Technology Partners
+   */
+  group: string;
+  logo?: (number | null) | Media;
+  url?: string | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "solutions".
+ */
+export interface Solution {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  description: string;
+  benefits?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  image?: (number | null) | Media;
+  /**
+   * Used to recommend catalogue products.
+   */
+  segmentKeys?: ('residential' | 'commercial' | 'utility' | 'storage')[] | null;
+  primaryCta: {
+    label: string;
+    /**
+     * Internal path (/about) or full URL (https://…).
+     */
+    href: string;
+  };
+  secondaryCta?: {
+    label?: string | null;
+    /**
+     * Internal path (/about) or full URL (https://…).
+     */
+    href?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "warranty-plans".
+ */
+export interface WarrantyPlan {
+  id: number;
+  productLine: string;
+  standard: string;
+  extended?: string | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sustainability-reports".
+ */
+export interface SustainabilityReport {
+  id: number;
+  title: string;
+  year: string;
+  file?: (number | null) | Media;
+  /**
+   * Optional link if file is hosted elsewhere.
+   */
+  externalUrl?: string | null;
+  size?: string | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1144,6 +1648,50 @@ export interface PayloadLockedDocument {
         value: number | Category;
       } | null)
     | ({
+        relationTo: 'case-studies';
+        value: number | CaseStudy;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
+      } | null)
+    | ({
+        relationTo: 'videos';
+        value: number | Video;
+      } | null)
+    | ({
+        relationTo: 'distributors';
+        value: number | Distributor;
+      } | null)
+    | ({
+        relationTo: 'jobs';
+        value: number | Job;
+      } | null)
+    | ({
+        relationTo: 'certifications';
+        value: number | Certification;
+      } | null)
+    | ({
+        relationTo: 'awards';
+        value: number | Award;
+      } | null)
+    | ({
+        relationTo: 'partners';
+        value: number | Partner;
+      } | null)
+    | ({
+        relationTo: 'solutions';
+        value: number | Solution;
+      } | null)
+    | ({
+        relationTo: 'warranty-plans';
+        value: number | WarrantyPlan;
+      } | null)
+    | ({
+        relationTo: 'sustainability-reports';
+        value: number | SustainabilityReport;
+      } | null)
+    | ({
         relationTo: 'users';
         value: number | User;
       } | null)
@@ -1162,6 +1710,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'search';
         value: number | Search;
+      } | null)
+    | ({
+        relationTo: 'payload-folders';
+        value: number | FolderInterface;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1241,6 +1793,11 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        statsGrid?: T | StatsGridBlockSelect<T>;
+        cardGrid?: T | CardGridBlockSelect<T>;
+        ctaBand?: T | CtaBandBlockSelect<T>;
+        contentPage?: T | ContentPageBlockSelect<T>;
+        iconFeature?: T | IconFeatureBlockSelect<T>;
       };
   meta?:
     | T
@@ -1342,6 +1899,95 @@ export interface FormBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsGridBlock_select".
+ */
+export interface StatsGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  stats?:
+    | T
+    | {
+        icon?: T;
+        iconKey?: T;
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CardGridBlock_select".
+ */
+export interface CardGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  cards?:
+    | T
+    | {
+        icon?: T;
+        iconKey?: T;
+        title?: T;
+        body?: T;
+        href?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBandBlock_select".
+ */
+export interface CtaBandBlockSelect<T extends boolean = true> {
+  title?: T;
+  body?: T;
+  primaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  secondaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContentPageBlock_select".
+ */
+export interface ContentPageBlockSelect<T extends boolean = true> {
+  sections?:
+    | T
+    | {
+        heading?: T;
+        body?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IconFeatureBlock_select".
+ */
+export interface IconFeatureBlockSelect<T extends boolean = true> {
+  icon?: T;
+  iconKey?: T;
+  title?: T;
+  body?: T;
+  href?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
@@ -1429,6 +2075,7 @@ export interface DownloadsSelect<T extends boolean = true> {
   documentType?: T;
   relatedProduct?: T;
   locale?: T;
+  folder?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1439,15 +2086,16 @@ export interface DownloadsSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   mediaType?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
   videoResolution?: T;
   caption?: T;
-  useAsHomeHero?: T;
-  homeHeroLinkType?: T;
-  homeHeroProduct?: T;
-  homeHeroPost?: T;
-  homeHeroHeadline?: T;
-  homeHeroCta?: T;
-  homeHeroSort?: T;
+  prefix?: T;
+  folder?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1566,6 +2214,224 @@ export interface CategoriesSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "case-studies_select".
+ */
+export interface CaseStudiesSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  segment?: T;
+  capacity?: T;
+  products?: T;
+  relatedProducts?: T;
+  location?: T;
+  image?: T;
+  summary?: T;
+  challenge?: T;
+  solution?: T;
+  results?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  stats?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
+  year?: T;
+  featured?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  group?: T;
+  question?: T;
+  answer?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos_select".
+ */
+export interface VideosSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  duration?: T;
+  thumbnail?: T;
+  embedUrl?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "distributors_select".
+ */
+export interface DistributorsSelect<T extends boolean = true> {
+  name?: T;
+  generateSlug?: T;
+  slug?: T;
+  type?: T;
+  city?: T;
+  state?: T;
+  country?: T;
+  region?: T;
+  email?: T;
+  phone?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs_select".
+ */
+export interface JobsSelect<T extends boolean = true> {
+  title?: T;
+  location?: T;
+  department?: T;
+  type?: T;
+  description?: T;
+  applyUrl?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certifications_select".
+ */
+export interface CertificationsSelect<T extends boolean = true> {
+  name?: T;
+  scope?: T;
+  region?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "awards_select".
+ */
+export interface AwardsSelect<T extends boolean = true> {
+  year?: T;
+  title?: T;
+  org?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners_select".
+ */
+export interface PartnersSelect<T extends boolean = true> {
+  name?: T;
+  group?: T;
+  logo?: T;
+  url?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "solutions_select".
+ */
+export interface SolutionsSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  description?: T;
+  benefits?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  image?: T;
+  segmentKeys?: T;
+  primaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  secondaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "warranty-plans_select".
+ */
+export interface WarrantyPlansSelect<T extends boolean = true> {
+  productLine?: T;
+  standard?: T;
+  extended?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sustainability-reports_select".
+ */
+export interface SustainabilityReportsSelect<T extends boolean = true> {
+  title?: T;
+  year?: T;
+  file?: T;
+  externalUrl?: T;
+  size?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1823,6 +2689,18 @@ export interface PayloadJobsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-folders_select".
+ */
+export interface PayloadFoldersSelect<T extends boolean = true> {
+  name?: T;
+  folder?: T;
+  documentsAndFolders?: T;
+  folderType?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -1854,31 +2732,62 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Utility bar, CTAs, and mega-menus for the public site header.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
  */
 export interface Header {
   id: number;
-  navItems?:
+  hotlineLabel?: string | null;
+  localeLabel?: string | null;
+  searchLabel?: string | null;
+  loginLabel?: string | null;
+  loginHref?: string | null;
+  whereToBuy: {
+    label: string;
+    /**
+     * Internal path (/about) or full URL (https://…).
+     */
+    href: string;
+    id?: string | null;
+  };
+  requestQuote: {
+    label: string;
+    /**
+     * Internal path (/about) or full URL (https://…).
+     */
+    href: string;
+    id?: string | null;
+  };
+  /**
+   * Order of top-level mega menus. Products columns are filled from the catalogue at render time.
+   */
+  primaryNav?:
     | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
+        key: 'about' | 'home' | 'business' | 'utility' | 'products' | 'support';
+        label: string;
+        columns?:
+          | {
+              title: string;
+              href?: string | null;
+              links?:
+                | {
+                    label: string;
+                    /**
+                     * Internal path (/about) or full URL (https://…).
+                     */
+                    href: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1886,70 +2795,6 @@ export interface Header {
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "footer".
  */
-export interface SiteSetting {
-  id: number;
-  siteName?: string | null;
-  hotline?: string | null;
-  copyrightText?: string | null;
-  seoTitle?: string | null;
-  seoTitleTemplate?: string | null;
-  seoDescription?: string | null;
-  twitterHandle?: string | null;
-  ogImage?: (number | null) | Media;
-  googleAnalyticsId?: string | null;
-  googleTagManagerId?: string | null;
-  footerColumns?:
-    | {
-        title: string;
-        links?:
-          | {
-              label: string;
-              href: string;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  legalLinks?:
-    | {
-        label: string;
-        href: string;
-        id?: string | null;
-      }[]
-    | null;
-  socialLinks?:
-    | {
-        platform: 'linkedin' | 'facebook' | 'youtube' | 'instagram';
-        href: string;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings_select".
- */
-export interface SiteSettingSelect<T extends boolean = true> {
-  siteName?: T;
-  hotline?: T;
-  copyrightText?: T;
-  seoTitle?: T;
-  seoTitleTemplate?: T;
-  seoDescription?: T;
-  twitterHandle?: T;
-  ogImage?: T;
-  googleAnalyticsId?: T;
-  googleTagManagerId?: T;
-  footerColumns?: T;
-  legalLinks?: T;
-  socialLinks?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
 export interface Footer {
   id: number;
   navItems?:
@@ -1976,24 +2821,666 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
+ * Brand, SEO, analytics, footer, and social links used across the public site.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * Used in the footer copyright and default SEO titles.
+   */
+  siteName?: string | null;
+  /**
+   * Logo for dark backgrounds (header on navy, etc.).
+   */
+  logoLight?: (number | null) | Media;
+  /**
+   * Logo for light backgrounds.
+   */
+  logoDark?: (number | null) | Media;
+  /**
+   * Shown in the header utility bar.
+   */
+  hotline?: string | null;
+  /**
+   * Optional override. Leave blank to use “© {year} {site name}. All rights reserved.”
+   */
+  copyrightText?: string | null;
+  /**
+   * Default document title for pages without their own title.
+   */
+  seoTitle?: string | null;
+  /**
+   * Use %s for the page title, e.g. “%s | Oriana Inverters”.
+   */
+  seoTitleTemplate?: string | null;
+  seoDescription?: string | null;
+  /**
+   * Twitter/X handle including @.
+   */
+  twitterHandle?: string | null;
+  /**
+   * Default social share image when a page has no OG image.
+   */
+  ogImage?: (number | null) | Media;
+  /**
+   * GA4 measurement ID, e.g. G-XXXXXXXXXX. Leave blank to disable.
+   */
+  googleAnalyticsId?: string | null;
+  /**
+   * GTM container ID, e.g. GTM-XXXXXXX. Leave blank to disable.
+   */
+  googleTagManagerId?: string | null;
+  /**
+   * Leave empty to keep the current built-in footer columns.
+   */
+  footerColumns?:
+    | {
+        title: string;
+        links?:
+          | {
+              label: string;
+              /**
+               * Internal path (/about) or full URL (https://…).
+               */
+              href: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Privacy, terms, sitemap, etc. Empty keeps the current legal row.
+   */
+  legalLinks?:
+    | {
+        label: string;
+        /**
+         * Internal path (/about) or full URL (https://…).
+         */
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  socialLinks?:
+    | {
+        platform: 'linkedin' | 'facebook' | 'youtube' | 'instagram';
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Homepage hero, strategies, stats, and section copy.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home".
+ */
+export interface Home {
+  id: number;
+  heroMode?: ('fallback' | 'slides') | null;
+  fallbackHero?: {
+    eyebrow?: string | null;
+    headline?: string | null;
+    subheadline?: string | null;
+    primaryCta: {
+      label: string;
+      /**
+       * Internal path (/about) or full URL (https://…).
+       */
+      href: string;
+      id?: string | null;
+    };
+    secondaryCta?: {
+      label?: string | null;
+      /**
+       * Internal path (/about) or full URL (https://…).
+       */
+      href?: string | null;
+    };
+  };
+  heroSlides?:
+    | {
+        image: number | Media;
+        linkType: 'product' | 'post' | 'custom';
+        product?: (number | null) | Product;
+        post?: (number | null) | Post;
+        href?: string | null;
+        headline?: string | null;
+        ctaLabel?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  strategiesSection?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    intro?: string | null;
+    items?:
+      | {
+          idKey: string;
+          label: string;
+          title: string;
+          description: string;
+          href: string;
+          /**
+           * Optional card image; UI may use mascot by idKey.
+           */
+          image?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  impactSection: {
+    eyebrow?: string | null;
+    title?: string | null;
+    link: {
+      label: string;
+      /**
+       * Internal path (/about) or full URL (https://…).
+       */
+      href: string;
+      id?: string | null;
+    };
+    stats?:
+      | {
+          /**
+           * Preferred: upload an SVG/PNG icon.
+           */
+          icon?: (number | null) | Media;
+          /**
+           * Fallback Lucide icon when no upload is set.
+           */
+          iconKey?:
+            | (
+                | 'award'
+                | 'globe'
+                | 'headphones'
+                | 'leaf'
+                | 'microscope'
+                | 'shield'
+                | 'phone'
+                | 'mail'
+                | 'mapPin'
+                | 'download'
+                | 'wrench'
+                | 'users'
+                | 'building'
+                | 'zap'
+                | 'checkCircle'
+              )
+            | null;
+          value: string;
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  whySection?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    body?: string | null;
+    items?:
+      | {
+          /**
+           * Preferred: upload an SVG/PNG icon.
+           */
+          icon?: (number | null) | Media;
+          /**
+           * Fallback Lucide icon when no upload is set.
+           */
+          iconKey?:
+            | (
+                | 'award'
+                | 'globe'
+                | 'headphones'
+                | 'leaf'
+                | 'microscope'
+                | 'shield'
+                | 'phone'
+                | 'mail'
+                | 'mapPin'
+                | 'download'
+                | 'wrench'
+                | 'users'
+                | 'building'
+                | 'zap'
+                | 'checkCircle'
+              )
+            | null;
+          title: string;
+          copy: string;
+          href: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  reachSection: {
+    eyebrow?: string | null;
+    title?: string | null;
+    body?: string | null;
+    regions?:
+      | {
+          name: string;
+          focus: string;
+          id?: string | null;
+        }[]
+      | null;
+    cta: {
+      label: string;
+      /**
+       * Internal path (/about) or full URL (https://…).
+       */
+      href: string;
+      id?: string | null;
+    };
+  };
+  caseStudiesSection: {
+    eyebrow?: string | null;
+    title?: string | null;
+    link: {
+      label: string;
+      /**
+       * Internal path (/about) or full URL (https://…).
+       */
+      href: string;
+      id?: string | null;
+    };
+    /**
+     * How many published case studies to show.
+     */
+    limit?: number | null;
+  };
+  newsSection: {
+    eyebrow?: string | null;
+    title?: string | null;
+    mode?: ('live' | 'manual') | null;
+    manualItems?:
+      | {
+          title: string;
+          date?: string | null;
+          href: string;
+          type?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    postsLimit?: number | null;
+    link: {
+      label: string;
+      /**
+       * Internal path (/about) or full URL (https://…).
+       */
+      href: string;
+      id?: string | null;
+    };
+  };
+  supportStrip: {
+    hotlineLabel?: string | null;
+    hotlineNote?: string | null;
+    downloads?:
+      | {
+          label: string;
+          /**
+           * Internal path (/about) or full URL (https://…).
+           */
+          href: string;
+          id?: string | null;
+        }[]
+      | null;
+    partnerCta: {
+      title?: string | null;
+      body?: string | null;
+      label: string;
+      /**
+       * Internal path (/about) or full URL (https://…).
+       */
+      href: string;
+    };
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Company about page content.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about".
+ */
+export interface About {
+  id: number;
+  hero: {
+    /**
+     * Small label above the title.
+     */
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+    image?: (number | null) | Media;
+  };
+  storyTitle?: string | null;
+  storyParagraphs?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  stats?:
+    | {
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  values?:
+    | {
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "careers".
+ */
+export interface Career {
+  id: number;
+  hero: {
+    /**
+     * Small label above the title.
+     */
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+    image?: (number | null) | Media;
+  };
+  image?: (number | null) | Media;
+  whyTitle?: string | null;
+  whyBody?: string | null;
+  openingsTitle?: string | null;
+  applyHref?: string | null;
+  applyLabel?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "support".
+ */
+export interface Support {
+  id: number;
+  hero: {
+    /**
+     * Small label above the title.
+     */
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+    image?: (number | null) | Media;
+  };
+  channels?:
+    | {
+        /**
+         * Preferred: upload an SVG/PNG icon.
+         */
+        icon?: (number | null) | Media;
+        /**
+         * Fallback Lucide icon when no upload is set.
+         */
+        iconKey?:
+          | (
+              | 'award'
+              | 'globe'
+              | 'headphones'
+              | 'leaf'
+              | 'microscope'
+              | 'shield'
+              | 'phone'
+              | 'mail'
+              | 'mapPin'
+              | 'download'
+              | 'wrench'
+              | 'users'
+              | 'building'
+              | 'zap'
+              | 'checkCircle'
+            )
+          | null;
+        title: string;
+        detail: string;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  selfServiceTitle?: string | null;
+  selfServiceLinks?:
+    | {
+        label: string;
+        /**
+         * Internal path (/about) or full URL (https://…).
+         */
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  ticketCta: {
+    title?: string | null;
+    body?: string | null;
+    label: string;
+    /**
+     * Internal path (/about) or full URL (https://…).
+     */
+    href: string;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sustainability".
+ */
+export interface Sustainability {
+  id: number;
+  hero: {
+    /**
+     * Small label above the title.
+     */
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+    image?: (number | null) | Media;
+  };
+  image?: (number | null) | Media;
+  highlights?:
+    | {
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  approachTitle?: string | null;
+  approachBody?: string | null;
+  links?:
+    | {
+        label: string;
+        /**
+         * Internal path (/about) or full URL (https://…).
+         */
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  strategyHero?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    description?: string | null;
+  };
+  strategySections?:
+    | {
+        heading: string;
+        body: string;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact".
+ */
+export interface Contact {
+  id: number;
+  hero: {
+    /**
+     * Small label above the title.
+     */
+    eyebrow?: string | null;
+    title: string;
+    description?: string | null;
+    image?: (number | null) | Media;
+  };
+  cards?:
+    | {
+        /**
+         * Preferred: upload an SVG/PNG icon.
+         */
+        icon?: (number | null) | Media;
+        /**
+         * Fallback Lucide icon when no upload is set.
+         */
+        iconKey?:
+          | (
+              | 'award'
+              | 'globe'
+              | 'headphones'
+              | 'leaf'
+              | 'microscope'
+              | 'shield'
+              | 'phone'
+              | 'mail'
+              | 'mapPin'
+              | 'download'
+              | 'wrench'
+              | 'users'
+              | 'building'
+              | 'zap'
+              | 'checkCircle'
+            )
+          | null;
+        title: string;
+        detail: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Payload Form Builder form used on the contact page.
+   */
+  form?: (number | null) | Form;
+  successMessage?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
-  navItems?:
+  hotlineLabel?: T;
+  localeLabel?: T;
+  searchLabel?: T;
+  loginLabel?: T;
+  loginHref?: T;
+  whereToBuy?:
     | T
     | {
-        link?:
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  requestQuote?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  primaryNav?:
+    | T
+    | {
+        key?: T;
+        label?: T;
+        columns?:
           | T
           | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
+              title?: T;
+              href?: T;
+              links?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              id?: T;
             };
         id?: T;
       };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -2017,6 +3504,473 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  logoLight?: T;
+  logoDark?: T;
+  hotline?: T;
+  copyrightText?: T;
+  seoTitle?: T;
+  seoTitleTemplate?: T;
+  seoDescription?: T;
+  twitterHandle?: T;
+  ogImage?: T;
+  googleAnalyticsId?: T;
+  googleTagManagerId?: T;
+  footerColumns?:
+    | T
+    | {
+        title?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  legalLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        href?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home_select".
+ */
+export interface HomeSelect<T extends boolean = true> {
+  heroMode?: T;
+  fallbackHero?:
+    | T
+    | {
+        eyebrow?: T;
+        headline?: T;
+        subheadline?: T;
+        primaryCta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        secondaryCta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  heroSlides?:
+    | T
+    | {
+        image?: T;
+        linkType?: T;
+        product?: T;
+        post?: T;
+        href?: T;
+        headline?: T;
+        ctaLabel?: T;
+        id?: T;
+      };
+  strategiesSection?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        intro?: T;
+        items?:
+          | T
+          | {
+              idKey?: T;
+              label?: T;
+              title?: T;
+              description?: T;
+              href?: T;
+              image?: T;
+              id?: T;
+            };
+      };
+  impactSection?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        stats?:
+          | T
+          | {
+              icon?: T;
+              iconKey?: T;
+              value?: T;
+              label?: T;
+              id?: T;
+            };
+      };
+  whySection?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        body?: T;
+        items?:
+          | T
+          | {
+              icon?: T;
+              iconKey?: T;
+              title?: T;
+              copy?: T;
+              href?: T;
+              id?: T;
+            };
+      };
+  reachSection?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        body?: T;
+        regions?:
+          | T
+          | {
+              name?: T;
+              focus?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+      };
+  caseStudiesSection?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        limit?: T;
+      };
+  newsSection?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        mode?: T;
+        manualItems?:
+          | T
+          | {
+              title?: T;
+              date?: T;
+              href?: T;
+              type?: T;
+              id?: T;
+            };
+        postsLimit?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+      };
+  supportStrip?:
+    | T
+    | {
+        hotlineLabel?: T;
+        hotlineNote?: T;
+        downloads?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        partnerCta?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              label?: T;
+              href?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about_select".
+ */
+export interface AboutSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  storyTitle?: T;
+  storyParagraphs?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  stats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  values?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "careers_select".
+ */
+export interface CareersSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  image?: T;
+  whyTitle?: T;
+  whyBody?: T;
+  openingsTitle?: T;
+  applyHref?: T;
+  applyLabel?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "support_select".
+ */
+export interface SupportSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  channels?:
+    | T
+    | {
+        icon?: T;
+        iconKey?: T;
+        title?: T;
+        detail?: T;
+        note?: T;
+        id?: T;
+      };
+  selfServiceTitle?: T;
+  selfServiceLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  ticketCta?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        label?: T;
+        href?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sustainability_select".
+ */
+export interface SustainabilitySelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  image?: T;
+  highlights?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  approachTitle?: T;
+  approachBody?: T;
+  links?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  strategyHero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  strategySections?:
+    | T
+    | {
+        heading?: T;
+        body?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact_select".
+ */
+export interface ContactSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  cards?:
+    | T
+    | {
+        icon?: T;
+        iconKey?: T;
+        title?: T;
+        detail?: T;
+        id?: T;
+      };
+  form?: T;
+  successMessage?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+      };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

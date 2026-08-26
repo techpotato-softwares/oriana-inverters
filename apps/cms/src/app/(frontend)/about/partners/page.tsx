@@ -1,13 +1,15 @@
 import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { getPartners } from '@/utilities/getMarketing'
+import type { Partner } from '@/payload-types'
 
 export const metadata = {
   title: 'Partners',
   description: 'Oriana strategic partners — distributors, EPCs, and technology alliances.',
 }
 
-const partnerTypes = [
+const fallbackPartnerTypes = [
   {
     category: 'Distribution Partners',
     partners: ['SolarEdge Distribution NA', 'GreenPower Wholesale', 'EuroSolar Components', 'APAC Energy Solutions'],
@@ -22,7 +24,27 @@ const partnerTypes = [
   },
 ]
 
-export default function PartnersPage() {
+function groupPartners(docs: Partner[]) {
+  const order: string[] = []
+  const map = new Map<string, string[]>()
+  for (const doc of docs) {
+    const group = doc.group || 'Partners'
+    if (!map.has(group)) {
+      map.set(group, [])
+      order.push(group)
+    }
+    map.get(group)!.push(doc.name)
+  }
+  return order.map((category) => ({
+    category,
+    partners: map.get(category) || [],
+  }))
+}
+
+export default async function PartnersPage() {
+  const docs = (await getPartners()) as Partner[]
+  const partnerTypes = docs.length > 0 ? groupPartners(docs) : fallbackPartnerTypes
+
   return (
     <main>
       <PageHero

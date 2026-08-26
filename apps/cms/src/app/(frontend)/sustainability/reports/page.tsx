@@ -2,21 +2,38 @@ import Link from 'next/link'
 import { FileText } from 'lucide-react'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { getSustainabilityReports } from '@/utilities/getMarketing'
+import type { Media, SustainabilityReport } from '@/payload-types'
+
+function mediaUrl(v: unknown): string | null {
+  return v && typeof v === 'object' && 'url' in v && (v as Media).url ? (v as Media).url! : null
+}
 
 export const metadata = {
   title: 'Reports & Policies',
   description: 'Oriana sustainability reports, environmental policies, and compliance documents.',
 }
 
-const reports = [
-  { title: '2025 ESG & Sustainability Report', year: '2025', size: '4.8 MB' },
-  { title: 'Environmental Policy', year: '2024', size: '620 KB' },
-  { title: 'Supplier Code of Conduct', year: '2024', size: '480 KB' },
-  { title: 'Conflict Minerals Statement', year: '2025', size: '310 KB' },
-  { title: 'ISO 14001 Certificate', year: '2024', size: '520 KB' },
+const fallbackReports = [
+  { title: '2025 ESG & Sustainability Report', year: '2025', size: '4.8 MB', href: '/resources/downloads' },
+  { title: 'Environmental Policy', year: '2024', size: '620 KB', href: '/resources/downloads' },
+  { title: 'Supplier Code of Conduct', year: '2024', size: '480 KB', href: '/resources/downloads' },
+  { title: 'Conflict Minerals Statement', year: '2025', size: '310 KB', href: '/resources/downloads' },
+  { title: 'ISO 14001 Certificate', year: '2024', size: '520 KB', href: '/resources/downloads' },
 ]
 
-export default function SustainabilityReportsPage() {
+export default async function SustainabilityReportsPage() {
+  const docs = (await getSustainabilityReports()) as SustainabilityReport[]
+  const reports =
+    docs.length > 0
+      ? docs.map((doc) => ({
+          title: doc.title,
+          year: doc.year,
+          size: doc.size || '',
+          href: mediaUrl(doc.file) || doc.externalUrl || '/resources/downloads',
+        }))
+      : fallbackReports
+
   return (
     <main>
       <PageHero
@@ -34,15 +51,18 @@ export default function SustainabilityReportsPage() {
             {reports.map((doc) => (
               <li key={doc.title}>
                 <Link
-                  href="/resources/downloads"
+                  href={doc.href}
                   className="flex items-center justify-between gap-4 px-6 py-5 transition hover:bg-oriana-silver/40"
+                  {...(doc.href.startsWith('http')
+                    ? { target: '_blank', rel: 'noopener noreferrer' }
+                    : {})}
                 >
                   <div className="flex items-start gap-3">
                     <FileText className="mt-0.5 h-5 w-5 shrink-0 text-oriana-blue" />
                     <div>
                       <p className="font-medium text-oriana-navy">{doc.title}</p>
                       <p className="mt-0.5 text-xs text-oriana-muted">
-                        {doc.year} · PDF · {doc.size}
+                        {[doc.year, 'PDF', doc.size].filter(Boolean).join(' · ')}
                       </p>
                     </div>
                   </div>

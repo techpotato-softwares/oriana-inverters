@@ -1,13 +1,15 @@
 import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { getWarrantyPlans } from '@/utilities/getMarketing'
+import type { WarrantyPlan } from '@/payload-types'
 
 export const metadata = {
   title: 'Warranty',
   description: 'Oriana inverter warranty terms, registration, and claim process.',
 }
 
-const warrantyTiers = [
+const fallbackTiers = [
   {
     product: 'Residential String & Hybrid',
     standard: '10 Years',
@@ -25,7 +27,17 @@ const warrantyTiers = [
   },
 ]
 
-export default function WarrantyPage() {
+export default async function WarrantyPage() {
+  const plans = (await getWarrantyPlans()) as WarrantyPlan[]
+  const warrantyTiers =
+    plans.length > 0
+      ? plans.map((p) => ({
+          product: p.productLine,
+          standard: p.standard,
+          extended: p.extended || '',
+        }))
+      : fallbackTiers
+
   return (
     <main>
       <PageHero

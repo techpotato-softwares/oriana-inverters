@@ -5,93 +5,42 @@ import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
 import { FadeIn } from '@/components/oriana/FadeIn'
 import { getCatalogueProducts } from '@/utilities/getCatalogue'
-
-const segments: Record<
-  string,
-  {
-    title: string
-    description: string
-    benefits: string[]
-    segmentKeys: Array<'residential' | 'commercial' | 'utility' | 'storage'>
-    image: string
-  }
-> = {
-  residential: {
-    title: 'Residential Solutions',
-    description:
-      'Power your home with Oriana single-phase string and hybrid inverters — engineered for maximum rooftop energy harvest, battery integration, and decades of reliable operation.',
-    benefits: [
-      'Single-phase and three-phase residential grid-tied inverters',
-      'Hybrid models with seamless battery backup switching',
-      'WiFi monitoring with homeowner-friendly app',
-      'Quiet operation with fanless or low-noise designs',
-      '10-year standard warranty with extension options',
-    ],
-    segmentKeys: ['residential', 'storage'],
-    image: '/assets/products/single-phase.svg',
-  },
-  commercial: {
-    title: 'Commercial & Industrial',
-    description:
-      'Scale your business energy independence with three-phase inverter systems designed for warehouses, factories, data centers, and commercial rooftops.',
-    benefits: [
-      'C&I grid-tied string inverters for rooftops and carports',
-      'Multi-MPPT for complex rooftop geometries',
-      'Fleet monitoring and SCADA integration',
-      'AFCI and rapid shutdown compliance',
-      'Dedicated C&I technical support team',
-    ],
-    segmentKeys: ['commercial'],
-    image: '/assets/products/three-phase.svg',
-  },
-  utility: {
-    title: 'Utility-Scale Solutions',
-    description:
-      'Deploy megawatt-class solar plants with Oriana utility platforms — built for high efficiency, grid code compliance, and long operational life.',
-    benefits: [
-      'Utility grid-tied inverters for large plants',
-      'Outdoor-rated enclosures',
-      'Advanced grid-support functions',
-      'Modular serviceability',
-      'Global grid code readiness',
-    ],
-    segmentKeys: ['utility'],
-    image: '/assets/products/utility-scale.svg',
-  },
-  storage: {
-    title: 'Energy Storage Solutions',
-    description:
-      'Integrate battery storage seamlessly with Oriana hybrid inverters — enabling backup power, peak shaving, time-of-use optimization, and grid services revenue.',
-    benefits: [
-      'Compatible with leading lithium battery brands',
-      'Fast backup switching',
-      'Time-of-use and self-consumption optimization',
-      'Virtual power plant (VPP) ready',
-      'Black start and islanding capability',
-    ],
-    segmentKeys: ['storage', 'residential'],
-    image: '/assets/products/hybrid-storage.svg',
-  },
-}
+import { getSolutionBySlug } from '@/utilities/getMarketing'
 
 type Props = { params: Promise<{ segment: string }> }
 
+function mediaUrl(value: unknown): string | null {
+  if (value && typeof value === 'object' && 'url' in value) {
+    return (value as { url?: string | null }).url || null
+  }
+  return null
+}
+
 export async function generateMetadata({ params }: Props) {
   const { segment } = await params
-  const data = segments[segment]
+  const data = await getSolutionBySlug(segment)
   if (!data) return {}
-  return { title: data.title, description: data.description }
+  return {
+    title: data.seo?.metaTitle || data.title,
+    description: data.seo?.metaDescription || data.description,
+  }
 }
 
 export default async function SolutionPage({ params }: Props) {
   const { segment } = await params
-  const data = segments[segment]
+  const data = await getSolutionBySlug(segment)
   if (!data) notFound()
 
+  const segmentKeys = (data.segmentKeys || []) as Array<
+    'residential' | 'commercial' | 'utility' | 'storage'
+  >
   const allProducts = await getCatalogueProducts()
   const recommended = allProducts
-    .filter((p) => data.segmentKeys.includes(p.segmentKey))
+    .filter((p) => segmentKeys.includes(p.segmentKey))
     .slice(0, 6)
+
+  const imageUrl = mediaUrl(data.image) || `/assets/products/${segment === 'residential' ? 'single-phase' : segment === 'commercial' ? 'three-phase' : segment === 'utility' ? 'utility-scale' : 'hybrid-storage'}.svg`
+  const benefits = (data.benefits || []).map((b) => (typeof b === 'string' ? b : b.text)).filter(Boolean)
 
   return (
     <main>
@@ -105,7 +54,7 @@ export default async function SolutionPage({ params }: Props) {
           <FadeIn>
             <div className="relative mx-auto mb-16 max-w-3xl overflow-hidden rounded-xl border border-oriana-navy/8 bg-oriana-silver">
               <Image
-                src={data.image}
+                src={imageUrl}
                 alt=""
                 width={640}
                 height={400}
@@ -118,57 +67,52 @@ export default async function SolutionPage({ params }: Props) {
           <div className="grid gap-16 lg:grid-cols-2">
             <FadeIn>
               <h2 className="font-display text-2xl font-bold text-oriana-navy">Key Benefits</h2>
-              <ul className="mt-8 space-y-4">
-                {data.benefits.map((benefit) => (
-                  <li key={benefit} className="flex items-start gap-3 text-oriana-muted">
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-oriana-blue" />
+              <ul className="mt-6 space-y-3">
+                {benefits.map((benefit) => (
+                  <li key={benefit} className="flex gap-3 text-oriana-muted">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-oriana-blue" />
                     {benefit}
                   </li>
                 ))}
               </ul>
+              <div className="mt-10 flex flex-wrap gap-4">
+                {data.primaryCta?.href ? (
+                  <Link
+                    href={data.primaryCta.href}
+                    className="rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white hover:bg-oriana-navy"
+                  >
+                    {data.primaryCta.label || 'Request a Quote'}
+                  </Link>
+                ) : null}
+                {data.secondaryCta?.href ? (
+                  <Link
+                    href={data.secondaryCta.href}
+                    className="rounded-md border border-oriana-navy/20 px-6 py-3 text-sm font-semibold text-oriana-navy hover:border-oriana-blue"
+                  >
+                    {data.secondaryCta.label || 'View Products'}
+                  </Link>
+                ) : null}
+              </div>
             </FadeIn>
 
-            <FadeIn delay={0.1}>
-              <h2 className="font-display text-2xl font-bold text-oriana-navy">
-                Recommended Products
-              </h2>
-              <div className="mt-8 space-y-3">
-                {recommended.length === 0 ? (
-                  <p className="text-sm text-oriana-muted">
-                    Products for this segment will appear here once published in{' '}
-                    <Link href="/admin/collections/products" className="text-oriana-blue hover:underline">
-                      Admin → Products
-                    </Link>
-                    .
-                  </p>
-                ) : (
-                  recommended.map((product) => (
+            <FadeIn delay={0.08}>
+              <h2 className="font-display text-2xl font-bold text-oriana-navy">Recommended Products</h2>
+              <ul className="mt-6 space-y-3">
+                {recommended.map((product) => (
+                  <li key={product.slug}>
                     <Link
-                      key={product.slug}
                       href={`/products/${product.slug}`}
-                      className="flex items-center justify-between rounded-xl border border-oriana-navy/8 bg-oriana-silver/50 px-6 py-4 transition hover:border-oriana-blue/20 hover:bg-white"
+                      className="block rounded-lg border border-oriana-navy/8 px-4 py-3 transition hover:border-oriana-blue"
                     >
-                      <span className="font-semibold text-oriana-navy">{product.name}</span>
-                      <span className="text-sm text-oriana-blue">View →</span>
+                      <p className="font-semibold text-oriana-navy">{product.name}</p>
+                      <p className="text-sm text-oriana-muted">{product.powerRange}</p>
                     </Link>
-                  ))
-                )}
-              </div>
-
-              <div className="mt-10 flex gap-4">
-                <Link
-                  href="/products"
-                  className="rounded-full bg-oriana-blue px-6 py-3 text-sm font-semibold text-white hover:bg-oriana-navy"
-                >
-                  View Products
-                </Link>
-                <Link
-                  href="/contact"
-                  className="rounded-full border border-oriana-navy/15 px-6 py-3 text-sm font-semibold text-oriana-navy hover:border-oriana-blue"
-                >
-                  Request a Quote
-                </Link>
-              </div>
+                  </li>
+                ))}
+                {!recommended.length ? (
+                  <p className="text-sm text-oriana-muted">Products coming soon.</p>
+                ) : null}
+              </ul>
             </FadeIn>
           </div>
         </div>

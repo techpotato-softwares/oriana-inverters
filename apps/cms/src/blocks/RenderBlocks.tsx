@@ -7,6 +7,13 @@ import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import {
+  CardGridBlock,
+  ContentPageBlock,
+  CtaBandBlock,
+  IconFeatureBlock,
+  StatsGridBlock,
+} from '@/blocks/Oriana/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -14,6 +21,11 @@ const blockComponents = {
   cta: CallToActionBlock,
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
+  statsGrid: StatsGridBlock,
+  cardGrid: CardGridBlock,
+  ctaBand: CtaBandBlock,
+  contentPage: ContentPageBlock,
+  iconFeature: IconFeatureBlock,
 }
 
 export const RenderBlocks: React.FC<{
@@ -30,7 +42,7 @@ export const RenderBlocks: React.FC<{
           const { blockType } = block
 
           if (blockType && blockType in blockComponents) {
-            const Block = blockComponents[blockType]
+            const Block = blockComponents[blockType as keyof typeof blockComponents]
 
             if (Block) {
               return (
