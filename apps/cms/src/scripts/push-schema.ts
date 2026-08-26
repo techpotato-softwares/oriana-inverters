@@ -35,8 +35,9 @@ async function schemaAlreadyPresent(): Promise<boolean> {
   if (process.env.PAYLOAD_FORCE_SCHEMA_PUSH === 'true') return false
 
   const schema = process.env.PAYLOAD_DB_SCHEMA || process.env.DB_SCHEMA || 'public'
-  // Quote only if needed; our site schema is a simple identifier.
-  const regclass = schema === 'public' ? 'public.users' : `${schema}.users`
+  // Do not skip push unless multiple core tables exist.
+  // This avoids false positives when only some tables were created.
+  const requiredTables = ['users', 'categories', 'media', 'posts', 'pages']
 
   const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
@@ -47,11 +48,24 @@ async function schemaAlreadyPresent(): Promise<boolean> {
   })
 
   try {
-    const result = await pool.query<{ present: boolean }>(
-      `SELECT to_regclass($1) IS NOT NULL AS present`,
-      [regclass],
+    const rows = await Promise.all(
+      requiredTables.map(async (table) => {
+        const regclass = `${schema}.${table}`
+        const result = await pool.query<{ present: boolean }>(
+          `SELECT to_regclass($1) IS NOT NULL AS present`,
+          [regclass],
+        )
+        return { table, present: Boolean(result.rows[0]?.present) }
+      }),
     )
-    return Boolean(result.rows[0]?.present)
+    const missing = rows.filter((row) => !row.present).map((row) => row.table)
+    if (missing.length > 0) {
+      console.log(
+        `schema:push required because missing tables in ${schema}: ${missing.join(', ')}`,
+      )
+      return false
+    }
+    return true
   } finally {
     await pool.end()
   }
@@ -61,7 +75,7 @@ const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 5)
 
 if (await schemaAlreadyPresent()) {
   const schema = process.env.PAYLOAD_DB_SCHEMA || process.env.DB_SCHEMA || 'public'
-  console.log(`Schema already present (${schema}.users exists); skipping schema:push.`)
+  console.log(`Schema already present (core tables exist in ${schema}); skipping schema:push.`)
   console.log('Set PAYLOAD_FORCE_SCHEMA_PUSH=true to push anyway.')
   process.exit(0)
 }

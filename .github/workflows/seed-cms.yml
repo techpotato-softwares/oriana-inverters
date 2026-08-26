@@ -99,6 +99,7 @@ jobs:
         working-directory: apps/cms
         env:
           NODE_OPTIONS: "--dns-result-order=ipv4first"
+          PAYLOAD_FORCE_SCHEMA_PUSH: "true"
         run: npm run schema:push
 
       - name: Seed catalogue

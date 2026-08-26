@@ -131,6 +131,7 @@ jobs:
         working-directory: apps/cms
         env:
           NODE_OPTIONS: "--dns-result-order=ipv4first"
+          PAYLOAD_FORCE_SCHEMA_PUSH: "true"
         run: npm run schema:push
 
       - name: Ensure media.prefix column (external DB)
@@ -200,6 +201,7 @@ jobs:
         working-directory: apps/cms
         env:
           NODE_OPTIONS: "--dns-result-order=ipv4first"
+          PAYLOAD_FORCE_SCHEMA_PUSH: "true"
         run: npm run schema:push
 
       - name: Ensure media.prefix column (RDS)
