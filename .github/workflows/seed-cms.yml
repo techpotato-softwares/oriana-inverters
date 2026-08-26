@@ -91,15 +91,24 @@ jobs:
             echo "CRON_SECRET=$CRON_SECRET"
             echo "PREVIEW_SECRET=$PREVIEW_SECRET"
             echo "DATABASE_URL=$DATABASE_URL"
-            echo "DB_SCHEMA=${DB_SCHEMA:-public}"
-            echo "PAYLOAD_DB_SCHEMA=${PAYLOAD_DB_SCHEMA:-public}"
+            echo "DB_SCHEMA=${DB_SCHEMA:-}"
+            echo "PAYLOAD_DB_SCHEMA=${PAYLOAD_DB_SCHEMA:-}"
           } >> "$GITHUB_ENV"
+
+          # Never pass schemaName=public to Payload (Drizzle rejects it)
+          if [ "${PAYLOAD_DB_SCHEMA:-}" = "public" ] || [ "${DB_SCHEMA:-}" = "public" ]; then
+            echo "PAYLOAD_DB_SCHEMA=" >> "$GITHUB_ENV"
+            echo "DB_SCHEMA=" >> "$GITHUB_ENV"
+          fi
 
       - name: Bootstrap schema (push tables)
         working-directory: apps/cms
         env:
+          # Payload only drizzle-pushes when NODE_ENV !== production
+          NODE_ENV: development
           NODE_OPTIONS: "--dns-result-order=ipv4first"
           PAYLOAD_FORCE_SCHEMA_PUSH: "true"
+          PAYLOAD_FORCE_DRIZZLE_PUSH: "true"
         run: npm run schema:push
 
       - name: Seed catalogue

@@ -25,8 +25,13 @@ DB_NAME=$(echo "$DB_JSON" | jq -r '.DB_NAME // .dbname // .database // "postgres
 DB_USER=$(echo "$DB_JSON" | jq -r '.DB_USER // .username // empty')
 DB_PASSWORD=$(echo "$DB_JSON" | jq -r '.DB_PASSWORD // .password // empty')
 DB_SSL=$(echo "$DB_JSON" | jq -r '.DB_SSL // true')
-DB_SCHEMA=$(echo "$DB_JSON" | jq -r '.DB_SCHEMA // "public"')
+DB_SCHEMA=$(echo "$DB_JSON" | jq -r '.DB_SCHEMA // empty')
 EXISTING_URL=$(echo "$DB_JSON" | jq -r '.DATABASE_URL // empty')
+
+# Payload/Drizzle reject schemaName "public" — treat as default (omit)
+if [[ "$DB_SCHEMA" == "public" ]]; then
+  DB_SCHEMA=""
+fi
 
 if [[ -z "$DB_USER" || -z "$DB_PASSWORD" ]]; then
   echo "Database secret /$APP/$ENV/database is missing credentials" >&2
