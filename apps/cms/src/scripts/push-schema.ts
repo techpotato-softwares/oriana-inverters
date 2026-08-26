@@ -8,8 +8,11 @@
  * ("No migrations to run") — leaving tables missing. We force development
  * for this script when PAYLOAD_DATABASE_PUSH=true.
  *
- * Supabase session poolers reject with EMAXCONNSESSION when too many clients
- * connect at once — keep PG_POOL_MAX=1 and retry transient pool exhaustion.
+ * Pool sizing: Payload holds 1 client for reconnect monitoring. Drizzle push
+ * needs additional clients — PG_POOL_MAX must be >= 3 (not 1).
+ *
+ * Supabase session poolers are slow to release sessions; we wait between
+ * pre-checks / retries and avoid forcing push on every QA deploy.
  */
 import pg from 'pg'
 import { getPayload } from 'payload'
@@ -48,7 +51,8 @@ const isPoolExhausted = (error: unknown): boolean => {
     text.includes('max clients reached') ||
     text.includes('too many clients') ||
     text.includes('timeout exceeded when trying to connect') ||
-    text.includes('timeout')
+    text.includes('Connection terminated') ||
+    text.includes('remaining connection slots')
   )
 }
 
@@ -56,8 +60,8 @@ async function withPool<T>(fn: (pool: pg.Pool) => Promise<T>): Promise<T> {
   const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
     max: 1,
-    connectionTimeoutMillis: 30_000,
-    idleTimeoutMillis: 1000,
+    connectionTimeoutMillis: 60_000,
+    idleTimeoutMillis: 500,
     allowExitOnIdle: true,
   })
   try {
@@ -80,18 +84,15 @@ async function ensurePostgresSchema(): Promise<void> {
 
 async function missingTables(): Promise<string[]> {
   const schema = dbSchema()
+  // Single round-trip — avoid burning multiple session-pooler slots.
   return withPool(async (pool) => {
-    const rows = await Promise.all(
-      requiredTables.map(async (table) => {
-        const regclass = `${schema}.${table}`
-        const result = await pool.query<{ present: boolean }>(
-          `SELECT to_regclass($1) IS NOT NULL AS present`,
-          [regclass],
-        )
-        return { table, present: Boolean(result.rows[0]?.present) }
-      }),
+    const result = await pool.query<{ table_name: string }>(
+      `SELECT wanted.table_name
+       FROM unnest($1::text[]) AS wanted(table_name)
+       WHERE to_regclass(($2::text || '.' || wanted.table_name)) IS NULL`,
+      [requiredTables, schema],
     )
-    return rows.filter((row) => !row.present).map((row) => row.table)
+    return result.rows.map((row) => row.table_name)
   })
 }
 
@@ -111,6 +112,11 @@ async function schemaAlreadyPresent(): Promise<boolean> {
 // Payload connect.js: push only when NODE_ENV !== 'production'
 process.env.PAYLOAD_DATABASE_PUSH = 'true'
 process.env.PAYLOAD_FORCE_DRIZZLE_PUSH = process.env.PAYLOAD_FORCE_DRIZZLE_PUSH || 'true'
+// Payload holds 1 reconnect client; drizzle push needs headroom.
+const poolMax = Number(process.env.PG_POOL_MAX || 3)
+process.env.PG_POOL_MAX = String(Math.max(poolMax, 3))
+process.env.PG_CONNECT_TIMEOUT_MS = process.env.PG_CONNECT_TIMEOUT_MS || '60000'
+
 if (process.env.NODE_ENV === 'production') {
   console.warn(
     'NODE_ENV=production disables Payload drizzle push — forcing NODE_ENV=development for schema:push',
@@ -118,7 +124,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 process.env.NODE_ENV = 'development'
 
-const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 5)
+const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 8)
+const poolerCooldownMs = Number(process.env.SCHEMA_PUSH_COOLDOWN_MS || 8_000)
 
 if (await schemaAlreadyPresent()) {
   console.log(`Schema already present (core tables exist in ${dbSchema()}); skipping schema:push.`)
@@ -127,6 +134,9 @@ if (await schemaAlreadyPresent()) {
 }
 
 await ensurePostgresSchema()
+// Let Supabase/session poolers release the probe connection before Payload opens its pool.
+console.log(`Waiting ${poolerCooldownMs}ms for DB pooler to release probe connections…`)
+await sleep(poolerCooldownMs)
 
 let lastError: unknown
 
@@ -135,6 +145,9 @@ for (let attempt = 1; attempt <= attempts; attempt++) {
     const payload = await getPayload({ config })
     payload.logger.info('Database schema push complete.')
     await payload.destroy()
+
+    // Cooldown before verification query (separate pool).
+    await sleep(Math.min(poolerCooldownMs, 5_000))
 
     const missing = await missingTables()
     if (missing.length > 0) {
@@ -153,9 +166,9 @@ for (let attempt = 1; attempt <= attempts; attempt++) {
       break
     }
 
-    const waitMs = 3000 * attempt
+    const waitMs = poolerCooldownMs * attempt
     console.warn(
-      `schema:push hit pool limit (attempt ${attempt}/${attempts}); retrying in ${waitMs}ms…`,
+      `schema:push hit pool/connect limit (attempt ${attempt}/${attempts}); retrying in ${waitMs}ms…`,
     )
     await sleep(waitMs)
   }

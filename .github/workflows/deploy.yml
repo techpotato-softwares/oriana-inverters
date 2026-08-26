@@ -138,10 +138,13 @@ jobs:
         env:
           NODE_ENV: development
           NODE_OPTIONS: "--dns-result-order=ipv4first"
-          PAYLOAD_FORCE_SCHEMA_PUSH: "true"
+          # Do NOT force push on every QA deploy — Supabase session pooler flakes
+          # under drizzle introspection. Skip when core tables already exist.
           PAYLOAD_FORCE_DRIZZLE_PUSH: "true"
           PG_POOL_MAX: "3"
           PG_CONNECT_TIMEOUT_MS: "60000"
+          SCHEMA_PUSH_RETRIES: "8"
+          SCHEMA_PUSH_COOLDOWN_MS: "8000"
         run: npm run schema:push
 
       - name: Ensure media.prefix column (external DB)
