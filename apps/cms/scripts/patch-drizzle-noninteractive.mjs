@@ -2,12 +2,8 @@
 /**
  * Patch drizzle-kit + Payload push helpers for non-interactive CI.
  *
- * drizzle-kit's pushSchema prompts "create or rename enum?" via hanji and hangs
- * in GitHub Actions. With DRIZZLE_PUSH_NONINTERACTIVE=true, always create
- * (never rename) and drop leftover unused objects — same as selecting the
- * first (+) option on every prompt.
- *
- * Also auto-accept Payload's data-loss warning confirm in CI.
+ * Enums use promptNamedWithSchemasConflict (not promptNamedConflict).
+ * Always inject a unique per-function guard so later patches are not skipped.
  */
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
@@ -15,75 +11,115 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const require = createRequire(import.meta.url)
-const marker = '/* ORIANA_NONINTERACTIVE_PATCH */'
+const fileMarker = '/* ORIANA_NONINTERACTIVE_PATCH_FILE */'
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
 
-function injectAfter(src, find, inject) {
-  if (!src.includes(find)) return { src, ok: false }
-  if (src.includes(inject.trim().slice(0, 40))) return { src, ok: true, already: true }
-  return { src: src.replace(find, `${find}${inject}`), ok: true }
+function ensureInject(src, { name, find, inject, guardId }) {
+  if (!src.includes(find)) {
+    console.warn(`  skip ${name}: needle not found`)
+    return { src, ok: false }
+  }
+  if (src.includes(guardId)) {
+    console.log(`  already patched ${name}`)
+    return { src, ok: true }
+  }
+  // Insert immediately after the function opening line
+  const next = src.replace(find, `${find}\n${inject}`)
+  if (next === src) {
+    console.warn(`  skip ${name}: replace failed`)
+    return { src, ok: false }
+  }
+  console.log(`  patched ${name}`)
+  return { src: next, ok: true }
 }
 
 const drizzleApi = require.resolve('drizzle-kit/api')
 console.log('Patching', path.relative(process.cwd(), drizzleApi))
 
 let drizzleSrc = fs.readFileSync(drizzleApi, 'utf8')
-if (drizzleSrc.includes(marker)) {
-  console.log('  drizzle-kit/api already patched')
-} else {
-  const patches = [
-    {
-      name: 'promptNamedConflict',
-      find: 'promptNamedConflict = async (newItems, missingItems, entity) => {',
-      inject: `
+const patches = [
+  {
+    name: 'promptNamedConflict',
+    guardId: 'ORIANA_NI_NAMED',
+    find: 'promptNamedConflict = async (newItems, missingItems, entity) => {',
+    inject: `      /* ORIANA_NI_NAMED */
       if (process.env.DRIZZLE_PUSH_NONINTERACTIVE === "true") {
         console.log("[drizzle] non-interactive: create all " + entity + "(s), skip rename prompts");
         return { created: newItems, renamed: [], deleted: missingItems };
       }`,
-    },
-    {
-      name: 'promptNamedWithSchemasConflict',
-      find: 'promptNamedWithSchemasConflict = async (newItems, missingItems, entity) => {',
-      inject: `
+  },
+  {
+    name: 'promptNamedWithSchemasConflict',
+    guardId: 'ORIANA_NI_NAMED_SCHEMA',
+    find: 'promptNamedWithSchemasConflict = async (newItems, missingItems, entity) => {',
+    inject: `      /* ORIANA_NI_NAMED_SCHEMA */
       if (process.env.DRIZZLE_PUSH_NONINTERACTIVE === "true") {
         console.log("[drizzle] non-interactive: create all " + entity + "(s), skip rename prompts");
         return { created: newItems, renamed: [], moved: [], deleted: missingItems };
       }`,
-    },
-    {
-      name: 'promptColumnsConflicts',
-      find: 'promptColumnsConflicts = async (tableName, newColumns, missingColumns) => {',
-      inject: `
+  },
+  {
+    name: 'promptColumnsConflicts',
+    guardId: 'ORIANA_NI_COLUMNS',
+    find: 'promptColumnsConflicts = async (tableName, newColumns, missingColumns) => {',
+    inject: `      /* ORIANA_NI_COLUMNS */
       if (process.env.DRIZZLE_PUSH_NONINTERACTIVE === "true") {
         console.log("[drizzle] non-interactive: create all columns in " + tableName + ", skip rename prompts");
         return { created: newColumns, renamed: [], deleted: missingColumns };
       }`,
-    },
-    {
-      name: 'promptSchemasConflict',
-      find: 'promptSchemasConflict = async (newSchemas, missingSchemas) => {',
-      inject: `
+  },
+  {
+    name: 'promptSchemasConflict',
+    guardId: 'ORIANA_NI_SCHEMAS',
+    find: 'promptSchemasConflict = async (newSchemas, missingSchemas) => {',
+    inject: `      /* ORIANA_NI_SCHEMAS */
       if (process.env.DRIZZLE_PUSH_NONINTERACTIVE === "true") {
         console.log("[drizzle] non-interactive: create all schemas, skip rename prompts");
         return { created: newSchemas, renamed: [], deleted: missingSchemas };
       }`,
-    },
-  ]
+  },
+  // Belt-and-suspenders: enums always go through this resolver
+  {
+    name: 'enumsResolver',
+    guardId: 'ORIANA_NI_ENUMS_RESOLVER',
+    find: 'enumsResolver = async (input) => {',
+    inject: `      /* ORIANA_NI_ENUMS_RESOLVER */
+      if (process.env.DRIZZLE_PUSH_NONINTERACTIVE === "true") {
+        console.log("[drizzle] non-interactive: enumsResolver create-all");
+        return {
+          created: input.created,
+          deleted: input.deleted,
+          moved: [],
+          renamed: [],
+        };
+      }`,
+  },
+]
 
-  for (const p of patches) {
-    const result = injectAfter(drizzleSrc, p.find, p.inject)
-    if (!result.ok) {
-      console.warn(`  skip ${p.name}: needle not found`)
-      continue
-    }
-    drizzleSrc = result.src
-    console.log(`  patched ${p.name}`)
-  }
-
-  drizzleSrc = `${marker}\n${drizzleSrc}`
-  fs.writeFileSync(drizzleApi, drizzleSrc)
-  console.log('  wrote drizzle-kit/api')
+let anyOk = false
+for (const p of patches) {
+  const result = ensureInject(drizzleSrc, p)
+  drizzleSrc = result.src
+  if (result.ok) anyOk = true
 }
+
+if (!anyOk) {
+  throw new Error('Failed to apply any drizzle-kit non-interactive patches')
+}
+
+if (!drizzleSrc.includes(fileMarker)) {
+  drizzleSrc = `${fileMarker}\n${drizzleSrc}`
+}
+fs.writeFileSync(drizzleApi, drizzleSrc)
+console.log('  wrote drizzle-kit/api')
+
+// Verify the critical enum path is patched
+if (!drizzleSrc.includes('ORIANA_NI_NAMED_SCHEMA') || !drizzleSrc.includes('ORIANA_NI_ENUMS_RESOLVER')) {
+  throw new Error(
+    'Critical enum patches missing after write (ORIANA_NI_NAMED_SCHEMA / ORIANA_NI_ENUMS_RESOLVER)',
+  )
+}
+console.log('  verified enum non-interactive guards present')
 
 const pushDevPath = path.join(
   repoRoot,
@@ -94,12 +130,13 @@ if (!fs.existsSync(pushDevPath)) {
   console.warn('  skip pushDevSchema: file not found at', pushDevPath)
 } else {
   let pushSrc = fs.readFileSync(pushDevPath, 'utf8')
-  if (pushSrc.includes(marker)) {
+  const pushGuard = 'ORIANA_NI_PUSH_WARNINGS'
+  if (pushSrc.includes(pushGuard)) {
     console.log('  pushDevSchema already patched')
   } else {
     const replaced = pushSrc.replace(
       /const \{ confirm: acceptWarnings \} = await prompts\([\s\S]*?\}\);/,
-      `${marker}
+      `/* ${pushGuard} */
         let acceptWarnings = true;
         if (process.env.DRIZZLE_PUSH_NONINTERACTIVE !== "true") {
             ({ confirm: acceptWarnings } = await prompts({
