@@ -20,7 +20,44 @@ import config from '@payload-config'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const requiredTables = ['users', 'categories', 'media', 'posts', 'pages']
+const requiredTables = [
+  // Core
+  'users',
+  'media',
+  'pages',
+  'posts',
+  'products',
+  'categories',
+  'downloads',
+  // Content CMS migration
+  'case_studies',
+  'faqs',
+  'videos',
+  'distributors',
+  'jobs',
+  'certifications',
+  'awards',
+  'partners',
+  'solutions',
+  'warranty_plans',
+  'sustainability_reports',
+  // Globals (Payload stores each as a table)
+  'header',
+  'footer',
+  'site_settings',
+  'home',
+  'about',
+  'careers',
+  'support',
+  'sustainability',
+  'contact',
+  // Plugins / folders
+  'payload_folders',
+  'forms',
+  'form_submissions',
+  'redirects',
+  'search',
+]
 
 function dbSchema(): string {
   const schema = (process.env.PAYLOAD_DB_SCHEMA || process.env.DB_SCHEMA || 'public').trim()

@@ -14,6 +14,11 @@ on:
         required: false
         type: boolean
         default: false
+      force_schema_push:
+        description: Force Drizzle schema push even if core tables exist
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -138,8 +143,8 @@ jobs:
         env:
           NODE_ENV: development
           NODE_OPTIONS: "--dns-result-order=ipv4first"
-          # Do NOT force push on every QA deploy — Supabase session pooler flakes
-          # under drizzle introspection. Skip when core tables already exist.
+          # Push when any required CMS table is missing. Optional force for repair.
+          PAYLOAD_FORCE_SCHEMA_PUSH: ${{ github.event.inputs.force_schema_push == 'true' && 'true' || 'false' }}
           PAYLOAD_FORCE_DRIZZLE_PUSH: "true"
           PG_POOL_MAX: "3"
           PG_CONNECT_TIMEOUT_MS: "60000"
