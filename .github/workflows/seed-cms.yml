@@ -102,6 +102,12 @@ jobs:
             echo "DB_SCHEMA=" >> "$GITHUB_ENV"
           fi
 
+      - name: Ensure media.alt values
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+        run: npm run ensure:media-alt
+
       - name: Bootstrap schema (push tables)
         working-directory: apps/cms
         env:

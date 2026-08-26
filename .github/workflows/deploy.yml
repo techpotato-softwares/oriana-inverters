@@ -137,6 +137,13 @@ jobs:
             echo "PAYLOAD_DB_SCHEMA=oriana_invertors"
           } >> "$GITHUB_ENV"
 
+      - name: Ensure media.alt values (external DB)
+        if: ${{ steps.env.outputs.uses_rds != 'true' && steps.secrets_pre.outputs.db_ready == 'true' }}
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+        run: npm run ensure:media-alt
+
       - name: Bootstrap schema (external DB)
         if: ${{ github.event.inputs.skip_migrate != 'true' && steps.env.outputs.uses_rds != 'true' && steps.secrets_pre.outputs.db_ready == 'true' }}
         working-directory: apps/cms
@@ -215,6 +222,13 @@ jobs:
             echo "PAYLOAD_DB_SCHEMA=${PAYLOAD_DB_SCHEMA:-oriana_invertors}"
           } >> "$GITHUB_ENV"
           echo "db_ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Ensure media.alt values (RDS)
+        if: ${{ steps.env.outputs.uses_rds == 'true' && steps.secrets_post.outputs.db_ready == 'true' }}
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+        run: npm run ensure:media-alt
 
       - name: Bootstrap schema (RDS)
         if: ${{ github.event.inputs.skip_migrate != 'true' && steps.env.outputs.uses_rds == 'true' && steps.secrets_post.outputs.db_ready == 'true' }}

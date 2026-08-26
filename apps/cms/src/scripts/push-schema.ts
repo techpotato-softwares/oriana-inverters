@@ -119,6 +119,51 @@ async function ensurePostgresSchema(): Promise<void> {
   })
 }
 
+/**
+ * Fix data that would block Drizzle NOT NULL / similar ALTERs on push.
+ * QA media rows often have null alt from before the field was required.
+ */
+async function preflightDataFixes(): Promise<void> {
+  const schema = dbSchema()
+  const media = `${quoteIdent(schema)}.${quoteIdent('media')}`
+
+  await withPool(async (pool) => {
+    const mediaExists = await pool.query<{ present: boolean }>(
+      `SELECT to_regclass($1) IS NOT NULL AS present`,
+      [`${schema}.media`],
+    )
+    if (!mediaExists.rows[0]?.present) {
+      console.log('preflight: media table missing — skip alt backfill')
+      return
+    }
+
+    const cols = await pool.query<{ column_name: string }>(
+      `SELECT column_name
+       FROM information_schema.columns
+       WHERE table_schema = $1 AND table_name = 'media'
+         AND column_name IN ('alt', 'filename')`,
+      [schema],
+    )
+    const names = new Set(cols.rows.map((r) => r.column_name))
+    if (!names.has('alt')) {
+      console.log('preflight: media.alt column missing — skip backfill')
+      return
+    }
+
+    const filenameExpr = names.has('filename') ? `NULLIF(BTRIM(filename), '')` : `NULL`
+    const result = await pool.query(
+      `UPDATE ${media}
+       SET alt = COALESCE(
+         NULLIF(BTRIM(alt), ''),
+         ${filenameExpr},
+         'Media ' || id::text
+       )
+       WHERE alt IS NULL OR BTRIM(COALESCE(alt, '')) = ''`,
+    )
+    console.log(`preflight: backfilled media.alt on ${result.rowCount ?? 0} row(s)`)
+  })
+}
+
 async function missingTables(): Promise<string[]> {
   const schema = dbSchema()
   // Single round-trip — avoid burning multiple session-pooler slots.
@@ -172,6 +217,7 @@ if (await schemaAlreadyPresent()) {
 }
 
 await ensurePostgresSchema()
+await preflightDataFixes()
 // Let Supabase/session poolers release the probe connection before Payload opens its pool.
 console.log(`Waiting ${poolerCooldownMs}ms for DB pooler to release probe connections…`)
 await sleep(poolerCooldownMs)
