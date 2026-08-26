@@ -1,6 +1,5 @@
 /**
  * Create the site_settings row/table without a full Drizzle introspect.
- * Array tables are created when Payload can push schema; scalars work immediately.
  *
  *   npm run ensure:site-settings -w @oriana/cms
  */
@@ -20,7 +19,12 @@ const isRetryable = (error: unknown): boolean => {
   )
 }
 
+function schemaName(): string {
+  return process.env.PAYLOAD_DB_SCHEMA || process.env.DB_SCHEMA || 'public'
+}
+
 async function ensure(connectionString: string) {
+  const schema = schemaName()
   const pool = new pg.Pool({
     connectionString,
     max: 1,
@@ -30,8 +34,9 @@ async function ensure(connectionString: string) {
   })
 
   try {
+    await pool.query(`CREATE SCHEMA IF NOT EXISTS ${schema}`)
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS public.site_settings (
+      CREATE TABLE IF NOT EXISTS ${schema}.site_settings (
         id serial PRIMARY KEY,
         site_name varchar,
         hotline varchar,
@@ -61,19 +66,21 @@ async function ensure(connectionString: string) {
       ['google_tag_manager_id', 'varchar'],
     ]
     for (const [name, type] of columns) {
-      await pool.query(`ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS ${name} ${type}`)
+      await pool.query(
+        `ALTER TABLE ${schema}.site_settings ADD COLUMN IF NOT EXISTS ${name} ${type}`,
+      )
     }
 
     await pool.query(`
-      INSERT INTO public.site_settings (id, site_name, hotline, seo_title, seo_title_template, twitter_handle)
+      INSERT INTO ${schema}.site_settings (id, site_name, hotline, seo_title, seo_title_template, twitter_handle)
       SELECT 1, 'Oriana Inverters', '+1 (800) ORIANA-1',
         'Oriana Inverters | Advanced Solar Inverter Solutions',
         '%s | Oriana Inverters',
         '@OrianaInverters'
-      WHERE NOT EXISTS (SELECT 1 FROM public.site_settings LIMIT 1)
+      WHERE NOT EXISTS (SELECT 1 FROM ${schema}.site_settings LIMIT 1)
     `)
 
-    console.log('Ensured public.site_settings exists.')
+    console.log(`Ensured ${schema}.site_settings exists.`)
   } finally {
     await pool.end()
   }

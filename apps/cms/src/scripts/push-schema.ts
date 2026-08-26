@@ -34,6 +34,10 @@ const isPoolExhausted = (error: unknown): boolean => {
 async function schemaAlreadyPresent(): Promise<boolean> {
   if (process.env.PAYLOAD_FORCE_SCHEMA_PUSH === 'true') return false
 
+  const schema = process.env.PAYLOAD_DB_SCHEMA || process.env.DB_SCHEMA || 'public'
+  // Quote only if needed; our site schema is a simple identifier.
+  const regclass = schema === 'public' ? 'public.users' : `${schema}.users`
+
   const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
     max: 1,
@@ -44,7 +48,8 @@ async function schemaAlreadyPresent(): Promise<boolean> {
 
   try {
     const result = await pool.query<{ present: boolean }>(
-      `SELECT to_regclass('public.users') IS NOT NULL AS present`,
+      `SELECT to_regclass($1) IS NOT NULL AS present`,
+      [regclass],
     )
     return Boolean(result.rows[0]?.present)
   } finally {
@@ -55,7 +60,8 @@ async function schemaAlreadyPresent(): Promise<boolean> {
 const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 5)
 
 if (await schemaAlreadyPresent()) {
-  console.log('Schema already present (public.users exists); skipping schema:push.')
+  const schema = process.env.PAYLOAD_DB_SCHEMA || process.env.DB_SCHEMA || 'public'
+  console.log(`Schema already present (${schema}.users exists); skipping schema:push.`)
   console.log('Set PAYLOAD_FORCE_SCHEMA_PUSH=true to push anyway.')
   process.exit(0)
 }

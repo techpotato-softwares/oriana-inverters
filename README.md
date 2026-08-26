@@ -35,6 +35,24 @@ Then create a durable migration when ready:
 DATABASE_URL="postgresql://..." PAYLOAD_SECRET="..." npm run migrate:create
 ```
 
+### Production database (shared RDS)
+
+| Resource | Value |
+|----------|--------|
+| RDS instance | `oriana-web` (shared across Oriana client sites) |
+| Postgres database | `postgres` |
+| This site’s schema | `oriana_invertors` |
+| Master secret | `/oriana-invertors-web/prod/database-master` (CDK auto username/password) |
+| App connection secret | `/oriana-invertors-web/prod/database` (host, user, password, `DB_SCHEMA`, `DATABASE_URL`) |
+
+Future websites on the same RDS: create another schema (e.g. `other_site`) and a separate Secrets Manager path for that app. Do **not** create a second RDS instance unless capacity requires it.
+
+After each prod CDK deploy, CI runs `scripts/sync-rds-app-secret.sh` which:
+
+1. Reads master credentials from Secrets Manager  
+2. Writes the app connection secret  
+3. Runs `CREATE SCHEMA IF NOT EXISTS oriana_invertors`
+
 ### Seed workflows
 
 | Script | What it does |
@@ -44,16 +62,14 @@ DATABASE_URL="postgresql://..." PAYLOAD_SECRET="..." npm run migrate:create
 | `npm run seed:content` | Marketing globals, collections, media folders/assets, legal pages, contact form |
 | `npm run seed:full` | Catalogue + content (use `--force` to wipe marketing collections first) |
 
-From the repo root:
+From the repo root (secrets loaded from AWS):
 
 ```bash
-npm run seed:admin
+eval "$(./scripts/load-deploy-secrets.sh prod)"
 npm run seed:full
-# or
-npm run seed:content -- --force
 ```
 
-GitHub Actions → **Seed Payload CMS** supports `catalogue` | `content` | `admin` | `full`.
+GitHub Actions → **Seed Payload CMS** supports `catalogue` | `content` | `admin` | `full`. Seeder always pulls `DATABASE_URL` from Secrets Manager.
 
 ### CMS content model (hybrid)
 
@@ -65,29 +81,20 @@ Edit copy, images, icons, and nav from Admin — no deploy required for content 
 
 ## Deploy via GitHub Actions (recommended)
 
-### 1. GitHub repository secrets
+### 1. GitHub repository secrets (only these two)
 
 | Secret | Purpose |
 |--------|---------|
 | `AWS_ACCESS_KEY_ID` | IAM user for deploy |
 | `AWS_SECRET_ACCESS_KEY` | IAM secret |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Optional if you prefer not to type inputs each run |
 
 Optional repo variable: `AWS_REGION` (default `ap-south-1`).
 
+Do **not** store DB passwords, Payload secrets, or admin passwords as GitHub secrets. Those live in AWS Secrets Manager (or one-off workflow_dispatch inputs for admin seed).
+
 ### 2. Environment file (no passwords in git)
 
-Edit [`config/deploy.env`](config/deploy.env) with Supabase **host**, **port**, **database name**, **user** only:
-
-```bash
-QA_DB_HOST=db.xxxx.supabase.co
-QA_DB_PORT=5432
-QA_DB_NAME=postgres
-QA_DB_USER=postgres
-QA_DB_SSL=true
-```
-
-Copy from [`config/deploy.env.example`](config/deploy.env.example) for other envs.
+Edit [`config/deploy.env`](config/deploy.env) with **QA** Supabase host/user only (see [`config/deploy.env.example`](config/deploy.env.example)). Prod RDS host/password are auto-registered by CDK + `sync-rds-app-secret.sh`.
 
 ### 3. Run deploy workflow
 
@@ -96,43 +103,44 @@ Copy from [`config/deploy.env.example`](config/deploy.env.example) for other env
 - Choose **environment**: `dev` | `qa` | `prod`
 - Workflow will:
   1. **CDK bootstrap** (first time)
-  2. **Create Secrets Manager placeholders** (auto-generates `PAYLOAD_SECRET`; if `db_password` input is provided, it is used immediately)
-  3. Deploy stack + Lambda + CloudFront + S3
+  2. Create/ensure Secrets Manager **payload** secrets
+  3. Build + **CDK deploy** (prod creates RDS `oriana-web`)
+  4. **Prod:** sync app DB secret + create schema `oriana_invertors`
+  5. Push Payload schema, patch Lambda env from Secrets Manager
+  6. Sync static assets to S3
 
-### 4. Set database password (one time per env)
+### 4. QA database password (one time)
 
-AWS Console → **Secrets Manager** → `/oriana-invertors-web/qa/database` → Edit:
-
-- Set `DB_PASSWORD` to your Supabase database password
-- Re-run **Deploy** (workflow rebuilds `DATABASE_URL` from host + password)
-
-You do **not** need to generate `PAYLOAD_SECRET` manually — it is created on first deploy.
+AWS Console → **Secrets Manager** → `/oriana-invertors-web/qa/database` → set `DB_PASSWORD` to your Supabase password. Re-run deploy/seed. Never put this password in GitHub.
 
 ### 5. Seed content
 
-**Actions → Seed Payload CMS** → choose env + `catalogue` / `content` / `admin` / `full` and optionally provide `admin_email` + `admin_password` inputs.
+**Actions → Seed Payload CMS** → choose env + seed type. Optionally pass `admin_email` / `admin_password` as **workflow inputs** (not saved GitHub secrets).
 
 ## Secrets created automatically
 
 | Secret path | Contents |
 |-------------|----------|
-| `/oriana-invertors-web/{env}/database` | `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DATABASE_URL`, … |
 | `/oriana-invertors-web/{env}/payload` | Auto-generated `PAYLOAD_SECRET`, `CRON_SECRET`, `PREVIEW_SECRET` |
+| `/oriana-invertors-web/prod/database-master` | CDK-generated RDS master `username` / `password` |
+| `/oriana-invertors-web/prod/database` | App connection: host, user, password, `DB_SCHEMA=oriana_invertors`, `DATABASE_URL` |
+| `/oriana-invertors-web/qa/database` | External Supabase connection (password set once in AWS Console) |
 
 ## Environments
 
 | Env | Database | Stack |
 |-----|----------|--------|
-| **qa** | Supabase | `oriana-invertors-web-qa` |
-| **prod** | RDS | `oriana-invertors-web-prod` |
+| **qa** | Supabase (external) | `oriana-invertors-web-qa` |
+| **prod** | Shared RDS `oriana-web` / schema `oriana_invertors` | `oriana-invertors-web-prod` |
 
 ## Manual (local AWS CLI)
 
 ```bash
-# After editing config/deploy.env
 export AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... AWS_REGION=ap-south-1
-./scripts/bootstrap-secrets.sh qa
-cd cdk && npm run bootstrap && npm run deploy:qa
+./scripts/bootstrap-secrets.sh qa   # or prod (payload only)
+cd cdk && npm run bootstrap && npm run deploy:prod
+../scripts/sync-rds-app-secret.sh prod
+eval "$(../scripts/load-deploy-secrets.sh prod)"
 ```
 
 See [`docs/QA_VERIFY.md`](docs/QA_VERIFY.md) and [`ARCHITECTURE.md`](ARCHITECTURE.md).

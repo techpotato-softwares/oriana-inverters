@@ -3,54 +3,36 @@ import * as rds from "aws-cdk-lib/aws-rds";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 import * as iam from "aws-cdk-lib/aws-iam";
-import { CfnOutput, Duration, RemovalPolicy } from "aws-cdk-lib";
+import { CfnOutput, Duration, RemovalPolicy, Stack } from "aws-cdk-lib";
 import { EnvironmentConfig } from "../../config/environment";
 import { RDSEnvironmentConfig, getRDSConfig } from "../../../config/rds.config";
 import { IPermissionProvider } from "../permissions/lambda-permissions";
 
-/**
- * Props for RDSConstruct
- */
 export interface RDSConstructProps {
-  /** Environment configuration */
   config: EnvironmentConfig;
-  /** Optional VPC to use (if not provided, a new VPC will be created) */
   vpc?: ec2.IVpc;
 }
 
 /**
- * RDS Construct
+ * Shared RDS PostgreSQL (`oriana-web` in prod).
  *
- * Creates an RDS PostgreSQL instance with:
- * - Automatic secret management via Secrets Manager
- * - VPC with public/private subnets (if not provided)
- * - Security group for database access
- * - Automated backups and maintenance windows
+ * Credentials are auto-generated into Secrets Manager. After deploy, CI runs
+ * `scripts/sync-rds-app-secret.sh` to:
+ *  1. CREATE SCHEMA IF NOT EXISTS <site schema>
+ *  2. Write the app connection secret (DB_* + DATABASE_URL + DB_SCHEMA)
  *
- * CRITICAL: Uses RemovalPolicy.SNAPSHOT for production to prevent data loss!
- * This creates a final snapshot before any deletion attempt.
- *
- * Usage:
- * ```typescript
- * const rdsConstruct = new RDSConstruct(this, 'RDS', { config });
- * // Access: rdsConstruct.instance, rdsConstruct.secret
- * ```
+ * Multiple websites can share this instance via different schemas.
  */
 export class RDSConstruct extends Construct implements IPermissionProvider {
-  /** RDS Database Instance */
   public readonly instance: rds.DatabaseInstance;
-
-  /** Database credentials secret */
-  public readonly secret: secretsmanager.ISecret;
-
-  /** VPC containing the database */
+  /** Raw RDS master credentials (username / password) — managed by CDK */
+  public readonly masterSecret: secretsmanager.ISecret;
   public readonly vpc: ec2.IVpc;
-
-  /** Security group for database access */
   public readonly securityGroup: ec2.SecurityGroup;
-
-  /** IAM policy statements for Lambda to access the database */
   public readonly permissions: iam.PolicyStatement[] = [];
+  public readonly schemaName: string;
+  public readonly databaseName: string;
+  public readonly instanceIdentifier: string;
 
   constructor(scope: Construct, id: string, props: RDSConstructProps) {
     super(scope, id);
@@ -59,31 +41,30 @@ export class RDSConstruct extends Construct implements IPermissionProvider {
     const rdsConfig = getRDSConfig(config.environment);
     const isProd = config.environment === "prod";
 
+    this.schemaName = rdsConfig.schemaName;
+    this.databaseName = rdsConfig.databaseName;
+    this.instanceIdentifier = rdsConfig.instanceIdentifier;
+
     console.log(
-      `   🗄️  Creating RDS PostgreSQL instance for ${config.environment}...`,
+      `   Creating shared RDS "${rdsConfig.instanceIdentifier}" (schema ${rdsConfig.schemaName})…`,
     );
 
-    // Create or use existing VPC
     this.vpc = props.vpc ?? this.createVpc(config, rdsConfig);
 
-    // Create security group for database
     this.securityGroup = new ec2.SecurityGroup(this, "DatabaseSecurityGroup", {
       vpc: this.vpc,
-      securityGroupName: `oriana-invertors-web-db-sg-${config.environment}`,
-      description: `Security group for oriana-invertors-web RDS - ${config.environment}`,
+      securityGroupName: `${rdsConfig.instanceIdentifier}-sg`,
+      description: `Security group for shared RDS ${rdsConfig.instanceIdentifier}`,
       allowAllOutbound: false,
     });
 
-    // Allow Lambda access (from within VPC or via public access for dev/qa)
     if (rdsConfig.publiclyAccessible) {
-      // For dev/qa - allow access from anywhere (be careful in production!)
       this.securityGroup.addIngressRule(
         ec2.Peer.anyIpv4(),
         ec2.Port.tcp(rdsConfig.port),
-        "Allow PostgreSQL access",
+        "Allow PostgreSQL access (CI schema sync + Lambda)",
       );
     } else {
-      // For production - only allow access from within the VPC
       this.securityGroup.addIngressRule(
         ec2.Peer.ipv4(this.vpc.vpcCidrBlock),
         ec2.Port.tcp(rdsConfig.port),
@@ -91,10 +72,11 @@ export class RDSConstruct extends Construct implements IPermissionProvider {
       );
     }
 
-    // Create database credentials secret
-    this.secret = new secretsmanager.Secret(this, "DatabaseSecret", {
-      secretName: config.dbSecretId,
-      description: `Database credentials for oriana-invertors-web - ${config.environment}`,
+    // Master credentials — separate from app connection secret so CDK can own rotation
+    const masterSecretName = `${config.dbSecretId}-master`;
+    this.masterSecret = new secretsmanager.Secret(this, "DatabaseMasterSecret", {
+      secretName: masterSecretName,
+      description: `RDS master credentials for ${rdsConfig.instanceIdentifier}`,
       generateSecretString: {
         secretStringTemplate: JSON.stringify({
           username: rdsConfig.username,
@@ -105,17 +87,14 @@ export class RDSConstruct extends Construct implements IPermissionProvider {
       },
     });
 
-    // Determine removal policy based on environment
-    // CRITICAL: Use SNAPSHOT for production to create a final snapshot before deletion
     const removalPolicy = isProd
       ? RemovalPolicy.SNAPSHOT
       : rdsConfig.deletionProtection
         ? RemovalPolicy.RETAIN
         : RemovalPolicy.DESTROY;
 
-    // Create RDS PostgreSQL instance
     this.instance = new rds.DatabaseInstance(this, "Database", {
-      instanceIdentifier: `oriana-invertors-web-db-${config.environment}`,
+      instanceIdentifier: rdsConfig.instanceIdentifier,
       engine: rds.DatabaseInstanceEngine.postgres({
         version: rds.PostgresEngineVersion.VER_18_1,
       }),
@@ -130,94 +109,79 @@ export class RDSConstruct extends Construct implements IPermissionProvider {
           : ec2.SubnetType.PRIVATE_ISOLATED,
       },
       securityGroups: [this.securityGroup],
-      credentials: rds.Credentials.fromSecret(this.secret),
+      credentials: rds.Credentials.fromSecret(this.masterSecret),
       databaseName: rdsConfig.databaseName,
       port: rdsConfig.port,
-
-      // Storage configuration
       allocatedStorage: rdsConfig.allocatedStorage,
       maxAllocatedStorage: rdsConfig.maxAllocatedStorage,
       storageType: rds.StorageType.GP3,
       storageEncrypted: true,
-
-      // Backup configuration
       backupRetention: Duration.days(rdsConfig.backupRetentionDays),
-      preferredBackupWindow: "03:00-04:00", // 3-4 AM UTC
-      preferredMaintenanceWindow: "Sun:04:00-Sun:05:00", // Sunday 4-5 AM UTC
-
-      // High availability
+      preferredBackupWindow: "03:00-04:00",
+      preferredMaintenanceWindow: "Sun:04:00-Sun:05:00",
       multiAz: rdsConfig.multiAz,
-
-      // Protection settings
       deletionProtection: rdsConfig.deletionProtection,
-      removalPolicy: removalPolicy,
-
-      // Performance and monitoring
+      removalPolicy,
       enablePerformanceInsights: isProd,
       performanceInsightRetention: isProd
         ? rds.PerformanceInsightRetention.DEFAULT
         : undefined,
       monitoringInterval: isProd ? Duration.seconds(60) : undefined,
-
-      // Network settings
       publiclyAccessible: rdsConfig.publiclyAccessible,
-
-      // Auto minor version upgrade
       autoMinorVersionUpgrade: true,
     });
 
-    // Generate permissions for Lambda to access Secrets Manager
-    this.permissions = this.generatePermissions();
+    this.permissions = this.generatePermissions(config);
 
-    // Outputs
     new CfnOutput(this, "DatabaseEndpoint", {
       value: this.instance.instanceEndpoint.hostname,
-      description: `RDS Endpoint for oriana-invertors-web - ${config.environment}`,
-      exportName: `oriana-invertors-web-RDS-Endpoint-${config.environment}`,
+      description: `Shared RDS endpoint (${rdsConfig.instanceIdentifier})`,
+      exportName: `oriana-web-RDS-Endpoint-${config.environment}`,
     });
 
     new CfnOutput(this, "DatabasePort", {
       value: this.instance.instanceEndpoint.port.toString(),
-      description: `RDS Port for oriana-invertors-web - ${config.environment}`,
-      exportName: `oriana-invertors-web-RDS-Port-${config.environment}`,
+      description: `RDS port`,
+      exportName: `oriana-web-RDS-Port-${config.environment}`,
     });
 
-    new CfnOutput(this, "DatabaseSecretArn", {
-      value: this.secret.secretArn,
-      description: `Secrets Manager ARN for database credentials - ${config.environment}`,
-      exportName: `oriana-invertors-web-RDS-SecretArn-${config.environment}`,
+    new CfnOutput(this, "DatabaseMasterSecretArn", {
+      value: this.masterSecret.secretArn,
+      description: `Master credentials secret ARN`,
+      exportName: `oriana-web-RDS-MasterSecretArn-${config.environment}`,
     });
 
     new CfnOutput(this, "DatabaseName", {
       value: rdsConfig.databaseName,
-      description: `Database name for oriana-invertors-web - ${config.environment}`,
-      exportName: `oriana-invertors-web-RDS-DatabaseName-${config.environment}`,
+      description: `Postgres database name`,
+      exportName: `oriana-web-RDS-DatabaseName-${config.environment}`,
     });
 
-    console.log(`   ✅ RDS instance created: oriana-invertors-web-db-${config.environment}`);
+    new CfnOutput(this, "DatabaseSchema", {
+      value: rdsConfig.schemaName,
+      description: `App schema on shared RDS (multi-tenant)`,
+      exportName: `oriana-invertors-web-RDS-Schema-${config.environment}`,
+    });
+
+    new CfnOutput(this, "DatabaseInstanceId", {
+      value: rdsConfig.instanceIdentifier,
+      description: `RDS instance identifier`,
+      exportName: `oriana-web-RDS-InstanceId-${config.environment}`,
+    });
+
     console.log(
-      `   ⚠️  RemovalPolicy: ${removalPolicy} (${isProd ? "will create snapshot on delete" : "will be destroyed"})`,
+      `   RDS instance: ${rdsConfig.instanceIdentifier} / db=${rdsConfig.databaseName} / schema=${rdsConfig.schemaName}`,
     );
   }
 
-  /**
-   * Create a VPC for the database
-   * COST OPTIMIZATION: Only creates NAT Gateway if private access is required
-   *
-   * NOTE: AWS RDS requires DB subnet groups to span at least 2 AZs,
-   * regardless of whether Multi-AZ is enabled. This is an AWS requirement.
-   */
   private createVpc(
     config: EnvironmentConfig,
     rdsConfig: RDSEnvironmentConfig,
   ): ec2.Vpc {
-    // AWS RDS requires at least 2 AZs for DB subnet groups, even for single-AZ deployments
-    const requiredAzs = 2;
-
     return new ec2.Vpc(this, "DatabaseVpc", {
-      vpcName: `oriana-invertors-web-vpc-${config.environment}`,
-      maxAzs: requiredAzs, // Only use multiple AZs if Multi-AZ is enabled
-      natGateways: rdsConfig.publiclyAccessible ? 0 : 1, // NAT Gateway costs ~$32/month, skip if public
+      vpcName: `${rdsConfig.instanceIdentifier}-vpc`,
+      maxAzs: 2,
+      natGateways: rdsConfig.publiclyAccessible ? 0 : 1,
       subnetConfiguration: [
         {
           name: "Public",
@@ -237,46 +201,30 @@ export class RDSConstruct extends Construct implements IPermissionProvider {
     });
   }
 
-  /**
-   * Generate IAM policy statements for Lambda access
-   */
-  private generatePermissions(): iam.PolicyStatement[] {
-    const statements: iam.PolicyStatement[] = [];
-
-    // Permission to read database secret
-    statements.push(
+  private generatePermissions(config: EnvironmentConfig): iam.PolicyStatement[] {
+    return [
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: [
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret",
         ],
-        resources: [this.secret.secretArn],
-      }),
-    );
-
-    // Permission to connect to RDS (if using IAM authentication)
-    statements.push(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ["rds-db:connect"],
         resources: [
-          `arn:aws:rds-db:*:*:dbuser:${this.instance.instanceIdentifier}/*`,
+          this.masterSecret.secretArn,
+          `arn:aws:secretsmanager:${Stack.of(this).region}:${Stack.of(this).account}:secret:${config.dbSecretId}*`,
         ],
       }),
-    );
-
-    return statements;
+    ];
   }
 
-  /**
-   * Get database connection details for Lambda environment variables
-   * Note: DB_SECRET_ID is already passed via config.dbSecretId, so only host/port needed
-   */
-  public getConnectionEnvVars(): Record<string, string> {
+  public getConnectionEnvVars(appDbSecretId: string): Record<string, string> {
     return {
       DB_HOST: this.instance.instanceEndpoint.hostname,
       DB_PORT: this.instance.instanceEndpoint.port.toString(),
+      DB_NAME: this.databaseName,
+      DB_SCHEMA: this.schemaName,
+      DB_SECRET_ID: appDbSecretId,
+      DB_MASTER_SECRET_ID: this.masterSecret.secretName!,
     };
   }
 }

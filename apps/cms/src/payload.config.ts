@@ -104,6 +104,9 @@ export default buildConfig({
       connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 20_000),
       allowExitOnIdle: true,
     },
+    // Multi-tenant: this site uses schema oriana_invertors on shared RDS oriana-web.
+    // QA/Supabase typically stays on public unless DB_SCHEMA is set in Secrets Manager.
+    schemaName: process.env.PAYLOAD_DB_SCHEMA || process.env.DB_SCHEMA || undefined,
     push: process.env.PAYLOAD_DATABASE_PUSH === 'true',
     prodMigrations: migrations,
   }),

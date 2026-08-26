@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
-# Bootstrap Secrets Manager placeholders for oriana-invertors-web.
-# Reads DB details from config/deploy.env using ENV-prefixed keys.
+# Bootstrap Secrets Manager for oriana-invertors-web.
+#
+# - Always ensures payload secrets exist (auto-generated).
+# - For external DBs (qa/dev): writes app DB secret from config/deploy.env
+#   (host/user only — password stays in Secrets Manager, never git/GH).
+# - For RDS prod: only ensures payload secrets; DB app secret is written by
+#   scripts/sync-rds-app-secret.sh after CDK creates the instance.
+#
 # Usage: ./scripts/bootstrap-secrets.sh qa
 
 set -euo pipefail
@@ -13,32 +19,11 @@ DB_SECRET="/${APP}/${ENV}/database"
 PAYLOAD_SECRET_PATH="/${APP}/${ENV}/payload"
 PLACEHOLDER_PASSWORD="CHANGE_ME_UPDATE_IN_AWS_CONSOLE"
 
-if [[ ! -f "$ENV_FILE" ]]; then
-  echo "Missing $ENV_FILE — copy from config/deploy.env.example"
-  exit 1
+# Prod uses shared RDS created by CDK — skip external DB bootstrap.
+USES_RDS=false
+if [[ "$ENV" == "prod" ]]; then
+  USES_RDS=true
 fi
-
-# shellcheck disable=SC1090
-set -a && source "$ENV_FILE" && set +a
-
-PREFIX=$(printf '%s' "$ENV" | tr '[:lower:]' '[:upper:]')
-
-DB_HOST_VAR="${PREFIX}_DB_HOST"
-DB_PORT_VAR="${PREFIX}_DB_PORT"
-DB_NAME_VAR="${PREFIX}_DB_NAME"
-DB_USER_VAR="${PREFIX}_DB_USER"
-DB_SSL_VAR="${PREFIX}_DB_SSL"
-
-DB_HOST="${!DB_HOST_VAR:-}"
-DB_PORT="${!DB_PORT_VAR:-}"
-DB_NAME="${!DB_NAME_VAR:-}"
-DB_USER="${!DB_USER_VAR:-}"
-DB_SSL="${!DB_SSL_VAR:-true}"
-
-: "${DB_HOST:?${DB_HOST_VAR} required in $ENV_FILE}"
-: "${DB_PORT:?${DB_PORT_VAR} required in $ENV_FILE}"
-: "${DB_NAME:?${DB_NAME_VAR} required in $ENV_FILE}"
-: "${DB_USER:?${DB_USER_VAR} required in $ENV_FILE}"
 
 gen_secret() {
   openssl rand -hex 32
@@ -74,7 +59,7 @@ put_secret() {
   fi
 }
 
-# Create payload secrets once
+# Create payload secrets once (never from GH secrets)
 if ! secret_exists "$PAYLOAD_SECRET_PATH"; then
   PS=$(gen_secret)
   CS=$(gen_secret)
@@ -83,32 +68,72 @@ if ! secret_exists "$PAYLOAD_SECRET_PATH"; then
     --arg ps "$PS" --arg cs "$CS" --arg pr "$PR" \
     '{PAYLOAD_SECRET: $ps, CRON_SECRET: $cs, PREVIEW_SECRET: $pr}')
   put_secret "$PAYLOAD_SECRET_PATH" "$PAYLOAD_JSON"
+else
+  echo "Payload secret already exists: $PAYLOAD_SECRET_PATH"
 fi
 
-# DB password source priority:
-# 1) DB_PASSWORD_OVERRIDE (workflow manual input)
-# 2) existing secret DB_PASSWORD
-# 3) placeholder
-if [[ -n "${DB_PASSWORD_OVERRIDE:-}" ]]; then
-  DB_PASSWORD="$DB_PASSWORD_OVERRIDE"
-else
-  EXISTING_DB=$(get_secret_json "$DB_SECRET")
-  if [[ "$EXISTING_DB" != "{}" ]]; then
-    DB_PASSWORD=$(echo "$EXISTING_DB" | jq -r '.DB_PASSWORD // empty')
-    if [[ -z "$DB_PASSWORD" || "$DB_PASSWORD" == "null" ]]; then
-      DB_PASSWORD="$PLACEHOLDER_PASSWORD"
-    fi
+if [[ "$USES_RDS" == "true" ]]; then
+  echo "Env ${ENV} uses CDK-managed RDS (oriana-web)."
+  echo "App DB secret will be written by sync-rds-app-secret.sh after deploy."
+  echo "Secrets bootstrap complete for ${ENV} (payload only)."
+  exit 0
+fi
+
+if [[ ! -f "$ENV_FILE" ]]; then
+  echo "Missing $ENV_FILE — copy from config/deploy.env.example"
+  exit 1
+fi
+
+# shellcheck disable=SC1090
+set -a && source "$ENV_FILE" && set +a
+
+PREFIX=$(printf '%s' "$ENV" | tr '[:lower:]' '[:upper:]')
+
+DB_HOST_VAR="${PREFIX}_DB_HOST"
+DB_PORT_VAR="${PREFIX}_DB_PORT"
+DB_NAME_VAR="${PREFIX}_DB_NAME"
+DB_USER_VAR="${PREFIX}_DB_USER"
+DB_SSL_VAR="${PREFIX}_DB_SSL"
+DB_SCHEMA_VAR="${PREFIX}_DB_SCHEMA"
+
+DB_HOST="${!DB_HOST_VAR:-}"
+DB_PORT="${!DB_PORT_VAR:-}"
+DB_NAME="${!DB_NAME_VAR:-}"
+DB_USER="${!DB_USER_VAR:-}"
+DB_SSL="${!DB_SSL_VAR:-true}"
+DB_SCHEMA="${!DB_SCHEMA_VAR:-public}"
+
+: "${DB_HOST:?${DB_HOST_VAR} required in $ENV_FILE}"
+: "${DB_PORT:?${DB_PORT_VAR} required in $ENV_FILE}"
+: "${DB_NAME:?${DB_NAME_VAR} required in $ENV_FILE}"
+: "${DB_USER:?${DB_USER_VAR} required in $ENV_FILE}"
+
+# Password only from existing Secrets Manager — never from GH / deploy.env
+EXISTING_DB=$(get_secret_json "$DB_SECRET")
+DB_PASSWORD=$(echo "$EXISTING_DB" | jq -r '.DB_PASSWORD // empty')
+if [[ -z "$DB_PASSWORD" || "$DB_PASSWORD" == "null" ]]; then
+  # Also accept RDS-style keys if someone rotated manually
+  DB_PASSWORD=$(echo "$EXISTING_DB" | jq -r '.password // empty')
+fi
+if [[ -z "$DB_PASSWORD" || "$DB_PASSWORD" == "null" ]]; then
+  DB_PASSWORD="$PLACEHOLDER_PASSWORD"
+fi
+
+ENC_PASSWORD=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$DB_PASSWORD")
+SSL_QUERY=""
+if [[ "$DB_SSL" == "true" ]]; then
+  SSL_QUERY="?sslmode=require&uselibpqcompat=true"
+fi
+if [[ "$DB_SCHEMA" != "public" && -n "$DB_SCHEMA" ]]; then
+  SEARCH_PATH_OPT=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote('-csearch_path='+sys.argv[1]+',public', safe=''))" "$DB_SCHEMA")
+  if [[ -n "$SSL_QUERY" ]]; then
+    SSL_QUERY="${SSL_QUERY}&options=${SEARCH_PATH_OPT}"
   else
-    DB_PASSWORD="$PLACEHOLDER_PASSWORD"
+    SSL_QUERY="?options=${SEARCH_PATH_OPT}"
   fi
 fi
 
-SSL_QUERY=""
-if [[ "$DB_SSL" == "true" ]]; then
-  SSL_QUERY="?sslmode=require"
-fi
-
-DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}${SSL_QUERY}"
+DATABASE_URL="postgresql://${DB_USER}:${ENC_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}${SSL_QUERY}"
 
 DB_JSON=$(jq -n \
   --arg host "$DB_HOST" \
@@ -116,6 +141,7 @@ DB_JSON=$(jq -n \
   --arg name "$DB_NAME" \
   --arg user "$DB_USER" \
   --arg pass "$DB_PASSWORD" \
+  --arg schema "$DB_SCHEMA" \
   --arg url "$DATABASE_URL" \
   --argjson ssl "$([ "$DB_SSL" = true ] && echo true || echo false)" \
   '{
@@ -125,6 +151,7 @@ DB_JSON=$(jq -n \
     DB_USER: $user,
     DB_PASSWORD: $pass,
     DB_SSL: $ssl,
+    DB_SCHEMA: $schema,
     DATABASE_URL: $url
   }')
 
@@ -132,7 +159,8 @@ put_secret "$DB_SECRET" "$DB_JSON"
 
 if [[ "$DB_PASSWORD" == "$PLACEHOLDER_PASSWORD" ]]; then
   echo "DB password is still placeholder for $ENV."
-  echo "Update $DB_SECRET -> DB_PASSWORD in AWS Secrets Manager"
+  echo "Set DB_PASSWORD once in AWS Secrets Manager → $DB_SECRET"
+  echo "(Do not put the password in GitHub Actions secrets.)"
 fi
 
 echo "Secrets bootstrap complete for ${ENV}"

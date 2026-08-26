@@ -1,7 +1,5 @@
 /**
  * Ensure media.prefix exists without a full Drizzle schema push.
- * Full schema:push against Supabase from GitHub Actions often times out; this
- * single ALTER is enough for @payloadcms/storage-s3.
  *
  *   npm run ensure:media-prefix -w @oriana/cms
  */
@@ -21,7 +19,12 @@ const isRetryable = (error: unknown): boolean => {
   )
 }
 
+function schemaName(): string {
+  return process.env.PAYLOAD_DB_SCHEMA || process.env.DB_SCHEMA || 'public'
+}
+
 async function ensurePrefix(connectionString: string) {
+  const schema = schemaName()
   const pool = new pg.Pool({
     connectionString,
     max: 1,
@@ -31,26 +34,21 @@ async function ensurePrefix(connectionString: string) {
   })
 
   try {
+    await pool.query(`CREATE SCHEMA IF NOT EXISTS ${schema}`)
     const mediaTable = await pool.query<{ present: boolean }>(
-      `SELECT to_regclass('public.media') IS NOT NULL AS present`,
+      `SELECT to_regclass($1) IS NOT NULL AS present`,
+      [`${schema}.media`],
     )
     if (!mediaTable.rows[0]?.present) {
-      console.log('public.media does not exist yet — run npm run schema:push first.')
+      console.log(`${schema}.media does not exist yet — run npm run schema:push first.`)
       return
     }
 
     await pool.query(`
-      ALTER TABLE public.media
-      ADD COLUMN IF NOT EXISTS prefix varchar,
-      ADD COLUMN IF NOT EXISTS use_as_home_hero boolean DEFAULT false,
-      ADD COLUMN IF NOT EXISTS home_hero_link_type varchar,
-      ADD COLUMN IF NOT EXISTS home_hero_product_id integer,
-      ADD COLUMN IF NOT EXISTS home_hero_post_id integer,
-      ADD COLUMN IF NOT EXISTS home_hero_headline varchar,
-      ADD COLUMN IF NOT EXISTS home_hero_cta varchar,
-      ADD COLUMN IF NOT EXISTS home_hero_sort numeric
+      ALTER TABLE ${schema}.media
+      ADD COLUMN IF NOT EXISTS prefix varchar
     `)
-    console.log('Ensured public.media.prefix and homepage hero columns exist.')
+    console.log(`Ensured ${schema}.media.prefix exists.`)
   } finally {
     await pool.end()
   }

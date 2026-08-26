@@ -110,10 +110,8 @@ export class OrianaInvertorsWebStack extends Stack {
     };
 
     if (rdsConstruct) {
-      lambdaEnv.DB_HOST = rdsConstruct.instance.instanceEndpoint.hostname;
-      lambdaEnv.DB_PORT = String(config.database.port);
-      lambdaEnv.DB_NAME = config.database.name;
-      lambdaEnv.DB_SECRET_ID = config.dbSecretId;
+      Object.assign(lambdaEnv, rdsConstruct.getConnectionEnvVars(config.dbSecretId));
+      lambdaEnv.PAYLOAD_DB_SCHEMA = rdsConstruct.schemaName;
     }
 
     console.log("\nCreating web Lambda (container + Web Adapter)...");
@@ -121,13 +119,22 @@ export class OrianaInvertorsWebStack extends Stack {
       config,
       repoRoot,
       environment: lambdaEnv,
-      permissions: s3Construct?.permissions || [],
+      permissions: [
+        ...(s3Construct?.permissions || []),
+        ...(rdsConstruct?.permissions || []),
+      ],
     });
 
     // Grant secret read (in addition to policy in WebLambdaConstruct)
     payloadSecret.grantRead(webLambda.fn);
     if (rdsConstruct) {
-      rdsConstruct.secret.grantRead(webLambda.fn);
+      rdsConstruct.masterSecret.grantRead(webLambda.fn);
+      // App connection secret is written by sync-rds-app-secret.sh after deploy
+      secretsmanager.Secret.fromSecretNameV2(
+        this,
+        "AppDatabaseSecret",
+        config.dbSecretId,
+      ).grantRead(webLambda.fn);
     }
 
     console.log("\nCreating CloudFront...");

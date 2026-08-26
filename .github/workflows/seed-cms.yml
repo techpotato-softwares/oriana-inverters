@@ -16,11 +16,11 @@ on:
         options: [catalogue, content, admin, full]
         default: catalogue
       admin_email:
-        description: Admin email (required for admin/full)
+        description: Admin email (workflow input only — not stored as a GitHub secret)
         required: false
         type: string
       admin_password:
-        description: Admin password (required for admin/full)
+        description: Admin password (workflow input only — not stored as a GitHub secret)
         required: false
         type: string
       admin_name:
@@ -30,6 +30,9 @@ on:
 
 permissions:
   contents: read
+
+# Only AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY as GitHub secrets.
+# DATABASE_URL / DB password / Payload secrets come from AWS Secrets Manager.
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION || 'ap-south-1' }}
@@ -62,24 +65,34 @@ jobs:
       - name: Ensure secrets exist
         run: ./scripts/bootstrap-secrets.sh "${{ github.event.inputs.environment }}"
 
-      - name: Load secrets
+      - name: Sync RDS app secret (prod)
+        if: ${{ github.event.inputs.environment == 'prod' }}
+        run: |
+          chmod +x ./scripts/sync-rds-app-secret.sh
+          RDS_INSTANCE_ID=oriana-web DB_SCHEMA=oriana_invertors \
+            ./scripts/sync-rds-app-secret.sh prod
+
+      - name: Load secrets from Secrets Manager
         run: |
           ENV="${{ github.event.inputs.environment }}"
           eval "$(./scripts/load-deploy-secrets.sh "$ENV")"
 
           if [ "$DB_PASSWORD" = "CHANGE_ME_UPDATE_IN_AWS_CONSOLE" ]; then
-            echo "Update DB_PASSWORD in /oriana-invertors-web/$ENV/database before seeding"
+            echo "Update DB_PASSWORD in Secrets Manager /oriana-invertors-web/$ENV/database (QA) or run sync-rds-app-secret.sh (prod)"
             exit 1
           fi
 
           echo "::add-mask::$PAYLOAD_SECRET"
           echo "::add-mask::$DATABASE_URL"
+          echo "::add-mask::$DB_PASSWORD"
 
           {
             echo "PAYLOAD_SECRET=$PAYLOAD_SECRET"
             echo "CRON_SECRET=$CRON_SECRET"
             echo "PREVIEW_SECRET=$PREVIEW_SECRET"
             echo "DATABASE_URL=$DATABASE_URL"
+            echo "DB_SCHEMA=${DB_SCHEMA:-public}"
+            echo "PAYLOAD_DB_SCHEMA=${PAYLOAD_DB_SCHEMA:-public}"
           } >> "$GITHUB_ENV"
 
       - name: Bootstrap schema (push tables)
@@ -113,7 +126,7 @@ jobs:
         run: |
           echo "::add-mask::$ADMIN_PASSWORD"
           if [ -z "$ADMIN_EMAIL" ] || [ -z "$ADMIN_PASSWORD" ]; then
-            echo "Provide admin_email and admin_password inputs for admin/full seed"
+            echo "Provide admin_email and admin_password as workflow inputs (not GitHub secrets)"
             exit 1
           fi
           npm run seed:admin
@@ -124,3 +137,6 @@ jobs:
           echo "### Seed complete" >> "$GITHUB_STEP_SUMMARY"
           echo "- Environment: \`$ENV\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Seed type: \`${{ github.event.inputs.seed_type }}\`" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$ENV" = "prod" ]; then
+            echo "- RDS: \`oriana-web\` / schema \`oriana_invertors\`" >> "$GITHUB_STEP_SUMMARY"
+          fi

@@ -17,6 +17,8 @@ export interface DatabaseConfig {
   host: string;
   port: number;
   name: string;
+  /** Postgres schema for this app (multi-tenant on shared RDS). */
+  schema: string;
   ssl: boolean;
   /** When true, DATABASE_URL comes from Secrets Manager (QA Supabase). */
   external: boolean;
@@ -69,6 +71,7 @@ export const environmentConfigs: Record<Environment, EnvironmentConfig> = {
       host: process.env.DB_HOST || "localhost",
       port: 5432,
       name: process.env.DB_NAME || "oriana",
+      schema: process.env.DB_SCHEMA || "public",
       ssl: false,
       external: true,
     },
@@ -91,6 +94,7 @@ export const environmentConfigs: Record<Environment, EnvironmentConfig> = {
       host: process.env.DB_HOST || "",
       port: 5432,
       name: process.env.DB_NAME || "postgres",
+      schema: process.env.DB_SCHEMA || "public",
       ssl: true,
       external: true,
     },
@@ -99,7 +103,7 @@ export const environmentConfigs: Record<Environment, EnvironmentConfig> = {
     ...baseConfig,
     environment: "prod",
     stackName: `${APP}-prod`,
-    description: "Oriana Invertors Web - Production (RDS)",
+    description: "Oriana Invertors Web - Production (shared RDS oriana-web)",
     dbSecretId: `/${APP}/prod/database`,
     payloadSecretId: `/${APP}/prod/payload`,
     logRetentionDays: 90,
@@ -111,7 +115,8 @@ export const environmentConfigs: Record<Environment, EnvironmentConfig> = {
     database: {
       host: "",
       port: 5432,
-      name: process.env.DB_NAME || "oriana",
+      name: process.env.DB_NAME || "postgres",
+      schema: process.env.DB_SCHEMA || "oriana_invertors",
       ssl: true,
       external: false,
     },

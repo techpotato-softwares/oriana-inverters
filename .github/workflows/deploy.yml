@@ -9,12 +9,8 @@ on:
         type: choice
         options: [dev, qa, prod]
         default: qa
-      db_password:
-        description: Optional DB password (for first-time bootstrap)
-        required: false
-        type: string
       skip_migrate:
-        description: Skip database migrate
+        description: Skip database migrate / schema push
         required: false
         type: boolean
         default: false
@@ -25,6 +21,9 @@ permissions:
 env:
   AWS_REGION: ${{ vars.AWS_REGION || 'ap-south-1' }}
   NODE_VERSION: "22"
+
+# Only AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY are required as GitHub secrets.
+# DB passwords and Payload secrets live exclusively in AWS Secrets Manager.
 
 jobs:
   deploy:
@@ -52,6 +51,11 @@ jobs:
           fi
           echo "environment=$ENV" >> "$GITHUB_OUTPUT"
           echo "stack=oriana-invertors-web-$ENV" >> "$GITHUB_OUTPUT"
+          if [ "$ENV" = "prod" ]; then
+            echo "uses_rds=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "uses_rds=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -66,15 +70,12 @@ jobs:
           ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
           npx cdk bootstrap "aws://${ACCOUNT}/${AWS_REGION}"
 
-      - name: Bootstrap secrets
-        env:
-          DB_PASSWORD_OVERRIDE: ${{ github.event.inputs.db_password }}
-        run: |
-          if [ -n "${DB_PASSWORD_OVERRIDE:-}" ]; then echo "::add-mask::$DB_PASSWORD_OVERRIDE"; fi
-          ./scripts/bootstrap-secrets.sh "${{ steps.env.outputs.environment }}"
+      - name: Bootstrap Secrets Manager (payload; QA DB host from deploy.env)
+        run: ./scripts/bootstrap-secrets.sh "${{ steps.env.outputs.environment }}"
 
-      - name: Load secrets
-        id: secrets
+      - name: Load secrets (external DB envs)
+        id: secrets_pre
+        if: ${{ steps.env.outputs.uses_rds != 'true' }}
         run: |
           ENV="${{ steps.env.outputs.environment }}"
           eval "$(./scripts/load-deploy-secrets.sh "$ENV")"
@@ -88,6 +89,8 @@ jobs:
             echo "CRON_SECRET=$CRON_SECRET"
             echo "PREVIEW_SECRET=$PREVIEW_SECRET"
             echo "DATABASE_URL=$DATABASE_URL"
+            echo "DB_SCHEMA=${DB_SCHEMA:-public}"
+            echo "PAYLOAD_DB_SCHEMA=${PAYLOAD_DB_SCHEMA:-public}"
             echo "PAYLOAD_SECRET_PLACEHOLDER=$PAYLOAD_SECRET"
             echo "CRON_SECRET_PLACEHOLDER=$CRON_SECRET"
             echo "PREVIEW_SECRET_PLACEHOLDER=$PREVIEW_SECRET"
@@ -99,24 +102,46 @@ jobs:
             echo "db_ready=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Bootstrap schema (push tables)
-        if: ${{ github.event.inputs.skip_migrate != 'true' && steps.secrets.outputs.db_ready == 'true' }}
+      - name: Load payload secrets only (RDS envs — DB after CDK)
+        if: ${{ steps.env.outputs.uses_rds == 'true' }}
+        run: |
+          ENV="${{ steps.env.outputs.environment }}"
+          APP="${APP_NAME:-oriana-invertors-web}"
+          PAYLOAD_JSON=$(aws secretsmanager get-secret-value \
+            --secret-id "/$APP/$ENV/payload" --region "$AWS_REGION" \
+            --query SecretString --output text)
+          PAYLOAD_SECRET=$(echo "$PAYLOAD_JSON" | jq -r '.PAYLOAD_SECRET')
+          CRON_SECRET=$(echo "$PAYLOAD_JSON" | jq -r '.CRON_SECRET // empty')
+          PREVIEW_SECRET=$(echo "$PAYLOAD_JSON" | jq -r '.PREVIEW_SECRET // empty')
+          echo "::add-mask::$PAYLOAD_SECRET"
+          {
+            echo "PAYLOAD_SECRET=$PAYLOAD_SECRET"
+            echo "CRON_SECRET=$CRON_SECRET"
+            echo "PREVIEW_SECRET=$PREVIEW_SECRET"
+            echo "PAYLOAD_SECRET_PLACEHOLDER=$PAYLOAD_SECRET"
+            echo "CRON_SECRET_PLACEHOLDER=$CRON_SECRET"
+            echo "PREVIEW_SECRET_PLACEHOLDER=$PREVIEW_SECRET"
+            echo "DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/postgres"
+            echo "DB_SCHEMA=oriana_invertors"
+            echo "PAYLOAD_DB_SCHEMA=oriana_invertors"
+          } >> "$GITHUB_ENV"
+
+      - name: Bootstrap schema (external DB)
+        if: ${{ github.event.inputs.skip_migrate != 'true' && steps.env.outputs.uses_rds != 'true' && steps.secrets_pre.outputs.db_ready == 'true' }}
         working-directory: apps/cms
         env:
           NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run schema:push
 
-      # Cheap safety net: older DBs were pushed without S3, so media.prefix is missing
-      # and /api/media 500s (admin image upload hangs). Idempotent ALTER COLUMN.
-      - name: Ensure media.prefix column
-        if: ${{ steps.secrets.outputs.db_ready == 'true' }}
+      - name: Ensure media.prefix column (external DB)
+        if: ${{ steps.env.outputs.uses_rds != 'true' && steps.secrets_pre.outputs.db_ready == 'true' }}
         working-directory: apps/cms
         env:
           NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run ensure:media-prefix
 
-      - name: Ensure site settings table
-        if: ${{ steps.secrets.outputs.db_ready == 'true' }}
+      - name: Ensure site settings table (external DB)
+        if: ${{ steps.env.outputs.uses_rds != 'true' && steps.secrets_pre.outputs.db_ready == 'true' }}
         working-directory: apps/cms
         env:
           NODE_OPTIONS: "--dns-result-order=ipv4first"
@@ -129,6 +154,7 @@ jobs:
           NEXT_IMAGE_UNOPTIMIZED: 'true'
           PAYLOAD_SECRET: ${{ env.PAYLOAD_SECRET }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
+          PAYLOAD_DB_SCHEMA: ${{ env.PAYLOAD_DB_SCHEMA }}
           NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run build:next
 
@@ -141,12 +167,66 @@ jobs:
           PREVIEW_SECRET: ${{ env.PREVIEW_SECRET }}
         run: npx cdk deploy "${{ steps.env.outputs.stack }}" --require-approval never --outputs-file cdk-outputs.json
 
-      - name: Sync Lambda env with CloudFront URL
+      - name: Sync RDS app secret + create schema oriana_invertors
+        if: ${{ steps.env.outputs.uses_rds == 'true' }}
+        run: |
+          chmod +x ./scripts/sync-rds-app-secret.sh
+          RDS_INSTANCE_ID=oriana-web DB_SCHEMA=oriana_invertors \
+            ./scripts/sync-rds-app-secret.sh "${{ steps.env.outputs.environment }}"
+
+      - name: Load secrets (post-RDS)
+        id: secrets_post
+        if: ${{ steps.env.outputs.uses_rds == 'true' }}
+        run: |
+          ENV="${{ steps.env.outputs.environment }}"
+          eval "$(./scripts/load-deploy-secrets.sh "$ENV")"
+
+          echo "::add-mask::$PAYLOAD_SECRET"
+          echo "::add-mask::$DATABASE_URL"
+          echo "::add-mask::$DB_PASSWORD"
+
+          {
+            echo "PAYLOAD_SECRET=$PAYLOAD_SECRET"
+            echo "CRON_SECRET=$CRON_SECRET"
+            echo "PREVIEW_SECRET=$PREVIEW_SECRET"
+            echo "DATABASE_URL=$DATABASE_URL"
+            echo "DB_SCHEMA=${DB_SCHEMA:-oriana_invertors}"
+            echo "PAYLOAD_DB_SCHEMA=${PAYLOAD_DB_SCHEMA:-oriana_invertors}"
+          } >> "$GITHUB_ENV"
+          echo "db_ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Bootstrap schema (RDS)
+        if: ${{ github.event.inputs.skip_migrate != 'true' && steps.env.outputs.uses_rds == 'true' && steps.secrets_post.outputs.db_ready == 'true' }}
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+        run: npm run schema:push
+
+      - name: Ensure media.prefix column (RDS)
+        if: ${{ steps.env.outputs.uses_rds == 'true' && steps.secrets_post.outputs.db_ready == 'true' }}
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+        run: npm run ensure:media-prefix
+
+      - name: Ensure site settings table (RDS)
+        if: ${{ steps.env.outputs.uses_rds == 'true' && steps.secrets_post.outputs.db_ready == 'true' }}
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+        run: npm run ensure:site-settings
+
+      - name: Sync Lambda env with CloudFront URL + Secrets Manager DB
         run: |
           ENV="${{ steps.env.outputs.environment }}"
           STACK="${{ steps.env.outputs.stack }}"
           OUT=cdk/cdk-outputs.json
           FN="oriana-invertors-web-$ENV"
+
+          # Always reload DB URL from Secrets Manager so Lambda never drifts
+          eval "$(./scripts/load-deploy-secrets.sh "$ENV")"
+          echo "::add-mask::$DATABASE_URL"
+          echo "::add-mask::$PAYLOAD_SECRET"
 
           CF_URL=$(jq -r --arg s "$STACK" '.[$s] | to_entries[] | select(.key|test("CloudFrontURL")) | .value' "$OUT" 2>/dev/null | head -1)
           MEDIA_BUCKET=$(jq -r --arg s "$STACK" '.[$s] | to_entries[] | select(.key|test("MediaBucketName")) | .value' "$OUT" 2>/dev/null | head -1)
@@ -159,12 +239,12 @@ jobs:
             --arg ps "$PAYLOAD_SECRET" \
             --arg cs "$CRON_SECRET" \
             --arg prs "$PREVIEW_SECRET" \
+            --arg schema "${PAYLOAD_DB_SCHEMA:-public}" \
             --arg bucket "${MEDIA_BUCKET:-}" \
             --arg region "$AWS_REGION" \
-            '{Variables: (. + {PAYLOAD_SERVER_URL: $url, NEXT_PUBLIC_SERVER_URL: $url, DATABASE_URL: $db, PAYLOAD_SECRET: $ps, CRON_SECRET: $cs, PREVIEW_SECRET: $prs, S3_BUCKET: $bucket, S3_REGION: $region, NEXT_IMAGE_UNOPTIMIZED: "true", NEXT_TELEMETRY_DISABLED: "1", AWS_LWA_ENABLE_COMPRESSION: "false", AWS_LWA_INVOKE_MODE: "buffered", PAYLOAD_CACHE_COMPONENTS_ENABLED: "true", PG_POOL_MAX: "5", PG_CONNECT_TIMEOUT_MS: "20000", NODE_OPTIONS: "--dns-result-order=ipv4first"})}' \
+            '{Variables: (. + {PAYLOAD_SERVER_URL: $url, NEXT_PUBLIC_SERVER_URL: $url, DATABASE_URL: $db, PAYLOAD_SECRET: $ps, CRON_SECRET: $cs, PREVIEW_SECRET: $prs, PAYLOAD_DB_SCHEMA: $schema, DB_SCHEMA: $schema, S3_BUCKET: $bucket, S3_REGION: $region, NEXT_IMAGE_UNOPTIMIZED: "true", NEXT_TELEMETRY_DISABLED: "1", AWS_LWA_ENABLE_COMPRESSION: "false", AWS_LWA_INVOKE_MODE: "buffered", PAYLOAD_CACHE_COMPONENTS_ENABLED: "true", PG_POOL_MAX: "5", PG_CONNECT_TIMEOUT_MS: "20000", NODE_OPTIONS: "--dns-result-order=ipv4first"})}' \
             /tmp/env.json > /tmp/lambda-env.json
 
-          # Pass via file to avoid shell quoting issues with nested JSON
           aws lambda update-function-configuration \
             --function-name "$FN" \
             --environment file:///tmp/lambda-env.json
@@ -175,6 +255,9 @@ jobs:
             echo "### Deployed oriana-invertors-web"
             echo "- Environment: \`$ENV\`"
             echo "- Stack: \`$STACK\`"
+            if [ "$ENV" = "prod" ]; then
+              echo "- RDS: \`oriana-web\` / schema \`oriana_invertors\`"
+            fi
             if [ -n "$CF_URL" ] && [ "$CF_URL" != "null" ]; then
               echo "- CloudFront: $CF_URL"
               echo "- Admin: $CF_URL/admin"
@@ -184,11 +267,9 @@ jobs:
       - name: Sync Next.js static assets to S3
         run: |
           chmod +x ./scripts/sync-next-static-to-s3.sh
-            ENV="${{ steps.env.outputs.environment }}"
+          ENV="${{ steps.env.outputs.environment }}"
           FN="oriana-invertors-web-$ENV"
 
-          # Docker rebuilds Next inside the image, so CI .next hashes do not match.
-          # Extract the exact static tree from the deployed Lambda image.
           IMAGE_URI=$(aws lambda get-function --function-name "$FN" --query 'Code.ImageUri' --output text)
           if [ -z "$IMAGE_URI" ] || [ "$IMAGE_URI" = "None" ]; then
             echo "Lambda image URI not found; falling back to HTML scrape sync"
