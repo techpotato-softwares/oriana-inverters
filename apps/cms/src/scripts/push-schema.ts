@@ -122,7 +122,8 @@ if (process.env.NODE_ENV === 'production') {
     'NODE_ENV=production disables Payload drizzle push — forcing NODE_ENV=development for schema:push',
   )
 }
-process.env.NODE_ENV = 'development'
+// NODE_ENV is typed read-only on ProcessEnv; mutate via Object.assign for CI push.
+Object.assign(process.env, { NODE_ENV: 'development' })
 
 const attempts = Number(process.env.SCHEMA_PUSH_RETRIES || 8)
 const poolerCooldownMs = Number(process.env.SCHEMA_PUSH_COOLDOWN_MS || 8_000)
