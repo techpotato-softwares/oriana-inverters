@@ -42,17 +42,7 @@ export function ProductsMegaMenuPanel({ menu }: { menu: CatalogueNavItem[] }) {
   const active = items[activeIndex] ?? items[0]
 
   if (!active) {
-    return (
-      <div className="absolute left-0 right-0 top-full z-40 border-t border-white/40 bg-white/90 px-6 py-10 shadow-lg backdrop-blur-xl">
-        <p className="text-sm text-oriana-muted">
-          No published products yet. Add categories and products in{' '}
-          <Link href="/admin" className="font-semibold text-oriana-blue hover:underline">
-            Admin → Catalogue
-          </Link>
-          .
-        </p>
-      </div>
-    )
+    return null
   }
 
   const categoryPlaceholder = placeholderFor(active.href)
@@ -111,7 +101,13 @@ export function ProductsMegaMenuPanel({ menu }: { menu: CatalogueNavItem[] }) {
           </div>
 
           {active.products.length === 0 ? (
-            <p className="text-sm text-oriana-muted">No published models in this category yet.</p>
+            <p className="text-sm text-oriana-muted">
+              View this category for details, or{' '}
+              <Link href="/contact" className="font-semibold text-oriana-blue hover:underline">
+                contact us
+              </Link>{' '}
+              for current models.
+            </p>
           ) : (
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 lg:gap-8">
               {active.products.slice(0, 8).map((product) => {

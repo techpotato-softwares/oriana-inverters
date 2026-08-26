@@ -48,7 +48,15 @@ export default async function ProductCategoryPage({ params }: Props) {
       <section className="py-12 lg:py-16">
         <div className="container">
           {seriesList.length === 0 ? (
-            <p className="text-oriana-muted">Products coming soon for this category.</p>
+            <div className="rounded-lg border border-dashed border-oriana-navy/20 bg-oriana-surface px-8 py-12 text-center">
+              <p className="text-oriana-muted">
+                Models for this category will appear here soon. For availability and specs,{' '}
+                <Link href="/contact" className="font-semibold text-oriana-blue hover:underline">
+                  contact our team
+                </Link>
+                .
+              </p>
+            </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {seriesList.map((series) => (

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Globe, Menu, Search, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { cn } from '@/utilities/ui'
 import {
@@ -15,7 +15,6 @@ import { ProductsMegaMenuPanel } from '@/components/oriana/ProductsMegaMenu'
 import type { CatalogueNavItem } from '@/types/catalogue'
 
 export type SiteHeaderNav = {
-  hotlineLabel?: string
   localeLabel?: string
   loginLabel?: string
   loginHref?: string
@@ -94,11 +93,9 @@ function MegaMenuPanel({
 
 export function SiteHeader({
   catalogueMenu = [],
-  hotline = '+1 (800) ORIANA-1',
   nav,
 }: {
   catalogueMenu?: CatalogueNavItem[]
-  hotline?: string
   nav?: SiteHeaderNav
 }) {
   const pathname = usePathname()
@@ -112,10 +109,6 @@ export function SiteHeader({
 
   const megaMenus = nav?.megaMenus ?? defaultMegaMenus
   const primaryNav = nav?.primaryNav ?? defaultPrimaryNav
-  const hotlineLabel = nav?.hotlineLabel ?? 'Customer Hotline'
-  const localeLabel = nav?.localeLabel ?? 'USA · English'
-  const loginLabel = nav?.loginLabel ?? 'Login'
-  const loginHref = nav?.loginHref ?? '/admin'
   const whereToBuy = nav?.whereToBuy ?? { label: 'Where to Buy', href: '/where-to-buy' }
   const requestQuote = nav?.requestQuote ?? { label: 'Request Quote', href: '/contact' }
 
@@ -154,46 +147,6 @@ export function SiteHeader({
       )}
       onMouseLeave={() => setOpenMenu(null)}
     >
-      <div
-        className={cn(
-          'hidden border-b text-xs lg:block',
-          overHero
-            ? 'border-white/10 bg-transparent text-white/60'
-            : 'border-oriana-navy/6 bg-oriana-surface text-oriana-muted',
-        )}
-      >
-        <div className="container flex h-9 items-center justify-between">
-          <span>
-            {hotlineLabel}: {hotline}
-          </span>
-          <div className="flex items-center gap-5">
-            <button
-              type="button"
-              className={cn('flex items-center gap-1.5', overHero ? 'hover:text-white' : 'hover:text-oriana-blue')}
-            >
-              <Globe className="h-3.5 w-3.5" />
-              {localeLabel}
-            </button>
-            <Link
-              href="/search"
-              className={overHero ? 'hover:text-white' : 'hover:text-oriana-blue'}
-              aria-label="Search"
-            >
-              <Search className="h-3.5 w-3.5" />
-            </Link>
-            <Link
-              href={loginHref}
-              className={cn(
-                'font-semibold uppercase tracking-wide',
-                overHero ? 'hover:text-white' : 'hover:text-oriana-blue',
-              )}
-            >
-              {loginLabel}
-            </Link>
-          </div>
-        </div>
-      </div>
-
       <div className={cn('relative border-b', overHero ? 'border-white/10' : 'border-oriana-navy/8')}>
         <div className="container">
           <div className="flex h-16 items-center justify-between lg:h-[4.25rem]">

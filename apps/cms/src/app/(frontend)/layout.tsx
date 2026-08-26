@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Outfit, Plus_Jakarta_Sans } from 'next/font/google'
 import React from 'react'
 
-import { AdminBar } from '@/components/AdminBar'
 import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery'
 import { SiteAnalytics, SiteAnalyticsNoscript } from '@/components/SiteAnalytics'
 import { SiteFooter } from '@/components/oriana/SiteFooter'
@@ -12,7 +11,6 @@ import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { getCatalogueNav } from '@/utilities/getCatalogue'
 import { getHeaderNav } from '@/utilities/getMarketing'
 import { getSiteSettings } from '@/utilities/getSiteSettings'
-import { draftMode } from 'next/headers'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -55,7 +53,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { isEnabled } = await draftMode()
   const [catalogueMenu, settings, headerNav] = await Promise.all([
     getCatalogueNav(),
     getSiteSettings(),
@@ -81,12 +78,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SiteAnalyticsNoscript googleTagManagerId={settings.googleTagManagerId} />
         <Providers>
           <ChunkLoadRecovery />
-          <AdminBar
-            adminBarProps={{
-              preview: isEnabled,
-            }}
-          />
-          <SiteHeader catalogueMenu={catalogueMenu} hotline={settings.hotline} nav={headerNav} />
+          <SiteHeader catalogueMenu={catalogueMenu} nav={headerNav} />
           {children}
           <SiteFooter settings={settings} />
         </Providers>

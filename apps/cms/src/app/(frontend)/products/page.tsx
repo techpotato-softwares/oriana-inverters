@@ -70,17 +70,17 @@ export default async function ProductsPage({ searchParams }: Props) {
           {categoryCards.length === 0 ? (
             <div className="rounded-lg border border-dashed border-oriana-navy/20 bg-oriana-surface px-8 py-16 text-center">
               <h2 className="font-display text-2xl font-semibold text-oriana-navy">
-                Catalogue coming soon
+                Explore our inverter range
               </h2>
               <p className="mx-auto mt-3 max-w-lg text-sm text-oriana-muted">
-                Products and categories are managed in the CMS. Create a category, then add and
-                publish products to list them here.
+                Our product catalogue is being updated. Contact us for current models and
+                availability, or request a quote for your project.
               </p>
               <Link
-                href="/admin/collections/products"
+                href="/contact"
                 className="mt-6 inline-flex rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white hover:bg-oriana-navy"
               >
-                Open Admin → Products
+                Request a quote
               </Link>
             </div>
           ) : (
