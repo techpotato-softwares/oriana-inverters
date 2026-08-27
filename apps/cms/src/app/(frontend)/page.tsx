@@ -12,6 +12,7 @@ import {
   SupportDownloadStrip,
   WhyOrianaSection,
 } from '@/components/oriana/HomeSections'
+import { PeekStackSection } from '@/components/oriana/PeekStackSection'
 import { getHome, getCaseStudies } from '@/utilities/getMarketing'
 import type { CaseStudy } from '@/data/caseStudies'
 
@@ -131,6 +132,7 @@ export default async function HomePage() {
           href: item.href || '#',
         }))}
       />
+      <PeekStackSection />
       <ImpactStats
         eyebrow={impact?.eyebrow ?? undefined}
         title={impact?.title ?? undefined}

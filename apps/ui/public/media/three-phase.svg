@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" fill="none" role="img" aria-label="Three phase inverter">
+  <rect width="480" height="320" fill="#f4f6f9"/>
+  <rect x="90" y="50" width="300" height="220" rx="10" fill="url(#g2)" stroke="#1a428a" stroke-width="3"/>
+  <rect x="120" y="80" width="240" height="40" rx="4" fill="#0d2248" opacity="0.9"/>
+  <rect x="120" y="135" width="55" height="55" rx="4" fill="#1a428a" opacity="0.2" stroke="#1a428a"/>
+  <rect x="185" y="135" width="55" height="55" rx="4" fill="#1a428a" opacity="0.2" stroke="#1a428a"/>
+  <rect x="250" y="135" width="55" height="55" rx="4" fill="#1a428a" opacity="0.2" stroke="#1a428a"/>
+  <rect x="315" y="135" width="45" height="55" rx="4" fill="#1a428a" opacity="0.2" stroke="#1a428a"/>
+  <rect x="120" y="210" width="240" height="30" rx="3" fill="#c5d4e8"/>
+  <text x="240" y="305" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#5a6b82">ORIANA · Three Phase</text>
+  <defs>
+    <linearGradient id="g2" x1="90" y1="50" x2="390" y2="270" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e8eef6"/>
+      <stop offset="1" stop-color="#b8c9de"/>
+    </linearGradient>
+  </defs>
+</svg>

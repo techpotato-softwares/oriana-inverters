@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" fill="none" role="img" aria-label="Sustainability">
+  <rect width="640" height="480" fill="#f4f6f9"/>
+  <circle cx="520" cy="90" r="48" fill="#ffd54f" opacity="0.9"/>
+  <path d="M80 380 Q200 280 320 340 T560 300 L560 420 L80 420 Z" fill="#c8e6c9"/>
+  <path d="M0 420 L640 420 L640 480 L0 480 Z" fill="#a5d6a7"/>
+  <rect x="180" y="200" width="280" height="160" rx="8" fill="url(#sg1)" stroke="#1a428a" stroke-width="2"/>
+  <rect x="210" y="230" width="220" height="40" rx="4" fill="#0d2248" opacity="0.8"/>
+  <path d="M240 310 L280 270 L320 300 L360 250 L400 290" stroke="#4da3ff" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="280" cy="270" r="6" fill="#4da3ff"/>
+  <circle cx="360" cy="250" r="6" fill="#4da3ff"/>
+  <path d="M120 200 L140 120 L160 200 Z" fill="#2e7d32"/>
+  <path d="M460 220 L480 140 L500 220 Z" fill="#388e3c"/>
+  <path d="M300 180 L315 130 L330 180 Z" fill="#43a047"/>
+  <text x="320" y="455" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" fill="#5a6b82">Clean Energy � Sustainable Manufacturing</text>
+  <defs>
+    <linearGradient id="sg1" x1="180" y1="200" x2="460" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e8eef6"/>
+      <stop offset="1" stop-color="#c5d4e8"/>
+    </linearGradient>
+  </defs>
+</svg>
