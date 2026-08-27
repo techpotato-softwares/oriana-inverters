@@ -1,5 +1,10 @@
+import Link from 'next/link'
 import type { Metadata } from 'next'
-import { ContentPage } from '@/components/oriana/ContentPage'
+import { ArrowRight } from 'lucide-react'
+
+import { FadeIn } from '@/components/oriana/FadeIn'
+import { SustainabilitySubNav } from '@/components/oriana/sustainability/SustainabilitySubNav'
+import { strategyPillars } from '@/components/oriana/sustainability/sustainabilityData'
 import { getSustainability } from '@/utilities/getMarketing'
 
 const fallbackSections = [
@@ -52,15 +57,80 @@ export default async function SustainabilityStrategyPage() {
       : fallbackSections
 
   return (
-    <ContentPage
-      eyebrow={strategyHero?.eyebrow || 'Sustainability'}
-      title={strategyHero?.title || 'Sustainability Strategy'}
-      description={
-        strategyHero?.description ||
-        'Our roadmap to net-zero operations and responsible product lifecycle management.'
-      }
-      breadcrumb={[{ label: 'Sustainability', href: '/sustainability' }, { label: 'Strategy' }]}
-      sections={sections}
-    />
+    <main>
+      <section className="relative overflow-hidden bg-oriana-navy pt-28 lg:pt-36">
+        <div className="absolute inset-0 bg-gradient-to-b from-oriana-navy via-[#0f2f6b] to-oriana-navy" />
+        <div className="container relative pb-12 lg:pb-16">
+          <FadeIn>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">
+              {strategyHero?.eyebrow || 'Sustainability'}
+            </p>
+            <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold tracking-tight text-white md:text-5xl">
+              {strategyHero?.title || 'Sustainability Strategy'}
+            </h1>
+            {strategyHero?.description ? (
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/70">
+                {strategyHero.description}
+              </p>
+            ) : null}
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <SustainabilitySubNav className="mt-10" variant="dark" />
+          </FadeIn>
+        </div>
+      </section>
+
+      <section className="bg-white py-16 lg:py-24">
+        <div className="container">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+            {strategyPillars.map((pillar, i) => (
+              <FadeIn key={pillar.id} delay={i * 0.04}>
+                <div
+                  className="border border-oriana-navy/8 bg-oriana-silver/30 p-5"
+                  style={{ borderRadius: 16 }}
+                >
+                  <p className="font-display text-base font-semibold text-oriana-navy">
+                    {pillar.label}
+                  </p>
+                  <ul className="mt-4 space-y-2">
+                    {pillar.stats.slice(0, 2).map((stat) => (
+                      <li key={stat.label} className="text-sm text-oriana-muted">
+                        <span className="font-semibold text-oriana-blue">{stat.value}</span>
+                        <span className="block">{stat.label}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+
+          <div className="mt-16 max-w-3xl space-y-12">
+            {sections.map((section, i) => (
+              <FadeIn key={section.heading} delay={i * 0.05}>
+                <h2 className="font-display text-2xl font-semibold text-oriana-navy">
+                  {section.heading}
+                </h2>
+                <div className="mt-4 space-y-4">
+                  {section.paragraphs.map((paragraph) => (
+                    <p key={paragraph.slice(0, 40)} className="text-sm leading-relaxed text-oriana-muted">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+
+          <Link
+            href="/sustainability"
+            className="mt-12 inline-flex items-center gap-2 text-sm font-semibold text-oriana-blue hover:underline"
+          >
+            Back to overview
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+    </main>
   )
 }

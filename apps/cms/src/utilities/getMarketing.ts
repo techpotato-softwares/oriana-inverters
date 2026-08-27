@@ -2,7 +2,7 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
 
-import { megaMenus, primaryNav, type MegaMenuKey } from '@/config/navigation'
+import { mainNav, type MainNavEntry } from '@/config/navigation'
 import type { Distributor } from '@/data/distributors'
 import { slugifySeries } from '@/utilities/series'
 import type { HomeHeroSlide } from '@/types/homeHero'
@@ -35,8 +35,7 @@ export type HeaderNavView = {
   loginHref: string
   whereToBuy: { label: string; href: string }
   requestQuote: { label: string; href: string }
-  primaryNav: MegaMenuKey[]
-  megaMenus: typeof megaMenus
+  mainNav: MainNavEntry[]
 }
 
 const defaultHeaderNav: HeaderNavView = {
@@ -47,51 +46,29 @@ const defaultHeaderNav: HeaderNavView = {
   loginHref: '/admin',
   whereToBuy: { label: 'Where to Buy', href: '/where-to-buy' },
   requestQuote: { label: 'Request Quote', href: '/contact' },
-  primaryNav: [...primaryNav],
-  megaMenus: { ...megaMenus },
+  mainNav: [...mainNav],
 }
 
 async function fetchHeaderNav(): Promise<HeaderNavView> {
   try {
     const payload = await getPayload({ config: configPromise })
     const doc = await payload.findGlobal({ slug: 'header', depth: 0 })
-    if (!doc?.primaryNav?.length) return defaultHeaderNav
-
-    const menus = { ...megaMenus } as typeof megaMenus
-    const keys: MegaMenuKey[] = []
-
-    for (const item of doc.primaryNav) {
-      const key = item.key as MegaMenuKey
-      if (!key || !(key in megaMenus)) continue
-      keys.push(key)
-      menus[key] = {
-        label: item.label || megaMenus[key].label,
-        columns: (item.columns || []).map((col) => ({
-          title: col.title || '',
-          href: col.href || undefined,
-          links: (col.links || [])
-            .filter((l): l is { label: string; href: string } => Boolean(l?.label && l?.href))
-            .map((l) => ({ label: l.label!, href: l.href! })),
-        })),
-      }
-    }
 
     return {
-      hotlineLabel: doc.hotlineLabel || defaultHeaderNav.hotlineLabel,
-      localeLabel: doc.localeLabel || defaultHeaderNav.localeLabel,
-      searchLabel: doc.searchLabel || defaultHeaderNav.searchLabel,
-      loginLabel: doc.loginLabel || defaultHeaderNav.loginLabel,
-      loginHref: doc.loginHref || defaultHeaderNav.loginHref,
+      hotlineLabel: doc?.hotlineLabel || defaultHeaderNav.hotlineLabel,
+      localeLabel: doc?.localeLabel || defaultHeaderNav.localeLabel,
+      searchLabel: doc?.searchLabel || defaultHeaderNav.searchLabel,
+      loginLabel: doc?.loginLabel || defaultHeaderNav.loginLabel,
+      loginHref: doc?.loginHref || defaultHeaderNav.loginHref,
       whereToBuy: {
-        label: doc.whereToBuy?.label || defaultHeaderNav.whereToBuy.label,
-        href: doc.whereToBuy?.href || defaultHeaderNav.whereToBuy.href,
+        label: doc?.whereToBuy?.label || defaultHeaderNav.whereToBuy.label,
+        href: doc?.whereToBuy?.href || defaultHeaderNav.whereToBuy.href,
       },
       requestQuote: {
-        label: doc.requestQuote?.label || defaultHeaderNav.requestQuote.label,
-        href: doc.requestQuote?.href || defaultHeaderNav.requestQuote.href,
+        label: doc?.requestQuote?.label || defaultHeaderNav.requestQuote.label,
+        href: doc?.requestQuote?.href || defaultHeaderNav.requestQuote.href,
       },
-      primaryNav: keys.length ? keys : defaultHeaderNav.primaryNav,
-      megaMenus: menus,
+      mainNav: defaultHeaderNav.mainNav,
     }
   } catch (error) {
     console.error('[getHeaderNav] failed:', error)

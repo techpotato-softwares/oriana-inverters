@@ -39,10 +39,11 @@ export const footerNav = [
   {
     title: 'About Us',
     links: [
-      { label: 'Brand Story', href: '/about' },
+      { label: 'About ORIANA', href: '/about' },
       { label: 'News & Media', href: '/posts' },
-      { label: 'Careers', href: '/careers' },
-      { label: 'Contact Oriana', href: '/contact' },
+      { label: 'Oriana Foundation', href: '/about/foundation' },
+      { label: 'Career', href: '/careers' },
+      { label: 'Contact Us', href: '/contact' },
     ],
   },
 ] as const

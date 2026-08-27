@@ -7,11 +7,14 @@ import { motion, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight,
   Award,
+  Building2,
   Globe2,
   Headphones,
   Leaf,
+  MapPin,
   Microscope,
   ShieldCheck,
+  Zap,
 } from 'lucide-react'
 import { caseStudies, type CaseStudy } from '@/data/caseStudies'
 import type { HomeHeroSlide } from '@/types/homeHero'
@@ -344,24 +347,29 @@ export function StrategiesSection({
 
 const impactStats = [
   {
-    icon: Globe2,
-    value: '25+',
-    label: 'Countries served',
+    icon: Award,
+    value: '10+',
+    label: 'Solar industry project experience',
   },
   {
-    icon: Award,
-    value: '1M+',
-    label: 'Converters installed',
+    icon: MapPin,
+    value: 'PAN India',
+    label: 'Market presence',
+  },
+  {
+    icon: Zap,
+    value: 'GW+',
+    label: 'Inverter distribution & experience',
+  },
+  {
+    icon: Building2,
+    value: '500+',
+    label: 'Channel & service partners',
   },
   {
     icon: Leaf,
     value: '99.6%',
-    label: 'Peak efficiency',
-  },
-  {
-    icon: Microscope,
-    value: '3',
-    label: 'Global R&D centers',
+    label: 'Peak conversion efficiency',
   },
 ]
 
@@ -370,6 +378,11 @@ const impactIconByKey = {
   award: Award,
   leaf: Leaf,
   microscope: Microscope,
+  building: Building2,
+  map: MapPin,
+  zap: Zap,
+  shield: ShieldCheck,
+  headphones: Headphones,
 } as const
 
 type ImpactStatItem = {
@@ -385,11 +398,13 @@ function resolveImpactIcon(iconKey: string) {
 export function ImpactStats({
   eyebrow,
   title,
+  body,
   link,
   stats,
 }: {
   eyebrow?: string
   title?: string
+  body?: string
   link?: { label: string; href: string }
   stats?: ImpactStatItem[]
 } = {}) {
@@ -405,42 +420,51 @@ export function ImpactStats({
   const resolvedLink = link || { label: 'Discover who we are', href: '/about' }
 
   return (
-    <section className="relative overflow-hidden border-y border-oriana-navy/6 bg-oriana-surface py-16 lg:py-20">
+    <section className="bg-white py-16 lg:py-24">
       <div className="container">
         <FadeIn>
-          <div className="mb-12 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-            <div className="max-w-xl">
+          <div className="mx-auto max-w-4xl text-center">
+            {eyebrow ? (
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
-                {eyebrow || 'Global footprint'}
+                {eyebrow}
               </p>
-              <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
-                {title || 'Built for international partners'}
-              </h2>
-            </div>
-            <Link
-              href={resolvedLink.href}
-              className="inline-flex items-center gap-2 text-sm font-semibold text-oriana-blue transition hover:gap-3"
-            >
-              {resolvedLink.label}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+            ) : null}
+            <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl lg:text-5xl">
+              {title || 'Our Impact'}
+            </h2>
+            {body ? (
+              <p className="mt-6 text-base leading-relaxed text-oriana-muted md:text-lg">{body}</p>
+            ) : null}
           </div>
         </FadeIn>
 
-        <Stagger className="grid grid-cols-2 gap-8 lg:grid-cols-4 lg:gap-6">
+        <Stagger className="mt-14 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:mt-16 lg:grid-cols-5 lg:gap-8">
           {resolved.map((stat) => (
             <StaggerItem key={stat.label}>
-              <div className="relative">
-                <stat.icon className="h-7 w-7 stroke-[1.4] text-oriana-blue" aria-hidden />
+              <div className="flex flex-col items-center text-center">
+                <stat.icon className="h-10 w-10 stroke-[1.3] text-oriana-sky" aria-hidden />
                 <AnimatedCounter
                   value={stat.value}
-                  className="mt-5 block font-display text-4xl font-semibold tracking-tight text-oriana-navy md:text-5xl"
+                  className="mt-5 block font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl"
                 />
-                <p className="mt-2 text-sm text-oriana-muted">{stat.label}</p>
+                <p className="mt-3 max-w-[12rem] text-sm leading-snug text-oriana-muted">
+                  {stat.label}
+                </p>
               </div>
             </StaggerItem>
           ))}
         </Stagger>
+
+        <FadeIn delay={0.15}>
+          <div className="mt-14 flex justify-center lg:mt-16">
+            <Link
+              href={resolvedLink.href}
+              className="inline-flex min-w-[14rem] items-center justify-center rounded-full border-2 border-oriana-blue px-8 py-3.5 text-sm font-semibold text-oriana-blue transition hover:bg-oriana-blue hover:text-white md:text-base"
+            >
+              {resolvedLink.label}
+            </Link>
+          </div>
+        </FadeIn>
       </div>
     </section>
   )

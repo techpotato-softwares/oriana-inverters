@@ -4,14 +4,7 @@ import { authenticated } from '@/access/authenticated'
 import { simpleLinkFields } from '@/fields/simpleLink'
 import { revalidateHeader } from '@/Header/hooks/revalidateHeader'
 
-const megaMenuKeys = [
-  { label: 'About Us', value: 'about' },
-  { label: 'For Home', value: 'home' },
-  { label: 'For Business', value: 'business' },
-  { label: 'For Utility', value: 'utility' },
-  { label: 'Products', value: 'products' },
-  { label: 'Service & Support', value: 'support' },
-]
+const megaMenuKeys = [{ label: 'Products', value: 'products' }]
 
 export const Header: GlobalConfig = {
   slug: 'header',

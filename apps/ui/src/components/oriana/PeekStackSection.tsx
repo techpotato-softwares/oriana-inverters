@@ -47,7 +47,7 @@ const PEEK_CARDS: PeekCard[] = [
       'String and central architectures for parks that need bankable performance and live visibility.',
     href: '/solutions/utility',
     image:
-      'https://images.unsplash.com/photo-1466611653911-950815379e85?auto=format&fit=crop&w=1920&q=80',
+      'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1920&q=80',
     video: 'https://videos.pexels.com/video-files/2491284/2491284-hd_1920_1080_25fps.mp4',
     accent: '#f5b942',
   },

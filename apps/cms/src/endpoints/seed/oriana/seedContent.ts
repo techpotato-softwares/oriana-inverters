@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 
 import { caseStudies } from '@/data/caseStudies'
 import { staticDistributors } from '@/data/distributors'
-import { megaMenus, primaryNav } from '@/config/navigation'
+import { mainNav, megaMenus } from '@/config/navigation'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -250,15 +250,17 @@ export async function seedOrianaContent({
       loginHref: '/contact',
       whereToBuy: { label: 'Where to Buy', href: '/where-to-buy' },
       requestQuote: { label: 'Request a Quote', href: '/contact' },
-      primaryNav: primaryNav.map((key) => ({
-        key,
-        label: megaMenus[key].label,
-        columns: megaMenus[key].columns.map((col) => ({
-          title: col.title,
-          href: col.href || undefined,
-          links: col.links,
-        })),
-      })),
+      primaryNav: [
+        {
+          key: 'products',
+          label: megaMenus.products.label,
+          columns: megaMenus.products.columns.map((col) => ({
+            title: col.title,
+            href: col.href || undefined,
+            links: col.links,
+          })),
+        },
+      ],
       _status: 'published',
     } as never,
     overrideAccess: true,
@@ -332,14 +334,15 @@ export async function seedOrianaContent({
         ],
       },
       impactSection: {
-        eyebrow: 'Global footprint',
-        title: 'Built for international partners',
+        title: 'Our Impact',
+        body: 'As a trusted solar inverter brand, we are committed to powering India\'s clean energy transition through advanced technology, nationwide reach, and exceptional customer support.',
         link: { label: 'Discover who we are', href: '/about' },
         stats: [
-          { iconKey: 'globe', value: '25+', label: 'Countries served' },
-          { iconKey: 'award', value: '1M+', label: 'Converters installed' },
-          { iconKey: 'leaf', value: '99.6%', label: 'Peak efficiency' },
-          { iconKey: 'microscope', value: '3', label: 'Global R&D centers' },
+          { iconKey: 'award', value: '10+', label: 'Solar industry project experience' },
+          { iconKey: 'map', value: 'PAN India', label: 'Market presence' },
+          { iconKey: 'zap', value: 'GW+', label: 'Inverter distribution & experience' },
+          { iconKey: 'building', value: '500+', label: 'Channel & service partners' },
+          { iconKey: 'leaf', value: '99.6%', label: 'Peak conversion efficiency' },
         ],
       },
       whySection: {

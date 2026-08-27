@@ -5,16 +5,217 @@ import { getPayload } from 'payload'
 import {
   CaseStudiesSection,
   GlobalReachSection,
-  HomeHero,
   ImpactStats,
   NewsEventsSection,
-  StrategiesSection,
   SupportDownloadStrip,
-  WhyOrianaSection,
 } from '@/components/oriana/HomeSections'
-import { PeekStackSection } from '@/components/oriana/PeekStackSection'
+import { FollowOrianaSection } from '@/components/oriana/FollowOrianaSection'
+import { GreenMissionSection } from '@/components/oriana/GreenMissionSection'
+import { PeekStackImages } from '@/components/oriana/PeekStackImages'
+import { ProductCategoriesSection } from '@/components/oriana/ProductCategoriesSection'
+import { VideoHero } from '@/components/oriana/VideoHero'
+import { VisionMissionSection } from '@/components/oriana/VisionMissionSection'
+import { WhyChooseOrianaSection } from '@/components/oriana/WhyChooseOrianaSection'
 import { getHome, getCaseStudies } from '@/utilities/getMarketing'
 import type { CaseStudy } from '@/data/caseStudies'
+
+const HOME_VIDEO_HERO = {
+  videoSrc: '/assets/clone/hero-dummy.mp4',
+  posterSrc:
+    'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=1920&q=80',
+  captions: [
+    'Clean power that crosses borders',
+    'To power that transforms businesses',
+    'Energy platforms partners trust',
+  ],
+}
+
+const HOME_PEEK_IMAGES = [
+  {
+    id: 'home',
+    title: 'For Home',
+    href: '/solutions/residential',
+    image:
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80',
+  },
+  {
+    id: 'business',
+    title: 'For Business',
+    href: '/solutions/commercial',
+    image:
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80',
+  },
+  {
+    id: 'utility',
+    title: 'For Utility',
+    href: '/solutions/utility',
+    image:
+     'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80',
+  },
+  {
+    id: 'storage',
+    title: 'For Storage',
+    href: '/solutions/storage',
+    image:
+      'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1920&q=80',
+  },
+]
+
+const HOME_VISION_MISSION = [
+  {
+    id: 'vision',
+    label: 'Our Vision',
+    body: 'To become a globally trusted solar inverter brand, powering a smarter, cleaner, and more sustainable energy future.',
+    image:
+      'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1920&q=80',
+    href: '/about',
+    ctaLabel: 'Explore more',
+  },
+  {
+    id: 'mission',
+    label: 'Our Mission',
+    body: 'To deliver innovative, reliable, and high-performance solar inverters through advanced technology, precision manufacturing, and exceptional customer service.',
+    image:
+      'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1920&q=80',
+    href: '/about',
+    ctaLabel: 'Explore more',
+  },
+]
+
+const HOME_IMPACT = {
+  title: 'Our Impact',
+  body: 'As a trusted solar inverter brand, we are committed to powering India\'s clean energy transition through advanced technology, nationwide reach, and exceptional customer support.',
+  link: { label: 'Discover who we are', href: '/about' },
+  stats: [
+    { iconKey: 'award', value: '10+', label: 'Solar industry project experience' },
+    { iconKey: 'map', value: 'PAN India', label: 'Market presence' },
+    { iconKey: 'zap', value: 'GW+', label: 'Inverter distribution & experience' },
+    { iconKey: 'building', value: '500+', label: 'Channel & service partners' },
+    { iconKey: 'leaf', value: '99.6%', label: 'Peak conversion efficiency' },
+  ],
+}
+
+const HOME_PRODUCT_CATEGORIES = [
+  {
+    id: 'residential',
+    label: 'Residential Inverters',
+    href: '/products/category/residential-grid-tied',
+    image:
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Residential rooftop solar installation',
+  },
+  {
+    id: 'commercial',
+    label: 'Commercial & Industrial Inverters',
+    href: '/products/category/ci-grid-tied',
+    image:
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Commercial building with solar power',
+  },
+  {
+    id: 'utility',
+    label: 'Utility-Scale Inverters',
+    href: '/products/category/utility-grid-tied',
+    image:
+      'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Utility-scale solar farm',
+  },
+  {
+    id: 'bess',
+    label: 'BESS',
+    href: '/products/category/ci-hybrid',
+    image:
+      'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Battery energy storage system',
+  },
+]
+
+const HOME_WHY_CHOOSE = {
+  title: 'Why Choose Oriana Inverters?',
+  body: 'Oriana Inverters brings together advanced power electronics, intelligent technology, and precision engineering to deliver reliable solar power solutions for homes, businesses, and large-scale applications.',
+  cards: [
+    {
+      id: 'expertise',
+      title: 'Solar Industry Expertise',
+      href: '/about',
+      image:
+        'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1400&q=80',
+      alt: 'Solar industry expertise',
+    },
+    {
+      id: 'ai-tech',
+      title: 'AI Technology Driven',
+      href: '/about',
+      image:
+        'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1400&q=80',
+      alt: 'AI technology driven solutions',
+    },
+    {
+      id: 'quality',
+      title: 'Quality Focused',
+      href: '/about/certifications',
+      image:
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1400&q=80',
+      alt: 'Quality focused manufacturing',
+    },
+    {
+      id: 'application',
+      title: 'Application Focused',
+      href: '/products',
+      image:
+        'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1400&q=80',
+      alt: 'Application focused solar solutions',
+    },
+    {
+      id: 'service',
+      title: 'Professional Service',
+      href: '/support',
+      image:
+        'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1400&q=80',
+      alt: 'Professional customer service',
+    },
+  ],
+}
+
+const HOME_GREEN_MISSION = {
+  title: 'Green Mission. Greener World',
+  image:
+    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1920&q=80',
+  alt: 'Lush green landscape representing sustainability',
+  href: '/sustainability',
+  ctaLabel: 'Explore more',
+}
+
+const HOME_FOLLOW_ORIANA = {
+  title: 'Follow Oriana Inverter',
+  links: [
+    {
+      platform: 'linkedin' as const,
+      label: 'LinkedIn',
+      href: 'https://www.linkedin.com/company/oriana-inverters',
+    },
+    {
+      platform: 'instagram' as const,
+      label: 'Instagram',
+      href: 'https://www.instagram.com/orianainverters',
+    },
+    {
+      platform: 'facebook' as const,
+      label: 'Facebook',
+      href: 'https://www.facebook.com/orianainverters',
+    },
+    {
+      platform: 'x' as const,
+      label: 'X',
+      href: 'https://x.com/orianainverters',
+    },
+    {
+      platform: 'youtube' as const,
+      label: 'YouTube',
+      href: 'https://www.youtube.com/@orianainverters',
+    },
+  ],
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const { home } = await getHome()
@@ -27,7 +228,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const { home, heroSlides } = await getHome()
+  const { home } = await getHome()
   const caseStudyDocs = await getCaseStudies()
 
   let livePosts: { title: string; slug: string; publishedAt?: string | null }[] = []
@@ -47,10 +248,6 @@ export default async function HomePage() {
     }
   }
 
-  const fallbackHero = home?.fallbackHero
-  const strategies = home?.strategiesSection
-  const impact = home?.impactSection
-  const why = home?.whySection
   const reach = home?.reachSection
   const news = home?.newsSection
   const support = home?.supportStrip
@@ -98,63 +295,24 @@ export default async function HomePage() {
 
   return (
     <main className="bg-white">
-      <HomeHero
-        slides={heroSlides}
-        fallback={
-          fallbackHero
-            ? {
-                eyebrow: fallbackHero.eyebrow || 'Oriana',
-                headline: fallbackHero.headline || 'Clean power that crosses borders',
-                subheadline:
-                  fallbackHero.subheadline ||
-                  'High-efficiency inverters and storage platforms for homes, industry, and utility grids.',
-                primaryCta: {
-                  label: fallbackHero.primaryCta?.label || 'Explore solutions',
-                  href: fallbackHero.primaryCta?.href || '/solutions/residential',
-                },
-                secondaryCta: {
-                  label: fallbackHero.secondaryCta?.label || 'Become a partner',
-                  href: fallbackHero.secondaryCta?.href || '/contact',
-                },
-              }
-            : undefined
-        }
-      />
-      <StrategiesSection
-        eyebrow={strategies?.eyebrow ?? undefined}
-        title={strategies?.title ?? undefined}
-        intro={strategies?.intro ?? undefined}
-        items={strategies?.items?.map((item) => ({
-          id: item.idKey || item.label || '',
-          label: item.label || '',
-          title: item.title || '',
-          description: item.description || '',
-          href: item.href || '#',
-        }))}
-      />
-      <PeekStackSection />
+      <VideoHero {...HOME_VIDEO_HERO} />
+      <PeekStackImages images={HOME_PEEK_IMAGES} ariaLabel="Customer scenarios" />
+      <VisionMissionSection cards={HOME_VISION_MISSION} />
       <ImpactStats
-        eyebrow={impact?.eyebrow ?? undefined}
-        title={impact?.title ?? undefined}
-        link={impact?.link?.href ? { label: impact.link.label || '', href: impact.link.href } : undefined}
-        stats={impact?.stats?.map((s) => ({
-          iconKey: s.iconKey || 'globe',
-          value: s.value || '',
-          label: s.label || '',
-        }))}
+        title={HOME_IMPACT.title}
+        body={HOME_IMPACT.body}
+        link={HOME_IMPACT.link}
+        stats={HOME_IMPACT.stats}
       />
-      <WhyOrianaSection
-        eyebrow={why?.eyebrow ?? undefined}
-        title={why?.title ?? undefined}
-        body={why?.body ?? undefined}
-        items={why?.items?.map((item) => ({
-          iconKey: item.iconKey || 'shield',
-          title: item.title || '',
-          copy: item.copy || '',
-          href: item.href || '#',
-        }))}
+      <ProductCategoriesSection categories={HOME_PRODUCT_CATEGORIES} />
+      <WhyChooseOrianaSection
+        title={HOME_WHY_CHOOSE.title}
+        body={HOME_WHY_CHOOSE.body}
+        cards={HOME_WHY_CHOOSE.cards}
       />
-      <GlobalReachSection
+      <GreenMissionSection {...HOME_GREEN_MISSION} />
+      <FollowOrianaSection title={HOME_FOLLOW_ORIANA.title} links={HOME_FOLLOW_ORIANA.links} />
+      {/* <GlobalReachSection
         eyebrow={reach?.eyebrow ?? undefined}
         title={reach?.title ?? undefined}
         body={reach?.body ?? undefined}
@@ -170,14 +328,14 @@ export default async function HomePage() {
             : undefined
         }
         studies={studies}
-      />
+      /> */}
       <NewsEventsSection
         eyebrow={news?.eyebrow ?? undefined}
         title={news?.title ?? undefined}
         link={news?.link?.href ? { label: news.link.label || '', href: news.link.href } : undefined}
         items={newsItems}
       />
-      <SupportDownloadStrip
+      {/* <SupportDownloadStrip
         hotlineNote={support?.hotlineNote ?? undefined}
         downloads={support?.downloads
           ?.filter((d): d is { label: string; href: string } => Boolean(d?.label && d?.href))
@@ -192,7 +350,7 @@ export default async function HomePage() {
               }
             : undefined
         }
-      />
+      /> */}
     </main>
   )
 }

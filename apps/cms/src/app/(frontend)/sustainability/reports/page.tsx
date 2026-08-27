@@ -1,7 +1,12 @@
 import Link from 'next/link'
-import { FileText } from 'lucide-react'
-import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
-import { PageHero } from '@/components/oriana/PageHero'
+import { Download } from 'lucide-react'
+
+import { FadeIn } from '@/components/oriana/FadeIn'
+import { SustainabilitySubNav } from '@/components/oriana/sustainability/SustainabilitySubNav'
+import {
+  fallbackPolicies,
+  fallbackReports,
+} from '@/components/oriana/sustainability/sustainabilityData'
 import { getSustainabilityReports } from '@/utilities/getMarketing'
 import type { Media, SustainabilityReport } from '@/payload-types'
 
@@ -14,14 +19,6 @@ export const metadata = {
   description: 'Oriana sustainability reports, environmental policies, and compliance documents.',
 }
 
-const fallbackReports = [
-  { title: '2025 ESG & Sustainability Report', year: '2025', size: '4.8 MB', href: '/resources/downloads' },
-  { title: 'Environmental Policy', year: '2024', size: '620 KB', href: '/resources/downloads' },
-  { title: 'Supplier Code of Conduct', year: '2024', size: '480 KB', href: '/resources/downloads' },
-  { title: 'Conflict Minerals Statement', year: '2025', size: '310 KB', href: '/resources/downloads' },
-  { title: 'ISO 14001 Certificate', year: '2024', size: '520 KB', href: '/resources/downloads' },
-]
-
 export default async function SustainabilityReportsPage() {
   const docs = (await getSustainabilityReports()) as SustainabilityReport[]
   const reports =
@@ -31,23 +28,42 @@ export default async function SustainabilityReportsPage() {
           year: doc.year,
           size: doc.size || '',
           href: mediaUrl(doc.file) || doc.externalUrl || '/resources/downloads',
+          tag: 'Enterprise',
         }))
-      : fallbackReports
+      : fallbackReports.map((r) => ({ ...r, size: 'PDF' }))
+
+  const policies = fallbackPolicies.map((p) => ({ ...p, size: 'PDF' }))
 
   return (
     <main>
-      <PageHero
-        eyebrow="Sustainability"
-        title="Reports & Policies"
-        description="Download our latest environmental, social, and governance disclosures."
-      />
-      <Breadcrumbs
-        items={[{ label: 'Sustainability', href: '/sustainability' }, { label: 'Reports' }]}
-      />
+      <section className="relative overflow-hidden bg-oriana-navy pt-28 lg:pt-36">
+        <div className="absolute inset-0 bg-gradient-to-b from-oriana-navy via-[#0f2f6b] to-oriana-navy" />
+        <div className="container relative pb-12 lg:pb-16">
+          <FadeIn>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">
+              Sustainability
+            </p>
+            <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold tracking-tight text-white md:text-5xl">
+              Reports &amp; Policies
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/70">
+              Download our latest environmental, social, and governance disclosures.
+            </p>
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <SustainabilitySubNav className="mt-10" variant="dark" />
+          </FadeIn>
+        </div>
+      </section>
 
-      <section className="py-12 lg:py-16">
-        <div className="container max-w-2xl">
-          <ul className="divide-y divide-oriana-navy/8 border border-oriana-navy/8 bg-white">
+      <section className="bg-white py-16 lg:py-24">
+        <div className="container">
+          <FadeIn>
+            <h2 className="font-display text-2xl font-semibold text-oriana-navy">
+              Sustainability Reports
+            </h2>
+          </FadeIn>
+          <ul className="mt-8 divide-y divide-oriana-navy/8 border border-oriana-navy/8 bg-white">
             {reports.map((doc) => (
               <li key={doc.title}>
                 <Link
@@ -57,16 +73,49 @@ export default async function SustainabilityReportsPage() {
                     ? { target: '_blank', rel: 'noopener noreferrer' }
                     : {})}
                 >
-                  <div className="flex items-start gap-3">
-                    <FileText className="mt-0.5 h-5 w-5 shrink-0 text-oriana-blue" />
-                    <div>
-                      <p className="font-medium text-oriana-navy">{doc.title}</p>
-                      <p className="mt-0.5 text-xs text-oriana-muted">
-                        {[doc.year, 'PDF', doc.size].filter(Boolean).join(' · ')}
-                      </p>
-                    </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-oriana-blue">
+                      {doc.tag}
+                    </p>
+                    <p className="mt-1 font-medium text-oriana-navy">{doc.title}</p>
+                    <p className="mt-0.5 text-xs text-oriana-muted">
+                      {[doc.year, 'PDF', doc.size].filter(Boolean).join(' · ')}
+                    </p>
                   </div>
-                  <span className="text-sm text-oriana-blue">Download</span>
+                  <span className="inline-flex items-center gap-1 text-sm text-oriana-blue">
+                    <Download className="h-4 w-4" />
+                    Download
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <FadeIn delay={0.05}>
+            <h2 className="mt-16 font-display text-2xl font-semibold text-oriana-navy">
+              Sustainability Policies
+            </h2>
+          </FadeIn>
+          <ul className="mt-8 divide-y divide-oriana-navy/8 border border-oriana-navy/8 bg-white">
+            {policies.map((doc) => (
+              <li key={doc.title}>
+                <Link
+                  href={doc.href}
+                  className="flex items-center justify-between gap-4 px-6 py-5 transition hover:bg-oriana-silver/40"
+                >
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-oriana-blue">
+                      {doc.tag}
+                    </p>
+                    <p className="mt-1 font-medium text-oriana-navy">{doc.title}</p>
+                    <p className="mt-0.5 text-xs text-oriana-muted">
+                      {[doc.year, 'PDF', doc.size].filter(Boolean).join(' · ')}
+                    </p>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-sm text-oriana-blue">
+                    <Download className="h-4 w-4" />
+                    Download
+                  </span>
                 </Link>
               </li>
             ))}

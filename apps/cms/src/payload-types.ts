@@ -2765,7 +2765,7 @@ export interface Header {
    */
   primaryNav?:
     | {
-        key: 'about' | 'home' | 'business' | 'utility' | 'products' | 'support';
+        key: 'products';
         label: string;
         columns?:
           | {
