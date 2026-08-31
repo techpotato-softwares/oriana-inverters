@@ -1,9 +1,15 @@
 import type { Category, Download, Media, Product } from '@/payload-types'
-import type { CatalogueCategory, CatalogueDownload, CatalogueProduct } from '@/types/catalogue'
+import { slugifyLabel } from '@/data/productMaster'
+import type {
+  CatalogueCategory,
+  CatalogueDownload,
+  CatalogueProduct,
+  CatalogueSegmentImage,
+} from '@/types/catalogue'
 
 const segmentLabels: Record<string, string> = {
   residential: 'Residential',
-  commercial: 'Commercial & Industrial',
+  commercial: 'C&I',
   utility: 'Utility-Scale',
   storage: 'Energy Storage',
 }
@@ -19,15 +25,32 @@ const documentTypeLabels: Record<string, string> = {
 
 function mediaUrl(media?: number | Media | null): string | null {
   if (!media || typeof media === 'number') return null
-  return media.url ?? null
+  const url = media.url?.trim()
+  if (!url) return null
+  if (/^https?:\/\//i.test(url) || url.startsWith('/')) return url
+  return `/${url}`
 }
 
 export function mapCategory(doc: Category): CatalogueCategory {
+  const segments: CatalogueSegmentImage[] =
+    doc.segments?.flatMap((segment) => {
+      if (!segment?.name) return []
+      return [
+        {
+          name: segment.name,
+          slug: segment.slug?.trim() || slugifyLabel(segment.name),
+          imageUrl: mediaUrl(segment.image),
+        },
+      ]
+    }) ?? []
+
   return {
     slug: doc.slug,
     title: doc.title,
     description: doc.description ?? '',
     sortOrder: doc.sortOrder ?? 100,
+    imageUrl: mediaUrl(doc.image),
+    segments,
   }
 }
 
@@ -50,7 +73,7 @@ export function mapProduct(doc: Product): CatalogueProduct {
     slug: doc.slug,
     name: doc.name,
     category: categoryDoc?.title ?? 'Inverter',
-    categorySlug: categoryDoc?.slug ?? 'residential-grid-tied',
+    categorySlug: categoryDoc?.slug ?? 'on-grid-inverters',
     segment: segmentLabels[doc.segment ?? ''] ?? 'Residential',
     segmentKey: (doc.segment ?? 'residential') as CatalogueProduct['segmentKey'],
     powerRange: doc.powerRange ?? '—',

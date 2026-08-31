@@ -2,55 +2,111 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
-import { ProductImage } from '@/components/oriana/ProductImage'
+import { ProductSeriesSections } from '@/components/oriana/ProductSeriesSections'
+import {
+  segmentLabelForSlug,
+  seriesMatchesSegment,
+} from '@/data/productMaster'
+import { seriesToCatalogueCard } from '@/utilities/allProductsCatalogue'
 import {
   getCategoryMeta,
   getSeriesByCategory,
 } from '@/utilities/getCatalogue'
 
-type Props = { params: Promise<{ slug: string }> }
+type Props = {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ segment?: string }>
+}
 
 export const dynamic = 'force-dynamic'
 
 /** Old catalogue slugs → Excel product-family slugs */
 const legacyCategorySlugs: Record<string, string> = {
-  'single-phase': 'residential-grid-tied',
-  'three-phase': 'ci-grid-tied',
-  'utility-scale': 'utility-grid-tied',
-  'energy-storage': 'residential-hybrid',
-  accessories: 'ci-grid-tied',
+  'single-phase': 'on-grid-inverters',
+  'three-phase': 'on-grid-inverters',
+  'utility-scale': 'utility-scale-inverters',
+  'energy-storage': 'hybrid-inverters',
+  accessories: 'on-grid-inverters',
+  'residential-grid-tied': 'on-grid-inverters',
+  'ci-grid-tied': 'on-grid-inverters',
+  'utility-grid-tied': 'utility-scale-inverters',
+  'residential-hybrid': 'hybrid-inverters',
+  'ci-hybrid': 'hybrid-inverters',
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params, searchParams }: Props) {
   const { slug } = await params
+  const { segment } = await searchParams
   const resolved = legacyCategorySlugs[slug] ?? slug
   const meta = await getCategoryMeta(resolved)
   if (!meta) return {}
+  const segmentLabel = segment ? segmentLabelForSlug(resolved, segment) : null
+  if (segmentLabel) {
+    return {
+      title: `${segmentLabel} · ${meta.title}`,
+      description: meta.description,
+    }
+  }
   return { title: meta.title, description: meta.description }
 }
 
-export default async function ProductCategoryPage({ params }: Props) {
+export default async function ProductCategoryPage({ params, searchParams }: Props) {
   const { slug } = await params
+  const { segment } = await searchParams
   if (legacyCategorySlugs[slug]) {
-    redirect(`/products/category/${legacyCategorySlugs[slug]}`)
+    const next = segment
+      ? `/products/category/${legacyCategorySlugs[slug]}?segment=${encodeURIComponent(segment)}`
+      : `/products/category/${legacyCategorySlugs[slug]}`
+    redirect(next)
   }
 
   const meta = await getCategoryMeta(slug)
   if (!meta) notFound()
 
-  const seriesList = await getSeriesByCategory(slug)
+  const allSeries = await getSeriesByCategory(slug)
+  const segmentLabel = segment ? segmentLabelForSlug(slug, segment) : null
+  const seriesList =
+    segment && segmentLabel
+      ? allSeries.filter((series) => seriesMatchesSegment(series, slug, segment))
+      : allSeries
 
   return (
     <main>
-      <PageHero eyebrow="Inverters" title={meta.title} description={meta.description} />
-      <Breadcrumbs items={[{ label: 'Inverters', href: '/products' }, { label: meta.title }]} />
+      <PageHero
+        eyebrow="Inverters"
+        title={segmentLabel ? `${meta.title} · ${segmentLabel}` : meta.title}
+        description={
+          segmentLabel
+            ? `${segmentLabel} products in the ${meta.title} range.`
+            : meta.description
+        }
+      />
+      <Breadcrumbs
+        items={[
+          { label: 'Inverters', href: '/products' },
+          {
+            label: meta.title,
+            href: segmentLabel ? `/products/category/${slug}` : undefined,
+          },
+          ...(segmentLabel ? [{ label: segmentLabel }] : []),
+        ]}
+      />
 
-      <section className="py-12 lg:py-16">
+      <section className="bg-oriana-surface py-12 lg:py-16">
         <div className="container">
+          {segmentLabel ? (
+            <p className="mb-8 text-sm text-oriana-muted">
+              Showing {segmentLabel}.{' '}
+              <Link href={`/products/category/${slug}`} className="font-semibold text-oriana-blue hover:underline">
+                View all {meta.title}
+              </Link>
+            </p>
+          ) : null}
+
           {seriesList.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-oriana-navy/20 bg-oriana-surface px-8 py-12 text-center">
+            <div className="rounded-lg border border-dashed border-oriana-navy/20 bg-white px-8 py-12 text-center">
               <p className="text-oriana-muted">
-                Models for this category will appear here soon. For availability and specs,{' '}
+                Models for this {segmentLabel ? 'segment' : 'category'} will appear here soon. For availability and specs,{' '}
                 <Link href="/contact" className="font-semibold text-oriana-blue hover:underline">
                   contact our team
                 </Link>
@@ -58,38 +114,7 @@ export default async function ProductCategoryPage({ params }: Props) {
               </p>
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {seriesList.map((series) => (
-                <Link
-                  key={series.slug}
-                  href={`/products/${series.slug}`}
-                  className="group overflow-hidden rounded-2xl border border-oriana-navy/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-oriana-blue/30 hover:shadow-lg"
-                >
-                  <div className="border-b border-oriana-navy/8 bg-gradient-to-br from-oriana-silver/70 to-white p-6">
-                    <ProductImage
-                      name={series.series}
-                      categorySlug={series.categorySlug}
-                      src={series.heroImageUrl}
-                      alt={series.heroImageAlt}
-                      className="mx-auto max-h-40"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-oriana-blue">
-                      {series.phases}
-                    </p>
-                    <h2 className="mt-2 font-display text-lg font-bold text-oriana-navy group-hover:text-oriana-blue">
-                      {series.series}
-                    </h2>
-                    <p className="mt-2 text-sm text-oriana-muted">
-                      {series.powerRange} · {series.variants.length}{' '}
-                      {series.variants.length === 1 ? 'variant' : 'variants'}
-                    </p>
-                    <p className="mt-4 text-sm font-semibold text-oriana-blue">View series →</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <ProductSeriesSections cards={seriesList.map(seriesToCatalogueCard)} />
           )}
         </div>
       </section>

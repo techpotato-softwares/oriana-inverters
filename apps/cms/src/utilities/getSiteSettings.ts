@@ -115,6 +115,13 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
       }
     }
 
+    const resolvedFooter =
+      footerColumns.length > 0 ? footerColumns : defaultSettings.footerColumns
+    const partnersFromConfig = defaultSettings.footerColumns.find((col) => col.title === 'Partners')
+    const footerWithPartners = partnersFromConfig
+      ? resolvedFooter.map((col) => (col.title === 'Partners' ? partnersFromConfig : col))
+      : resolvedFooter
+
     return {
       siteName: text(doc.siteName, defaultSettings.siteName),
       hotline: text(doc.hotline, defaultSettings.hotline),
@@ -126,7 +133,7 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
       ogImageUrl,
       googleAnalyticsId: optionalId(doc.googleAnalyticsId),
       googleTagManagerId: optionalId(doc.googleTagManagerId),
-      footerColumns: footerColumns.length ? footerColumns : defaultSettings.footerColumns,
+      footerColumns: footerWithPartners,
       legalLinks: legalLinks.length ? legalLinks : defaultSettings.legalLinks,
       socialLinks: socialLinks.length ? socialLinks : defaultSettings.socialLinks,
     }

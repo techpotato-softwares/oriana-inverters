@@ -2,6 +2,14 @@ import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ProductSeriesDetail } from '@/components/oriana/ProductSeriesDetail'
 import { getProductBySlug, getSeriesBySlug } from '@/utilities/getCatalogue'
+import { getContact } from '@/utilities/getMarketing'
+import type { Form } from '@/payload-types'
+
+function formIdFromRelation(form: number | Form | null | undefined): number | null {
+  if (typeof form === 'number' && Number.isFinite(form)) return form
+  if (form && typeof form === 'object' && 'id' in form) return form.id
+  return null
+}
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -29,7 +37,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params
-  const series = await getSeriesBySlug(slug)
+  const [series, contact] = await Promise.all([getSeriesBySlug(slug), getContact()])
   if (!series) notFound()
 
   const deepLinkedProduct = await getProductBySlug(slug)
@@ -39,20 +47,20 @@ export default async function ProductDetailPage({ params }: Props) {
       : series.variants[0]?.slug
 
   return (
-    <main className="bg-[linear-gradient(180deg,#f7f9fc_0%,#ffffff_28%)]">
-      <div className="border-b border-oriana-navy/8 bg-white/80">
-        <div className="container py-4">
-          <Breadcrumbs
-            items={[
-              { label: 'Inverters', href: '/products' },
-              { label: series.category, href: `/products/category/${series.categorySlug}` },
-              { label: series.series },
-            ]}
-          />
-        </div>
-      </div>
+    <main className="bg-white pt-20 lg:pt-24">
+      <Breadcrumbs
+        items={[
+          { label: 'All Products', href: '/products' },
+          { label: series.category, href: `/products/category/${series.categorySlug}` },
+          { label: series.series },
+        ]}
+      />
 
-      <ProductSeriesDetail series={series} initialModelSlug={initialModelSlug} />
+      <ProductSeriesDetail
+        series={series}
+        initialModelSlug={initialModelSlug}
+        formId={formIdFromRelation(contact?.form)}
+      />
     </main>
   )
 }

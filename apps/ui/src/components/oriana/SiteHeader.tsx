@@ -11,6 +11,7 @@ import {
   aboutMegaMenuCategories,
   mainNav as defaultMainNav,
   megaItemHasSubitems,
+  partnersMegaMenuCategories,
   productsMegaMenuCategories,
   supportMegaMenuCategories,
   type MainNavEntry,
@@ -26,16 +27,18 @@ export type SiteHeaderNav = {
   mainNav?: MainNavEntry[]
 }
 
-type MegaMenuKey = 'products' | 'support' | 'about'
+type MegaMenuKey = 'products' | 'partners' | 'support' | 'about'
 
 const megaHrefs: Record<MegaMenuKey, string> = {
   products: '/products',
+  partners: '/partners',
   support: '/support',
   about: '/about',
 }
 
 const megaMenuFallbacks: Record<MegaMenuKey, MainNavEntry> = {
   products: { type: 'products', label: 'Products', categories: productsMegaMenuCategories },
+  partners: { type: 'partners', label: 'Partners', categories: partnersMegaMenuCategories },
   support: {
     type: 'support',
     label: 'Service & Support',
@@ -47,7 +50,12 @@ const megaMenuFallbacks: Record<MegaMenuKey, MainNavEntry> = {
 function isMegaMenuItem(
   item: MainNavEntry,
 ): item is Extract<MainNavEntry, { type: MegaMenuKey }> {
-  return item.type === 'products' || item.type === 'support' || item.type === 'about'
+  return (
+    item.type === 'products' ||
+    item.type === 'partners' ||
+    item.type === 'support' ||
+    item.type === 'about'
+  )
 }
 
 function itemHasSubmenu(
@@ -71,12 +79,9 @@ export function SiteHeader({
   const router = useRouter()
   const reduceMotion = useReducedMotion()
   const refreshedEmptyMenu = useRef(false)
-  const lastScrollY = useRef(0)
-  const scrollTicking = useRef(false)
-  const scrollAccum = useRef(0)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<MegaMenuKey | null>(null)
-  const [headerHidden, setHeaderHidden] = useState(false)
+  const [navCollapsed, setNavCollapsed] = useState(false)
 
   const mainNavItems = nav?.mainNav ?? defaultMainNav
   const localeLabel = nav?.localeLabel ?? 'USA · English'
@@ -93,45 +98,19 @@ export function SiteHeader({
   useEffect(() => {
     setMobileOpen(false)
     setOpenMenu(null)
-    setHeaderHidden(false)
+    setNavCollapsed(window.scrollY > 16)
   }, [pathname])
 
   useEffect(() => {
-    lastScrollY.current = window.scrollY
-    scrollAccum.current = 0
-
-    const onScroll = () => {
-      if (scrollTicking.current) return
-      scrollTicking.current = true
-
-      window.requestAnimationFrame(() => {
-        const current = window.scrollY
-        const delta = current - lastScrollY.current
-
-        if (current <= 24) {
-          setHeaderHidden(false)
-          scrollAccum.current = 0
-        } else {
-          const reversed =
-            (delta > 0 && scrollAccum.current < 0) || (delta < 0 && scrollAccum.current > 0)
-          if (reversed) scrollAccum.current = 0
-          scrollAccum.current += delta
-
-          if (scrollAccum.current > 12 && !mobileOpen) {
-            setHeaderHidden(true)
-            setOpenMenu(null)
-          } else if (scrollAccum.current < -12) {
-            setHeaderHidden(false)
-          }
-        }
-
-        lastScrollY.current = current
-        scrollTicking.current = false
-      })
+    const update = () => {
+      const collapsed = window.scrollY > 16 && !mobileOpen
+      setNavCollapsed((prev) => (prev === collapsed ? prev : collapsed))
+      if (collapsed) setOpenMenu(null)
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    return () => window.removeEventListener('scroll', update)
   }, [mobileOpen])
 
   useEffect(() => {
@@ -146,18 +125,15 @@ export function SiteHeader({
     'inline-flex items-center gap-1.5 text-xs font-medium tracking-wide text-oriana-navy/70 transition-colors hover:text-oriana-blue'
 
   return (
-    <header
-      className={cn(
-        'fixed inset-x-0 top-0 z-50 bg-white/90 shadow-sm backdrop-blur-xl backdrop-saturate-150',
-        reduceMotion
-          ? 'transition-none'
-          : 'transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
-        headerHidden ? '-translate-y-full' : 'translate-y-0',
-      )}
-    >
+    <header className="fixed inset-x-0 top-0 z-50 bg-white/90 shadow-sm backdrop-blur-xl backdrop-saturate-150">
       <div className="relative" onMouseLeave={() => setOpenMenu(null)}>
         <div className="container">
-          <div className="grid h-[4.5rem] grid-cols-[1fr_auto_1fr] items-center lg:h-20">
+          <div
+            className={cn(
+              'grid grid-cols-[1fr_auto_1fr] items-center transition-[height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
+              navCollapsed ? 'h-16 lg:h-[4.25rem]' : 'h-[4.5rem] lg:h-20',
+            )}
+          >
             <div className="flex items-center justify-start gap-2">
               <button
                 type="button"
@@ -171,7 +147,14 @@ export function SiteHeader({
             </div>
 
             <Link href="/" className="justify-self-center">
-              <Logo priority variant="light" className="h-12 w-auto md:h-16" />
+              <Logo
+                priority
+                variant="light"
+                className={cn(
+                  'w-auto transition-[height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
+                  navCollapsed ? 'h-10 md:h-12' : 'h-12 md:h-16',
+                )}
+              />
             </Link>
 
             <div className="flex items-center justify-end gap-3 sm:gap-4">
@@ -187,40 +170,54 @@ export function SiteHeader({
           </div>
         </div>
 
-        <div className="hidden border-t border-oriana-navy/8 xl:block">
-          <div className="container">
-            <nav className="flex items-center justify-center gap-1">
-              {mainNavItems.map((item) => {
-                const hasMenu = itemHasSubmenu(item)
-                const href = navHref(item)
-                const open = hasMenu && openMenu === item.type
-                const active = item.type === 'link' && pathname === item.href
+        <div
+          className={cn(
+            'grid max-xl:hidden transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
+            reduceMotion && 'transition-none',
+            navCollapsed ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]',
+          )}
+          aria-hidden={navCollapsed}
+        >
+          <div
+            className={cn(
+              'min-h-0 overflow-hidden border-t border-oriana-navy/8',
+              navCollapsed && 'pointer-events-none border-transparent',
+            )}
+          >
+            <div className="container">
+              <nav className="flex items-center justify-center gap-1">
+                {mainNavItems.map((item) => {
+                  const hasMenu = itemHasSubmenu(item)
+                  const href = navHref(item)
+                  const open = hasMenu && openMenu === item.type
+                  const active = item.type === 'link' && pathname === item.href
 
-                return (
-                  <Link
-                    key={item.label}
-                    href={href}
-                    className={cn(linkClass, (open || active) && 'text-oriana-blue')}
-                    onMouseEnter={() =>
-                      setOpenMenu(itemHasSubmenu(item) ? item.type : null)
-                    }
-                    onFocus={() =>
-                      setOpenMenu(itemHasSubmenu(item) ? item.type : null)
-                    }
-                    aria-expanded={itemHasSubmenu(item) ? open : undefined}
-                    aria-haspopup={itemHasSubmenu(item) ? 'true' : undefined}
-                  >
-                    {item.label}
-                    <span
-                      className={cn(
-                        'absolute inset-x-3 bottom-0 h-0.5 origin-center bg-oriana-blue transition-transform duration-300',
-                        open || active ? 'scale-x-100' : 'scale-x-0',
-                      )}
-                    />
-                  </Link>
-                )
-              })}
-            </nav>
+                  return (
+                    <Link
+                      key={item.label}
+                      href={href}
+                      className={cn(linkClass, (open || active) && 'text-oriana-blue')}
+                      onMouseEnter={() =>
+                        setOpenMenu(itemHasSubmenu(item) ? item.type : null)
+                      }
+                      onFocus={() =>
+                        setOpenMenu(itemHasSubmenu(item) ? item.type : null)
+                      }
+                      aria-expanded={itemHasSubmenu(item) ? open : undefined}
+                      aria-haspopup={itemHasSubmenu(item) ? 'true' : undefined}
+                    >
+                      {item.label}
+                      <span
+                        className={cn(
+                          'absolute inset-x-3 bottom-0 h-0.5 origin-center bg-oriana-blue transition-transform duration-300',
+                          open || active ? 'scale-x-100' : 'scale-x-0',
+                        )}
+                      />
+                    </Link>
+                  )
+                })}
+              </nav>
+            </div>
           </div>
         </div>
 
@@ -245,14 +242,14 @@ export function SiteHeader({
                 }}
                 onMouseEnter={() => setOpenMenu(openMegaItem.type)}
               >
-                <div className="pb-10">
-                  <NavMegaPanel
-                    key={openMegaItem.type}
-                    label={openMegaItem.label}
-                    categories={openMegaItem.categories}
-                    ariaLabel={`${openMegaItem.label} menu`}
-                  />
-                </div>
+                <NavMegaPanel
+                  key={openMegaItem.type}
+                  label={openMegaItem.label}
+                  categories={openMegaItem.categories}
+                  ariaLabel={`${openMegaItem.label} menu`}
+                  viewAllHref={openMegaItem.type === 'products' ? '/products' : undefined}
+                  viewAllLabel={openMegaItem.type === 'products' ? 'All Products' : undefined}
+                />
               </motion.div>
             ) : null}
           </AnimatePresence>
@@ -291,15 +288,30 @@ export function SiteHeader({
                       {category.label}
                     </Link>
                     {category.columns.map((col) =>
-                      col.links.slice(0, 3).map((link) => (
+                      col.href ? (
                         <Link
-                          key={link.href}
-                          href={link.href}
-                          className="block py-1.5 pl-2 text-sm text-oriana-muted"
+                          key={col.href}
+                          href={col.href}
+                          className="mt-1 block py-1.5 pl-2 text-sm text-oriana-muted"
                         >
-                          {link.label}
+                          {col.title}
                         </Link>
-                      )),
+                      ) : (
+                        <div key={col.title} className="mt-1 pl-2">
+                          <p className="pt-1 text-[11px] font-semibold uppercase tracking-wider text-oriana-navy/50">
+                            {col.title}
+                          </p>
+                          {col.links.map((link) => (
+                            <Link
+                              key={`${link.href}:${link.label}`}
+                              href={link.href}
+                              className="block py-1.5 text-sm text-oriana-muted"
+                            >
+                              {link.label}
+                            </Link>
+                          ))}
+                        </div>
+                      ),
                     )}
                   </div>
                 ))}

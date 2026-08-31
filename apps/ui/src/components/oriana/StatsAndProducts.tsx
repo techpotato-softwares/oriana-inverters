@@ -10,22 +10,22 @@ const stats = [
 
 const featuredProducts = [
   {
-    name: 'OG6 Hybrid Series',
-    segment: 'Residential / Storage',
-    power: '3 – 8 kW',
-    href: '/products/category/residential-hybrid',
+    name: 'ORI-OG7 Hybrid Series',
+    segment: 'Single Phase',
+    power: '3 – 12 kW',
+    href: '/products/category/hybrid-inverters',
   },
   {
-    name: 'OG6 C&I Grid-Tied',
-    segment: 'Commercial & Industrial',
-    power: '25 – 125 kW',
-    href: '/products/category/ci-grid-tied',
+    name: 'ORI-OG04 C&I Grid-Tied',
+    segment: 'C&I',
+    power: '30 – 80 kW',
+    href: '/products/category/on-grid-inverters',
   },
   {
-    name: 'OG6 Utility',
+    name: 'ORI-OG6 Utility',
     segment: 'Utility-Scale',
     power: '350 kW',
-    href: '/products/category/utility-grid-tied',
+    href: '/products/category/utility-scale-inverters',
   },
 ]
 

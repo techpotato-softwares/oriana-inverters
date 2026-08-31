@@ -80,7 +80,7 @@ export default async function PartnersPage() {
             </p>
             <div className="mt-6 flex flex-wrap gap-4">
               <Link
-                href="/contact"
+                href="/partners/partnership"
                 className="rounded bg-white px-6 py-3 text-sm font-bold text-oriana-navy hover:bg-oriana-silver"
               >
                 Become a Partner

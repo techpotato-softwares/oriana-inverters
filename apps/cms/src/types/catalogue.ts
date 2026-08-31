@@ -35,11 +35,19 @@ export type CatalogueSeries = {
   variants: CatalogueProduct[]
 }
 
+export type CatalogueSegmentImage = {
+  name: string
+  slug?: string | null
+  imageUrl?: string | null
+}
+
 export type CatalogueCategory = {
   slug: string
   title: string
   description: string
   sortOrder?: number | null
+  imageUrl?: string | null
+  segments?: CatalogueSegmentImage[]
 }
 
 export type CatalogueNavItem = {

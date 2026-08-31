@@ -8,26 +8,20 @@ import type { CatalogueNavItem } from '@/types/catalogue'
 import { cn } from '@/utilities/ui'
 
 const categoryPlaceholders: Record<string, string> = {
-  'residential-grid-tied': '/assets/products/single-phase.svg',
-  'ci-grid-tied': '/assets/products/three-phase.svg',
-  'utility-grid-tied': '/assets/products/utility-scale.svg',
-  'residential-hybrid': '/assets/products/hybrid-storage.svg',
-  'ci-hybrid': '/assets/products/hybrid-storage.svg',
-  'single-phase': '/assets/products/single-phase.svg',
-  'three-phase': '/assets/products/three-phase.svg',
-  'utility-scale': '/assets/products/utility-scale.svg',
-  'energy-storage': '/assets/products/hybrid-storage.svg',
-  accessories: '/assets/products/accessories.svg',
+  'on-grid-inverters': '/assets/products/single-phase.svg',
+  'hybrid-inverters': '/assets/products/hybrid-storage.svg',
+  'utility-scale-inverters': '/assets/products/utility-scale.svg',
+  bess: '/assets/products/hybrid-storage.svg',
 }
 
 function categorySlugFromHref(href: string) {
-  return href.split('/').pop() ?? 'residential-grid-tied'
+  return href.split('/').pop() ?? 'on-grid-inverters'
 }
 
 function placeholderFor(href: string, imageUrl?: string | null) {
   if (imageUrl) return imageUrl
   const slug = categorySlugFromHref(href)
-  return categoryPlaceholders[slug] ?? categoryPlaceholders['residential-grid-tied']
+  return categoryPlaceholders[slug] ?? categoryPlaceholders['on-grid-inverters']
 }
 
 function firstIndexWithProducts(items: CatalogueNavItem[]) {

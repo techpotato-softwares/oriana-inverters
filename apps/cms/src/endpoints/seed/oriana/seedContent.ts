@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 import { caseStudies } from '@/data/caseStudies'
 import { staticDistributors } from '@/data/distributors'
 import { mainNav, megaMenus } from '@/config/navigation'
+import { footerNav } from '@/config/footer'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -273,6 +274,10 @@ export async function seedOrianaContent({
     data: {
       siteName: 'Oriana Inverters',
       hotline: '+1 (800) ORIANA-1',
+      footerColumns: footerNav.map((col) => ({
+        title: col.title,
+        links: col.links.map((link) => ({ label: link.label, href: link.href })),
+      })),
       ...(mediaMap.logoLight ? { logoLight: mediaMap.logoLight } : {}),
       ...(mediaMap.logoDark ? { logoDark: mediaMap.logoDark } : {}),
     } as never,

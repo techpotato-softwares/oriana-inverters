@@ -107,25 +107,25 @@ const HOME_IMPACT = {
 
 const HOME_PRODUCT_CATEGORIES = [
   {
-    id: 'residential',
-    label: 'Residential Inverters',
-    href: '/products/category/residential-grid-tied',
+    id: 'on-grid',
+    label: 'On Grid Inverters',
+    href: '/products/category/on-grid-inverters',
     image:
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80',
     alt: 'Residential rooftop solar installation',
   },
   {
-    id: 'commercial',
-    label: 'Commercial & Industrial Inverters',
-    href: '/products/category/ci-grid-tied',
+    id: 'hybrid',
+    label: 'Hybrid Inverters',
+    href: '/products/category/hybrid-inverters',
     image:
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Commercial building with solar power',
+    alt: 'Hybrid inverter and battery energy storage',
   },
   {
     id: 'utility',
-    label: 'Utility-Scale Inverters',
-    href: '/products/category/utility-grid-tied',
+    label: 'Utility Scale Inverters',
+    href: '/products/category/utility-scale-inverters',
     image:
       'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1920&q=80',
     alt: 'Utility-scale solar farm',
@@ -133,7 +133,7 @@ const HOME_PRODUCT_CATEGORIES = [
   {
     id: 'bess',
     label: 'BESS',
-    href: '/products/category/ci-hybrid',
+    href: '/products/category/bess',
     image:
       'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1920&q=80',
     alt: 'Battery energy storage system',

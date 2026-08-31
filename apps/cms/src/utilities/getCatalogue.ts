@@ -3,6 +3,18 @@ import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
 
 import { staticCategories } from '@/data/products'
+import {
+  familyToSeries,
+  findFamilyBySlug,
+  productMasterCategories,
+  seriesFromProductMaster,
+  seriesSegmentLabel,
+  slugifyLabel,
+  sortSeriesByProductMaster,
+  buildProductsMegaMenu,
+  uniqueProductsMegaMenuImageUrls,
+} from '@/data/productMaster'
+import type { NavMegaCategory } from '@/config/navigation'
 import { mapCategory, mapDownload, mapProduct } from '@/utilities/mapCatalogue'
 import { groupProductsIntoSeries, seriesNameOf, slugifySeries } from '@/utilities/series'
 import type {
@@ -32,6 +44,24 @@ function relationId(value: unknown): number | null {
     return relationId((value as { id: unknown }).id)
   }
   return null
+}
+
+const CANONICAL_CATEGORY_SLUGS = new Set(productMasterCategories.map((category) => category.slug))
+
+function isCanonicalCategorySlug(slug: string | null | undefined): boolean {
+  return Boolean(slug && CANONICAL_CATEGORY_SLUGS.has(slug))
+}
+
+function cmsSeriesMatchesMaster(cms: CatalogueSeries, master: CatalogueSeries): boolean {
+  if (cms.slug === master.slug) return true
+  if (slugifyLabel(cms.series) === master.slug) return true
+  if (slugifyLabel(cms.series) === slugifyLabel(master.series)) return true
+  const masterKeys = new Set([master.slug, ...master.variants.map((variant) => variant.slug)])
+  return cms.variants.some(
+    (variant) =>
+      masterKeys.has(variant.slug) ||
+      slugifyLabel(variant.modelSeries || '') === master.slug,
+  )
 }
 
 /** Products come only from Payload Admin (published). No hardcoded product fallback. */
@@ -71,22 +101,24 @@ async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
     const categoriesById = new Map(categoriesResult.docs.map((doc) => [doc.id, doc]))
     const mediaById = new Map(mediaResult.docs.map((doc) => [doc.id, doc]))
 
-    return result.docs.map((doc) => {
-      const categoryId = relationId(doc.category)
-      const categoryDoc =
-        categoryId !== null ? categoriesById.get(categoryId) : null
+    return result.docs
+      .map((doc) => {
+        const categoryId = relationId(doc.category)
+        const categoryDoc =
+          categoryId !== null ? categoriesById.get(categoryId) : null
 
-      const heroId = relationId(doc.heroImage)
-      const datasheetId = relationId(doc.datasheetPdf)
+        const heroId = relationId(doc.heroImage)
+        const datasheetId = relationId(doc.datasheetPdf)
 
-      return mapProduct({
-        ...doc,
-        category: categoryDoc ?? doc.category,
-        heroImage: (heroId !== null ? mediaById.get(heroId) : null) ?? doc.heroImage,
-        datasheetPdf:
-          (datasheetId !== null ? mediaById.get(datasheetId) : null) ?? doc.datasheetPdf,
+        return mapProduct({
+          ...doc,
+          category: categoryDoc ?? doc.category,
+          heroImage: (heroId !== null ? mediaById.get(heroId) : null) ?? doc.heroImage,
+          datasheetPdf:
+            (datasheetId !== null ? mediaById.get(datasheetId) : null) ?? doc.datasheetPdf,
+        })
       })
-    })
+      .filter((product) => isCanonicalCategorySlug(product.categorySlug))
   } catch (error) {
     console.error('[getCatalogue] products query failed:', error)
     return []
@@ -109,7 +141,52 @@ async function fetchCategories(): Promise<CatalogueCategory[]> {
 
     if (!result.docs.length) return []
 
-    return result.docs.map(mapCategory).sort((a, b) => (a.sortOrder ?? 100) - (b.sortOrder ?? 100))
+    const mediaIds = new Set<number>()
+    for (const doc of result.docs) {
+      const imageId = relationId(doc.image)
+      if (imageId !== null) mediaIds.add(imageId)
+      for (const segment of doc.segments ?? []) {
+        const segmentImageId = relationId(segment.image)
+        if (segmentImageId !== null) mediaIds.add(segmentImageId)
+      }
+    }
+
+    const mediaById = new Map(
+      mediaIds.size
+        ? (
+            await payload.find({
+              collection: 'media',
+              depth: 0,
+              limit: mediaIds.size,
+              pagination: false,
+              where: { id: { in: [...mediaIds] } },
+            })
+          ).docs.map((doc) => [doc.id, doc])
+        : [],
+    )
+
+    const order = productMasterCategories.map((category) => category.slug)
+    const mapped = result.docs
+      .map((doc) => {
+        const imageId = relationId(doc.image)
+        return mapCategory({
+          ...doc,
+          image: (imageId !== null ? mediaById.get(imageId) : null) ?? doc.image,
+          segments: doc.segments?.map((segment) => {
+            const segmentImageId = relationId(segment.image)
+            return {
+              ...segment,
+              image:
+                (segmentImageId !== null ? mediaById.get(segmentImageId) : null) ?? segment.image,
+            }
+          }),
+        })
+      })
+      .filter((category) => isCanonicalCategorySlug(category.slug))
+
+    if (!mapped.length) return productMasterCategories
+
+    return mapped.sort((a, b) => order.indexOf(a.slug) - order.indexOf(b.slug))
   } catch (error) {
     console.error('[getCatalogue] categories query failed:', error)
     return []
@@ -136,13 +213,29 @@ async function fetchDownloads(): Promise<CatalogueDownload[]> {
   }
 }
 
-export const getCatalogueProducts = unstable_cache(fetchPublishedProducts, ['catalogue-products'], {
-  tags: ['products'],
-})
+export const getCatalogueProducts = unstable_cache(
+  fetchPublishedProducts,
+  ['catalogue-products', 'canonical-v1'],
+  {
+    tags: ['products'],
+  },
+)
 
-export const getCatalogueCategories = unstable_cache(fetchCategories, ['catalogue-categories'], {
-  tags: ['categories'],
-})
+export const getCatalogueCategories = unstable_cache(
+  fetchCategories,
+  ['catalogue-categories', 'canonical-v1'],
+  {
+    tags: ['categories'],
+  },
+)
+
+export { uniqueProductsMegaMenuImageUrls }
+
+/** Products mega-menu with CMS segment photos when present; static PNGs otherwise. */
+export async function getProductsMegaMenu(): Promise<NavMegaCategory[]> {
+  const categories = await getCatalogueCategories()
+  return buildProductsMegaMenu(categories)
+}
 
 export const getCatalogueDownloads = unstable_cache(fetchDownloads, ['catalogue-downloads'], {
   tags: ['downloads'],
@@ -183,7 +276,11 @@ export async function getProductBySlug(slug: string): Promise<CatalogueProduct |
 
   // Recovery path for stale/empty unstable_cache entries.
   const fresh = await fetchPublishedProducts()
-  return fresh.find((p) => p.slug === slug) ?? null
+  const fromCms = fresh.find((p) => p.slug === slug)
+  if (fromCms) return fromCms
+
+  const master = findFamilyBySlug(slug)
+  return master ? familyToSeries(master.category, master.family).variants[0] ?? null : null
 }
 
 export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | null> {
@@ -191,21 +288,28 @@ export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | n
   const bySeriesSlug = seriesList.find((s) => s.slug === slug)
   if (bySeriesSlug) return bySeriesSlug
 
-  // Deep link: model slug → parent series
-  const product = await getProductBySlug(slug)
-  if (!product) return null
-  const byDeepLink = seriesList.find((s) => s.series === seriesNameOf(product))
-  if (byDeepLink) return byDeepLink
+  // Deep link: CMS model slug → parent series
+  const cmsProducts = await getCatalogueProducts()
+  const cmsProduct = cmsProducts.find((p) => p.slug === slug)
+  if (cmsProduct) {
+    const byDeepLink = seriesList.find((s) => s.series === seriesNameOf(cmsProduct))
+    if (byDeepLink) return byDeepLink
+  }
+
+  const master = findFamilyBySlug(slug)
+  if (master) return familyToSeries(master.category, master.family)
 
   // Recovery path: if cache was populated during a transient Payload init
   // failure, unstable_cache can hold an empty catalogue and produce false 404s.
-  const freshSeriesList = groupProductsIntoSeries(await fetchPublishedProducts())
+  const freshProducts = await fetchPublishedProducts()
+  const freshSeriesList = groupProductsIntoSeries(freshProducts)
   const freshBySeriesSlug = freshSeriesList.find((s) => s.slug === slug)
   if (freshBySeriesSlug) return freshBySeriesSlug
-  return (
-    freshSeriesList.find((s) => s.series === seriesNameOf(product)) ??
-    null
-  )
+  const freshProduct = freshProducts.find((p) => p.slug === slug)
+  if (freshProduct) {
+    return freshSeriesList.find((s) => s.series === seriesNameOf(freshProduct)) ?? null
+  }
+  return null
 }
 
 export async function getProductsByCategory(categorySlug: string): Promise<CatalogueProduct[]> {
@@ -214,8 +318,26 @@ export async function getProductsByCategory(categorySlug: string): Promise<Catal
 }
 
 export async function getSeriesByCategory(categorySlug: string): Promise<CatalogueSeries[]> {
-  const seriesList = await getCatalogueSeries()
-  return seriesList.filter((s) => s.categorySlug === categorySlug)
+  const fromMaster = seriesFromProductMaster(categorySlug)
+  const seriesList = isCanonicalCategorySlug(categorySlug) ? await getCatalogueSeries() : []
+  const fromCms = seriesList.filter((series) => series.categorySlug === categorySlug)
+
+  return sortSeriesByProductMaster(
+    fromMaster.map((master) => {
+      const cms = fromCms.find((series) => cmsSeriesMatchesMaster(series, master))
+      const segment = seriesSegmentLabel(master, categorySlug)
+      if (!cms) return { ...master, segment }
+      return {
+        ...master,
+        segment,
+        powerRange: cms.powerRange || master.powerRange,
+        heroImageUrl: cms.heroImageUrl ?? master.heroImageUrl,
+        heroImageAlt: cms.heroImageAlt ?? master.heroImageAlt ?? master.series,
+        variants: cms.variants.length ? cms.variants : master.variants,
+      }
+    }),
+    categorySlug,
+  )
 }
 
 export async function getCategoryMeta(slug: string): Promise<CatalogueCategory | null> {

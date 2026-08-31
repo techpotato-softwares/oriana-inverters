@@ -76,7 +76,7 @@ async function fetchHeaderNav(): Promise<HeaderNavView> {
   }
 }
 
-export const getHeaderNav = unstable_cache(fetchHeaderNav, ['header-nav'], {
+export const getHeaderNav = unstable_cache(fetchHeaderNav, ['header-nav', 'partners-installers-distributors'], {
   tags: ['global_header'],
 })
 

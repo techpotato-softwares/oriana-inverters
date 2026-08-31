@@ -1,8 +1,20 @@
-/** Site IA — category hrefs used as static fallbacks; live Products menu comes from CMS. */
+import {
+  buildProductsMegaMenu,
+  categoryHref,
+  familyHref,
+  productMaster,
+} from '@/data/productMaster'
+
+/** Site IA — Products menu is built from productMaster.json. */
 
 export type SimpleNavLink = { label: string; href: string }
 
-export type NavMenuColumn = { title: string; links: SimpleNavLink[] }
+export type NavMenuColumn = {
+  title: string
+  href?: string
+  image?: string
+  links: SimpleNavLink[]
+}
 
 export type NavMegaCategory = {
   label: string
@@ -11,7 +23,7 @@ export type NavMegaCategory = {
 }
 
 export function categoryHasSubitems(category: NavMegaCategory): boolean {
-  return category.columns.some((column) => column.links.length > 0)
+  return category.columns.some((column) => column.links.length > 0 || Boolean(column.href))
 }
 
 export function megaItemHasSubitems(categories: NavMegaCategory[] | undefined): boolean {
@@ -21,95 +33,8 @@ export function megaItemHasSubitems(categories: NavMegaCategory[] | undefined): 
 /** @deprecated Use NavMegaCategory */
 export type ProductCategoryNav = NavMegaCategory
 
-/** Products mega-menu — left category rail + column links (Sungrow-style). */
-export const productsMegaMenuCategories: NavMegaCategory[] = [
-  {
-    label: 'On Grid Inverters',
-    href: '/products/category/residential-grid-tied',
-    columns: [
-      {
-        title: 'Products',
-        links: [
-          { label: 'Residential Grid-Tied', href: '/products/category/residential-grid-tied' },
-          { label: 'C&I Grid-Tied', href: '/products/category/ci-grid-tied' },
-          { label: 'All On Grid', href: '/products' },
-        ],
-      },
-      {
-        title: 'Resources',
-        links: [
-          { label: 'Download Center', href: '/resources/downloads' },
-          { label: 'Installation Videos', href: '/resources/videos' },
-          { label: 'FAQs', href: '/resources/faqs' },
-        ],
-      },
-    ],
-  },
-  {
-    label: 'Hybrid Inverters',
-    href: '/products/category/residential-hybrid',
-    columns: [
-      {
-        title: 'Products',
-        links: [
-          { label: 'Residential Hybrid', href: '/products/category/residential-hybrid' },
-          { label: 'C&I Hybrid', href: '/products/category/ci-hybrid' },
-          { label: 'All Hybrid', href: '/products' },
-        ],
-      },
-      {
-        title: 'Solutions',
-        links: [
-          { label: 'For Home', href: '/solutions/residential' },
-          { label: 'For Business', href: '/solutions/commercial' },
-          { label: 'Energy Storage', href: '/solutions/storage' },
-        ],
-      },
-    ],
-  },
-  {
-    label: 'Utility Scale Inverters',
-    href: '/products/category/utility-grid-tied',
-    columns: [
-      {
-        title: 'Products',
-        links: [
-          { label: 'Utility Grid-Tied', href: '/products/category/utility-grid-tied' },
-          { label: 'All Utility Products', href: '/products' },
-        ],
-      },
-      {
-        title: 'Solutions',
-        links: [
-          { label: 'Utility-Scale PV', href: '/solutions/utility' },
-          { label: 'Case Studies', href: '/case-studies' },
-          { label: 'Contact Sales', href: '/contact' },
-        ],
-      },
-    ],
-  },
-  {
-    label: 'BESS',
-    href: '/products/category/ci-hybrid',
-    columns: [
-      {
-        title: 'Products',
-        links: [
-          { label: 'C&I Hybrid / BESS', href: '/products/category/ci-hybrid' },
-          { label: 'Residential Hybrid', href: '/products/category/residential-hybrid' },
-        ],
-      },
-      {
-        title: 'Support',
-        links: [
-          { label: 'Service & Support', href: '/support' },
-          { label: 'Warranty', href: '/support/warranty' },
-          { label: 'Documentation', href: '/resources/downloads' },
-        ],
-      },
-    ],
-  },
-]
+/** Products mega-menu — driven by productMaster.json (category → segment → product). */
+export const productsMegaMenuCategories: NavMegaCategory[] = buildProductsMegaMenu()
 
 /** Service & Support mega-menu */
 export const supportMegaMenuCategories: NavMegaCategory[] = [
@@ -176,22 +101,69 @@ export const supportMegaMenuCategories: NavMegaCategory[] = [
       },
     ],
   },
+]
+
+const partnerSolutionsColumn: NavMenuColumn = {
+  title: 'Solutions & Cases',
+  links: [
+    { label: 'Solutions for Home', href: '/solutions/residential' },
+    { label: 'Solutions for Business', href: '/solutions/commercial' },
+    { label: 'Cases & Stories', href: '/case-studies' },
+  ],
+}
+
+const partnerHowToBuyColumn: NavMenuColumn = {
+  title: 'How to Buy',
+  links: [{ label: 'Find a Distributor', href: '/where-to-buy' }],
+}
+
+/** Partners mega-menu — left rail is Installers / Distributors only. */
+export const partnersMegaMenuCategories: NavMegaCategory[] = [
   {
-    label: 'Partners',
-    href: '/about/partners',
+    label: 'Installers',
+    href: '/partners/installers',
     columns: [
       {
         title: 'Partnership',
         links: [
-          { label: 'Become a Partner', href: '/about/partners' },
+          { label: 'Oriana for Installers', href: '/partners/installers' },
+          { label: 'Become an Installer', href: '/partners/become-an-installer' },
+        ],
+      },
+      partnerSolutionsColumn,
+      partnerHowToBuyColumn,
+      {
+        title: 'Support',
+        links: [
+          { label: 'Installer Support', href: '/support' },
+          { label: 'Product Documentation', href: '/resources/downloads' },
+          { label: 'Installation Videos', href: '/resources/videos' },
+          { label: 'FAQs', href: '/resources/faqs' },
+          { label: 'Warranty', href: '/support/warranty' },
+        ],
+      },
+    ],
+  },
+  {
+    label: 'Distributors',
+    href: '/partners/distributors',
+    columns: [
+      {
+        title: 'Partnership',
+        links: [
+          { label: 'Oriana for Distributors', href: '/partners/distributors' },
           { label: 'Find a Distributor', href: '/where-to-buy' },
         ],
       },
+      partnerSolutionsColumn,
+      partnerHowToBuyColumn,
       {
-        title: 'Sales',
+        title: 'Support',
         links: [
-          { label: 'Where to Buy', href: '/where-to-buy' },
-          { label: 'Request a Quote', href: '/contact' },
+          { label: 'Distributor Support', href: '/support' },
+          { label: 'Product Documentation', href: '/resources/downloads' },
+          { label: 'FAQs', href: '/resources/faqs' },
+          { label: 'Warranty', href: '/support/warranty' },
         ],
       },
     ],
@@ -330,9 +302,16 @@ export const aboutNavLinks: SimpleNavLink[] = aboutMegaMenuCategories.map((cat) 
   href: cat.href,
 }))
 
+/** Flat list for mobile / simple fallbacks */
+export const partnersNavLinks: SimpleNavLink[] = partnersMegaMenuCategories.map((cat) => ({
+  label: cat.label,
+  href: cat.href,
+}))
+
 export type MainNavEntry =
   | { type: 'link'; label: string; href: string }
   | { type: 'products'; label: string; categories: NavMegaCategory[] }
+  | { type: 'partners'; label: string; categories: NavMegaCategory[] }
   | { type: 'support'; label: string; categories: NavMegaCategory[] }
   | { type: 'about'; label: string; categories: NavMegaCategory[] }
 
@@ -346,38 +325,20 @@ export const sustainabilityNavLinks: SimpleNavLink[] = [
 export const mainNav: MainNavEntry[] = [
   { type: 'link', label: 'Home', href: '/' },
   { type: 'products', label: 'Products', categories: productsMegaMenuCategories },
+  { type: 'partners', label: 'Partners', categories: partnersMegaMenuCategories },
   { type: 'support', label: 'Service & Support', categories: supportMegaMenuCategories },
   { type: 'link', label: 'Sustainability', href: '/sustainability' },
   { type: 'about', label: 'About Us', categories: aboutMegaMenuCategories },
 ]
 
-export const inverterMegaMenu = [
-  {
-    title: 'Residential Grid-Tied PV Inverter',
-    href: '/products/category/residential-grid-tied',
-    products: [] as { label: string; href: string }[],
-  },
-  {
-    title: 'C&I Grid-Tied PV Inverter',
-    href: '/products/category/ci-grid-tied',
-    products: [] as { label: string; href: string }[],
-  },
-  {
-    title: 'Utility Grid-Tied PV Inverter',
-    href: '/products/category/utility-grid-tied',
-    products: [] as { label: string; href: string }[],
-  },
-  {
-    title: 'Residential Hybrid Inverter',
-    href: '/products/category/residential-hybrid',
-    products: [] as { label: string; href: string }[],
-  },
-  {
-    title: 'C&I Hybrid Inverter',
-    href: '/products/category/ci-hybrid',
-    products: [] as { label: string; href: string }[],
-  },
-]
+export const inverterMegaMenu = productMaster.categories.map((category) => ({
+  title: category.name,
+  href: categoryHref(category.name),
+  products: category.families.map((family) => ({
+    label: family.productName,
+    href: familyHref(family),
+  })),
+}))
 
 export const solutionsMenu = [
   { label: 'Residential', href: '/solutions/residential', desc: 'Home solar & battery solutions' },
@@ -441,6 +402,7 @@ export type MegaMenuKey =
   | 'business'
   | 'utility'
   | 'products'
+  | 'partners'
   | 'support'
 
 export const megaMenus: Record<
@@ -483,14 +445,14 @@ export const megaMenus: Record<
         links: [
           { label: 'Residential PV', href: '/solutions/residential' },
           { label: 'Energy Storage', href: '/solutions/storage' },
-          { label: 'Hybrid Systems', href: '/products/category/residential-hybrid' },
+          { label: 'Hybrid Systems', href: '/products/category/hybrid-inverters' },
         ],
       },
       {
         title: 'Products',
         links: [
-          { label: 'Residential Grid-Tied', href: '/products/category/residential-grid-tied' },
-          { label: 'Residential Hybrid', href: '/products/category/residential-hybrid' },
+          { label: 'On Grid Inverters', href: '/products/category/on-grid-inverters' },
+          { label: 'Hybrid Inverters', href: '/products/category/hybrid-inverters' },
           { label: 'All Home Products', href: '/products' },
         ],
       },
@@ -518,8 +480,8 @@ export const megaMenus: Record<
       {
         title: 'Products',
         links: [
-          { label: 'C&I Grid-Tied', href: '/products/category/ci-grid-tied' },
-          { label: 'C&I Hybrid', href: '/products/category/ci-hybrid' },
+          { label: 'On Grid Inverters', href: '/products/category/on-grid-inverters' },
+          { label: 'Hybrid Inverters', href: '/products/category/hybrid-inverters' },
           { label: 'All C&I Products', href: '/products' },
         ],
       },
@@ -540,14 +502,14 @@ export const megaMenus: Record<
         title: 'Solutions',
         links: [
           { label: 'Utility-Scale PV', href: '/solutions/utility' },
-          { label: 'Utility Grid-Tied', href: '/products/category/utility-grid-tied' },
+          { label: 'Utility Scale Inverters', href: '/products/category/utility-scale-inverters' },
           { label: 'Grid Services', href: '/solutions/utility' },
         ],
       },
       {
         title: 'Products',
         links: [
-          { label: 'Utility Catalogue', href: '/products/category/utility-grid-tied' },
+          { label: 'Utility Catalogue', href: '/products/category/utility-scale-inverters' },
           { label: 'All Products', href: '/products' },
           { label: 'Request a Quote', href: '/contact' },
         ],
@@ -565,6 +527,14 @@ export const megaMenus: Record<
   products: {
     label: 'Products',
     columns: productsMegaMenuCategories.map((cat) => ({
+      title: cat.label,
+      href: cat.href,
+      links: cat.columns.flatMap((col) => col.links),
+    })),
+  },
+  partners: {
+    label: 'Partners',
+    columns: partnersMegaMenuCategories.map((cat) => ({
       title: cat.label,
       href: cat.href,
       links: cat.columns.flatMap((col) => col.links),

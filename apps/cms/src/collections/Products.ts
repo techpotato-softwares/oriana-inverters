@@ -91,7 +91,7 @@ export const Products: CollectionConfig = {
               type: 'text',
               required: true,
               admin: {
-                description: 'Website label (Excel col J), e.g. "5kW OG6-GR1P5K-S(21A)".',
+                description: 'Website label, e.g. "4kW ORI-4K-OG04P1-EU-CM1".',
               },
             },
             slugField({ fieldToUse: 'name' }),
@@ -108,7 +108,7 @@ export const Products: CollectionConfig = {
               name: 'modelSeries',
               type: 'text',
               admin: {
-                description: 'Datasheet model series (e.g. OG6-GR1P(2-3)K01-NV-YD). Used to group models on category pages.',
+                description: 'Datasheet model series (family productName). Used to group models on category pages.',
               },
             },
             {

@@ -24,6 +24,9 @@
 
 @plugin "@tailwindcss/typography";
 
+/* UI package lives outside apps/cms; symlink targets are not auto-scanned. */
+@source "../../../../ui/src/**/*.{js,ts,jsx,tsx}";
+
 @source inline("lg:col-span-4");
 @source inline("lg:col-span-6");
 @source inline("lg:col-span-8");

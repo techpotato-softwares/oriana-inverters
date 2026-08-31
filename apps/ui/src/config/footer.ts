@@ -7,15 +7,18 @@ export const footerNav = [
       { label: 'C&I PV Solutions', href: '/solutions/commercial' },
       { label: 'Utility PV Solutions', href: '/solutions/utility' },
       { label: 'Energy Storage', href: '/solutions/storage' },
-      { label: 'PV Inverters', href: '/products' },
-      { label: 'Hybrid Inverters', href: '/products/category/residential-hybrid' },
+      { label: 'On Grid Inverters', href: '/products/category/on-grid-inverters' },
+      { label: 'Hybrid Inverters', href: '/products/category/hybrid-inverters' },
+      { label: 'Utility Scale Inverters', href: '/products/category/utility-scale-inverters' },
+      { label: 'BESS', href: '/products/category/bess' },
     ],
   },
   {
     title: 'Partners',
     links: [
+      { label: 'Oriana for Installers', href: '/partners/installers' },
+      { label: 'Oriana for Distributors', href: '/partners/distributors' },
       { label: 'Find a Distributor', href: '/where-to-buy' },
-      { label: 'Become a Partner', href: '/about/partners' },
     ],
   },
   {

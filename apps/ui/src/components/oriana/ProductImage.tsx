@@ -2,17 +2,10 @@ import Image from 'next/image'
 import { cn } from '@/utilities/ui'
 
 const categoryPlaceholders: Record<string, string> = {
-  'residential-grid-tied': '/assets/products/single-phase.svg',
-  'ci-grid-tied': '/assets/products/three-phase.svg',
-  'utility-grid-tied': '/assets/products/utility-scale.svg',
-  'residential-hybrid': '/assets/products/hybrid-storage.svg',
-  'ci-hybrid': '/assets/products/hybrid-storage.svg',
-  // legacy aliases
-  'single-phase': '/assets/products/single-phase.svg',
-  'three-phase': '/assets/products/three-phase.svg',
-  'utility-scale': '/assets/products/utility-scale.svg',
-  'energy-storage': '/assets/products/hybrid-storage.svg',
-  accessories: '/assets/products/accessories.svg',
+  'on-grid-inverters': '/assets/products/single-phase.svg',
+  'hybrid-inverters': '/assets/products/hybrid-storage.svg',
+  'utility-scale-inverters': '/assets/products/utility-scale.svg',
+  bess: '/assets/products/hybrid-storage.svg',
 }
 
 type ProductImageProps = {
@@ -23,26 +16,31 @@ type ProductImageProps = {
   className?: string
   priority?: boolean
   sizes?: string
+  plain?: boolean
 }
 
 export function ProductImage({
   name,
-  categorySlug = 'residential-grid-tied',
+  categorySlug = 'on-grid-inverters',
   src,
   alt,
   className,
   priority = false,
   sizes = '(max-width: 768px) 100vw, 50vw',
+  plain = false,
 }: ProductImageProps) {
   const placeholder =
-    categoryPlaceholders[categorySlug] ?? categoryPlaceholders['residential-grid-tied']
+    categoryPlaceholders[categorySlug] ?? categoryPlaceholders['on-grid-inverters']
   const imageSrc = src || placeholder
   const isSvg = imageSrc.endsWith('.svg')
 
   return (
     <div
       className={cn(
-        'relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-oriana-silver to-white',
+        'relative overflow-hidden',
+        plain
+          ? 'aspect-[4/3] bg-white'
+          : 'aspect-[4/3] bg-gradient-to-br from-oriana-silver to-white',
         className,
       )}
     >

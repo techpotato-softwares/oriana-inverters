@@ -34,16 +34,10 @@ function minimalPdf(name: string): File {
 }
 
 const categoryImages: Record<string, string> = {
-  'residential-grid-tied': 'single-phase.svg',
-  'ci-grid-tied': 'three-phase.svg',
-  'utility-grid-tied': 'utility-scale.svg',
-  'residential-hybrid': 'hybrid-storage.svg',
-  'ci-hybrid': 'hybrid-storage.svg',
-  'single-phase': 'single-phase.svg',
-  'three-phase': 'three-phase.svg',
-  'utility-scale': 'utility-scale.svg',
-  'energy-storage': 'hybrid-storage.svg',
-  accessories: 'accessories.svg',
+  'on-grid-inverters': 'single-phase.svg',
+  'hybrid-inverters': 'hybrid-storage.svg',
+  'utility-scale-inverters': 'utility-scale.svg',
+  bess: 'hybrid-storage.svg',
 }
 
 export async function seedProducts({ payload }: { payload: Payload }) {
@@ -193,7 +187,7 @@ export async function seedProducts({ payload }: { payload: Payload }) {
     }
   }
 
-  // Final sweep: delete leftover capacity-prefixed slug copies (e.g. 5kw-og6-...).
+  // Remove every product that is not in the new catalogue (old OG6 SKUs, etc.).
   const leftovers = await payload.find({
     collection: 'products',
     depth: 0,
@@ -202,24 +196,40 @@ export async function seedProducts({ payload }: { payload: Payload }) {
     ...seedOpts,
   })
   for (const doc of leftovers.docs) {
-    const slug = doc.slug ?? ''
-    if (/^\d+(\.\d+)?kw-/i.test(slug) && !canonicalSlugs.has(slug)) {
-      await payload.delete({
-        collection: 'products',
-        id: doc.id,
-        ...seedOpts,
-      })
-      payload.logger.info(`— Removed leftover duplicate ${slug} (#${doc.id})`)
-    }
+    if (canonicalSlugs.has(doc.slug)) continue
+    await payload.delete({
+      collection: 'products',
+      id: doc.id,
+      ...seedOpts,
+    })
+    payload.logger.info(`— Removed old product ${doc.slug} (#${doc.id})`)
+  }
+
+  const canonicalCategorySlugs = new Set(staticCategories.map((cat) => cat.slug))
+  const oldCategories = await payload.find({
+    collection: 'categories',
+    depth: 0,
+    limit: 100,
+    pagination: false,
+    ...seedOpts,
+  })
+  for (const doc of oldCategories.docs) {
+    if (canonicalCategorySlugs.has(doc.slug)) continue
+    await payload.delete({
+      collection: 'categories',
+      id: doc.id,
+      ...seedOpts,
+    })
+    payload.logger.info(`— Removed old category ${doc.slug} (#${doc.id})`)
   }
 
   payload.logger.info('— Seeding downloads...')
 
   const sampleDownloads = [
-    { title: 'Residential Grid-Tied Series Datasheet', type: 'datasheet' as const },
-    { title: 'C&I Grid-Tied Series Datasheet', type: 'datasheet' as const },
-    { title: 'Utility Grid-Tied Datasheet', type: 'datasheet' as const },
-    { title: 'Residential Hybrid Installation Guide', type: 'manual' as const },
+    { title: 'On Grid Inverters Datasheet', type: 'datasheet' as const },
+    { title: 'Hybrid Inverters Datasheet', type: 'datasheet' as const },
+    { title: 'Utility Scale Inverters Datasheet', type: 'datasheet' as const },
+    { title: 'BESS Home Datasheet', type: 'datasheet' as const },
     { title: 'UL 1741 SA Certificate', type: 'certificate' as const },
     { title: 'ISO 9001 Quality Certificate', type: 'certificate' as const },
   ]

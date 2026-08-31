@@ -495,7 +495,7 @@ export interface Download {
 export interface Product {
   id: number;
   /**
-   * Website label (Excel col J), e.g. "5kW OG6-GR1P5K-S(21A)".
+   * Website label, e.g. "4kW ORI-4K-OG04P1-EU-CM1".
    */
   name: string;
   /**
@@ -508,7 +508,7 @@ export interface Product {
    */
   category: number | Category;
   /**
-   * Datasheet model series (e.g. OG6-GR1P(2-3)K01-NV-YD). Used to group models on category pages.
+   * Datasheet model series (family productName). Used to group models on category pages.
    */
   modelSeries?: string | null;
   /**
@@ -598,7 +598,7 @@ export interface Product {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Product families (e.g. Residential Grid-Tied). Create these first, then assign products to them.
+ * Product families (e.g. On Grid Inverters). Create these first, then assign products to them. Products mega-menu tile photos: Catalogue → Categories → open a category → Segments. Segment names must match tile labels (Single Phase, Three Phase, C&I, Utility Grid-Tied PV Inverter, ORIANA BESS Home).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
@@ -622,6 +622,30 @@ export interface Category {
    * Short description for category cards and mega-menu.
    */
   description?: string | null;
+  /**
+   * Optional category photo for cards. Segment tiles in the Products mega-menu use the Segments list below.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Photos shown in the Products mega-menu for this category. Name must match the segment label (Single Phase, Three Phase, C&I, Utility Grid-Tied PV Inverter, ORIANA BESS Home, …).
+   */
+  segments?:
+    | {
+        /**
+         * Must match the mega-menu segment label, e.g. Single Phase, Three Phase, C&I.
+         */
+        name: string;
+        /**
+         * Optional. Auto-derived from name on save if left empty (single-phase, three-phase, c-and-i).
+         */
+        slug?: string | null;
+        /**
+         * Photo for this segment tile in the Products hover menu.
+         */
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Optional longer intro copy for the category landing page (SEO).
    */
@@ -2202,6 +2226,15 @@ export interface CategoriesSelect<T extends boolean = true> {
   slug?: T;
   sortOrder?: T;
   description?: T;
+  image?: T;
+  segments?:
+    | T
+    | {
+        name?: T;
+        slug?: T;
+        image?: T;
+        id?: T;
+      };
   categoryIntroBody?: T;
   parent?: T;
   breadcrumbs?:
