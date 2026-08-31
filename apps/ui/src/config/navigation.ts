@@ -10,6 +10,14 @@ export type NavMegaCategory = {
   columns: NavMenuColumn[]
 }
 
+export function categoryHasSubitems(category: NavMegaCategory): boolean {
+  return category.columns.some((column) => column.links.length > 0)
+}
+
+export function megaItemHasSubitems(categories: NavMegaCategory[] | undefined): boolean {
+  return Boolean(categories?.some(categoryHasSubitems))
+}
+
 /** @deprecated Use NavMegaCategory */
 export type ProductCategoryNav = NavMegaCategory
 

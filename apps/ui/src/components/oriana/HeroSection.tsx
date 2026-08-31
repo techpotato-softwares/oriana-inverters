@@ -18,7 +18,7 @@ export function HeroSection() {
       <div className="pointer-events-none absolute -right-32 top-1/4 h-[500px] w-[500px] rounded-full border border-oriana-sky/10" />
       <div className="pointer-events-none absolute -right-16 top-1/3 h-[380px] w-[380px] rounded-full border border-oriana-sky/5" />
 
-      <div className="container relative z-10 pt-28 pb-20 lg:pt-36">
+      <div className="container relative z-10 pt-28 pb-20 lg:pt-44">
         <div className="grid items-center gap-16 lg:grid-cols-2">
           <div>
             <FadeIn>

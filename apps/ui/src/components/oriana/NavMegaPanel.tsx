@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { ChevronRight } from 'lucide-react'
 
-import type { NavMegaCategory } from '@/config/navigation'
+import { categoryHasSubitems, type NavMegaCategory } from '@/config/navigation'
 import { cn } from '@/utilities/ui'
 
 type NavMegaPanelProps = {
@@ -20,8 +20,10 @@ export function NavMegaPanel({
   ariaLabel,
   viewAllLabel = 'View category →',
 }: NavMegaPanelProps) {
-  const [activeIndex, setActiveIndex] = useState(0)
+  const firstWithSubitems = categories.findIndex(categoryHasSubitems)
+  const [activeIndex, setActiveIndex] = useState(firstWithSubitems >= 0 ? firstWithSubitems : 0)
   const active = categories[activeIndex] ?? categories[0]
+  const activeHasSubitems = active ? categoryHasSubitems(active) : false
 
   if (!active) return null
 
@@ -62,11 +64,17 @@ export function NavMegaPanel({
                         ? 'border-oriana-blue font-semibold text-oriana-blue'
                         : 'border-transparent text-oriana-navy/80 hover:text-oriana-blue',
                     )}
-                    onMouseEnter={() => setActiveIndex(index)}
-                    onFocus={() => setActiveIndex(index)}
+                    onMouseEnter={() => {
+                      if (categoryHasSubitems(category)) setActiveIndex(index)
+                    }}
+                    onFocus={() => {
+                      if (categoryHasSubitems(category)) setActiveIndex(index)
+                    }}
                   >
                     <span className="pr-2 leading-snug">{category.label}</span>
-                    {isActive ? <ChevronRight className="h-4 w-4 shrink-0" aria-hidden /> : null}
+                    {isActive && categoryHasSubitems(category) ? (
+                      <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
+                    ) : null}
                   </Link>
                 </li>
               )
@@ -74,6 +82,7 @@ export function NavMegaPanel({
           </ul>
         </aside>
 
+        {activeHasSubitems ? (
         <div className="min-w-0 flex-1 lg:pl-2">
           <div className="mb-6 flex items-center justify-between">
             <Link
@@ -98,7 +107,9 @@ export function NavMegaPanel({
                 : 'sm:grid-cols-2 lg:grid-cols-3',
             )}
           >
-            {active.columns.map((column) => (
+            {active.columns
+              .filter((column) => column.links.length > 0)
+              .map((column) => (
               <div
                 key={column.title}
                 className="rounded-xl border border-white/50 p-5 shadow-[0_4px_24px_rgba(7,21,37,0.08)] backdrop-blur-lg"
@@ -126,6 +137,7 @@ export function NavMegaPanel({
             ))}
           </div>
         </div>
+        ) : null}
       </div>
     </div>
   )

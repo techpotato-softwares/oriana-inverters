@@ -3,12 +3,13 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Menu, X } from 'lucide-react'
+import { Menu, Search, User, X } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { cn } from '@/utilities/ui'
 import {
   aboutMegaMenuCategories,
   mainNav as defaultMainNav,
+  megaItemHasSubitems,
   productsMegaMenuCategories,
   supportMegaMenuCategories,
   type MainNavEntry,
@@ -18,6 +19,7 @@ import type { CatalogueNavItem } from '@/types/catalogue'
 
 export type SiteHeaderNav = {
   localeLabel?: string
+  searchLabel?: string
   loginLabel?: string
   loginHref?: string
   whereToBuy?: { label: string; href: string }
@@ -26,6 +28,12 @@ export type SiteHeaderNav = {
 }
 
 type MegaMenuKey = 'products' | 'support' | 'about'
+
+const megaHrefs: Record<MegaMenuKey, string> = {
+  products: '/products',
+  support: '/support',
+  about: '/about',
+}
 
 const megaMenuFallbacks: Record<MegaMenuKey, MainNavEntry> = {
   products: { type: 'products', label: 'Products', categories: productsMegaMenuCategories },
@@ -41,6 +49,16 @@ function isMegaMenuItem(
   item: MainNavEntry,
 ): item is Extract<MainNavEntry, { type: MegaMenuKey }> {
   return item.type === 'products' || item.type === 'support' || item.type === 'about'
+}
+
+function itemHasSubmenu(
+  item: MainNavEntry,
+): item is Extract<MainNavEntry, { type: MegaMenuKey }> {
+  return isMegaMenuItem(item) && megaItemHasSubitems(item.categories)
+}
+
+function navHref(item: MainNavEntry): string {
+  return item.type === 'link' ? item.href : megaHrefs[item.type]
 }
 
 export function SiteHeader({
@@ -59,11 +77,16 @@ export function SiteHeader({
   const mainNavItems = nav?.mainNav ?? defaultMainNav
   const whereToBuy = nav?.whereToBuy ?? { label: 'Where to Buy', href: '/where-to-buy' }
   const requestQuote = nav?.requestQuote ?? { label: 'Request Quote', href: '/contact' }
+  const localeLabel = nav?.localeLabel ?? 'USA · English'
+  const searchLabel = nav?.searchLabel ?? 'Search'
+  const loginLabel = nav?.loginLabel ?? 'Login'
+  const loginHref = nav?.loginHref ?? '/admin'
 
   const openMegaItem =
     openMenu != null
       ? (mainNavItems.find((item) => item.type === openMenu) ?? megaMenuFallbacks[openMenu])
       : null
+  const showMegaPanel = openMegaItem != null && itemHasSubmenu(openMegaItem)
 
   useEffect(() => {
     setMobileOpen(false)
@@ -77,81 +100,102 @@ export function SiteHeader({
   }, [catalogueMenu.length, router])
 
   const linkClass =
-    'relative px-3 py-5 text-sm font-medium text-oriana-navy transition-colors hover:text-oriana-blue'
+    'relative px-3 py-3.5 text-sm font-medium text-oriana-navy transition-colors hover:text-oriana-blue'
+  const utilityClass =
+    'inline-flex items-center gap-1.5 text-xs font-medium tracking-wide text-oriana-navy/70 transition-colors hover:text-oriana-blue'
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-white/90 shadow-sm backdrop-blur-xl backdrop-saturate-150 transition-all duration-300">
-      <div className="relative border-b border-oriana-navy/8" onMouseLeave={() => setOpenMenu(null)}>
+      <div className="relative" onMouseLeave={() => setOpenMenu(null)}>
         <div className="container">
-          <div className="flex h-16 items-center justify-between lg:h-[4.25rem]">
-            <Link href="/" className="shrink-0">
-              <Logo priority variant="light" />
-            </Link>
-
-            <nav className="hidden flex-1 items-center justify-center gap-1 xl:flex">
-              {mainNavItems.map((item) => {
-                if (item.type === 'link') {
-                  const active = pathname === item.href
-                  return (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      className={cn(linkClass, active && 'text-oriana-blue')}
-                    >
-                      {item.label}
-                    </Link>
-                  )
-                }
-
-                if (!isMegaMenuItem(item)) return null
-
-                const open = openMenu === item.type
-                return (
-                  <button
-                    key={item.label}
-                    type="button"
-                    className={cn(linkClass, open && 'text-oriana-blue')}
-                    onMouseEnter={() => setOpenMenu(item.type)}
-                    onFocus={() => setOpenMenu(item.type)}
-                    aria-expanded={open}
-                    aria-haspopup="true"
-                  >
-                    {item.label}
-                    <span
-                      className={cn(
-                        'absolute inset-x-3 bottom-0 h-0.5 origin-center bg-oriana-blue transition-transform duration-300',
-                        open ? 'scale-x-100' : 'scale-x-0',
-                      )}
-                    />
-                  </button>
-                )
-              })}
-            </nav>
-
-            <div className="hidden shrink-0 items-center gap-2 xl:flex">
-              <Link href={whereToBuy.href} className={linkClass}>
-                {whereToBuy.label}
-              </Link>
-              <Link
-                href={requestQuote.href}
-                className="ml-1 rounded-md bg-oriana-blue px-5 py-2 text-sm font-semibold text-white transition hover:bg-oriana-navy"
+          <div className="grid h-[4.25rem] grid-cols-[1fr_auto_1fr] items-center lg:h-[4.75rem]">
+            <div className="flex items-center justify-start gap-2">
+              <button
+                type="button"
+                className="p-2 text-oriana-navy xl:hidden"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                aria-label="Menu"
               >
-                {requestQuote.label}
-              </Link>
+                {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+              <span className={cn(utilityClass, 'hidden xl:inline-flex')}>{localeLabel}</span>
             </div>
 
-            <button
-              type="button"
-              className="p-2 text-oriana-navy xl:hidden"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Menu"
-            >
-              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+            <Link href="/" className="justify-self-center">
+              <Logo priority variant="light" className="h-11 w-auto md:h-[3.25rem]" />
+            </Link>
+
+            <div className="flex items-center justify-end gap-3 sm:gap-4">
+              <Link href="/search" className={utilityClass} aria-label={searchLabel}>
+                <Search className="h-4 w-4" />
+                <span className="sr-only xl:not-sr-only">{searchLabel}</span>
+              </Link>
+              <Link href={loginHref} className={cn(utilityClass, 'hidden sm:inline-flex')}>
+                <User className="h-4 w-4" />
+                <span className="uppercase">{loginLabel}</span>
+              </Link>
+            </div>
           </div>
         </div>
 
-        {openMegaItem && isMegaMenuItem(openMegaItem) && (
+        <div className="hidden border-t border-oriana-navy/8 xl:block">
+          <div className="container">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+              <div />
+              <nav className="flex items-center justify-center gap-1">
+                {mainNavItems.map((item) => {
+                  const hasMenu = itemHasSubmenu(item)
+                  const href = navHref(item)
+                  const open = hasMenu && openMenu === item.type
+                  const active = item.type === 'link' && pathname === item.href
+
+                  return (
+                    <Link
+                      key={item.label}
+                      href={href}
+                      className={cn(linkClass, (open || active) && 'text-oriana-blue')}
+                      onMouseEnter={() =>
+                        setOpenMenu(itemHasSubmenu(item) ? item.type : null)
+                      }
+                      onFocus={() =>
+                        setOpenMenu(itemHasSubmenu(item) ? item.type : null)
+                      }
+                      aria-expanded={itemHasSubmenu(item) ? open : undefined}
+                      aria-haspopup={itemHasSubmenu(item) ? 'true' : undefined}
+                    >
+                      {item.label}
+                      <span
+                        className={cn(
+                          'absolute inset-x-3 bottom-0 h-0.5 origin-center bg-oriana-blue transition-transform duration-300',
+                          open || active ? 'scale-x-100' : 'scale-x-0',
+                        )}
+                      />
+                    </Link>
+                  )
+                })}
+              </nav>
+
+              <div className="flex items-center justify-end gap-2">
+                <Link
+                  href={whereToBuy.href}
+                  className={linkClass}
+                  onMouseEnter={() => setOpenMenu(null)}
+                >
+                  {whereToBuy.label}
+                </Link>
+                <Link
+                  href={requestQuote.href}
+                  className="ml-1 rounded-md bg-oriana-blue px-5 py-2 text-sm font-semibold text-white transition hover:bg-oriana-navy"
+                  onMouseEnter={() => setOpenMenu(null)}
+                >
+                  {requestQuote.label}
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {showMegaPanel && openMegaItem ? (
           <div
             className="hidden xl:block"
             onMouseEnter={() => setOpenMenu(openMegaItem.type)}
@@ -162,17 +206,17 @@ export function SiteHeader({
               ariaLabel={`${openMegaItem.label} menu`}
             />
           </div>
-        )}
+        ) : null}
       </div>
 
       {mobileOpen && (
         <div className="max-h-[80vh] overflow-y-auto border-t border-oriana-navy/10 bg-white px-4 py-4 xl:hidden">
           {mainNavItems.map((item) => {
-            if (item.type === 'link') {
+            if (!itemHasSubmenu(item)) {
               return (
                 <Link
                   key={item.label}
-                  href={item.href}
+                  href={navHref(item)}
                   className="mb-4 block py-2 text-sm font-semibold text-oriana-navy hover:text-oriana-blue"
                 >
                   {item.label}
@@ -180,13 +224,14 @@ export function SiteHeader({
               )
             }
 
-            if (!isMegaMenuItem(item)) return null
-
             return (
               <div key={item.label} className="mb-6">
-                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-oriana-blue">
+                <Link
+                  href={navHref(item)}
+                  className="mb-2 block text-xs font-bold uppercase tracking-widest text-oriana-blue"
+                >
                   {item.label}
-                </p>
+                </Link>
                 {item.categories.map((category) => (
                   <div key={category.href} className="mb-3">
                     <Link

@@ -1,6 +1,7 @@
-import clsx from 'clsx'
 import Image from 'next/image'
 import React from 'react'
+
+import { cn } from '@/utilities/ui'
 
 interface Props {
   className?: string
@@ -23,7 +24,7 @@ export const Logo = (props: Props) => {
       height={80}
       priority={priority}
       {...(priority ? {} : { loading })}
-      className={clsx('h-10 w-auto md:h-12', className)}
+      className={cn('h-10 w-auto md:h-12', className)}
       src={src}
     />
   )

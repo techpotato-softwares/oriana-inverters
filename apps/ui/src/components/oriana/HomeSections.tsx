@@ -73,7 +73,7 @@ export function HomeHero({
         <div className="absolute inset-0 bg-gradient-to-r from-oriana-navy/80 via-oriana-navy/45 to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-white via-white/80 to-transparent" />
 
-        <div className="container relative z-10 pb-28 pt-32 lg:pb-36 lg:pt-36">
+        <div className="container relative z-10 pb-28 pt-32 lg:pb-36 lg:pt-48">
           <FadeIn>
             <p className="font-display text-sm font-semibold uppercase tracking-[0.28em] text-oriana-sky">
               {slide.linkType === 'post' ? 'From the blog' : 'Featured product'}
@@ -141,7 +141,7 @@ export function HomeHero({
       {/* Atmospheric horizon band */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-white via-white/80 to-transparent" />
 
-      <div className="container relative z-10 grid items-center gap-10 pb-28 pt-32 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:pb-36 lg:pt-36">
+      <div className="container relative z-10 grid items-center gap-10 pb-28 pt-32 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:pb-36 lg:pt-48">
         <div>
           <FadeIn>
             <p className="font-display text-sm font-semibold uppercase tracking-[0.28em] text-oriana-sky">

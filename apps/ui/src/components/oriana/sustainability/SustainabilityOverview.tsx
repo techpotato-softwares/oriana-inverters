@@ -55,7 +55,7 @@ export function SustainabilityOverview({
 
   return (
     <main>
-      <section className="relative overflow-hidden bg-oriana-navy pt-28 lg:pt-36">
+      <section className="relative overflow-hidden bg-oriana-navy pt-28 lg:pt-48">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={heroImage}
