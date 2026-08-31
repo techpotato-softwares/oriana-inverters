@@ -21,6 +21,30 @@ export type VisionMissionSectionProps = {
   className?: string
 }
 
+function clamp01(n: number) {
+  return Math.min(1, Math.max(0, n))
+}
+
+function smoothstep(edge0: number, edge1: number, x: number) {
+  const t = clamp01((x - edge0) / Math.max(edge1 - edge0, 1e-6))
+  return t * t * (3 - 2 * t)
+}
+
+/** Crossfade opacities with the swap centered on each card boundary (50% for two cards). */
+function textOpacitiesForRatio(ratio: number, count: number, fadeWindow = 0.36): number[] {
+  if (count <= 1) return [1]
+  return Array.from({ length: count }, (_, i) => {
+    const start = i / count
+    const end = (i + 1) / count
+    const half = fadeWindow / 2
+    const inStart = i === 0 ? -1 : start - half
+    const inEnd = i === 0 ? 0 : start + half
+    const outStart = i === count - 1 ? 1 : end - half
+    const outEnd = i === count - 1 ? 2 : end + half
+    return clamp01(smoothstep(inStart, inEnd, ratio) * (1 - smoothstep(outStart, outEnd, ratio)))
+  })
+}
+
 function AccentMark() {
   return (
     <svg
@@ -50,7 +74,11 @@ export function VisionMissionSection({
   className = '',
 }: VisionMissionSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
+  const ticking = useRef(false)
   const [active, setActive] = useState(0)
+  const [textOpacities, setTextOpacities] = useState<number[]>(() =>
+    cards.map((_, i) => (i === 0 ? 1 : 0)),
+  )
   const [imageProgress, setImageProgress] = useState<number[]>(() => cards.map(() => 0))
 
   useEffect(() => {
@@ -69,6 +97,13 @@ export function VisionMissionSection({
       const nextActive = Math.min(cards.length - 1, Math.floor(ratio * cards.length + 0.001))
       setActive(nextActive)
 
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (reduceMotion) {
+        setTextOpacities(cards.map((_, i) => (i === nextActive ? 1 : 0)))
+      } else {
+        setTextOpacities(textOpacitiesForRatio(ratio, cards.length))
+      }
+
       const progress = cards.map((_, i) => {
         const start = i / cards.length
         const end = (i + 1) / cards.length
@@ -79,12 +114,21 @@ export function VisionMissionSection({
       setImageProgress(progress)
     }
 
+    const onScroll = () => {
+      if (ticking.current) return
+      ticking.current = true
+      window.requestAnimationFrame(() => {
+        update()
+        ticking.current = false
+      })
+    }
+
     update()
-    window.addEventListener('scroll', update, { passive: true })
-    window.addEventListener('resize', update)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
     return () => {
-      window.removeEventListener('scroll', update)
-      window.removeEventListener('resize', update)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
     }
   }, [cards])
 
@@ -119,16 +163,21 @@ export function VisionMissionSection({
             {/* Copy panel */}
             <div className="relative order-2 h-full min-h-[280px] bg-white lg:order-1">
               {cards.map((card, i) => {
+                const opacity = textOpacities[i] ?? 0
                 const isActive = active === i
                 return (
                   <div
                     key={card.id}
-                    className="absolute inset-0 flex flex-col justify-center px-8 py-10 transition-opacity duration-500 sm:px-12 lg:px-14 xl:px-16"
+                    className="absolute inset-0 flex flex-col justify-center px-8 py-10 sm:px-12 lg:px-14 xl:px-16"
                     style={{
-                      opacity: isActive ? 1 : 0,
-                      zIndex: isActive ? 2 : 0,
-                      pointerEvents: isActive ? 'auto' : 'none',
+                      opacity,
+                      zIndex: isActive ? 2 : 1,
+                      pointerEvents: opacity > 0.45 ? 'auto' : 'none',
+                      transform: `translateY(${(1 - opacity) * 14}px)`,
+                      filter: `blur(${(1 - opacity) * 1.6}px)`,
+                      willChange: 'opacity, transform, filter',
                     }}
+                    aria-hidden={opacity < 0.45}
                   >
                     <div className="flex max-w-xl flex-col gap-6 lg:gap-8">
                       <div>
@@ -149,6 +198,7 @@ export function VisionMissionSection({
                     {card.href ? (
                       <Link
                         href={card.href}
+                        tabIndex={opacity > 0.45 ? 0 : -1}
                         className="mt-8 inline-flex w-fit min-w-[12rem] items-center justify-center rounded-full border-2 border-oriana-blue px-8 py-3.5 text-sm font-semibold text-oriana-blue transition hover:bg-oriana-blue hover:text-white sm:text-base"
                       >
                         {card.ctaLabel || 'Explore more'}

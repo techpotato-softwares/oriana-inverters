@@ -6,7 +6,7 @@ const AdminIcon: React.FC = () => {
     // eslint-disable-next-line @next/next/no-img-element
     <img
       alt="Oriana"
-      src="/favicon.svg"
+      src="/apple-touch-icon.png"
       style={{ height: '1.5rem', width: '1.5rem', display: 'block' }}
     />
   )

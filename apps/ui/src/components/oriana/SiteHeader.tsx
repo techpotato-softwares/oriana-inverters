@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Menu, Search, User, X } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { cn } from '@/utilities/ui'
@@ -22,8 +23,6 @@ export type SiteHeaderNav = {
   searchLabel?: string
   loginLabel?: string
   loginHref?: string
-  whereToBuy?: { label: string; href: string }
-  requestQuote?: { label: string; href: string }
   mainNav?: MainNavEntry[]
 }
 
@@ -70,13 +69,16 @@ export function SiteHeader({
 }) {
   const pathname = usePathname()
   const router = useRouter()
+  const reduceMotion = useReducedMotion()
   const refreshedEmptyMenu = useRef(false)
+  const lastScrollY = useRef(0)
+  const scrollTicking = useRef(false)
+  const scrollAccum = useRef(0)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<MegaMenuKey | null>(null)
+  const [headerHidden, setHeaderHidden] = useState(false)
 
   const mainNavItems = nav?.mainNav ?? defaultMainNav
-  const whereToBuy = nav?.whereToBuy ?? { label: 'Where to Buy', href: '/where-to-buy' }
-  const requestQuote = nav?.requestQuote ?? { label: 'Request Quote', href: '/contact' }
   const localeLabel = nav?.localeLabel ?? 'USA · English'
   const searchLabel = nav?.searchLabel ?? 'Search'
   const loginLabel = nav?.loginLabel ?? 'Login'
@@ -91,7 +93,46 @@ export function SiteHeader({
   useEffect(() => {
     setMobileOpen(false)
     setOpenMenu(null)
+    setHeaderHidden(false)
   }, [pathname])
+
+  useEffect(() => {
+    lastScrollY.current = window.scrollY
+    scrollAccum.current = 0
+
+    const onScroll = () => {
+      if (scrollTicking.current) return
+      scrollTicking.current = true
+
+      window.requestAnimationFrame(() => {
+        const current = window.scrollY
+        const delta = current - lastScrollY.current
+
+        if (current <= 24) {
+          setHeaderHidden(false)
+          scrollAccum.current = 0
+        } else {
+          const reversed =
+            (delta > 0 && scrollAccum.current < 0) || (delta < 0 && scrollAccum.current > 0)
+          if (reversed) scrollAccum.current = 0
+          scrollAccum.current += delta
+
+          if (scrollAccum.current > 12 && !mobileOpen) {
+            setHeaderHidden(true)
+            setOpenMenu(null)
+          } else if (scrollAccum.current < -12) {
+            setHeaderHidden(false)
+          }
+        }
+
+        lastScrollY.current = current
+        scrollTicking.current = false
+      })
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [mobileOpen])
 
   useEffect(() => {
     if (catalogueMenu.length > 0 || refreshedEmptyMenu.current) return
@@ -105,10 +146,18 @@ export function SiteHeader({
     'inline-flex items-center gap-1.5 text-xs font-medium tracking-wide text-oriana-navy/70 transition-colors hover:text-oriana-blue'
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-white/90 shadow-sm backdrop-blur-xl backdrop-saturate-150 transition-all duration-300">
+    <header
+      className={cn(
+        'fixed inset-x-0 top-0 z-50 bg-white/90 shadow-sm backdrop-blur-xl backdrop-saturate-150',
+        reduceMotion
+          ? 'transition-none'
+          : 'transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
+        headerHidden ? '-translate-y-full' : 'translate-y-0',
+      )}
+    >
       <div className="relative" onMouseLeave={() => setOpenMenu(null)}>
         <div className="container">
-          <div className="grid h-[4.25rem] grid-cols-[1fr_auto_1fr] items-center lg:h-[4.75rem]">
+          <div className="grid h-[4.5rem] grid-cols-[1fr_auto_1fr] items-center lg:h-20">
             <div className="flex items-center justify-start gap-2">
               <button
                 type="button"
@@ -122,7 +171,7 @@ export function SiteHeader({
             </div>
 
             <Link href="/" className="justify-self-center">
-              <Logo priority variant="light" className="h-11 w-auto md:h-[3.25rem]" />
+              <Logo priority variant="light" className="h-12 w-auto md:h-16" />
             </Link>
 
             <div className="flex items-center justify-end gap-3 sm:gap-4">
@@ -140,73 +189,74 @@ export function SiteHeader({
 
         <div className="hidden border-t border-oriana-navy/8 xl:block">
           <div className="container">
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center">
-              <div />
-              <nav className="flex items-center justify-center gap-1">
-                {mainNavItems.map((item) => {
-                  const hasMenu = itemHasSubmenu(item)
-                  const href = navHref(item)
-                  const open = hasMenu && openMenu === item.type
-                  const active = item.type === 'link' && pathname === item.href
+            <nav className="flex items-center justify-center gap-1">
+              {mainNavItems.map((item) => {
+                const hasMenu = itemHasSubmenu(item)
+                const href = navHref(item)
+                const open = hasMenu && openMenu === item.type
+                const active = item.type === 'link' && pathname === item.href
 
-                  return (
-                    <Link
-                      key={item.label}
-                      href={href}
-                      className={cn(linkClass, (open || active) && 'text-oriana-blue')}
-                      onMouseEnter={() =>
-                        setOpenMenu(itemHasSubmenu(item) ? item.type : null)
-                      }
-                      onFocus={() =>
-                        setOpenMenu(itemHasSubmenu(item) ? item.type : null)
-                      }
-                      aria-expanded={itemHasSubmenu(item) ? open : undefined}
-                      aria-haspopup={itemHasSubmenu(item) ? 'true' : undefined}
-                    >
-                      {item.label}
-                      <span
-                        className={cn(
-                          'absolute inset-x-3 bottom-0 h-0.5 origin-center bg-oriana-blue transition-transform duration-300',
-                          open || active ? 'scale-x-100' : 'scale-x-0',
-                        )}
-                      />
-                    </Link>
-                  )
-                })}
-              </nav>
-
-              <div className="flex items-center justify-end gap-2">
-                <Link
-                  href={whereToBuy.href}
-                  className={linkClass}
-                  onMouseEnter={() => setOpenMenu(null)}
-                >
-                  {whereToBuy.label}
-                </Link>
-                <Link
-                  href={requestQuote.href}
-                  className="ml-1 rounded-md bg-oriana-blue px-5 py-2 text-sm font-semibold text-white transition hover:bg-oriana-navy"
-                  onMouseEnter={() => setOpenMenu(null)}
-                >
-                  {requestQuote.label}
-                </Link>
-              </div>
-            </div>
+                return (
+                  <Link
+                    key={item.label}
+                    href={href}
+                    className={cn(linkClass, (open || active) && 'text-oriana-blue')}
+                    onMouseEnter={() =>
+                      setOpenMenu(itemHasSubmenu(item) ? item.type : null)
+                    }
+                    onFocus={() =>
+                      setOpenMenu(itemHasSubmenu(item) ? item.type : null)
+                    }
+                    aria-expanded={itemHasSubmenu(item) ? open : undefined}
+                    aria-haspopup={itemHasSubmenu(item) ? 'true' : undefined}
+                  >
+                    {item.label}
+                    <span
+                      className={cn(
+                        'absolute inset-x-3 bottom-0 h-0.5 origin-center bg-oriana-blue transition-transform duration-300',
+                        open || active ? 'scale-x-100' : 'scale-x-0',
+                      )}
+                    />
+                  </Link>
+                )
+              })}
+            </nav>
           </div>
         </div>
 
-        {showMegaPanel && openMegaItem ? (
-          <div
-            className="hidden xl:block"
-            onMouseEnter={() => setOpenMenu(openMegaItem.type)}
-          >
-            <NavMegaPanel
-              label={openMegaItem.label}
-              categories={openMegaItem.categories}
-              ariaLabel={`${openMegaItem.label} menu`}
-            />
-          </div>
-        ) : null}
+        <div className="pointer-events-none absolute inset-x-0 top-full z-40 hidden xl:block">
+          <AnimatePresence>
+            {showMegaPanel && openMegaItem ? (
+              <motion.div
+                key="mega-panel"
+                className="pointer-events-auto overflow-hidden"
+                initial={reduceMotion ? false : { height: 0, opacity: 0.4 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={reduceMotion ? undefined : { height: 0, opacity: 0.4 }}
+                transition={{
+                  height: {
+                    duration: reduceMotion ? 0 : 0.38,
+                    ease: [0.22, 1, 0.36, 1],
+                  },
+                  opacity: {
+                    duration: reduceMotion ? 0 : 0.24,
+                    ease: 'easeOut',
+                  },
+                }}
+                onMouseEnter={() => setOpenMenu(openMegaItem.type)}
+              >
+                <div className="pb-10">
+                  <NavMegaPanel
+                    key={openMegaItem.type}
+                    label={openMegaItem.label}
+                    categories={openMegaItem.categories}
+                    ariaLabel={`${openMegaItem.label} menu`}
+                  />
+                </div>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+        </div>
       </div>
 
       {mobileOpen && (
@@ -256,15 +306,6 @@ export function SiteHeader({
               </div>
             )
           })}
-          <Link href={whereToBuy.href} className="block py-2 text-sm font-semibold text-oriana-blue">
-            {whereToBuy.label}
-          </Link>
-          <Link
-            href={requestQuote.href}
-            className="mt-4 block rounded-md bg-oriana-blue py-3 text-center text-sm font-semibold text-white"
-          >
-            {requestQuote.label}
-          </Link>
         </div>
       )}
     </header>

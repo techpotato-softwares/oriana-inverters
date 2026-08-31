@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { ChevronRight } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
 
 import { categoryHasSubitems, type NavMegaCategory } from '@/config/navigation'
 import { cn } from '@/utilities/ui'
@@ -22,6 +23,7 @@ export function NavMegaPanel({
 }: NavMegaPanelProps) {
   const firstWithSubitems = categories.findIndex(categoryHasSubitems)
   const [activeIndex, setActiveIndex] = useState(firstWithSubitems >= 0 ? firstWithSubitems : 0)
+  const reduceMotion = useReducedMotion()
   const active = categories[activeIndex] ?? categories[0]
   const activeHasSubitems = active ? categoryHasSubitems(active) : false
 
@@ -29,7 +31,7 @@ export function NavMegaPanel({
 
   return (
     <div
-      className="absolute left-0 right-0 top-full z-40 border-t border-white/60 shadow-[0_12px_40px_rgba(7,21,37,0.12)] backdrop-blur-2xl backdrop-saturate-150"
+      className="border-t border-white/60 shadow-[0_12px_40px_rgba(7,21,37,0.12)] backdrop-blur-2xl backdrop-saturate-150"
       style={{
         background: 'rgba(255, 255, 255, 0.92)',
         backdropFilter: 'blur(24px)',
@@ -83,60 +85,66 @@ export function NavMegaPanel({
         </aside>
 
         {activeHasSubitems ? (
-        <div className="min-w-0 flex-1 lg:pl-2">
-          <div className="mb-6 flex items-center justify-between">
-            <Link
-              href={active.href}
-              className="text-base font-semibold text-oriana-navy transition hover:text-oriana-blue"
-            >
-              {active.label}
-            </Link>
-            <Link
-              href={active.href}
-              className="text-sm text-oriana-muted transition hover:text-oriana-blue"
-            >
-              {viewAllLabel}
-            </Link>
-          </div>
-
-          <div
-            className={cn(
-              'grid gap-8',
-              active.columns.length >= 4
-                ? 'sm:grid-cols-2 lg:grid-cols-4'
-                : 'sm:grid-cols-2 lg:grid-cols-3',
-            )}
+          <motion.div
+            key={active.href}
+            className="min-w-0 flex-1 lg:pl-2"
+            initial={reduceMotion ? false : { opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
           >
-            {active.columns
-              .filter((column) => column.links.length > 0)
-              .map((column) => (
-              <div
-                key={column.title}
-                className="rounded-xl border border-white/50 p-5 shadow-[0_4px_24px_rgba(7,21,37,0.08)] backdrop-blur-lg"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.78)',
-                  backdropFilter: 'blur(16px)',
-                  WebkitBackdropFilter: 'blur(16px)',
-                  borderRadius: 16,
-                }}
+            <div className="mb-6 flex items-center justify-between">
+              <Link
+                href={active.href}
+                className="text-base font-semibold text-oriana-navy transition hover:text-oriana-blue"
               >
-                <p className="text-base font-semibold text-oriana-navy">{column.title}</p>
-                <ul className="mt-4 space-y-2.5">
-                  {column.links.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className="text-sm text-oriana-muted transition hover:text-oriana-blue"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
+                {active.label}
+              </Link>
+              <Link
+                href={active.href}
+                className="text-sm text-oriana-muted transition hover:text-oriana-blue"
+              >
+                {viewAllLabel}
+              </Link>
+            </div>
+
+            <div
+              className={cn(
+                'grid gap-8',
+                active.columns.length >= 4
+                  ? 'sm:grid-cols-2 lg:grid-cols-4'
+                  : 'sm:grid-cols-2 lg:grid-cols-3',
+              )}
+            >
+              {active.columns
+                .filter((column) => column.links.length > 0)
+                .map((column) => (
+                  <div
+                    key={column.title}
+                    className="rounded-xl border border-white/50 p-5 shadow-[0_4px_24px_rgba(7,21,37,0.08)] backdrop-blur-lg"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.78)',
+                      backdropFilter: 'blur(16px)',
+                      WebkitBackdropFilter: 'blur(16px)',
+                      borderRadius: 16,
+                    }}
+                  >
+                    <p className="text-base font-semibold text-oriana-navy">{column.title}</p>
+                    <ul className="mt-4 space-y-2.5">
+                      {column.links.map((link) => (
+                        <li key={link.href}>
+                          <Link
+                            href={link.href}
+                            className="text-sm text-oriana-muted transition hover:text-oriana-blue"
+                          >
+                            {link.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+            </div>
+          </motion.div>
         ) : null}
       </div>
     </div>

@@ -6,8 +6,8 @@ const AdminLogo: React.FC = () => {
     // eslint-disable-next-line @next/next/no-img-element
     <img
       alt="Oriana Inverters"
-      src="/assets/logo-light.png"
-      style={{ height: '2.75rem', width: 'auto', display: 'block' }}
+      src="/assets/logo.svg"
+      style={{ height: '3.25rem', width: 'auto', display: 'block' }}
     />
   )
 }

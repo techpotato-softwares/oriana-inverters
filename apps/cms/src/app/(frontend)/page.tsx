@@ -11,6 +11,7 @@ import {
 } from '@/components/oriana/HomeSections'
 import { FollowOrianaSection } from '@/components/oriana/FollowOrianaSection'
 import { GreenMissionSection } from '@/components/oriana/GreenMissionSection'
+import { IntroductionSection } from '@/components/oriana/IntroductionSection'
 import { PeekStackImages } from '@/components/oriana/PeekStackImages'
 import { ProductCategoriesSection } from '@/components/oriana/ProductCategoriesSection'
 import { VideoHero } from '@/components/oriana/VideoHero'
@@ -28,6 +29,15 @@ const HOME_VIDEO_HERO = {
     'To power that transforms businesses',
     'Energy platforms partners trust',
   ],
+}
+
+const HOME_INTRODUCTION = {
+  title: 'Introduction',
+  paragraphs: [
+    'At Oriana, we are building the next generation of solar inverter technology with a focus on efficiency, reliability, intelligent performance, and long-term value.',
+    "Backed by industry experience and a strong understanding of India's solar ecosystem, Oriana Inverters are designed to meet the evolving requirements of residential, commercial, industrial, and utility-scale solar applications.",
+  ],
+  tagline: 'Built in India. Designed for the Future.',
 }
 
 const HOME_PEEK_IMAGES = [
@@ -296,6 +306,7 @@ export default async function HomePage() {
   return (
     <main className="bg-white">
       <VideoHero {...HOME_VIDEO_HERO} />
+      <IntroductionSection {...HOME_INTRODUCTION} />
       <PeekStackImages images={HOME_PEEK_IMAGES} ariaLabel="Customer scenarios" />
       <VisionMissionSection cards={HOME_VISION_MISSION} />
       <ImpactStats
