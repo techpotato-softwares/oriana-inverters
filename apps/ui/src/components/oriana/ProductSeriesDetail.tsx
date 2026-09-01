@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { FileText } from 'lucide-react'
-import { ProductImage } from '@/components/oriana/ProductImage'
+import { ProductImage } from './ProductImage'
 import {
   formatProductPowerLabel,
   productCardTypeLabel,
@@ -440,10 +440,10 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
 
           <div>
             <p className="text-sm font-medium text-oriana-blue">{typeLabel}</p>
-            <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl lg:text-5xl">
+            <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-oriana-ink md:text-4xl lg:text-5xl">
               {headline}
             </h1>
-            <p className="mt-4 font-display text-lg font-medium leading-snug text-oriana-navy md:text-2xl">
+            <p className="mt-4 font-display text-lg font-medium leading-snug text-oriana-ink md:text-2xl">
               {series.series}
             </p>
             {series.description ? (
@@ -564,7 +564,7 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
             </div>
 
             <div className="mt-14">
-              <h2 className="text-center font-display text-2xl font-semibold text-oriana-navy md:text-3xl">
+              <h2 className="text-center font-display text-2xl font-semibold text-oriana-ink md:text-3xl">
                 {series.series}
               </h2>
               <dl className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">

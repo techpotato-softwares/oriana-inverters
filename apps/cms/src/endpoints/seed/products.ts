@@ -10,13 +10,18 @@ const assetsDir = path.resolve(dirname, '../../../public/assets/products')
 
 const seedOpts = { overrideAccess: true as const, context: { disableRevalidate: true } }
 
-function readLocalSvg(filename: string): File {
+function readLocalImage(filename: string): File {
   const filePath = path.join(assetsDir, filename)
   const data = fs.readFileSync(filePath)
+  const mimetype = filename.endsWith('.png')
+    ? 'image/png'
+    : filename.endsWith('.jpg') || filename.endsWith('.jpeg')
+      ? 'image/jpeg'
+      : 'image/svg+xml'
   return {
     name: filename,
     data,
-    mimetype: 'image/svg+xml',
+    mimetype,
     size: data.byteLength,
   }
 }
@@ -34,10 +39,10 @@ function minimalPdf(name: string): File {
 }
 
 const categoryImages: Record<string, string> = {
-  'on-grid-inverters': 'single-phase.svg',
-  'hybrid-inverters': 'hybrid-storage.svg',
-  'utility-scale-inverters': 'utility-scale.svg',
-  bess: 'hybrid-storage.svg',
+  'on-grid-inverters': 'segment-string.png',
+  'hybrid-inverters': 'segment-string.png',
+  'utility-scale-inverters': 'segment-cabinet.png',
+  bess: 'segment-cabinet.png',
 }
 
 export async function seedProducts({ payload }: { payload: Payload }) {
@@ -118,7 +123,7 @@ export async function seedProducts({ payload }: { payload: Payload }) {
 
     if (canUploadMedia && !heroImageId) {
       try {
-        const imageFile = readLocalSvg(categoryImages[product.categorySlug] ?? 'single-phase.svg')
+        const imageFile = readLocalImage(categoryImages[product.categorySlug] ?? 'segment-string.png')
         const hero = await payload.create({
           collection: 'media',
           data: {

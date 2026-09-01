@@ -29,8 +29,55 @@ export function NavMegaPanel({
   const active = categories[activeIndex] ?? categories[0]
   const activeHasSubitems = active ? categoryHasSubitems(active) : false
   const isSegmentMenu = Boolean(active?.columns.some((column) => column.image))
+  const isCategoryTiles =
+    categories.length > 1 && categories.every((category) => Boolean(category.image))
 
   if (!active) return null
+
+  if (isCategoryTiles) {
+    return (
+      <div className="border-t border-oriana-navy/8 bg-white" role="region" aria-label={ariaLabel ?? `${label} menu`}>
+        <div className="container py-10 lg:py-12">
+          <Link
+            href={viewAllHref}
+            className="mb-8 inline-flex items-center gap-1 text-sm font-medium text-oriana-navy transition hover:text-oriana-blue"
+          >
+            {viewAllLabel}
+            <ChevronRight className="h-4 w-4" aria-hidden />
+          </Link>
+          <div
+            className={cn(
+              'grid gap-8',
+              categories.length >= 4 ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-2 md:grid-cols-3',
+            )}
+          >
+            {categories.map((category) => (
+              <Link
+                key={category.href}
+                href={category.href}
+                className="group flex flex-col items-center"
+              >
+                <span className="flex h-40 w-full items-center justify-center sm:h-48">
+                  <img
+                    src={category.image ?? ''}
+                    alt={category.label}
+                    width={320}
+                    height={208}
+                    loading="eager"
+                    decoding="async"
+                    className="h-auto max-h-full w-auto max-w-full object-contain transition group-hover:scale-105"
+                  />
+                </span>
+                <p className="mt-4 text-center text-sm font-medium leading-snug text-oriana-ink transition group-hover:text-oriana-blue">
+                  {category.label}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="border-t border-oriana-navy/8 bg-white" role="region" aria-label={ariaLabel ?? `${label} menu`}>
@@ -145,7 +192,7 @@ function SegmentTiles({ columns, priority }: { columns: NavMenuColumn[]; priorit
               className="h-auto max-h-full w-auto max-w-full object-contain"
             />
           </span>
-          <p className="mt-4 text-center text-sm font-medium leading-snug text-oriana-navy/80 transition group-hover:text-oriana-blue">
+          <p className="mt-4 text-center text-sm font-medium leading-snug text-oriana-ink transition group-hover:text-oriana-blue">
             {column.title}
           </p>
         </Link>

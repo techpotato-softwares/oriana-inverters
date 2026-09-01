@@ -19,19 +19,20 @@ export type NavMenuColumn = {
 export type NavMegaCategory = {
   label: string
   href: string
+  image?: string
   columns: NavMenuColumn[]
 }
 
 export function categoryHasSubitems(category: NavMegaCategory): boolean {
-  return category.columns.some((column) => column.links.length > 0 || Boolean(column.href))
+  return (
+    Boolean(category.image) ||
+    category.columns.some((column) => column.links.length > 0 || Boolean(column.href))
+  )
 }
 
 export function megaItemHasSubitems(categories: NavMegaCategory[] | undefined): boolean {
   return Boolean(categories?.some(categoryHasSubitems))
 }
-
-/** @deprecated Use NavMegaCategory */
-export type ProductCategoryNav = NavMegaCategory
 
 /** Products mega-menu — driven by productMaster.json (category → segment → product). */
 export const productsMegaMenuCategories: NavMegaCategory[] = buildProductsMegaMenu()
@@ -170,18 +171,6 @@ export const partnersMegaMenuCategories: NavMegaCategory[] = [
   },
 ]
 
-/** Flat list for mobile / simple fallbacks */
-export const supportNavLinks: SimpleNavLink[] = supportMegaMenuCategories.map((cat) => ({
-  label: cat.label,
-  href: cat.href,
-}))
-
-/** Flat list for mobile / simple fallbacks */
-export const productsNavLinks: SimpleNavLink[] = productsMegaMenuCategories.map((cat) => ({
-  label: cat.label,
-  href: cat.href,
-}))
-
 /** About Us mega-menu */
 export const aboutMegaMenuCategories: NavMegaCategory[] = [
   {
@@ -296,31 +285,12 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
   },
 ]
 
-/** Flat list for mobile / simple fallbacks */
-export const aboutNavLinks: SimpleNavLink[] = aboutMegaMenuCategories.map((cat) => ({
-  label: cat.label,
-  href: cat.href,
-}))
-
-/** Flat list for mobile / simple fallbacks */
-export const partnersNavLinks: SimpleNavLink[] = partnersMegaMenuCategories.map((cat) => ({
-  label: cat.label,
-  href: cat.href,
-}))
-
 export type MainNavEntry =
   | { type: 'link'; label: string; href: string }
   | { type: 'products'; label: string; categories: NavMegaCategory[] }
   | { type: 'partners'; label: string; categories: NavMegaCategory[] }
   | { type: 'support'; label: string; categories: NavMegaCategory[] }
   | { type: 'about'; label: string; categories: NavMegaCategory[] }
-
-/** Sustainability sub-pages — used in footer and in-page sub-nav */
-export const sustainabilityNavLinks: SimpleNavLink[] = [
-  { label: 'Overview', href: '/sustainability' },
-  { label: 'Sustainability Strategy', href: '/sustainability/strategy' },
-  { label: 'Reports and Policies', href: '/sustainability/reports' },
-]
 
 export const mainNav: MainNavEntry[] = [
   { type: 'link', label: 'Home', href: '/' },
@@ -340,14 +310,6 @@ export const inverterMegaMenu = productMaster.categories.map((category) => ({
   })),
 }))
 
-export const solutionsMenu = [
-  { label: 'Residential', href: '/solutions/residential', desc: 'Home solar & battery solutions' },
-  { label: 'Commercial & Industrial', href: '/solutions/commercial', desc: 'C&I rooftops & carports' },
-  { label: 'Utility-Scale', href: '/solutions/utility', desc: 'Solar farms & IPP projects' },
-  { label: 'Energy Storage', href: '/solutions/storage', desc: 'Hybrid & grid services' },
-  { label: 'Case Studies', href: '/case-studies', desc: 'Customer success stories' },
-]
-
 export const supportMenu = [
   { label: 'Download Center', href: '/resources/downloads' },
   { label: 'Warranty', href: '/support/warranty' },
@@ -355,43 +317,6 @@ export const supportMenu = [
   { label: 'Installation Videos', href: '/resources/videos' },
   { label: 'Contact Support', href: '/support' },
 ]
-
-export const newsMenu = [
-  { label: 'Newsroom', href: '/posts' },
-  { label: 'Video Center', href: '/resources/videos' },
-  { label: 'Case Studies', href: '/case-studies' },
-]
-
-export const aboutMenu = [
-  { label: 'Company Profile', href: '/about' },
-  { label: 'Certifications & Awards', href: '/about/certifications' },
-  { label: 'Partners', href: '/about/partners' },
-  { label: 'Contact Us', href: '/contact' },
-]
-
-export const segments = [
-  {
-    id: 'home',
-    label: 'For Home',
-    href: '/solutions/residential',
-    tagline: 'Residential PV + Storage + EV-ready solutions',
-    image: 'residential',
-  },
-  {
-    id: 'business',
-    label: 'For Business',
-    href: '/solutions/commercial',
-    tagline: 'Commercial & industrial power conversion',
-    image: 'commercial',
-  },
-  {
-    id: 'utility',
-    label: 'For Utility',
-    href: '/solutions/utility',
-    tagline: 'Utility-scale central inverter platforms',
-    image: 'utility',
-  },
-] as const
 
 /** Sungrow-style mega-menu column groups */
 export type MegaMenuLink = { label: string; href: string }
@@ -570,5 +495,3 @@ export const megaMenus: Record<
     ],
   },
 }
-
-export const primaryNav: MegaMenuKey[] = ['products']

@@ -33,35 +33,35 @@
         },
         {
           "family": 5,
-          "segment": "C&I",
+          "segment": "Three Phase",
           "capacity": "30 kW to 36 kW",
           "series": "ORI-OG04",
           "productName": "ORI-(30/33/35/36)K-OG04P3-EU-CM2"
         },
         {
           "family": 6,
-          "segment": "C&I",
+          "segment": "Three Phase",
           "capacity": "40 kW to 50 Kw",
           "series": "ORI-OG04",
           "productName": "ORI-(40/45)K-OG04P3-EU-CM3, ORI-50K-OG04P3-EU-CM4"
         },
         {
           "family": 7,
-          "segment": "C&I",
+          "segment": "Three Phase",
           "capacity": "60 kW to 80 kW",
           "series": "ORI-OG04",
           "productName": "ORI-(60/70/75/80)K-OG04P3-EU-AM4"
         },
         {
           "family": 8,
-          "segment": "C&I",
+          "segment": "Three Phase",
           "capacity": "70 kW to 110 kW",
           "series": "ORI-OG03",
           "productName": "ORI-(70/75/80/90/100/110)K-OG03"
         },
         {
           "family": 9,
-          "segment": "C&I",
+          "segment": "Three Phase",
           "capacity": "120 kW to 136 kW",
           "series": "ORI-OG01",
           "productName": "ORI-(120/125/130/135/136)K-OG01P3-EU-AM8"
@@ -94,14 +94,14 @@
         },
         {
           "family": 4,
-          "segment": "C&I",
+          "segment": "Three Phase",
           "capacity": "30 kW to 60 kW",
           "series": "ORI-OG6",
           "productName": "ORI-OG6-EH3P(30-60)K-H(21A)"
         },
         {
           "family": 5,
-          "segment": "C&I",
+          "segment": "Three Phase",
           "capacity": "80 kW to 125 kW",
           "series": "ORI-OG6",
           "productName": "ORI-OG6-EH3P(80-125)K10-NV-YD-H"
@@ -113,7 +113,7 @@
       "families": [
         {
           "family": 1,
-          "segment": "Utility Grid-Tied PV Inverter",
+          "segment": "Utility Inverter",
           "capacity": "350 kW",
           "series": "ORI-OG6",
           "productName": "ORI-OG6-GU3P350K06-EV-ND"
@@ -125,10 +125,24 @@
       "families": [
         {
           "family": 1,
-          "segment": null,
+          "segment": "ORIANA BESS Home",
           "capacity": "5 kWh to 16kWh",
           "series": "ORIANA BESS Home",
           "productName": "ORIANA-BESS Home-(5-16)kWh"
+        },
+        {
+          "family": 2,
+          "segment": "ORIANA BESS C&I",
+          "capacity": "60 kWh to 261 kWh",
+          "series": "ORIANA BESS C&I",
+          "productName": "ORIANA-BESS C&I-(60-261)kWh"
+        },
+        {
+          "family": 3,
+          "segment": "ORIANA BESS Core",
+          "capacity": "100 kWh to 261 kWh",
+          "series": "ORIANA BESS Core",
+          "productName": "ORIANA-BESS Core-(100-261)kWh"
         }
       ]
     }

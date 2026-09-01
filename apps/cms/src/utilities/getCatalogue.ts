@@ -7,6 +7,7 @@ import {
   familyToSeries,
   findFamilyBySlug,
   productMasterCategories,
+  segmentImage,
   seriesFromProductMaster,
   seriesSegmentLabel,
   slugifyLabel,
@@ -62,6 +63,32 @@ function cmsSeriesMatchesMaster(cms: CatalogueSeries, master: CatalogueSeries): 
       masterKeys.has(variant.slug) ||
       slugifyLabel(variant.modelSeries || '') === master.slug,
   )
+}
+
+function isSvgUrl(url?: string | null): boolean {
+  return Boolean(url && url.split('?')[0]?.toLowerCase().endsWith('.svg'))
+}
+
+function preferProductPhoto(cmsUrl?: string | null, masterUrl?: string | null): string | null | undefined {
+  if (!cmsUrl || isSvgUrl(cmsUrl)) return masterUrl ?? cmsUrl
+  return cmsUrl
+}
+
+function overlayMasterPhotos(series: CatalogueSeries): CatalogueSeries {
+  const fromMaster = seriesFromProductMaster(series.categorySlug)
+  const matched = fromMaster.find((item) => cmsSeriesMatchesMaster(series, item))
+  const family = matched ? null : findFamilyBySlug(series.slug)
+  const master = matched ?? (family ? familyToSeries(family.category, family.family) : null)
+  const fallback = master?.heroImageUrl ?? segmentImage(series.segment || series.category)
+
+  return {
+    ...series,
+    heroImageUrl: preferProductPhoto(series.heroImageUrl, fallback),
+    variants: series.variants.map((variant) => ({
+      ...variant,
+      heroImageUrl: preferProductPhoto(variant.heroImageUrl, fallback),
+    })),
+  }
 }
 
 /** Products come only from Payload Admin (published). No hardcoded product fallback. */
@@ -286,28 +313,29 @@ export async function getProductBySlug(slug: string): Promise<CatalogueProduct |
 export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | null> {
   const seriesList = await getCatalogueSeries()
   const bySeriesSlug = seriesList.find((s) => s.slug === slug)
-  if (bySeriesSlug) return bySeriesSlug
+  if (bySeriesSlug) return overlayMasterPhotos(bySeriesSlug)
 
   // Deep link: CMS model slug → parent series
   const cmsProducts = await getCatalogueProducts()
   const cmsProduct = cmsProducts.find((p) => p.slug === slug)
   if (cmsProduct) {
     const byDeepLink = seriesList.find((s) => s.series === seriesNameOf(cmsProduct))
-    if (byDeepLink) return byDeepLink
+    if (byDeepLink) return overlayMasterPhotos(byDeepLink)
   }
 
   const master = findFamilyBySlug(slug)
-  if (master) return familyToSeries(master.category, master.family)
+  if (master) return overlayMasterPhotos(familyToSeries(master.category, master.family))
 
   // Recovery path: if cache was populated during a transient Payload init
   // failure, unstable_cache can hold an empty catalogue and produce false 404s.
   const freshProducts = await fetchPublishedProducts()
   const freshSeriesList = groupProductsIntoSeries(freshProducts)
   const freshBySeriesSlug = freshSeriesList.find((s) => s.slug === slug)
-  if (freshBySeriesSlug) return freshBySeriesSlug
+  if (freshBySeriesSlug) return overlayMasterPhotos(freshBySeriesSlug)
   const freshProduct = freshProducts.find((p) => p.slug === slug)
   if (freshProduct) {
-    return freshSeriesList.find((s) => s.series === seriesNameOf(freshProduct)) ?? null
+    const series = freshSeriesList.find((s) => s.series === seriesNameOf(freshProduct))
+    return series ? overlayMasterPhotos(series) : null
   }
   return null
 }
@@ -326,15 +354,15 @@ export async function getSeriesByCategory(categorySlug: string): Promise<Catalog
     fromMaster.map((master) => {
       const cms = fromCms.find((series) => cmsSeriesMatchesMaster(series, master))
       const segment = seriesSegmentLabel(master, categorySlug)
-      if (!cms) return { ...master, segment }
-      return {
+      if (!cms) return overlayMasterPhotos({ ...master, segment })
+      return overlayMasterPhotos({
         ...master,
         segment,
         powerRange: cms.powerRange || master.powerRange,
         heroImageUrl: cms.heroImageUrl ?? master.heroImageUrl,
         heroImageAlt: cms.heroImageAlt ?? master.heroImageAlt ?? master.series,
         variants: cms.variants.length ? cms.variants : master.variants,
-      }
+      })
     }),
     categorySlug,
   )

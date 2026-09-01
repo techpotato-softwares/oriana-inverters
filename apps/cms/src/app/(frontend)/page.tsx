@@ -2,13 +2,7 @@ import type { Metadata } from 'next'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
-import {
-  CaseStudiesSection,
-  GlobalReachSection,
-  ImpactStats,
-  NewsEventsSection,
-  SupportDownloadStrip,
-} from '@/components/oriana/HomeSections'
+import { ImpactStats, NewsEventsSection } from '@/components/oriana/HomeSections'
 import { FollowOrianaSection } from '@/components/oriana/FollowOrianaSection'
 import { GreenMissionSection } from '@/components/oriana/GreenMissionSection'
 import { IntroductionSection } from '@/components/oriana/IntroductionSection'
@@ -17,8 +11,7 @@ import { ProductCategoriesSection } from '@/components/oriana/ProductCategoriesS
 import { VideoHero } from '@/components/oriana/VideoHero'
 import { VisionMissionSection } from '@/components/oriana/VisionMissionSection'
 import { WhyChooseOrianaSection } from '@/components/oriana/WhyChooseOrianaSection'
-import { getHome, getCaseStudies } from '@/utilities/getMarketing'
-import type { CaseStudy } from '@/data/caseStudies'
+import { getHome } from '@/utilities/getMarketing'
 
 const HOME_VIDEO_HERO = {
   videoSrc: '/assets/clone/hero-dummy.mp4',
@@ -239,7 +232,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const { home } = await getHome()
-  const caseStudyDocs = await getCaseStudies()
 
   let livePosts: { title: string; slug: string; publishedAt?: string | null }[] = []
   if (home?.newsSection?.mode !== 'manual') {
@@ -258,29 +250,7 @@ export default async function HomePage() {
     }
   }
 
-  const reach = home?.reachSection
   const news = home?.newsSection
-  const support = home?.supportStrip
-  const caseSec = home?.caseStudiesSection
-
-  const studies: CaseStudy[] = (caseStudyDocs as Array<Record<string, unknown>>)
-    .slice(0, caseSec?.limit || 3)
-    .map((doc) => ({
-      slug: String(doc.slug || ''),
-      title: String(doc.title || ''),
-      segment: String(doc.segment || ''),
-      capacity: String(doc.capacity || ''),
-      products: String(doc.products || ''),
-      productSlugs: [],
-      location: String(doc.location || ''),
-      image: '',
-      summary: String(doc.summary || ''),
-      challenge: String(doc.challenge || ''),
-      solution: String(doc.solution || ''),
-      results: [],
-      stats: [],
-      year: String(doc.year || ''),
-    }))
 
   const newsItems =
     news?.mode === 'manual' && news.manualItems?.length
@@ -323,45 +293,12 @@ export default async function HomePage() {
       />
       <GreenMissionSection {...HOME_GREEN_MISSION} />
       <FollowOrianaSection title={HOME_FOLLOW_ORIANA.title} links={HOME_FOLLOW_ORIANA.links} />
-      {/* <GlobalReachSection
-        eyebrow={reach?.eyebrow ?? undefined}
-        title={reach?.title ?? undefined}
-        body={reach?.body ?? undefined}
-        regions={reach?.regions?.map((r) => ({ name: r.name || '', focus: r.focus || '' }))}
-        cta={reach?.cta?.href ? { label: reach.cta.label || '', href: reach.cta.href } : undefined}
-      />
-      <CaseStudiesSection
-        eyebrow={caseSec?.eyebrow ?? undefined}
-        title={caseSec?.title ?? undefined}
-        link={
-          caseSec?.link?.href
-            ? { label: caseSec.link.label || '', href: caseSec.link.href }
-            : undefined
-        }
-        studies={studies}
-      /> */}
       <NewsEventsSection
         eyebrow={news?.eyebrow ?? undefined}
         title={news?.title ?? undefined}
         link={news?.link?.href ? { label: news.link.label || '', href: news.link.href } : undefined}
         items={newsItems}
       />
-      {/* <SupportDownloadStrip
-        hotlineNote={support?.hotlineNote ?? undefined}
-        downloads={support?.downloads
-          ?.filter((d): d is { label: string; href: string } => Boolean(d?.label && d?.href))
-          .map((d) => ({ label: d.label, href: d.href }))}
-        partner={
-          support?.partnerCta
-            ? {
-                title: support.partnerCta.title ?? undefined,
-                body: support.partnerCta.body ?? undefined,
-                label: support.partnerCta.label || 'Request partnership',
-                href: support.partnerCta.href || '/contact',
-              }
-            : undefined
-        }
-      /> */}
     </main>
   )
 }

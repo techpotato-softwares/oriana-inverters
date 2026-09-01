@@ -10,7 +10,6 @@
     "./providers/*": "./src/providers/*",
     "./config/*": "./src/config/*",
     "./data/*": "./src/data/*",
-    "./Header/*": "./src/Header/*",
     "./Footer/*": "./src/Footer/*"
   },
   "peerDependencies": {

@@ -1,1 +1,0 @@
-../../../ui/src/Header/Component.client.tsx

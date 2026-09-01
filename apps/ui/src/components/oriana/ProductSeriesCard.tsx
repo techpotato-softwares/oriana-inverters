@@ -1,4 +1,4 @@
-import { ProductImage } from '@/components/oriana/ProductImage'
+import { ProductImage } from './ProductImage'
 
 export function productCardTypeLabel(group: string, categorySlug: string): string {
   const hybrid = categorySlug === 'hybrid-inverters'
@@ -14,13 +14,18 @@ export function productCardTypeLabel(group: string, categorySlug: string): strin
     if (onGrid) return '3-Phase On Grid Inverter'
     return '3-Phase Inverter'
   }
-  if (group === 'C&I') {
+  if (group === 'C&I' || group === 'ORIANA BESS C&I') {
+    if (categorySlug === 'bess') return 'C&I Energy Storage'
     if (hybrid) return 'C&I Hybrid Inverter'
     if (onGrid) return 'C&I On Grid Inverter'
     return 'C&I Inverter'
   }
+  if (group === 'ORIANA BESS Home') return 'Residential Energy Storage'
+  if (group === 'ORIANA BESS Core') return 'Utility Energy Storage'
   if (categorySlug === 'bess') return 'Residential Energy Storage'
-  if (categorySlug === 'utility-scale-inverters') return 'Utility Grid-Tied PV Inverter'
+  if (group === 'Utility Inverter' || categorySlug === 'utility-scale-inverters') {
+    return 'Utility Grid-Tied PV Inverter'
+  }
   return group
 }
 
@@ -77,13 +82,18 @@ export function ProductSeriesCard({
         />
       </a>
 
-      <h3 className="text-center font-display text-xl font-semibold leading-snug tracking-tight text-oriana-navy md:text-2xl">
-        <a href={href} target="_blank" rel="noopener noreferrer" className="line-clamp-3">
+      <h3 className="product-card-name text-center leading-snug">
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="line-clamp-2 whitespace-pre-wrap break-all"
+        >
           {title}
         </a>
       </h3>
 
-      <div className="mt-8 flex flex-col gap-3">
+      <div className="mt-auto flex flex-col gap-3 pt-8">
         <a href={href} target="_blank" rel="noopener noreferrer" className={actionClass}>
           Learn More
         </a>

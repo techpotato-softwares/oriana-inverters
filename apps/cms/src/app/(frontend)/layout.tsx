@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Outfit, Plus_Jakarta_Sans } from 'next/font/google'
+import { Montserrat } from 'next/font/google'
 import React from 'react'
 
 import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery'
@@ -28,15 +28,9 @@ function preloadImageType(href: string): string | undefined {
   return undefined
 }
 
-const jakarta = Plus_Jakarta_Sans({
+const montserrat = Montserrat({
   subsets: ['latin'],
-  variable: '--font-jakarta',
-  display: 'swap',
-})
-
-const outfit = Outfit({
-  subsets: ['latin'],
-  variable: '--font-outfit',
+  variable: '--font-montserrat',
   display: 'swap',
 })
 
@@ -96,7 +90,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html
-      className={`${jakarta.variable} ${outfit.variable}`}
+      className={`${montserrat.variable} ${montserrat.className}`}
       lang="en"
       data-theme="light"
       suppressHydrationWarning

@@ -86,7 +86,7 @@ export const productCatalog: ProductCategorySeed[] = [
         ],
       },
       {
-        segment: 'C&I',
+        segment: 'Three Phase',
         series: 'ORI-OG04',
         productName: 'ORI-(30/33/35/36)K-OG04P3-EU-CM2',
         models: [
@@ -97,7 +97,7 @@ export const productCatalog: ProductCategorySeed[] = [
         ],
       },
       {
-        segment: 'C&I',
+        segment: 'Three Phase',
         series: 'ORI-OG04',
         productName: 'ORI-(40/45)K-OG04P3-EU-CM3, ORI-50K-OG04P3-EU-CM4',
         models: [
@@ -107,7 +107,7 @@ export const productCatalog: ProductCategorySeed[] = [
         ],
       },
       {
-        segment: 'C&I',
+        segment: 'Three Phase',
         series: 'ORI-OG04',
         productName: 'ORI-(60/70/75/80)K-OG04P3-EU-AM4',
         models: [
@@ -118,7 +118,7 @@ export const productCatalog: ProductCategorySeed[] = [
         ],
       },
       {
-        segment: 'C&I',
+        segment: 'Three Phase',
         series: 'ORI-OG03',
         productName: 'ORI-(70/75/80/90/100/110)K-OG03',
         models: [
@@ -131,7 +131,7 @@ export const productCatalog: ProductCategorySeed[] = [
         ],
       },
       {
-        segment: 'C&I',
+        segment: 'Three Phase',
         series: 'ORI-OG01',
         productName: 'ORI-(120/125/130/135/136)K-OG01P3-EU-AM8',
         models: [
@@ -184,7 +184,7 @@ export const productCatalog: ProductCategorySeed[] = [
         ],
       },
       {
-        segment: 'C&I',
+        segment: 'Three Phase',
         series: 'ORI-OG6',
         productName: 'ORI-OG6-EH3P(30-60)K-H(21A)',
         models: [
@@ -195,7 +195,7 @@ export const productCatalog: ProductCategorySeed[] = [
         ],
       },
       {
-        segment: 'C&I',
+        segment: 'Three Phase',
         series: 'ORI-OG6',
         productName: 'ORI-OG6-EH3P(80-125)K10-NV-YD-H',
         models: [
@@ -210,7 +210,7 @@ export const productCatalog: ProductCategorySeed[] = [
     name: 'Utility Scale Inverters',
     families: [
       {
-        segment: 'Utility Grid-Tied PV Inverter',
+        segment: 'Utility Inverter',
         series: 'ORI-OG6',
         productName: 'ORI-OG6-GU3P350K06-EV-ND',
         models: [
@@ -223,7 +223,7 @@ export const productCatalog: ProductCategorySeed[] = [
     name: 'BESS',
     families: [
       {
-        segment: null,
+        segment: 'ORIANA BESS Home',
         series: 'ORIANA BESS Home',
         productName: 'ORIANA-BESS Home-(5-16)kWh',
         models: [
@@ -231,6 +231,26 @@ export const productCatalog: ProductCategorySeed[] = [
           { modelNo: 'ORIANA-BESS Home-5kWh-6K', rating: '5 kWh' },
           { modelNo: 'ORIANA-BESS Home-10kWh-6K', rating: '10 kWh' },
           { modelNo: 'ORIANA-BESS Home-16kWh-6K', rating: '16 kWh' },
+        ],
+      },
+      {
+        segment: 'ORIANA BESS C&I',
+        series: 'ORIANA BESS C&I',
+        productName: 'ORIANA-BESS C&I-(60-261)kWh',
+        models: [
+          { modelNo: 'ORIANA-BESS C&I-60kWh', rating: '60 kWh' },
+          { modelNo: 'ORIANA-BESS C&I-129kWh', rating: '129 kWh' },
+          { modelNo: 'ORIANA-BESS C&I-261kWh', rating: '261 kWh' },
+        ],
+      },
+      {
+        segment: 'ORIANA BESS Core',
+        series: 'ORIANA BESS Core',
+        productName: 'ORIANA-BESS Core-(100-261)kWh',
+        models: [
+          { modelNo: 'ORIANA-BESS Core-100kWh', rating: '100 kWh' },
+          { modelNo: 'ORIANA-BESS Core-200kWh', rating: '200 kWh' },
+          { modelNo: 'ORIANA-BESS Core-261kWh', rating: '261 kWh' },
         ],
       },
     ],

@@ -4,7 +4,7 @@ import productMasterJson from './productMaster.json'
 
 type MegaLink = { label: string; href: string }
 type MegaColumn = { title: string; href?: string; image?: string; links: MegaLink[] }
-type MegaCategory = { label: string; href: string; columns: MegaColumn[] }
+type MegaCategory = { label: string; href: string; image?: string; columns: MegaColumn[] }
 
 export type CmsSegmentImage = {
   name: string
@@ -63,38 +63,36 @@ export function categoryHref(name: string): string {
   return `/products/category/${categorySlug(name)}`
 }
 
-export function segmentHref(categoryName: string, segmentTitle: string): string {
-  return `${categoryHref(categoryName)}?segment=${encodeURIComponent(slugifyLabel(segmentTitle))}`
-}
-
 export const SEGMENT_IMAGE_STRING = '/assets/products/segment-string.png'
 export const SEGMENT_IMAGE_CABINET = '/assets/products/segment-cabinet.png'
 
+const CATEGORY_IMAGES: Record<string, string> = {
+  'on-grid-inverters': SEGMENT_IMAGE_STRING,
+  'hybrid-inverters': SEGMENT_IMAGE_STRING,
+  'utility-scale-inverters': SEGMENT_IMAGE_CABINET,
+  bess: SEGMENT_IMAGE_CABINET,
+}
+
+export function categoryImage(categoryName: string, cms?: CmsCategoryImages): string {
+  const fallback = CATEGORY_IMAGES[categorySlug(categoryName)] ?? SEGMENT_IMAGE_STRING
+  const cmsUrl = cms?.imageUrl
+  if (cmsUrl && !cmsUrl.toLowerCase().endsWith('.svg')) return cmsUrl
+  return fallback
+}
+
 export function segmentImage(segmentTitle: string): string {
   const title = segmentTitle.toLowerCase()
+  if (title.includes('home')) return SEGMENT_IMAGE_STRING
   if (
     title.includes('c&i') ||
     title.includes('c and i') ||
     title.includes('utility') ||
+    title.includes('core') ||
     title.includes('bess')
   ) {
     return SEGMENT_IMAGE_CABINET
   }
   return SEGMENT_IMAGE_STRING
-}
-
-function cmsSegmentImageUrl(
-  cmsCategory: CmsCategoryImages | undefined,
-  segmentTitle: string,
-): string | null {
-  if (!cmsCategory?.segments?.length) return null
-  const key = slugifyLabel(segmentTitle)
-  for (const segment of cmsCategory.segments) {
-    if (!segment.imageUrl) continue
-    const segmentKey = slugifyLabel(segment.slug || segment.name)
-    if (segmentKey === key || slugifyLabel(segment.name) === key) return segment.imageUrl
-  }
-  return null
 }
 
 export function familySlug(family: ProductFamily): string {
@@ -107,22 +105,6 @@ export function familyHref(family: ProductFamily): string {
 
 function segmentTitle(family: ProductFamily): string {
   return family.segment || family.series || 'Products'
-}
-
-function groupFamiliesBySegment(families: ProductFamily[]) {
-  const order: string[] = []
-  const groups = new Map<string, ProductFamily[]>()
-
-  for (const family of families) {
-    const title = segmentTitle(family)
-    if (!groups.has(title)) {
-      groups.set(title, [])
-      order.push(title)
-    }
-    groups.get(title)!.push(family)
-  }
-
-  return order.map((title) => ({ title, families: groups.get(title)! }))
 }
 
 function normalizeSegmentSlug(segmentSlug: string): string {
@@ -193,9 +175,10 @@ export function seriesMatchesSegment(
 const SEGMENT_DISPLAY_ALIASES: Record<string, string> = {
   'c-and-i': 'C&I',
   candi: 'C&I',
-  commercial: 'C&I',
-  'commercial-and-industrial': 'C&I',
-  'utility-scale': 'Utility Grid-Tied PV Inverter',
+  commercial: 'Three Phase',
+  'commercial-and-industrial': 'Three Phase',
+  'utility-scale': 'Utility Inverter',
+  'utility-grid-tied-pv-inverter': 'Utility Inverter',
   'energy-storage': 'ORIANA BESS Home',
 }
 
@@ -216,7 +199,9 @@ export function seriesSegmentLabel(series: SeriesSegmentInput, categorySlugValue
     }
   }
 
-  if (series.segmentKey === 'commercial') return 'C&I'
+  if (series.segmentKey === 'commercial' && categorySlugValue !== 'bess') {
+    return 'Three Phase'
+  }
   if (series.segment) {
     const aliased = SEGMENT_DISPLAY_ALIASES[slugifyLabel(series.segment)]
     if (aliased) return aliased
@@ -241,55 +226,39 @@ export function sortSeriesByProductMaster<T extends { slug: string; series: stri
   })
 }
 
-/** Products mega-menu: category rail → segment tiles → category product list. */
+/** Products mega-menu: horizontal category tiles → category pages. */
 export function buildProductsMegaMenu(cmsCategories?: CmsCategoryImages[]): MegaCategory[] {
   const cmsBySlug = new Map((cmsCategories ?? []).map((category) => [category.slug, category]))
 
   return productMaster.categories.map((category) => {
     const cms = cmsBySlug.get(categorySlug(category.name))
-    const groups = groupFamiliesBySegment(category.families)
-    const usedKeys = new Set(groups.map((group) => slugifyLabel(group.title)))
-
-    const columns: MegaColumn[] = groups.map((group) => {
-      const href = segmentHref(category.name, group.title)
-      return {
-        title: group.title,
-        href,
-        image: cmsSegmentImageUrl(cms, group.title) || segmentImage(group.title),
-        links: [{ label: group.title, href }],
-      }
-    })
-
-    for (const segment of cms?.segments ?? []) {
-      const key = slugifyLabel(segment.slug || segment.name)
-      if (!key || usedKeys.has(key) || !segment.imageUrl) continue
-      usedKeys.add(key)
-      const href = segmentHref(category.name, segment.name)
-      columns.push({
-        title: segment.name,
-        href,
-        image: segment.imageUrl || segmentImage(segment.name),
-        links: [{ label: segment.name, href }],
-      })
-    }
-
+    const href = categoryHref(category.name)
+    const image = categoryImage(category.name, cms)
     return {
       label: category.name,
-      href: categoryHref(category.name),
-      columns,
+      href,
+      image,
+      columns: [
+        {
+          title: category.name,
+          href,
+          image,
+          links: [{ label: category.name, href }],
+        },
+      ],
     }
   })
 }
 
 /** Unique tile image URLs for `<link rel="preload">` / eager `<img>` warmup. */
 export function uniqueProductsMegaMenuImageUrls(
-  menu: Array<{ columns: Array<{ image?: string }> }>,
+  menu: Array<{ image?: string; columns: Array<{ image?: string }> }>,
 ): string[] {
   const urls: string[] = []
   const seen = new Set<string>()
   for (const category of menu) {
-    for (const column of category.columns) {
-      const image = column.image
+    const images = [category.image, ...category.columns.map((column) => column.image)]
+    for (const image of images) {
       if (!image || seen.has(image)) continue
       seen.add(image)
       urls.push(image)
@@ -311,11 +280,20 @@ export const productMasterCategories: CatalogueCategory[] = productMaster.catego
 
 export function segmentKeyOf(
   categoryName: string,
-  family: { segment: string | null },
+  family: { segment: string | null; capacity?: string },
 ): CatalogueProduct['segmentKey'] {
-  if (categoryName === 'BESS') return 'storage'
+  if (categoryName === 'BESS') {
+    const segment = (family.segment || '').toLowerCase()
+    if (segment.includes('c&i') || segment.includes('c and i')) return 'commercial'
+    if (segment.includes('core')) return 'utility'
+    return 'storage'
+  }
   if (categoryName === 'Utility Scale Inverters') return 'utility'
-  if (family.segment === 'C&I') return 'commercial'
+  const capacity = family.capacity ?? ''
+  const nums = [...capacity.replace(/,/g, '').matchAll(/(\d+(?:\.\d+)?)/g)].map((match) =>
+    Number(match[1]),
+  )
+  if (nums.length && Math.min(...nums) >= 30) return 'commercial'
   return 'residential'
 }
 
@@ -341,6 +319,8 @@ export function familyToSeries(
   const segment = family.segment || family.series || category.name
   const description = `${family.productName} — ${family.capacity} (${family.series}).`
 
+  const imageUrl = segmentImage(segment)
+
   const variant: CatalogueProduct = {
     slug,
     name: family.productName,
@@ -354,6 +334,8 @@ export function familyToSeries(
     warranty: '—',
     description,
     modelSeries: family.series,
+    heroImageUrl: imageUrl,
+    heroImageAlt: family.productName,
     specs: [
       { label: 'Model', value: family.productName },
       { label: 'Model Series', value: family.series },
@@ -371,6 +353,8 @@ export function familyToSeries(
     phases: variant.phases,
     powerRange: family.capacity,
     description,
+    heroImageUrl: imageUrl,
+    heroImageAlt: family.productName,
     variants: [variant],
   }
 }

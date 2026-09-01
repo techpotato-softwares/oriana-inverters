@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight, SlidersHorizontal, X } from 'lucide-react'
-import { ProductImage } from '@/components/oriana/ProductImage'
-import { ProductSeriesSections } from '@/components/oriana/ProductSeriesSections'
+import { ProductImage } from './ProductImage'
+import { ProductSeriesSections } from './ProductSeriesSections'
 import { cn } from '@/utilities/ui'
 import type {
   AllProductsCard,

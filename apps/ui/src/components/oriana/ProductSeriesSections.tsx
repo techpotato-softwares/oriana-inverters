@@ -1,7 +1,7 @@
 import {
   productCardTypeLabel,
   ProductSeriesCard,
-} from '@/components/oriana/ProductSeriesCard'
+} from './ProductSeriesCard'
 import { groupCardsBySegment, type AllProductsCard } from '@/utilities/allProductsCatalogue'
 
 export function ProductSeriesSections({ cards }: { cards: AllProductsCard[] }) {
@@ -20,7 +20,7 @@ export function ProductSeriesSections({ cards }: { cards: AllProductsCard[] }) {
               <div className="mb-8 flex items-end justify-between gap-4 border-b border-oriana-navy/10 pb-4">
                 <h2
                   id={headingId}
-                  className="font-display text-2xl font-semibold text-oriana-navy md:text-3xl"
+                  className="font-display text-2xl font-semibold text-oriana-ink md:text-3xl"
                 >
                   {group.title}
                 </h2>

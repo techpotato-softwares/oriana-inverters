@@ -2,10 +2,10 @@ import Image from 'next/image'
 import { cn } from '@/utilities/ui'
 
 const categoryPlaceholders: Record<string, string> = {
-  'on-grid-inverters': '/assets/products/single-phase.svg',
-  'hybrid-inverters': '/assets/products/hybrid-storage.svg',
-  'utility-scale-inverters': '/assets/products/utility-scale.svg',
-  bess: '/assets/products/hybrid-storage.svg',
+  'on-grid-inverters': '/assets/products/segment-string.png',
+  'hybrid-inverters': '/assets/products/segment-string.png',
+  'utility-scale-inverters': '/assets/products/segment-cabinet.png',
+  bess: '/assets/products/segment-cabinet.png',
 }
 
 type ProductImageProps = {
@@ -31,8 +31,10 @@ export function ProductImage({
 }: ProductImageProps) {
   const placeholder =
     categoryPlaceholders[categorySlug] ?? categoryPlaceholders['on-grid-inverters']
-  const imageSrc = src || placeholder
-  const isSvg = imageSrc.endsWith('.svg')
+  const srcPath = src?.split('?')[0]?.toLowerCase() ?? ''
+  const srcIsSvg = srcPath.endsWith('.svg')
+  const imageSrc = src && !srcIsSvg ? src : placeholder
+  const isSvg = imageSrc.split('?')[0]?.toLowerCase().endsWith('.svg') ?? false
 
   return (
     <div
@@ -48,7 +50,7 @@ export function ProductImage({
         src={imageSrc}
         alt={alt || name}
         fill
-        className="object-contain p-6 md:p-8"
+        className="object-contain p-2 md:p-3"
         priority={priority}
         sizes={sizes}
         unoptimized={isSvg}

@@ -79,6 +79,7 @@ export function SiteHeader({
   const router = useRouter()
   const reduceMotion = useReducedMotion()
   const refreshedEmptyMenu = useRef(false)
+  const lastScrollY = useRef(0)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<MegaMenuKey | null>(null)
   const [navCollapsed, setNavCollapsed] = useState(false)
@@ -98,14 +99,37 @@ export function SiteHeader({
   useEffect(() => {
     setMobileOpen(false)
     setOpenMenu(null)
+    lastScrollY.current = window.scrollY
     setNavCollapsed(window.scrollY > 16)
   }, [pathname])
 
   useEffect(() => {
+    lastScrollY.current = window.scrollY
+
     const update = () => {
-      const collapsed = window.scrollY > 16 && !mobileOpen
-      setNavCollapsed((prev) => (prev === collapsed ? prev : collapsed))
-      if (collapsed) setOpenMenu(null)
+      const y = Math.max(0, window.scrollY)
+      const delta = y - lastScrollY.current
+      lastScrollY.current = y
+
+      if (mobileOpen) {
+        setNavCollapsed(false)
+        return
+      }
+
+      if (y <= 16) {
+        setNavCollapsed(false)
+        return
+      }
+
+      if (delta > 6) {
+        setNavCollapsed(true)
+        setOpenMenu(null)
+        return
+      }
+
+      if (delta < -6) {
+        setNavCollapsed(false)
+      }
     }
 
     update()
