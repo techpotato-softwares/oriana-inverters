@@ -39,12 +39,12 @@ export const productMaster = productMasterJson as ProductMaster
 
 const categoryDescriptions: Record<string, string> = {
   'on-grid-inverters':
-    'Grid-tied string inverters for residential, commercial, and industrial solar systems.',
+    'Oriana On-Grid Solar Inverters are engineered to efficiently convert solar energy into usable AC power and seamlessly integrate it with the electrical grid.',
   'hybrid-inverters':
-    'Hybrid inverters with battery integration for home and C&I energy storage.',
+    'Oriana Hybrid Solar Inverters intelligently manage solar, battery, and grid power to deliver efficient energy utilization with reliable backup.',
   'utility-scale-inverters':
-    'High-capacity grid-tied inverters engineered for utility-scale solar plants.',
-  bess: 'Battery energy storage systems for residential applications.',
+    'Oriana Utility-Scale Solar Inverter is engineered for high-capacity solar power plants where efficiency, reliability, grid performance, and long-term operational stability are critical.',
+  bess: 'Oriana Battery Energy Storage Systems (BESS) are designed to store electrical energy and deliver it when it matters most.',
 }
 
 export function slugifyLabel(value: string): string {
@@ -209,6 +209,13 @@ export function seriesSegmentLabel(series: SeriesSegmentInput, categorySlugValue
   }
   if (series.phases && series.phases !== '—') return series.phases
   return series.series || 'Products'
+}
+
+/** Listing headings: Single Phase → Single Phase Inverter, and so on. */
+export function listingSectionTitle(group: string): string {
+  if (group === 'Single Phase') return 'Single Phase Inverter'
+  if (group === 'Three Phase') return 'Three Phase Inverter'
+  return group
 }
 
 export function sortSeriesByProductMaster<T extends { slug: string; series: string }>(

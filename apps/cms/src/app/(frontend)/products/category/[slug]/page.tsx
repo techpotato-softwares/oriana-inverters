@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
-import { PageHero } from '@/components/oriana/PageHero'
+import { CategoryPageHero, CategoryPageIntro } from '@/components/oriana/CategoryPageHero'
 import { ProductSeriesSections } from '@/components/oriana/ProductSeriesSections'
+import { getCategoryPageCopy } from '@/data/categoryPageCopy'
 import {
+  listingSectionTitle,
   segmentLabelForSlug,
   seriesMatchesSegment,
 } from '@/data/productMaster'
@@ -43,7 +45,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
   const segmentLabel = segment ? segmentLabelForSlug(resolved, segment) : null
   if (segmentLabel) {
     return {
-      title: `${segmentLabel} · ${meta.title}`,
+      title: `${listingSectionTitle(segmentLabel)} · ${meta.title}`,
       description: meta.description,
     }
   }
@@ -65,6 +67,8 @@ export default async function ProductCategoryPage({ params, searchParams }: Prop
 
   const allSeries = await getSeriesByCategory(slug)
   const segmentLabel = segment ? segmentLabelForSlug(slug, segment) : null
+  const listingLabel = segmentLabel ? listingSectionTitle(segmentLabel) : null
+  const copy = getCategoryPageCopy(slug)
   const seriesList =
     segment && segmentLabel
       ? allSeries.filter((series) => seriesMatchesSegment(series, slug, segment))
@@ -72,32 +76,26 @@ export default async function ProductCategoryPage({ params, searchParams }: Prop
 
   return (
     <main>
-      <PageHero
-        eyebrow="Inverters"
-        title={segmentLabel ? `${meta.title} · ${segmentLabel}` : meta.title}
-        description={
-          segmentLabel
-            ? `${segmentLabel} products in the ${meta.title} range.`
-            : meta.description
-        }
-      />
+      <CategoryPageHero title={meta.title} />
       <Breadcrumbs
         items={[
           { label: 'Inverters', href: '/products' },
           {
             label: meta.title,
-            href: segmentLabel ? `/products/category/${slug}` : undefined,
+            href: listingLabel ? `/products/category/${slug}` : undefined,
           },
-          ...(segmentLabel ? [{ label: segmentLabel }] : []),
+          ...(listingLabel ? [{ label: listingLabel }] : []),
         ]}
       />
 
-      <section className="bg-oriana-surface py-12 lg:py-16">
+      <section className="category-page bg-white py-16 lg:py-20">
         <div className="container">
-          {segmentLabel ? (
-            <p className="mb-8 text-sm text-oriana-muted">
-              Showing {segmentLabel}.{' '}
-              <Link href={`/products/category/${slug}`} className="font-semibold text-oriana-blue hover:underline">
+          {copy ? <CategoryPageIntro title={meta.title} paragraphs={copy.paragraphs} /> : null}
+
+          {listingLabel ? (
+            <p className="category-filter-note">
+              Showing {listingLabel}.{' '}
+              <Link href={`/products/category/${slug}`}>
                 View all {meta.title}
               </Link>
             </p>
