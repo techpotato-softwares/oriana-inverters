@@ -3,12 +3,21 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { FileText } from 'lucide-react'
+import {
+  Activity,
+  BarChart3,
+  FileText,
+  Hand,
+  LineChart,
+  Settings2,
+  ShieldCheck,
+} from 'lucide-react'
 import { ProductImage } from './ProductImage'
 import {
   formatProductPowerLabel,
   productCardTypeLabel,
 } from '@/components/oriana/ProductSeriesCard'
+import { getOnGridSeriesPageData } from '@/data/onGridProductPage'
 import { seriesSegmentLabel } from '@/data/productMaster'
 import { isFileDocument, resolveDatasheetUrl } from '@/utilities/allProductsCatalogue'
 import { cn } from '@/utilities/ui'
@@ -29,14 +38,66 @@ const AUDIENCE_LABEL: Record<CatalogueProduct['segmentKey'], string> = {
   storage: 'Homeowners',
 }
 
-function seriesHeadline(categorySlug: string): string {
-  if (categorySlug === 'hybrid-inverters') return 'Hybrid Inverter for PV and Storage'
-  if (categorySlug === 'utility-scale-inverters') return 'Utility Grid-Tied PV Inverter'
-  if (categorySlug === 'bess') return 'Residential Energy Storage System'
+const FEATURE_ICONS = {
+  Efficient: BarChart3,
+  Intelligent: LineChart,
+  Adaptive: Settings2,
+  Reliable: ShieldCheck,
+  'HIGH YIELD': Activity,
+  'SAFE AND RELIABLE': Hand,
+  'USER FRIENDLY SETUP': Settings2,
+  'SMART MANAGEMENT': LineChart,
+} as const
+
+function seriesHeadline(series: CatalogueSeries, selected: CatalogueProduct): string {
+  const pageData = getOnGridSeriesPageData(
+    selected.modelSeries,
+    series.series,
+    series.slug,
+    selected.slug,
+  )
+  if (pageData?.heroType) return pageData.heroType
+
+  if (series.categorySlug === 'hybrid-inverters') {
+    return selected.phases?.includes('Single')
+      ? '1-Phase Hybrid Inverter'
+      : '3-Phase Hybrid Inverter'
+  }
+  if (series.categorySlug === 'utility-scale-inverters') return 'Utility Grid-Tied PV Inverter'
+  if (series.categorySlug === 'bess') return 'Residential Energy Storage System'
+  if (selected.phases?.includes('Single')) return '1-Phase String Inverter'
+  if (selected.phases?.includes('Three')) return '3-Phase String Inverter'
   return 'String Inverter for Grid-Tied PV'
 }
 
+function heroTitle(series: CatalogueSeries, selected: CatalogueProduct): string {
+  const pageData = getOnGridSeriesPageData(
+    selected.modelSeries,
+    series.series,
+    series.slug,
+    selected.slug,
+  )
+  const modelName = selected.modelSeries || series.series
+  const power = pageData?.ratedAcOutputPower ?? formatProductPowerLabel(series.powerRange)
+  // Sungrow-style: "5~6kW SG5.0/6.0RS"
+  if (power && modelName) return `${power.replace(/\s+/g, '')} ${modelName}`
+  return modelName
+}
+
 function featureGroups(series: CatalogueSeries, selected: CatalogueProduct) {
+  const pageData = getOnGridSeriesPageData(
+    selected.modelSeries,
+    series.series,
+    series.slug,
+    selected.slug,
+  )
+  if (pageData?.featureGroups?.length) {
+    return pageData.featureGroups.map((group) => ({
+      title: group.title,
+      items: group.items,
+    }))
+  }
+
   const warranty =
     selected.warranty && selected.warranty !== '—'
       ? `${selected.warranty} product warranty`
@@ -190,38 +251,59 @@ function featureGroups(series: CatalogueSeries, selected: CatalogueProduct) {
   ]
 }
 
+function findSpec(product: CatalogueProduct, ...labels: string[]): string | null {
+  for (const label of labels) {
+    const hit = product.specs.find(
+      (spec) => spec.label.toLowerCase() === label.toLowerCase() && spec.value && spec.value !== '—',
+    )
+    if (hit) return hit.value
+  }
+  return null
+}
+
 function specTiles(series: CatalogueSeries, selected: CatalogueProduct) {
+  const pageData = getOnGridSeriesPageData(
+    selected.modelSeries,
+    series.series,
+    series.slug,
+    selected.slug,
+  )
+  if (pageData) {
+    return [
+      { value: pageData.maxPvInputVoltage, label: 'Max. PV Input Voltage' },
+      { value: pageData.ratedAcOutputPower, label: 'Rated AC Output Power' },
+      { value: pageData.ratedAcVoltage, label: 'Rated AC Voltage' },
+      { value: pageData.maxEfficiency, label: 'Max. Efficiency' },
+    ]
+  }
+
   const tiles: { value: string; label: string }[] = []
-  const power = formatProductPowerLabel(selected.powerRange || series.powerRange)
+  const maxPv = findSpec(selected, 'Max. PV Input Voltage', 'Max PV Input Voltage')
+  if (maxPv) tiles.push({ value: maxPv, label: 'Max. PV Input Voltage' })
+
+  const power =
+    findSpec(selected, 'Rated AC Output Power') ||
+    formatProductPowerLabel(selected.powerRange || series.powerRange)
   if (power) {
     tiles.push({
       value: power,
       label: series.categorySlug === 'bess' ? 'Storage Capacity' : 'Rated AC Output Power',
     })
   }
-  if (selected.phases && selected.phases !== '—') {
+
+  const voltage = findSpec(selected, 'Rated AC Voltage')
+  if (voltage) tiles.push({ value: voltage, label: 'Rated AC Voltage' })
+
+  const efficiency =
+    findSpec(selected, 'Max. Efficiency') ||
+    (selected.efficiency && selected.efficiency !== '—' ? selected.efficiency : null)
+  if (efficiency) tiles.push({ value: efficiency, label: 'Max. Efficiency' })
+
+  if (tiles.length < 4 && selected.phases && selected.phases !== '—') {
     tiles.push({ value: selected.phases, label: 'Phases' })
   }
-  if (selected.efficiency && selected.efficiency !== '—') {
-    tiles.push({ value: selected.efficiency, label: 'Max. Efficiency' })
-  }
-  if (selected.warranty && selected.warranty !== '—') {
+  if (tiles.length < 4 && selected.warranty && selected.warranty !== '—') {
     tiles.push({ value: selected.warranty, label: 'Warranty' })
-  }
-  const extra = selected.specs.find(
-    (spec) =>
-      spec.value &&
-      spec.value !== '—' &&
-      !['Model', 'Model Series', 'Capacity', 'Series'].includes(spec.label),
-  )
-  if (extra && tiles.length < 4) {
-    tiles.push({ value: extra.value, label: extra.label })
-  }
-  if (tiles.length < 4 && series.variants.length > 1) {
-    tiles.push({
-      value: String(series.variants.length),
-      label: series.categorySlug === 'bess' ? 'Capacity Options' : 'Power Variants',
-    })
   }
   return tiles.slice(0, 4)
 }
@@ -356,6 +438,68 @@ function ProductInquiryForm({
   )
 }
 
+function FeatureQuadrant({
+  groups,
+}: {
+  groups: { title: string; items: string[] }[]
+}) {
+  const isCompact = groups.every((g) =>
+    ['Efficient', 'Intelligent', 'Adaptive', 'Reliable'].includes(g.title),
+  )
+
+  if (isCompact) {
+    return (
+      <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl bg-[#f3f4f6]">
+        <div className="pointer-events-none absolute inset-x-1/2 inset-y-8 w-px -translate-x-1/2 bg-oriana-navy/10" />
+        <div className="pointer-events-none absolute inset-x-8 inset-y-1/2 h-px -translate-y-1/2 bg-oriana-navy/10" />
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-oriana-navy/25" />
+        <div className="grid sm:grid-cols-2">
+          {groups.map((group) => {
+            const Icon = FEATURE_ICONS[group.title as keyof typeof FEATURE_ICONS] ?? BarChart3
+            return (
+              <div
+                key={group.title}
+                className="flex flex-col items-center px-8 py-10 text-center sm:px-10 sm:py-12"
+              >
+                <Icon className="h-10 w-10 text-oriana-navy" strokeWidth={1.5} aria-hidden />
+                <h2 className="mt-5 text-lg font-semibold text-oriana-navy">{group.title}</h2>
+                <ul className="mt-4 space-y-2 text-left text-sm leading-relaxed text-oriana-navy/75">
+                  {group.items.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-oriana-navy/50" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+      {groups.map((group) => (
+        <div key={group.title}>
+          <h2 className="text-sm font-bold uppercase tracking-widest text-oriana-blue">
+            {group.title}
+          </h2>
+          <ul className="mt-4 space-y-2.5 text-sm leading-relaxed text-oriana-navy/80">
+            {group.items.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-oriana-blue" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props) {
   const router = useRouter()
   const [tab, setTab] = useState<TabId>('overview')
@@ -386,7 +530,8 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
     seriesSegmentLabel(series, series.categorySlug),
     series.categorySlug,
   )
-  const headline = seriesHeadline(series.categorySlug)
+  const headline = seriesHeadline(series, selected)
+  const title = heroTitle(series, selected)
   const audience = AUDIENCE_LABEL[selected.segmentKey] ?? AUDIENCE_LABEL[series.segmentKey]
   const features = featureGroups(series, selected)
   const tiles = specTiles(series, selected)
@@ -415,50 +560,48 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
       external: false,
     },
     {
-      title: 'Installation Guide',
+      title: 'Quick Installation Guide',
       detail: `${series.series} Quick Installation Guide`,
       href: '/resources/downloads',
+      external: false,
+    },
+    {
+      title: 'Installation Video',
+      detail: `${series.series} Installation Video`,
+      href: '/resources/videos',
       external: false,
     },
   ]
 
   return (
     <>
-      <section className="bg-white">
-        <div className="container grid items-center gap-10 py-10 lg:grid-cols-2 lg:gap-16 lg:py-14">
-          <div className="overflow-hidden rounded-3xl bg-oriana-surface px-6 py-8 md:px-10 md:py-12">
-            <ProductImage
-              name={series.series}
-              categorySlug={series.categorySlug}
-              src={selected.heroImageUrl ?? series.heroImageUrl}
-              alt={selected.heroImageAlt ?? series.heroImageAlt}
-              className="aspect-square w-full bg-transparent"
-              plain
-              priority
-            />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-oriana-blue">{typeLabel}</p>
-            <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-oriana-ink md:text-4xl lg:text-5xl">
-              {headline}
+      {/* Sungrow-style hero: copy left, product render right, soft studio gradient */}
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background:
+            'linear-gradient(180deg, #d9dee6 0%, #e8ecf1 42%, #f4f6f8 78%, #ffffff 100%)',
+        }}
+      >
+        <div className="container grid items-center gap-10 py-12 lg:grid-cols-2 lg:gap-16 lg:py-20">
+          <div className="order-2 lg:order-1">
+            <p className="text-sm font-medium text-oriana-muted md:text-base">{headline}</p>
+            <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl lg:text-[2.5rem] lg:leading-tight">
+              {title}
             </h1>
-            <p className="mt-4 font-display text-lg font-medium leading-snug text-oriana-ink md:text-2xl">
-              {series.series}
-            </p>
             {series.description ? (
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-oriana-muted md:text-base">
+              <p className="mt-5 max-w-xl text-sm leading-relaxed text-oriana-muted md:text-base">
                 {series.description}
               </p>
             ) : null}
 
-            <div className="mt-6 flex flex-wrap items-center gap-2">
-              <span className="rounded-full border border-oriana-navy/10 bg-oriana-surface px-3 py-1 text-xs font-semibold uppercase tracking-wider text-oriana-navy">
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full border border-oriana-navy/10 bg-white/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-oriana-navy backdrop-blur">
                 {audience}
               </span>
-              {selected.phases && selected.phases !== '—' ? (
-                <span className="rounded-full border border-oriana-navy/10 px-3 py-1 text-xs font-medium text-oriana-muted">
-                  {selected.phases}
+              {typeLabel ? (
+                <span className="rounded-full border border-oriana-navy/10 bg-white/50 px-3 py-1.5 text-xs font-medium text-oriana-muted">
+                  {typeLabel}
                 </span>
               ) : null}
             </div>
@@ -480,7 +623,7 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
                           'rounded-md border px-3.5 py-2 text-sm font-semibold transition',
                           active
                             ? 'border-oriana-blue bg-oriana-blue text-white'
-                            : 'border-oriana-navy/12 bg-white text-oriana-navy hover:border-oriana-blue/40',
+                            : 'border-oriana-navy/12 bg-white/80 text-oriana-navy hover:border-oriana-blue/40',
                         )}
                         aria-pressed={active}
                       >
@@ -492,10 +635,24 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
               </div>
             ) : null}
           </div>
+
+          <div className="order-1 lg:order-2">
+            <div className="mx-auto max-w-md lg:max-w-none">
+              <ProductImage
+                name={series.series}
+                categorySlug={series.categorySlug}
+                src={selected.heroImageUrl ?? series.heroImageUrl}
+                alt={selected.heroImageAlt ?? series.heroImageAlt}
+                className="aspect-square w-full bg-transparent"
+                plain
+                priority
+              />
+            </div>
+          </div>
         </div>
       </section>
 
-      <div className="sticky top-16 z-20 border-b border-oriana-navy/10 bg-white/95 backdrop-blur-md lg:top-20">
+      <div className="sticky top-[var(--site-header-height,5rem)] z-20 border-b border-oriana-navy/10 bg-white/95 backdrop-blur-md">
         <div className="container">
           <div role="tablist" aria-label="Product sections" className="flex gap-1">
             {(
@@ -534,25 +691,9 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
       {tab === 'overview' ? (
         <section className="bg-white py-12 lg:py-16" role="tabpanel">
           <div className="container">
-            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-              {features.map((group) => (
-                <div key={group.title}>
-                  <h2 className="text-sm font-bold uppercase tracking-widest text-oriana-blue">
-                    {group.title}
-                  </h2>
-                  <ul className="mt-4 space-y-2.5 text-sm leading-relaxed text-oriana-navy/80">
-                    {group.items.map((item) => (
-                      <li key={item} className="flex gap-2">
-                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-oriana-blue" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
+            <FeatureQuadrant groups={features} />
 
-            <div className="mx-auto mt-14 max-w-lg">
+            <div className="mx-auto mt-16 max-w-lg">
               <ProductImage
                 name={series.series}
                 categorySlug={series.categorySlug}
@@ -564,8 +705,8 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
             </div>
 
             <div className="mt-14">
-              <h2 className="text-center font-display text-2xl font-semibold text-oriana-ink md:text-3xl">
-                {series.series}
+              <h2 className="text-center font-display text-2xl font-semibold text-oriana-navy md:text-3xl">
+                {title}
               </h2>
               <dl className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
                 {tiles.map((tile) => (

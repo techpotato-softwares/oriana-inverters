@@ -340,12 +340,12 @@ export function familyToSeries(
     phases: family.segment || '—',
     warranty: '—',
     description,
-    modelSeries: family.series,
+    modelSeries: family.productName,
     heroImageUrl: imageUrl,
     heroImageAlt: family.productName,
     specs: [
       { label: 'Model', value: family.productName },
-      { label: 'Model Series', value: family.series },
+      { label: 'Model Series', value: family.productName },
       { label: 'Capacity', value: family.capacity },
     ],
   }
