@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
   Activity,
@@ -10,14 +9,20 @@ import {
   Hand,
   LineChart,
   Settings2,
+  Shield,
   ShieldCheck,
+  Waves,
 } from 'lucide-react'
 import { ProductImage } from './ProductImage'
 import {
   formatProductPowerLabel,
   productCardTypeLabel,
 } from '@/components/oriana/ProductSeriesCard'
-import { getOnGridSeriesPageData } from '@/data/onGridProductPage'
+import {
+  getOnGridSeriesPageData,
+  type OnGridFeatureIcon,
+  type OnGridFeatureListItem,
+} from '@/data/onGridProductPage'
 import { seriesSegmentLabel } from '@/data/productMaster'
 import { isFileDocument, resolveDatasheetUrl } from '@/utilities/allProductsCatalogue'
 import { cn } from '@/utilities/ui'
@@ -438,6 +443,53 @@ function ProductInquiryForm({
   )
 }
 
+function FeatureIconGlyph({ icon }: { icon: OnGridFeatureIcon }) {
+  const box = 'flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-oriana-navy/80 text-oriana-navy'
+  if (icon === 'export') {
+    return (
+      <span className={cn(box, 'font-display text-lg font-bold')} aria-hidden>
+        F
+      </span>
+    )
+  }
+  if (icon === 'lv') {
+    return (
+      <span className={cn(box, 'font-display text-sm font-bold tracking-wide')} aria-hidden>
+        LV
+      </span>
+    )
+  }
+  if (icon === 'pid') {
+    return (
+      <span className={cn(box, 'flex-col gap-0.5')} aria-hidden>
+        <span className="grid grid-cols-3 gap-px">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <span key={i} className="h-1.5 w-1.5 border border-oriana-navy/80" />
+          ))}
+        </span>
+        <span className="text-[8px] font-bold leading-none">PID</span>
+      </span>
+    )
+  }
+  if (icon === 'spd') return <span className={box}><Shield className="h-5 w-5" strokeWidth={1.5} /></span>
+  if (icon === 'wave') return <span className={box}><Waves className="h-5 w-5" strokeWidth={1.5} /></span>
+  if (icon === 'monitor') return <span className={box}><Activity className="h-5 w-5" strokeWidth={1.5} /></span>
+  return <span className={box}><BarChart3 className="h-5 w-5" strokeWidth={1.5} /></span>
+}
+
+function FeatureIconList({ items }: { items: OnGridFeatureListItem[] }) {
+  return (
+    <ul className="mx-auto flex max-w-2xl flex-col gap-5">
+      {items.map((item) => (
+        <li key={item.text} className="flex items-center gap-4">
+          <FeatureIconGlyph icon={item.icon} />
+          <span className="text-sm font-medium text-oriana-navy md:text-base">{item.text}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function FeatureQuadrant({
   groups,
 }: {
@@ -501,7 +553,6 @@ function FeatureQuadrant({
 }
 
 export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props) {
-  const router = useRouter()
   const [tab, setTab] = useState<TabId>('overview')
 
   const resolveSlug = (preferred?: string | null) =>
@@ -533,18 +584,19 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
   const headline = seriesHeadline(series, selected)
   const title = heroTitle(series, selected)
   const audience = AUDIENCE_LABEL[selected.segmentKey] ?? AUDIENCE_LABEL[series.segmentKey]
+  const pageData = getOnGridSeriesPageData(
+    selected.modelSeries,
+    series.series,
+    series.slug,
+    selected.slug,
+  )
   const features = featureGroups(series, selected)
+  const featureList = pageData?.featureLayout === 'list' ? pageData.featureList ?? [] : null
   const tiles = specTiles(series, selected)
   const datasheetUrl = resolveDatasheetUrl(
     series.categorySlug,
     selected.datasheetUrl ?? series.variants.find((item) => item.datasheetUrl)?.datasheetUrl,
   )
-
-  const selectVariant = (slug: string) => {
-    setSelectedSlug(slug)
-    const url = `/products/${series.slug}?model=${encodeURIComponent(slug)}`
-    router.replace(url, { scroll: false })
-  }
 
   const downloads = [
     {
@@ -605,35 +657,6 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
                 </span>
               ) : null}
             </div>
-
-            {series.variants.length > 1 ? (
-              <div className="mt-8">
-                <p className="text-xs font-semibold uppercase tracking-widest text-oriana-muted">
-                  Select capacity
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {series.variants.map((variant) => {
-                    const active = variant.slug === selected.slug
-                    return (
-                      <button
-                        key={variant.slug}
-                        type="button"
-                        onClick={() => selectVariant(variant.slug)}
-                        className={cn(
-                          'rounded-md border px-3.5 py-2 text-sm font-semibold transition',
-                          active
-                            ? 'border-oriana-blue bg-oriana-blue text-white'
-                            : 'border-oriana-navy/12 bg-white/80 text-oriana-navy hover:border-oriana-blue/40',
-                        )}
-                        aria-pressed={active}
-                      >
-                        {variant.powerRange}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ) : null}
           </div>
 
           <div className="order-1 lg:order-2">
@@ -691,7 +714,11 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
       {tab === 'overview' ? (
         <section className="bg-white py-12 lg:py-16" role="tabpanel">
           <div className="container">
-            <FeatureQuadrant groups={features} />
+            {featureList?.length ? (
+              <FeatureIconList items={featureList} />
+            ) : (
+              <FeatureQuadrant groups={features} />
+            )}
 
             <div className="mx-auto mt-16 max-w-lg">
               <ProductImage
