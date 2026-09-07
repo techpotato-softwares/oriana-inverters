@@ -14,9 +14,8 @@ import { WhyChooseOrianaSection } from '@/components/oriana/WhyChooseOrianaSecti
 import { getHome } from '@/utilities/getMarketing'
 
 const HOME_VIDEO_HERO = {
-  videoSrc: '/assets/clone/hero-dummy.mp4',
-  posterSrc:
-    'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=1920&q=80',
+  videoSrc: '/assets/home/hero.mp4',
+  posterSrc: '/assets/home/hero-poster.jpg',
   captions: [
     'Clean power that crosses borders',
     'To power that transforms businesses',
@@ -90,7 +89,7 @@ const HOME_IMPACT = {
   body: 'As a trusted solar inverter brand, we are committed to powering India\'s clean energy transition through advanced technology, nationwide reach, and exceptional customer support.',
   link: { label: 'Discover who we are', href: '/about' },
   stats: [
-    { iconKey: 'award', value: '10+', label: 'Solar industry project experience' },
+    { iconKey: 'award', value: '10+ Years', label: 'Solar industry project experience' },
     { iconKey: 'map', value: 'PAN India', label: 'Market presence' },
     { iconKey: 'zap', value: 'GW+', label: 'Inverter distribution & experience' },
     { iconKey: 'building', value: '500+', label: 'Channel & service partners' },

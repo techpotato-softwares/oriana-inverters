@@ -16,7 +16,7 @@ import { FadeIn, Stagger, StaggerItem } from './FadeIn'
 const impactStats = [
   {
     icon: Award,
-    value: '10+',
+    value: '10+ Years',
     label: 'Solar industry project experience',
   },
   {

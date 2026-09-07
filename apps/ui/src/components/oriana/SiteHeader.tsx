@@ -82,6 +82,7 @@ export function SiteHeader({
   const lastScrollY = useRef(0)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<MegaMenuKey | null>(null)
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const [navCollapsed, setNavCollapsed] = useState(false)
 
   const mainNavItems = nav?.mainNav ?? defaultMainNav
@@ -99,6 +100,7 @@ export function SiteHeader({
   useEffect(() => {
     setMobileOpen(false)
     setOpenMenu(null)
+    setHoveredNav(null)
     lastScrollY.current = window.scrollY
     setNavCollapsed(window.scrollY > 16)
   }, [pathname])
@@ -124,6 +126,7 @@ export function SiteHeader({
       if (delta > 6) {
         setNavCollapsed(true)
         setOpenMenu(null)
+        setHoveredNav(null)
         return
       }
 
@@ -150,7 +153,13 @@ export function SiteHeader({
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-white/90 shadow-sm backdrop-blur-xl backdrop-saturate-150">
-      <div className="relative" onMouseLeave={() => setOpenMenu(null)}>
+      <div
+        className="relative"
+        onMouseLeave={() => {
+          setOpenMenu(null)
+          setHoveredNav(null)
+        }}
+      >
         <div className="container">
           <div
             className={cn(
@@ -214,27 +223,29 @@ export function SiteHeader({
                   const hasMenu = itemHasSubmenu(item)
                   const href = navHref(item)
                   const open = hasMenu && openMenu === item.type
-                  const active = item.type === 'link' && pathname === item.href
+                  const marked = open || hoveredNav === item.label
 
                   return (
                     <Link
                       key={item.label}
                       href={href}
-                      className={cn(linkClass, (open || active) && 'text-oriana-blue')}
-                      onMouseEnter={() =>
-                        setOpenMenu(itemHasSubmenu(item) ? item.type : null)
-                      }
-                      onFocus={() =>
-                        setOpenMenu(itemHasSubmenu(item) ? item.type : null)
-                      }
-                      aria-expanded={itemHasSubmenu(item) ? open : undefined}
-                      aria-haspopup={itemHasSubmenu(item) ? 'true' : undefined}
+                      className={cn(linkClass, marked && 'text-oriana-blue')}
+                      onMouseEnter={() => {
+                        setHoveredNav(item.label)
+                        setOpenMenu(hasMenu ? item.type : null)
+                      }}
+                      onFocus={() => {
+                        setHoveredNav(item.label)
+                        setOpenMenu(hasMenu ? item.type : null)
+                      }}
+                      aria-expanded={hasMenu ? open : undefined}
+                      aria-haspopup={hasMenu ? 'true' : undefined}
                     >
                       {item.label}
                       <span
                         className={cn(
                           'absolute inset-x-3 bottom-0 h-0.5 origin-center bg-oriana-blue transition-transform duration-300',
-                          open || active ? 'scale-x-100' : 'scale-x-0',
+                          marked ? 'scale-x-100' : 'scale-x-0',
                         )}
                       />
                     </Link>

@@ -343,7 +343,7 @@ export async function seedOrianaContent({
         body: 'As a trusted solar inverter brand, we are committed to powering India\'s clean energy transition through advanced technology, nationwide reach, and exceptional customer support.',
         link: { label: 'Discover who we are', href: '/about' },
         stats: [
-          { iconKey: 'award', value: '10+', label: 'Solar industry project experience' },
+          { iconKey: 'award', value: '10+ Years', label: 'Solar industry project experience' },
           { iconKey: 'map', value: 'PAN India', label: 'Market presence' },
           { iconKey: 'zap', value: 'GW+', label: 'Inverter distribution & experience' },
           { iconKey: 'building', value: '500+', label: 'Channel & service partners' },
