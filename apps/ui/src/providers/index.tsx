@@ -1,14 +1,16 @@
-import React from 'react'
+'use client'
 
-import { HeaderThemeProvider } from './HeaderTheme'
+import type { ReactNode } from 'react'
 import { ThemeProvider } from './Theme'
+import { HeaderThemeProvider } from './HeaderTheme'
+import { SmoothScroll } from './SmoothScroll'
 
-export const Providers: React.FC<{
-  children: React.ReactNode
-}> = ({ children }) => {
+export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
-      <HeaderThemeProvider>{children}</HeaderThemeProvider>
+      <HeaderThemeProvider>
+        <SmoothScroll>{children}</SmoothScroll>
+      </HeaderThemeProvider>
     </ThemeProvider>
   )
 }

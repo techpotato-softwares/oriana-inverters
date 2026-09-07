@@ -61,8 +61,10 @@
   --font-display: var(--font-montserrat), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
   --font-product: var(--font-montserrat), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
 
-  /* Oriana brand */
-  --color-oriana-navy: #071525;
+  /* Oriana brand — headings/body use soft gray (#606060, Sungrow system-gray).
+     Keep deep navy for dark section backgrounds via oriana-deep. */
+  --color-oriana-navy: #606060;
+  --color-oriana-deep: #071525;
   --color-oriana-blue: #1a428a;
   --color-oriana-sky: #4da3ff;
   --color-oriana-sun: #f5b942;
@@ -75,6 +77,15 @@
 @layer utilities {
   .text-oriana-ink {
     color: #606060;
+  }
+
+  /* Soft charcoal headings (Sungrow system-gray) — explicit so HMR/theme always picks it up */
+  .text-oriana-navy {
+    color: #606060;
+  }
+
+  .bg-oriana-deep {
+    background-color: #071525;
   }
 
   .font-sans,
@@ -144,9 +155,9 @@
 :root {
   --site-header-height: 8.5rem;
   --background: #ffffff;
-  --foreground: #071525;
+  --foreground: #606060;
   --card: #f7f9fc;
-  --card-foreground: #071525;
+  --card-foreground: #606060;
   --border: #e2e8f0;
   --primary: #1a428a;
   --primary-foreground: #ffffff;

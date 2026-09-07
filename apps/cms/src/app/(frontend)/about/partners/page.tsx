@@ -72,7 +72,7 @@ export default async function PartnersPage() {
             </div>
           ))}
 
-          <div className="rounded border border-oriana-blue/20 bg-oriana-navy p-8 text-white lg:p-12">
+          <div className="rounded border border-oriana-blue/20 bg-oriana-deep p-8 text-white lg:p-12">
             <h2 className="font-display text-2xl font-bold">Partner with Oriana</h2>
             <p className="mt-3 max-w-xl text-white/70">
               Access technical training, co-marketing resources, and dedicated commercial support as an authorized

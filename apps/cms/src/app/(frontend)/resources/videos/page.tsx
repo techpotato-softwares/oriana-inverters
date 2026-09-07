@@ -76,7 +76,7 @@ export default async function VideosPage() {
             {videos.map((video) => {
               const card = (
                 <>
-                  <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-oriana-navy to-oriana-blue">
+                  <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-oriana-deep to-oriana-blue">
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 backdrop-blur transition group-hover:bg-white/30">
                       <Play className="h-6 w-6 fill-white text-white" />
                     </div>

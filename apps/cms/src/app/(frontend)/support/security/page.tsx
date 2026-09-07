@@ -41,7 +41,7 @@ export default function SecurityPage() {
           <p className="text-sm text-oriana-muted">Need immediate assistance?</p>
           <Link
             href="/contact"
-            className="mt-4 inline-block rounded-full bg-oriana-blue px-8 py-3 text-sm font-bold text-white hover:bg-oriana-navy"
+            className="mt-4 inline-block rounded-full bg-oriana-blue px-8 py-3 text-sm font-bold text-white hover:bg-oriana-deep"
           >
             Contact Security Team
           </Link>

@@ -87,7 +87,7 @@ export const CtaBandBlock: React.FC<CtaBandBlockProps & { disableInnerContainer?
   secondaryCta,
 }) => (
   <section className="container py-12">
-    <div className="rounded-2xl bg-oriana-navy px-8 py-12 text-center text-white">
+    <div className="rounded-2xl bg-oriana-deep px-8 py-12 text-center text-white">
       <h2 className="font-display text-3xl font-semibold">{title}</h2>
       {body ? <p className="mx-auto mt-4 max-w-2xl text-white/70">{body}</p> : null}
       <div className="mt-8 flex flex-wrap justify-center gap-4">

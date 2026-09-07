@@ -1,7 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { useReducedMotion } from 'framer-motion'
+
+import { GrowingAccentLine } from './GrowingAccentLine'
 
 export type VisionMissionCard = {
   id: string
@@ -30,18 +33,28 @@ function smoothstep(edge0: number, edge1: number, x: number) {
   return t * t * (3 - 2 * t)
 }
 
-/** Crossfade opacities with the swap centered on each card boundary (50% for two cards). */
-function textOpacitiesForRatio(ratio: number, count: number, fadeWindow = 0.36): number[] {
+/**
+ * Copy stays on card N until its image is mostly gone, then crossfades.
+ * Lift segments are only for cards that slide (count - 1).
+ */
+function textOpacitiesForLift(ratio: number, count: number): number[] {
   if (count <= 1) return [1]
+  const lifts = Math.max(count - 1, 1)
   return Array.from({ length: count }, (_, i) => {
-    const start = i / count
-    const end = (i + 1) / count
-    const half = fadeWindow / 2
-    const inStart = i === 0 ? -1 : start - half
-    const inEnd = i === 0 ? 0 : start + half
-    const outStart = i === count - 1 ? 1 : end - half
-    const outEnd = i === count - 1 ? 2 : end + half
-    return clamp01(smoothstep(inStart, inEnd, ratio) * (1 - smoothstep(outStart, outEnd, ratio)))
+    if (i === 0) {
+      // Fade out in the last ~30% of the first lift
+      return 1 - smoothstep(0.7, 0.92, ratio)
+    }
+    if (i === count - 1 && count === 2) {
+      return smoothstep(0.7, 0.92, ratio)
+    }
+    // 3+ cards: map each lift beat
+    const start = (i - 1) / lifts
+    const end = i / lifts
+    const enter = smoothstep(start + (end - start) * 0.7, start + (end - start) * 0.92, ratio)
+    if (i === count - 1) return enter
+    const leave = 1 - smoothstep(end + (1 / lifts) * 0.7, end + (1 / lifts) * 0.92, ratio)
+    return enter * leave
   })
 }
 
@@ -53,7 +66,7 @@ function AccentMark() {
       viewBox="0 0 40 6"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="h-[5px] w-10 text-oriana-sky"
+      className="h-[5px] w-10 text-oriana-blue"
       aria-hidden
     >
       <path
@@ -64,8 +77,15 @@ function AccentMark() {
   )
 }
 
+/** Sticky pin runway: lift beats + short hold so the card can unpin and scroll away. */
+const LIFT_VH_PER_CARD = 90
+const EXIT_HOLD_VH = 40
+
 /**
- * Sticky split-card section — left copy crossfades, right image peek stack on scroll.
+ * Sticky split cards — Sungrow “Greener Tomorrow” stack:
+ * top image slides up as a panel; next image is visible underneath the whole time.
+ * After the last lift, the sticky card unpins and scrolls up before the next section.
+ * @see https://www.sungrowpower.com/en
  */
 export function VisionMissionSection({
   title = 'Vision & Mission',
@@ -73,167 +93,274 @@ export function VisionMissionSection({
   ariaLabel = 'Vision and mission',
   className = '',
 }: VisionMissionSectionProps) {
+  const reduceMotion = useReducedMotion()
   const sectionRef = useRef<HTMLElement>(null)
-  const ticking = useRef(false)
-  const [active, setActive] = useState(0)
-  const [textOpacities, setTextOpacities] = useState<number[]>(() =>
-    cards.map((_, i) => (i === 0 ? 1 : 0)),
-  )
-  const [imageProgress, setImageProgress] = useState<number[]>(() => cards.map(() => 0))
+  const layerRefs = useRef<(HTMLDivElement | null)[]>([])
+  const textRefs = useRef<(HTMLDivElement | null)[]>([])
+  const targetRatio = useRef(0)
+
+  const liftVh = Math.max(cards.length - 1, 1) * LIFT_VH_PER_CARD
+  const runwayVh = 100 + liftVh + EXIT_HOLD_VH
 
   useEffect(() => {
-    if (!cards.length) return
+    if (!cards.length || reduceMotion) return
 
-    const update = () => {
+    const readRatio = () => {
       const section = sectionRef.current
-      if (!section) return
-
+      if (!section) return 0
       const vh = window.innerHeight
       const rect = section.getBoundingClientRect()
       const scrollSpan = Math.max(section.offsetHeight - vh, 1)
       const scrolled = Math.min(Math.max(-rect.top, 0), scrollSpan)
-      const ratio = scrolled / scrollSpan
+      // Map only the lift portion — exit hold keeps last card fully visible while unpin starts
+      const liftSpan = Math.max(scrollSpan * (liftVh / (liftVh + EXIT_HOLD_VH)), 1)
+      return clamp01(scrolled / liftSpan)
+    }
 
-      const nextActive = Math.min(cards.length - 1, Math.floor(ratio * cards.length + 0.001))
-      setActive(nextActive)
+    let raf = 0
+    let current = 0
+    let running = true
 
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduceMotion) {
-        setTextOpacities(cards.map((_, i) => (i === nextActive ? 1 : 0)))
-      } else {
-        setTextOpacities(textOpacitiesForRatio(ratio, cards.length))
+    const tick = () => {
+      if (!running) return
+      targetRatio.current = readRatio()
+      current += (targetRatio.current - current) * 0.16
+      if (Math.abs(targetRatio.current - current) < 0.00015) current = targetRatio.current
+
+      const count = cards.length
+      const lifts = Math.max(count - 1, 1)
+      const opacities = textOpacitiesForLift(current, count)
+
+      for (let i = 0; i < count; i++) {
+        let progress = 0
+        if (i < lifts) {
+          const start = i / lifts
+          const end = (i + 1) / lifts
+          if (current <= start) progress = 0
+          else if (current >= end) progress = 1
+          else progress = (current - start) / (end - start)
+        }
+
+        const layer = layerRefs.current[i]
+        if (layer) {
+          // Whole panel slides up — next image stays fixed underneath (visible during the move)
+          layer.style.transform = i < lifts ? `translate3d(0, ${-progress * 100}%, 0)` : 'translate3d(0, 0, 0)'
+        }
+
+        const text = textRefs.current[i]
+        if (text) {
+          const opacity = opacities[i] ?? 0
+          text.style.opacity = String(opacity)
+          text.style.zIndex = opacity > 0.45 ? '2' : '1'
+          text.style.pointerEvents = opacity > 0.45 ? 'auto' : 'none'
+          text.style.transform = `translateY(${(1 - opacity) * 8}px)`
+          text.setAttribute('aria-hidden', opacity < 0.45 ? 'true' : 'false')
+          const link = text.querySelector('a')
+          if (link) link.tabIndex = opacity > 0.45 ? 0 : -1
+        }
       }
 
-      const progress = cards.map((_, i) => {
-        const start = i / cards.length
-        const end = (i + 1) / cards.length
-        if (ratio <= start) return 0
-        if (ratio >= end) return 1
-        return (ratio - start) / (end - start)
-      })
-      setImageProgress(progress)
+      raf = window.requestAnimationFrame(tick)
     }
 
-    const onScroll = () => {
-      if (ticking.current) return
-      ticking.current = true
-      window.requestAnimationFrame(() => {
-        update()
-        ticking.current = false
-      })
-    }
-
-    update()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
+    raf = window.requestAnimationFrame(tick)
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
+      running = false
+      window.cancelAnimationFrame(raf)
     }
-  }, [cards])
+  }, [cards, reduceMotion, liftVh])
 
   if (!cards.length) return null
 
-  const runwayVh = cards.length * 100
+  if (reduceMotion) {
+    return (
+      <section
+        ref={sectionRef}
+        className={`relative bg-white py-14 lg:py-16 ${className}`.trim()}
+        aria-label={ariaLabel}
+      >
+        <div className="container">
+          {title ? (
+            <div className="mx-auto mb-10 max-w-3xl text-center">
+              <h2 className="font-display text-3xl font-semibold text-oriana-navy md:text-4xl lg:text-5xl">
+                {title}
+              </h2>
+              <GrowingAccentLine reduceMotion size="heading" className="mt-3" progress={1} />
+            </div>
+          ) : null}
+          <div className="grid gap-4
+           lg:grid-cols-2">
+            {cards.map((card) => (
+              <article key={card.id} className="overflow-hidden rounded-[2rem] border border-black/5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={card.image} alt={card.alt || card.label} className="aspect-[4/3] w-full object-cover" />
+                <div className="p-8">
+                  <p className="font-display text-[#8a8a8a]">{card.label}</p>
+                  <p className="mt-4 font-display text-xl text-[#606060]">{card.headline || card.body}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section
       ref={sectionRef}
       className={`relative bg-white ${className}`.trim()}
-      style={{ height: `${runwayVh}svh` }}
+      style={{
+        height: `${runwayVh}svh`,
+        marginTop: '1.5rem',
+        // Small breathing room before Our Impact (no negative overlap)
+        marginBottom: '1.25rem',
+      }}
       aria-label={ariaLabel}
     >
-      <div className="sticky top-0 min-h-[100svh]" style={{ height: '100svh' }}>
-        <div className="box-border flex h-full w-full flex-col justify-center px-4 py-10 sm:px-8 lg:px-12 xl:px-20">
+      <div
+        className="sticky top-0 z-10 flex flex-col overflow-hidden bg-white"
+        style={{ height: '100svh', maxHeight: '100svh' }}
+      >
+        <div
+          className="flex shrink-0 flex-col items-center px-4"
+          style={{
+            paddingTop: 'max(3.75rem, calc(env(safe-area-inset-top, 0px) + 3.25rem))',
+          }}
+        >
           {title ? (
-            <h2 className="mb-8 text-center font-display text-3xl font-semibold tracking-tight text-oriana-navy md:mb-10 md:text-4xl lg:text-5xl">
-              {title}
-            </h2>
+            <>
+              <h2 className="text-center font-display text-3xl font-semibold text-oriana-navy md:text-4xl lg:text-5xl">
+                {title}
+              </h2>
+              <GrowingAccentLine
+                sectionRef={sectionRef}
+                reduceMotion={!!reduceMotion}
+                size="heading"
+                className="mt-3"
+              />
+            </>
           ) : null}
+        </div>
 
+        <div className="flex min-h-0 flex-1 items-stretch justify-center px-4 pb-5 pt-2 sm:px-8 lg:px-12 xl:px-16">
           <div
-            className="mx-auto grid w-full max-w-7xl grid-cols-1 overflow-hidden lg:grid-cols-2"
+            className="mx-auto grid h-full w-full max-w-7xl grid-cols-1 overflow-hidden lg:grid-cols-2"
             style={{
-              height: title ? 'min(72svh, 680px)' : 'min(78svh, 720px)',
-              minHeight: '520px',
               borderRadius: 40,
-              boxShadow: '0 28px 80px rgba(7, 21, 37, 0.12)',
+              border: '1px solid rgba(7, 21, 37, 0.06)',
             }}
           >
             {/* Copy panel */}
-            <div className="relative order-2 h-full min-h-[280px] bg-white lg:order-1">
+            <div className="relative order-2 h-full min-h-0 bg-white lg:order-1">
               {cards.map((card, i) => {
-                const opacity = textOpacities[i] ?? 0
-                const isActive = active === i
+                const primary = card.headline || card.body
+                const support = card.headline && card.body ? card.body : null
+
                 return (
                   <div
                     key={card.id}
-                    className="absolute inset-0 flex flex-col justify-center px-8 py-10 sm:px-12 lg:px-14 xl:px-16"
-                    style={{
-                      opacity,
-                      zIndex: isActive ? 2 : 1,
-                      pointerEvents: opacity > 0.45 ? 'auto' : 'none',
-                      transform: `translateY(${(1 - opacity) * 14}px)`,
-                      filter: `blur(${(1 - opacity) * 1.6}px)`,
-                      willChange: 'opacity, transform, filter',
+                    ref={(node) => {
+                      textRefs.current[i] = node
                     }}
-                    aria-hidden={opacity < 0.45}
+                    className="absolute inset-0 box-border"
+                    style={{
+                      opacity: i === 0 ? 1 : 0,
+                      zIndex: i === 0 ? 2 : 1,
+                      pointerEvents: i === 0 ? 'auto' : 'none',
+                      transform: 'translateY(0px)',
+                      willChange: 'opacity, transform',
+                      padding: 'clamp(2rem, 4.2vw, 3.5rem)',
+                    }}
+                    aria-hidden={i !== 0}
                   >
-                    <div className="flex max-w-xl flex-col gap-6 lg:gap-8">
+                    <div className="flex h-full w-full max-w-lg flex-col justify-center">
                       <div>
-                        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">
+                        <p
+                          className="font-display font-medium text-[#8a8a8a]"
+                          style={{
+                            fontSize: '1rem',
+                            letterSpacing: '0.02em',
+                            marginBottom: '0.75rem',
+                          }}
+                        >
                           {card.label}
                         </p>
                         <AccentMark />
                       </div>
-                      <p className="font-display text-2xl font-semibold leading-snug text-oriana-navy sm:text-3xl lg:text-4xl lg:leading-tight">
-                        {card.headline || card.body}
+
+                      <p
+                        className="font-display font-medium text-[#606060]"
+                        style={{
+                          fontSize: 'clamp(1.35rem, 1.9vw, 2.1rem)',
+                          lineHeight: 1.35,
+                          maxWidth: '26rem',
+                          marginTop: '1.5rem',
+                        }}
+                      >
+                        {primary}
                       </p>
-                      {card.headline && card.body ? (
-                        <p className="text-base leading-relaxed text-oriana-muted md:text-lg">
-                          {card.body}
+                      {support ? (
+                        <p
+                          className="text-oriana-muted"
+                          style={{
+                            fontSize: 'clamp(0.95rem, 1.05vw, 1.05rem)',
+                            lineHeight: 1.65,
+                            marginTop: '1rem',
+                            maxWidth: '26rem',
+                          }}
+                        >
+                          {support}
                         </p>
                       ) : null}
+
+                      {card.href ? (
+                        <Link
+                          href={card.href}
+                          tabIndex={i === 0 ? 0 : -1}
+                          className="inline-flex w-fit items-center justify-center border border-oriana-blue font-medium text-oriana-blue transition hover:bg-oriana-blue hover:text-white"
+                          style={{
+                            marginTop: '2.25rem',
+                            minWidth: '11.5rem',
+                            padding: '0.85rem 1.85rem',
+                            borderRadius: '0.8rem',
+                            fontSize: '0.9rem',
+                          }}
+                        >
+                          {card.ctaLabel || 'Explore more'}
+                        </Link>
+                      ) : null}
                     </div>
-                    {card.href ? (
-                      <Link
-                        href={card.href}
-                        tabIndex={opacity > 0.45 ? 0 : -1}
-                        className="mt-8 inline-flex w-fit min-w-[12rem] items-center justify-center rounded-full border-2 border-oriana-blue px-8 py-3.5 text-sm font-semibold text-oriana-blue transition hover:bg-oriana-blue hover:text-white sm:text-base"
-                      >
-                        {card.ctaLabel || 'Explore more'}
-                      </Link>
-                    ) : null}
                   </div>
                 )
               })}
             </div>
 
-            {/* Image peek stack */}
-            <div className="relative order-1 h-full min-h-[240px] lg:order-2">
-              {cards.map((card, i) => {
-                const progress = imageProgress[i] ?? 0
-                const lift = i < cards.length - 1 ? progress * -100 : 0
-                return (
-                  <div
-                    key={card.id}
-                    className="absolute inset-0 overflow-hidden"
-                    style={{
-                      zIndex: cards.length - i,
-                      transform: `translateY(${lift}%)`,
-                      transition: 'transform 0.15s linear',
-                    }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={card.image}
-                      alt={card.alt || card.label}
-                      className="absolute inset-0 h-full w-full object-cover"
-                      loading={i === 0 ? 'eager' : 'lazy'}
-                    />
-                  </div>
-                )
-              })}
+            {/* Image stack — top panel slides up; base image stays put and stays visible */}
+            <div className="relative order-1 h-full min-h-0 overflow-hidden bg-oriana-silver lg:order-2">
+              {cards.map((card, i) => (
+                <div
+                  key={card.id}
+                  ref={(node) => {
+                    layerRefs.current[i] = node
+                  }}
+                  className="absolute inset-0"
+                  style={{
+                    zIndex: cards.length - i,
+                    transform: 'translate3d(0, 0, 0)',
+                    willChange: 'transform',
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={card.image}
+                    alt={card.alt || card.label}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                    draggable={false}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>

@@ -91,7 +91,7 @@ export default async function WarrantyPage() {
           <div className="mt-12 flex flex-wrap gap-4">
             <Link
               href="/contact"
-              className="rounded bg-oriana-blue px-6 py-3 text-sm font-bold text-white hover:bg-oriana-navy"
+              className="rounded bg-oriana-blue px-6 py-3 text-sm font-bold text-white hover:bg-oriana-deep"
             >
               Register / Claim Warranty
             </Link>

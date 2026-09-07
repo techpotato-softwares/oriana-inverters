@@ -38,7 +38,10 @@ export function GreenMissionSection({
   )
 
   return (
-    <section className={`bg-white py-16 lg:py-24 ${className}`.trim()} aria-label={ariaLabel}>
+    <section
+      className={`relative bg-white py-12 lg:py-16 ${className}`.trim()}
+      aria-label={ariaLabel}
+    >
       <div className="container">
         <article
           className="relative overflow-hidden"
@@ -51,9 +54,9 @@ export function GreenMissionSection({
             className="absolute inset-0 h-full w-full object-cover"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-oriana-navy/35" aria-hidden />
+          <div className="absolute inset-0 bg-oriana-deep/35" aria-hidden />
           <div
-            className="absolute inset-0 bg-gradient-to-t from-oriana-navy/55 via-oriana-navy/20 to-oriana-navy/10"
+            className="absolute inset-0 bg-gradient-to-t from-oriana-deep/55 via-oriana-deep/20 to-oriana-deep/10"
             aria-hidden
           />
 

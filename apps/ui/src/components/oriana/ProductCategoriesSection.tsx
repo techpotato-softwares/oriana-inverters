@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
+import { useReducedMotion } from 'framer-motion'
 import { useState } from 'react'
 
 import { cn } from '@/utilities/ui'
@@ -21,12 +22,21 @@ export type ProductCategoriesSectionProps = {
   className?: string
 }
 
+const TAB_RADIUS = '0.8rem'
+const TAB_EASE = 'cubic-bezier(0.4, 0, 0.2, 1)'
+
+/**
+ * Sungrow-style category hero tabs:
+ * frosted bar (no border), per-tab white active state with CSS transition
+ * (avoids layoutId border-radius flash).
+ */
 export function ProductCategoriesSection({
   title = 'Product Categories',
   categories,
   ariaLabel = 'Product categories',
   className = '',
 }: ProductCategoriesSectionProps) {
+  const reduceMotion = useReducedMotion()
   const [activeIndex, setActiveIndex] = useState(0)
   const [hoverIndex, setHoverIndex] = useState<number | null>(null)
 
@@ -34,10 +44,11 @@ export function ProductCategoriesSection({
 
   const displayIndex = hoverIndex ?? activeIndex
   const current = categories[displayIndex] ?? categories[0]
+  const transition = reduceMotion ? 'none' : `background-color 0.3s ${TAB_EASE}, color 0.3s ${TAB_EASE}, box-shadow 0.3s ${TAB_EASE}, font-weight 0.3s ${TAB_EASE}`
 
   return (
     <section
-      className={cn('relative min-h-[100svh] overflow-hidden bg-oriana-navy', className)}
+      className={cn('relative min-h-[100svh] overflow-hidden bg-oriana-deep', className)}
       style={{ height: '100svh' }}
       aria-label={ariaLabel}
       onMouseLeave={() => setHoverIndex(null)}
@@ -59,9 +70,9 @@ export function ProductCategoriesSection({
             className="absolute inset-0 h-full w-full object-cover"
             loading={index === 0 ? 'eager' : 'lazy'}
           />
-          <div className="absolute inset-0 bg-oriana-navy/40" aria-hidden />
+          <div className="absolute inset-0 bg-oriana-deep/40" aria-hidden />
           <div
-            className="absolute inset-0 bg-gradient-to-r from-oriana-navy/80 via-oriana-navy/45 to-oriana-navy/20"
+            className="absolute inset-0 bg-gradient-to-r from-oriana-deep/80 via-oriana-deep/45 to-oriana-deep/20"
             aria-hidden
           />
         </div>
@@ -89,41 +100,67 @@ export function ProductCategoriesSection({
           style={{ bottom: '2rem' }}
         >
           <div
-            className="mx-auto flex w-full max-w-7xl items-stretch rounded-2xl border border-white/15 bg-white/10 p-1.5 backdrop-blur-md"
+            className="mx-auto flex w-full max-w-7xl items-stretch"
+            style={{
+              height: 'clamp(4.5rem, 6.5vw, 5.75rem)',
+              borderRadius: TAB_RADIUS,
+              backgroundColor: 'rgba(230, 230, 230, 0.5)',
+              backdropFilter: 'blur(28px)',
+              WebkitBackdropFilter: 'blur(28px)',
+            }}
             role="tablist"
             aria-label={title}
           >
             {categories.map((category, index) => {
               const isHighlighted =
                 hoverIndex === index || (hoverIndex === null && activeIndex === index)
-              const isFirst = index === 0
-              const isLast = index === categories.length - 1
+              const showDividerAfter =
+                index < categories.length - 1 &&
+                displayIndex !== index &&
+                displayIndex !== index + 1
 
               return (
-                <Link
+                <div
                   key={category.id}
-                  href={category.href}
-                  role="tab"
-                  aria-selected={isHighlighted}
-                  onMouseEnter={() => setHoverIndex(index)}
-                  onFocus={() => setHoverIndex(index)}
-                  onBlur={() => setHoverIndex(null)}
-                  onClick={() => setActiveIndex(index)}
-                  style={{ height: '5rem' }}
-                  className={cn(
-                    'flex min-w-0 flex-1 items-center justify-center border-r border-white/15 px-2 text-center text-xs font-semibold leading-snug transition last:border-r-0 sm:px-3 sm:text-sm lg:px-4 lg:text-base',
-                    isHighlighted
-                      ? cn(
-                          'bg-white text-oriana-navy',
-                          isFirst && 'rounded-l-xl',
-                          isLast && 'rounded-r-xl',
-                          !isFirst && !isLast && 'rounded-xl',
-                        )
-                      : 'text-white hover:ring-2 hover:ring-inset hover:ring-oriana-sky',
-                  )}
+                  className="relative flex min-w-0 flex-1 items-center justify-center"
+                  style={{ height: '100%' }}
                 >
-                  <span className="block max-w-full">{category.label}</span>
-                </Link>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={isHighlighted}
+                    onMouseEnter={() => setHoverIndex(index)}
+                    onFocus={() => setHoverIndex(index)}
+                    onBlur={() => setHoverIndex(null)}
+                    onClick={() => setActiveIndex(index)}
+                    className="flex h-full w-full items-center justify-center px-2 text-center text-xs leading-snug sm:px-3 sm:text-sm lg:px-4 lg:text-base"
+                    style={{
+                      borderRadius: TAB_RADIUS,
+                      transition,
+                      backgroundColor: isHighlighted ? '#ffffff' : 'transparent',
+                      color: isHighlighted ? '#606060' : '#ffffff',
+                      fontWeight: isHighlighted ? 500 : 400,
+                      boxShadow: isHighlighted ? '0 10px 25px rgba(7, 21, 37, 0.12)' : 'none',
+                    }}
+                  >
+                    <span className="block max-w-full">{category.label}</span>
+                  </button>
+
+                  {index < categories.length - 1 ? (
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute right-0 top-1/2 z-[1] -translate-y-1/2 text-black/35"
+                      style={{
+                        opacity: showDividerAfter ? 1 : 0,
+                        transition: reduceMotion ? undefined : 'opacity 0.3s ease',
+                        fontSize: '0.85rem',
+                        lineHeight: 1,
+                      }}
+                    >
+                      |
+                    </span>
+                  ) : null}
+                </div>
               )
             })}
           </div>

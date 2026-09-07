@@ -127,7 +127,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
                   </span>
                 ) : null}
                 {study.year ? (
-                  <span className="rounded-full bg-oriana-navy/5 px-3 py-1 text-xs font-medium text-oriana-muted">
+                  <span className="rounded-full bg-oriana-deep/5 px-3 py-1 text-xs font-medium text-oriana-muted">
                     {study.year}
                   </span>
                 ) : null}
@@ -184,7 +184,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
             </Link>
             <Link
               href="/contact"
-              className="rounded-full bg-oriana-blue px-6 py-3 text-sm font-semibold text-white hover:bg-oriana-navy"
+              className="rounded-full bg-oriana-blue px-6 py-3 text-sm font-semibold text-white hover:bg-oriana-deep"
             >
               Request similar project support
             </Link>

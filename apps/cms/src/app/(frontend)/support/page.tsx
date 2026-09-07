@@ -115,7 +115,7 @@ export default async function SupportPage() {
             </div>
           </div>
 
-          <div className="mt-16 rounded border border-oriana-blue/20 bg-oriana-navy p-8 text-white lg:p-12">
+          <div className="mt-16 rounded border border-oriana-blue/20 bg-oriana-deep p-8 text-white lg:p-12">
             <div className="max-w-xl">
               <h2 className="font-display text-2xl font-bold">
                 {ticket?.title || 'Submit a Support Ticket'}

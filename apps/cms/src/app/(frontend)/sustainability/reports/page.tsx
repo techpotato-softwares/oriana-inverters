@@ -36,8 +36,8 @@ export default async function SustainabilityReportsPage() {
 
   return (
     <main>
-      <section className="relative overflow-hidden bg-oriana-navy pt-28 lg:pt-36">
-        <div className="absolute inset-0 bg-gradient-to-b from-oriana-navy via-[#0f2f6b] to-oriana-navy" />
+      <section className="relative overflow-hidden bg-oriana-deep pt-28 lg:pt-36">
+        <div className="absolute inset-0 bg-gradient-to-b from-oriana-deep via-[#0f2f6b] to-oriana-deep" />
         <div className="container relative pb-12 lg:pb-16">
           <FadeIn>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">

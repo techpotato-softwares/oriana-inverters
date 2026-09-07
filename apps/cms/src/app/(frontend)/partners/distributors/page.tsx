@@ -111,7 +111,7 @@ export default function DistributorsPage() {
             </Link>
           </div>
 
-          <div className="mt-16 rounded border border-oriana-blue/20 bg-oriana-navy p-8 text-white lg:p-12">
+          <div className="mt-16 rounded border border-oriana-blue/20 bg-oriana-deep p-8 text-white lg:p-12">
             <h2 className="font-display text-2xl font-bold">Become an Oriana distributor</h2>
             <p className="mt-3 max-w-xl text-white/70">
               Inquire about distribution rights in your territory. We will follow up with portfolio details, commercial

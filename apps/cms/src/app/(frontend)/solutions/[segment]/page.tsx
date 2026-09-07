@@ -79,7 +79,7 @@ export default async function SolutionPage({ params }: Props) {
                 {data.primaryCta?.href ? (
                   <Link
                     href={data.primaryCta.href}
-                    className="rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white hover:bg-oriana-navy"
+                    className="rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white hover:bg-oriana-deep"
                   >
                     {data.primaryCta.label || 'Request a Quote'}
                   </Link>

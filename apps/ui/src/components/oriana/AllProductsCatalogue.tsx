@@ -233,7 +233,7 @@ export function AllProductsCatalogue({
 
       {filterOpen ? (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-oriana-navy/25 p-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-oriana-deep/25 p-4"
           onClick={closeFilters}
         >
           <div
@@ -314,7 +314,7 @@ export function AllProductsCatalogue({
                 <button
                   type="button"
                   onClick={applyFilters}
-                  className="min-w-[88px] rounded-md bg-oriana-blue px-6 py-2 text-sm font-semibold text-white transition hover:bg-oriana-navy"
+                  className="min-w-[88px] rounded-md bg-oriana-blue px-6 py-2 text-sm font-semibold text-white transition hover:bg-oriana-deep"
                 >
                   Go
                 </button>
@@ -335,7 +335,7 @@ export function AllProductsCatalogue({
               </h2>
               <Link
                 href={`/products/${featured.slug}`}
-                className="mt-6 grid overflow-hidden rounded-2xl bg-gradient-to-br from-[#050d18] via-oriana-navy to-[#0a1f4a] shadow-lg transition hover:shadow-xl lg:grid-cols-[1.15fr_0.85fr]"
+                className="mt-6 grid overflow-hidden rounded-2xl bg-gradient-to-br from-[#050d18] via-oriana-deep to-[#0a1f4a] shadow-lg transition hover:shadow-xl lg:grid-cols-[1.15fr_0.85fr]"
               >
                 <div className="flex flex-col justify-center px-8 py-10 md:px-12 md:py-14">
                   <span className="inline-flex w-fit rounded-sm bg-oriana-sun px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.18em] text-oriana-navy">
@@ -377,7 +377,7 @@ export function AllProductsCatalogue({
               </p>
               <Link
                 href="/contact"
-                className="mt-6 inline-flex rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white hover:bg-oriana-navy"
+                className="mt-6 inline-flex rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white hover:bg-oriana-deep"
               >
                 Request a quote
               </Link>
@@ -417,7 +417,7 @@ export function AllProductsCatalogue({
           </div>
           <Link
             href="/where-to-buy"
-            className="inline-flex shrink-0 items-center gap-2 rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-oriana-navy"
+            className="inline-flex shrink-0 items-center gap-2 rounded-md bg-oriana-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-oriana-deep"
           >
             Connect with Your Distributor
             <ArrowRight className="h-4 w-4" />

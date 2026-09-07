@@ -101,7 +101,7 @@ export default async function FaqsPage() {
             <p className="text-oriana-navy">Still have questions?</p>
             <Link
               href="/support"
-              className="mt-4 inline-block rounded bg-oriana-blue px-6 py-3 text-sm font-bold text-white hover:bg-oriana-navy"
+              className="mt-4 inline-block rounded bg-oriana-blue px-6 py-3 text-sm font-bold text-white hover:bg-oriana-deep"
             >
               Contact Support
             </Link>

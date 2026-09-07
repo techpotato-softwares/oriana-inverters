@@ -106,7 +106,7 @@ export default function BecomeAnInstallerPage() {
             </div>
           </div>
 
-          <div className="mt-16 rounded border border-oriana-blue/20 bg-oriana-navy p-8 text-white lg:p-12">
+          <div className="mt-16 rounded border border-oriana-blue/20 bg-oriana-deep p-8 text-white lg:p-12">
             <h2 className="font-display text-2xl font-bold">Start your installer application</h2>
             <p className="mt-3 max-w-xl text-white/70">
               Use the contact form and select installer partnership. Our team typically responds within one business

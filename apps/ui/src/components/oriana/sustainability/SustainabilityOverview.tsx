@@ -55,7 +55,7 @@ export function SustainabilityOverview({
 
   return (
     <main>
-      <section className="relative overflow-hidden bg-oriana-navy pt-28 lg:pt-48">
+      <section className="relative overflow-hidden bg-oriana-deep pt-28 lg:pt-48">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={heroImage}
@@ -63,7 +63,7 @@ export function SustainabilityOverview({
           className="absolute inset-0 h-full w-full object-cover opacity-45"
           aria-hidden
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-oriana-navy/70 via-oriana-navy/55 to-oriana-navy/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-oriana-deep/70 via-oriana-deep/55 to-oriana-deep/90" />
         <div className="container relative pb-12 lg:pb-16">
           <FadeIn>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">
@@ -152,8 +152,8 @@ export function SustainabilityOverview({
                   alt=""
                   className="absolute inset-0 h-full w-full object-cover"
                 />
-                <div className="absolute inset-0 bg-oriana-navy/25" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-oriana-navy/80 to-transparent p-6">
+                <div className="absolute inset-0 bg-oriana-deep/25" />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-oriana-deep/80 to-transparent p-6">
                   <p className="font-display text-2xl font-semibold text-white">{pillar.label}</p>
                 </div>
               </div>
@@ -333,7 +333,7 @@ export function SustainabilityOverview({
         </section>
       )}
 
-      <section id="contact" className="scroll-mt-24 bg-oriana-navy py-16 lg:py-24">
+      <section id="contact" className="scroll-mt-24 bg-oriana-deep py-16 lg:py-24">
         <div className="container">
           <FadeIn>
             <div
