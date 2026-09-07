@@ -77,9 +77,14 @@ function AccentMark() {
   )
 }
 
+/** Sticky pin runway: lift beats + short hold so the card can unpin and scroll away. */
+const LIFT_VH_PER_CARD = 90
+const EXIT_HOLD_VH = 40
+
 /**
  * Sticky split cards — Sungrow “Greener Tomorrow” stack:
  * top image slides up as a panel; next image is visible underneath the whole time.
+ * After the last lift, the sticky card unpins and scrolls up before the next section.
  * @see https://www.sungrowpower.com/en
  */
 export function VisionMissionSection({
@@ -94,6 +99,9 @@ export function VisionMissionSection({
   const textRefs = useRef<(HTMLDivElement | null)[]>([])
   const targetRatio = useRef(0)
 
+  const liftVh = Math.max(cards.length - 1, 1) * LIFT_VH_PER_CARD
+  const runwayVh = 100 + liftVh + EXIT_HOLD_VH
+
   useEffect(() => {
     if (!cards.length || reduceMotion) return
 
@@ -104,7 +112,9 @@ export function VisionMissionSection({
       const rect = section.getBoundingClientRect()
       const scrollSpan = Math.max(section.offsetHeight - vh, 1)
       const scrolled = Math.min(Math.max(-rect.top, 0), scrollSpan)
-      return scrolled / scrollSpan
+      // Map only the lift portion — exit hold keeps last card fully visible while unpin starts
+      const liftSpan = Math.max(scrollSpan * (liftVh / (liftVh + EXIT_HOLD_VH)), 1)
+      return clamp01(scrolled / liftSpan)
     }
 
     let raf = 0
@@ -158,13 +168,9 @@ export function VisionMissionSection({
       running = false
       window.cancelAnimationFrame(raf)
     }
-  }, [cards, reduceMotion])
+  }, [cards, reduceMotion, liftVh])
 
   if (!cards.length) return null
-
-  // One viewport of pin + one lift beat per sliding card (no dead hold on last card)
-  const runwayVh = 100 + Math.max(cards.length - 1, 1) * 90
-  const collapseDeadZone = runwayVh - 100
 
   if (reduceMotion) {
     return (
@@ -207,8 +213,8 @@ export function VisionMissionSection({
       style={{
         height: `${runwayVh}svh`,
         marginTop: '1.5rem',
-        // Pull Impact up over the unpin dead-zone (sectionH - 100svh)
-        marginBottom: `calc(-${collapseDeadZone}svh)`,
+        // Small breathing room before Our Impact (no negative overlap)
+        marginBottom: '1.25rem',
       }}
       aria-label={ariaLabel}
     >

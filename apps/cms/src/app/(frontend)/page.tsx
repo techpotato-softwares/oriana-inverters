@@ -189,7 +189,7 @@ const HOME_GREEN_MISSION = {
 }
 
 const HOME_FOLLOW_ORIANA = {
-  title: 'Follow Oriana Inverter',
+  title: 'Follow Oriana',
   links: [
     {
       platform: 'linkedin' as const,
@@ -232,14 +232,19 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const { home } = await getHome()
 
-  let livePosts: { title: string; slug: string; publishedAt?: string | null }[] = []
+  let livePosts: {
+    title: string
+    slug: string
+    publishedAt?: string | null
+    heroImage?: unknown
+  }[] = []
   if (home?.newsSection?.mode !== 'manual') {
     try {
       const payload = await getPayload({ config: configPromise })
       const result = await payload.find({
         collection: 'posts',
-        depth: 0,
-        limit: home?.newsSection?.postsLimit || 3,
+        depth: 1,
+        limit: home?.newsSection?.postsLimit || 5,
         where: { _status: { equals: 'published' } },
         sort: '-publishedAt',
       })
@@ -251,6 +256,13 @@ export default async function HomePage() {
 
   const news = home?.newsSection
 
+  const mediaUrl = (value: unknown): string | undefined => {
+    if (value && typeof value === 'object' && 'url' in value && typeof value.url === 'string') {
+      return value.url
+    }
+    return undefined
+  }
+
   const newsItems =
     news?.mode === 'manual' && news.manualItems?.length
       ? news.manualItems.map((item) => ({
@@ -258,6 +270,7 @@ export default async function HomePage() {
           date: item.date || '',
           href: item.href || '/posts',
           type: item.type || 'News',
+          image: mediaUrl((item as { image?: unknown }).image),
         }))
       : livePosts.map((post) => ({
           title: post.title,
@@ -270,6 +283,7 @@ export default async function HomePage() {
             : '',
           href: `/posts/${post.slug}`,
           type: 'News',
+          image: mediaUrl(post.heroImage),
         }))
 
   return (
@@ -291,13 +305,12 @@ export default async function HomePage() {
         cards={HOME_WHY_CHOOSE.cards}
       />
       <GreenMissionSection {...HOME_GREEN_MISSION} />
-      <FollowOrianaSection title={HOME_FOLLOW_ORIANA.title} links={HOME_FOLLOW_ORIANA.links} />
       <NewsEventsSection
-        eyebrow={news?.eyebrow ?? undefined}
         title={news?.title ?? undefined}
         link={news?.link?.href ? { label: news.link.label || '', href: news.link.href } : undefined}
         items={newsItems}
       />
+      <FollowOrianaSection title={HOME_FOLLOW_ORIANA.title} links={HOME_FOLLOW_ORIANA.links} />
     </main>
   )
 }

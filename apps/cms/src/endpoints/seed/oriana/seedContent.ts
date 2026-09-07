@@ -403,10 +403,10 @@ export async function seedOrianaContent({
       },
       newsSection: {
         eyebrow: 'News & media',
-        title: 'Latest from Oriana',
+        title: 'Trending News & Events',
         mode: 'live',
-        postsLimit: 3,
-        link: { label: 'Newsroom →', href: '/posts' },
+        postsLimit: 5,
+        link: { label: 'Explore more', href: '/posts' },
       },
       supportStrip: {
         hotlineLabel: 'Customer Hotline',

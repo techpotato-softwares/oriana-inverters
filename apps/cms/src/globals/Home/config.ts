@@ -290,7 +290,7 @@ export const Home: GlobalConfig = {
               type: 'group',
               fields: [
                 { name: 'eyebrow', type: 'text', defaultValue: 'News & media' },
-                { name: 'title', type: 'text', defaultValue: 'Latest from Oriana' },
+                { name: 'title', type: 'text', defaultValue: 'Trending News & Events' },
                 {
                   name: 'mode',
                   type: 'select',
@@ -316,7 +316,7 @@ export const Home: GlobalConfig = {
                 {
                   name: 'postsLimit',
                   type: 'number',
-                  defaultValue: 3,
+                  defaultValue: 5,
                   admin: {
                     condition: (_, siblingData) => siblingData?.mode !== 'manual',
                   },
