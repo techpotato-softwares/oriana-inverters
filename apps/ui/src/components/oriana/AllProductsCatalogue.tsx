@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight, SlidersHorizontal, X } from 'lucide-react'
 import { ProductImage } from './ProductImage'
+import { formatProductPowerLabel } from './ProductSeriesCard'
 import { ProductSeriesSections } from './ProductSeriesSections'
 import { listingSectionTitle } from '@/data/productMaster'
 import { cn } from '@/utilities/ui'
@@ -193,7 +194,7 @@ export function AllProductsCatalogue({
                     className={cn(
                       'relative block whitespace-nowrap px-4 py-4 text-sm font-semibold transition-colors md:px-6 md:text-base',
                       active
-                        ? 'text-oriana-navy'
+                        ? 'text-oriana-blue'
                         : 'text-oriana-muted hover:text-oriana-navy',
                     )}
                   >
@@ -341,11 +342,10 @@ export function AllProductsCatalogue({
                   <span className="inline-flex w-fit rounded-sm bg-oriana-sun px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.18em] text-oriana-navy">
                     New
                   </span>
-                  <p className="mt-5 text-sm font-medium text-white/55">{featured.powerRange}</p>
-                  <h3 className="mt-2 font-display text-2xl font-semibold tracking-tight text-white md:text-4xl">
-                    {featured.series}
+                  <h3 className="mt-5 font-display text-2xl font-semibold tracking-tight text-white md:text-4xl">
+                    {formatProductPowerLabel(featured.powerRange) || featured.powerRange}
                   </h3>
-                  <p className="mt-3 text-sm text-white/60">{listingSectionTitle(featured.group)}</p>
+                  <p className="sr-only">{featured.series}</p>
                   <span className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-oriana-blue px-5 py-2.5 text-sm font-semibold text-white">
                     Explore
                     <ArrowRight className="h-4 w-4" />

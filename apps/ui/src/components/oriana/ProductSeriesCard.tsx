@@ -44,7 +44,6 @@ const actionClass =
 
 export function ProductSeriesCard({
   href,
-  typeLabel,
   title,
   name,
   categorySlug,
@@ -52,8 +51,7 @@ export function ProductSeriesCard({
   imageAlt,
 }: {
   href: string
-  typeLabel: string
-  title: string
+  title?: string
   name: string
   categorySlug: string
   imageSrc?: string | null
@@ -63,14 +61,7 @@ export function ProductSeriesCard({
 
   return (
     <article className="flex h-full flex-col rounded-3xl bg-white px-8 pb-8 pt-6 shadow-sm">
-      <p className="text-sm font-medium leading-snug text-oriana-blue">{typeLabel}</p>
-
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mx-auto flex w-40 items-center justify-center py-8"
-      >
+      <a href={href} className="mx-auto flex w-40 items-center justify-center py-8">
         <ProductImage
           name={name}
           categorySlug={categorySlug}
@@ -82,22 +73,13 @@ export function ProductSeriesCard({
         />
       </a>
 
-      <h3 className="product-card-name text-center leading-snug">
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="line-clamp-2 whitespace-pre-wrap break-all"
-        >
-          {title}
-        </a>
-      </h3>
+      {title ? <h3 className="product-card-name text-center leading-snug">{title}</h3> : null}
 
       <div className="mt-auto flex flex-col gap-3 pt-8">
-        <a href={href} target="_blank" rel="noopener noreferrer" className={actionClass}>
+        <a href={href} className={actionClass}>
           Learn More
         </a>
-        <a href={documentsHref} target="_blank" rel="noopener noreferrer" className={actionClass}>
+        <a href={documentsHref} className={actionClass}>
           Documents & Installation
         </a>
       </div>
