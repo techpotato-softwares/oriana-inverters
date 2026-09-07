@@ -90,7 +90,7 @@ export default async function CaseStudiesPage() {
                         </span>
                       ) : null}
                       {cs.location ? (
-                        <span className="rounded-full bg-oriana-navy/5 px-3 py-1 text-xs font-medium text-oriana-muted">
+                        <span className="rounded-full bg-oriana-deep/5 px-3 py-1 text-xs font-medium text-oriana-muted">
                           {cs.location}
                         </span>
                       ) : null}

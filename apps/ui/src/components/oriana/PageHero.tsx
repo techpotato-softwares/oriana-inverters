@@ -28,7 +28,7 @@ export function PageHero({
         'relative overflow-hidden',
         light
           ? 'bg-oriana-surface pb-12 pt-32 lg:pb-16 lg:pt-44'
-          : 'bg-oriana-navy pb-16 pt-32 lg:pb-20 lg:pt-48',
+          : 'bg-oriana-deep pb-16 pt-32 lg:pb-20 lg:pt-48',
       )}
     >
       {light ? (
@@ -39,7 +39,7 @@ export function PageHero({
         </>
       ) : (
         <>
-          <div className="absolute inset-0 bg-gradient-to-br from-[#041018] via-oriana-navy to-[#0f2f6b]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#041018] via-oriana-deep to-[#0f2f6b]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_80%_0%,rgba(77,163,255,0.16),transparent)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_35%_at_10%_90%,rgba(245,185,66,0.1),transparent)]" />
           <EnergyMesh className="opacity-70" />

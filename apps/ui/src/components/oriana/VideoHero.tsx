@@ -72,7 +72,7 @@ export function VideoHero({
 
   return (
     <section
-      className={`relative min-h-[100svh] w-full overflow-hidden bg-oriana-navy ${className}`.trim()}
+      className={`relative min-h-[100svh] w-full overflow-hidden bg-oriana-deep ${className}`.trim()}
       style={{ height: '100svh' }}
       aria-label={ariaLabel}
     >
@@ -99,9 +99,9 @@ export function VideoHero({
         poster={posterSrc}
         aria-hidden
       />
-      <div className="absolute inset-0 bg-oriana-navy/25" aria-hidden />
+      <div className="absolute inset-0 bg-oriana-deep/25" aria-hidden />
       <div
-        className="absolute inset-0 bg-gradient-to-t from-oriana-navy/80 via-transparent to-oriana-navy/20"
+        className="absolute inset-0 bg-gradient-to-t from-oriana-deep/80 via-transparent to-oriana-deep/20"
         aria-hidden
       />
 

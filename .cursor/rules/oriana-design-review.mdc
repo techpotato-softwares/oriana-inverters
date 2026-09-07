@@ -1,0 +1,19 @@
+---
+description: Pre-ship UI/UX review checklist for Oriana pages
+globs: apps/ui/**/*.{tsx,css},apps/cms/src/app/(frontend)/**/*.{tsx,css}
+alwaysApply: false
+---
+
+# Design review checklist
+
+When finishing a UI change, run this pass (use `web-design-guidelines` + `accessibility` + `web-quality-audit` skills for depth):
+
+- [ ] Brand test: first viewport still reads as Oriana without the nav
+- [ ] No generic AI look (purple gradients, Inter/Roboto defaults, cream+terracotta, glow pills)
+- [ ] Hierarchy: one primary CTA; secondary actions quieter
+- [ ] Spacing rhythm consistent with nearby Oriana sections
+- [ ] Mobile: nav, hero, forms, and CTAs usable at 375px
+- [ ] Focus states and contrast meet WCAG AA for text/UI
+- [ ] Reduced motion path works
+- [ ] No layout shift from images/fonts (sizes reserved)
+- [ ] Payload-driven content still renders; empty/error states are intentional

@@ -88,7 +88,7 @@ export function ImpactStats({
   const resolvedLink = link || { label: 'Discover who we are', href: '/about' }
 
   return (
-    <section className="bg-white py-16 lg:py-24">
+    <section className="relative z-[1] bg-white pb-14 pt-4 lg:pb-20 lg:pt-6">
       <div className="container">
         <FadeIn>
           <div className="mx-auto max-w-4xl text-center">

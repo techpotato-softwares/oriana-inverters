@@ -1,0 +1,32 @@
+---
+description: React/Tailwind component conventions for Oriana public UI
+globs: apps/ui/**/*.{tsx,ts,css},apps/cms/src/app/(frontend)/**/*.{tsx,ts,css}
+alwaysApply: false
+---
+
+# Frontend components
+
+## Structure
+
+- Put reusable UI in `apps/ui/src/components/oriana/`.
+- Keep route files in `apps/cms/src/app/(frontend)/` thin: fetch data, compose sections.
+- Reuse `PageHero`, `Breadcrumbs`, `FadeIn`, `SiteHeader`, `SiteFooter` before inventing new shells.
+
+## Styling
+
+- Tailwind v4 + tokens from `apps/cms/src/app/(frontend)/globals.css` `@theme`.
+- Prefer semantic classes: `text-oriana-navy`, `bg-oriana-surface`, `font-display`, `container`.
+- Avoid arbitrary one-off hex except rare gradients already used in heroes.
+- Use `cn()` from `@/utilities/ui` for conditional classes.
+
+## Interaction
+
+- Client components only when needed (`'use client'` for motion, menus, forms).
+- Follow `vercel-composition-patterns` for compound/flexible APIs; avoid boolean-prop soup.
+- For page transitions / shared-element motion, consult `vercel-react-view-transitions`.
+
+## Quality gates
+
+- Keyboard focus visible; interactive elements are real buttons/links.
+- Images: Next `Image` or existing `ProductImage`; always meaningful `alt`.
+- After larger UI changes, apply `core-web-vitals` / `performance` skills (LCP, CLS, INP).

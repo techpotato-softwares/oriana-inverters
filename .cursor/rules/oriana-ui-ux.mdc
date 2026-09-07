@@ -1,0 +1,25 @@
+---
+description: Mandatory modern UI/UX standards for Oriana Invertors Web
+alwaysApply: true
+---
+
+# Oriana UI/UX — always on
+
+Before designing or changing any public UI, read and apply these project skills (in order):
+
+1. `oriana-modern-ui` — brand tokens, layout, motion, component placement
+2. `frontend-design` — distinctive, non-generic visual direction
+3. `ui-ux-pro-max` — layout, typography, interaction, responsive patterns
+4. `web-design-guidelines` — Vercel Web Interface Guidelines review
+5. `accessibility` — WCAG 2.2 keyboard, contrast, semantics
+6. `vercel-react-best-practices` — Next.js/React performance while building UI
+
+## Non-negotiables
+
+- Preserve Oriana brand tokens (`oriana-navy`, `oriana-blue`, `oriana-sky`, `oriana-sun`, `oriana-silver`, `oriana-muted`, `oriana-surface`). Do not invent a purple/indigo or cream/terracotta AI-default theme.
+- Public UI lives in `apps/ui`; pages/routing stay in `apps/cms`. Prefer extending existing `apps/ui/src/components/oriana/*` over one-off page markup.
+- One job per section: one headline, one short supporting line, clear CTA when needed.
+- Heroes are full-bleed compositions (brand + headline + short support + CTA + dominant media). No card grids, stat strips, or floating badges in the first viewport.
+- Motion: use existing `FadeIn` / Framer Motion patterns; respect `prefers-reduced-motion`.
+- Content comes from Payload when available; never hardcode fake CMS copy that fights production content.
+- Desktop + mobile both required; no hover-only critical actions.

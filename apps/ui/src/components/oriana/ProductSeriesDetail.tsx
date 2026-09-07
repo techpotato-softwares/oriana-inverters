@@ -434,7 +434,7 @@ function ProductInquiryForm({
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="rounded-md bg-oriana-blue px-10 py-3 text-sm font-semibold text-white transition hover:bg-oriana-navy disabled:opacity-60"
+          className="rounded-md bg-oriana-blue px-10 py-3 text-sm font-semibold text-white transition hover:bg-oriana-deep disabled:opacity-60"
         >
           {status === 'sending' ? 'Submitting…' : 'Submit'}
         </button>
@@ -502,9 +502,9 @@ function FeatureQuadrant({
   if (isCompact) {
     return (
       <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl bg-[#f3f4f6]">
-        <div className="pointer-events-none absolute inset-x-1/2 inset-y-8 w-px -translate-x-1/2 bg-oriana-navy/10" />
-        <div className="pointer-events-none absolute inset-x-8 inset-y-1/2 h-px -translate-y-1/2 bg-oriana-navy/10" />
-        <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-oriana-navy/25" />
+        <div className="pointer-events-none absolute inset-x-1/2 inset-y-8 w-px -translate-x-1/2 bg-oriana-deep/10" />
+        <div className="pointer-events-none absolute inset-x-8 inset-y-1/2 h-px -translate-y-1/2 bg-oriana-deep/10" />
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-oriana-deep/25" />
         <div className="grid sm:grid-cols-2">
           {groups.map((group) => {
             const Icon = FEATURE_ICONS[group.title as keyof typeof FEATURE_ICONS] ?? BarChart3
@@ -518,7 +518,7 @@ function FeatureQuadrant({
                 <ul className="mt-4 space-y-2 text-left text-sm leading-relaxed text-oriana-navy/75">
                   {group.items.map((item) => (
                     <li key={item} className="flex gap-2">
-                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-oriana-navy/50" />
+                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-oriana-deep/50" />
                       <span>{item}</span>
                     </li>
                   ))}

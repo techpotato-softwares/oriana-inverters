@@ -33,7 +33,7 @@ export default async function WhereToBuyPage() {
             </p>
             <Link
               href="/contact"
-              className="mt-6 inline-block rounded bg-oriana-blue px-6 py-3 text-sm font-bold text-white hover:bg-oriana-navy"
+              className="mt-6 inline-block rounded bg-oriana-blue px-6 py-3 text-sm font-bold text-white hover:bg-oriana-deep"
             >
               Partner Inquiry
             </Link>

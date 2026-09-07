@@ -153,7 +153,7 @@ export function ContactForm({ cards, formId, successMessage }: ContactFormProps)
             <button
               type="submit"
               disabled={status === 'sending'}
-              className="mt-8 w-full rounded-full bg-oriana-blue py-4 text-sm font-bold text-white transition hover:bg-oriana-navy disabled:opacity-60 sm:w-auto sm:px-12"
+              className="mt-8 w-full rounded-full bg-oriana-blue py-4 text-sm font-bold text-white transition hover:bg-oriana-deep disabled:opacity-60 sm:w-auto sm:px-12"
             >
               {status === 'sending' ? 'Submitting…' : 'Submit Request'}
             </button>
