@@ -138,7 +138,7 @@ export function ProductCategoriesSection({
                       borderRadius: TAB_RADIUS,
                       transition,
                       backgroundColor: isHighlighted ? '#ffffff' : 'transparent',
-                      color: isHighlighted ? '#606060' : '#ffffff',
+                      color: isHighlighted ? '#071525' : '#ffffff',
                       fontWeight: isHighlighted ? 500 : 400,
                       boxShadow: isHighlighted ? '0 10px 25px rgba(7, 21, 37, 0.12)' : 'none',
                     }}

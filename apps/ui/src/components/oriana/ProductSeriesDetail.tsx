@@ -2,34 +2,29 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import {
-  Activity,
-  BarChart3,
-  FileText,
-  Hand,
-  LineChart,
-  Settings2,
-  Shield,
-  ShieldCheck,
-  Waves,
-} from 'lucide-react'
+import { Activity, BarChart3, CircleChevronRight, Shield, Waves } from 'lucide-react'
 import { ProductImage } from './ProductImage'
 import {
   formatProductPowerLabel,
-  productCardTypeLabel,
+  ProductSeriesCard,
 } from '@/components/oriana/ProductSeriesCard'
 import {
   getOnGridSeriesPageData,
   type OnGridFeatureIcon,
   type OnGridFeatureListItem,
 } from '@/data/onGridProductPage'
-import { seriesSegmentLabel } from '@/data/productMaster'
-import { isFileDocument, resolveDatasheetUrl } from '@/utilities/allProductsCatalogue'
+import {
+  isFileDocument,
+  resolveDatasheetUrl,
+  type AllProductsCard,
+} from '@/utilities/allProductsCatalogue'
 import { cn } from '@/utilities/ui'
 import type { CatalogueProduct, CatalogueSeries } from '@/types/catalogue'
 
 type Props = {
   series: CatalogueSeries
+  related?: AllProductsCard[]
+  relatedHref?: string
   initialModelSlug?: string | null
   formId?: number | null
 }
@@ -43,50 +38,17 @@ const AUDIENCE_LABEL: Record<CatalogueProduct['segmentKey'], string> = {
   storage: 'Homeowners',
 }
 
-const FEATURE_ICONS = {
-  Efficient: BarChart3,
-  Intelligent: LineChart,
-  Adaptive: Settings2,
-  Reliable: ShieldCheck,
-  'HIGH YIELD': Activity,
-  'SAFE AND RELIABLE': Hand,
-  'USER FRIENDLY SETUP': Settings2,
-  'SMART MANAGEMENT': LineChart,
-} as const
-
-function seriesHeadline(series: CatalogueSeries, selected: CatalogueProduct): string {
-  const pageData = getOnGridSeriesPageData(
-    selected.modelSeries,
-    series.series,
-    series.slug,
-    selected.slug,
-  )
-  if (pageData?.heroType) return pageData.heroType
-
-  if (series.categorySlug === 'hybrid-inverters') {
-    return selected.phases?.includes('Single')
-      ? '1-Phase Hybrid Inverter'
-      : '3-Phase Hybrid Inverter'
-  }
-  if (series.categorySlug === 'utility-scale-inverters') return 'Utility Grid-Tied PV Inverter'
-  if (series.categorySlug === 'bess') return 'Residential Energy Storage System'
-  if (selected.phases?.includes('Single')) return '1-Phase String Inverter'
-  if (selected.phases?.includes('Three')) return '3-Phase String Inverter'
-  return 'String Inverter for Grid-Tied PV'
+function isSerialLikeCopy(series: CatalogueSeries, value?: string | null): boolean {
+  const text = value?.trim() ?? ''
+  if (!text) return true
+  if (text.startsWith(series.series)) return true
+  return /^ORI[-_(]/i.test(text)
 }
 
-function heroTitle(series: CatalogueSeries, selected: CatalogueProduct): string {
-  const pageData = getOnGridSeriesPageData(
-    selected.modelSeries,
-    series.series,
-    series.slug,
-    selected.slug,
-  )
-  const modelName = selected.modelSeries || series.series
-  const power = pageData?.ratedAcOutputPower ?? formatProductPowerLabel(series.powerRange)
-  // Sungrow-style: "5~6kW SG5.0/6.0RS"
-  if (power && modelName) return `${power.replace(/\s+/g, '')} ${modelName}`
-  return modelName
+function relatedSectionHeading(segmentKey: CatalogueProduct['segmentKey']): string {
+  if (segmentKey === 'commercial') return 'Products for Business'
+  if (segmentKey === 'utility') return 'Products for Utility'
+  return 'Products for Home'
 }
 
 function featureGroups(series: CatalogueSeries, selected: CatalogueProduct) {
@@ -495,64 +457,37 @@ function FeatureQuadrant({
 }: {
   groups: { title: string; items: string[] }[]
 }) {
-  const isCompact = groups.every((g) =>
-    ['Efficient', 'Intelligent', 'Adaptive', 'Reliable'].includes(g.title),
-  )
-
-  if (isCompact) {
-    return (
-      <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl bg-[#f3f4f6]">
-        <div className="pointer-events-none absolute inset-x-1/2 inset-y-8 w-px -translate-x-1/2 bg-oriana-deep/10" />
-        <div className="pointer-events-none absolute inset-x-8 inset-y-1/2 h-px -translate-y-1/2 bg-oriana-deep/10" />
-        <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-oriana-deep/25" />
-        <div className="grid sm:grid-cols-2">
-          {groups.map((group) => {
-            const Icon = FEATURE_ICONS[group.title as keyof typeof FEATURE_ICONS] ?? BarChart3
-            return (
-              <div
-                key={group.title}
-                className="flex flex-col items-center px-8 py-10 text-center sm:px-10 sm:py-12"
-              >
-                <Icon className="h-10 w-10 text-oriana-navy" strokeWidth={1.5} aria-hidden />
-                <h2 className="mt-5 text-lg font-semibold text-oriana-navy">{group.title}</h2>
-                <ul className="mt-4 space-y-2 text-left text-sm leading-relaxed text-oriana-navy/75">
-                  {group.items.map((item) => (
-                    <li key={item} className="flex gap-2">
-                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-oriana-deep/50" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+    <div className="grid gap-5 sm:grid-cols-2">
       {groups.map((group) => (
-        <div key={group.title}>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-oriana-blue">
+        <article
+          key={group.title}
+          className="rounded-2xl bg-white px-8 py-9 shadow-[0_8px_28px_rgba(7,21,37,0.06)]"
+        >
+          <h2 className="font-display text-sm font-bold uppercase tracking-[0.14em] text-oriana-blue">
             {group.title}
           </h2>
-          <ul className="mt-4 space-y-2.5 text-sm leading-relaxed text-oriana-navy/80">
+          <ul className="mt-5 space-y-2.5 text-sm leading-relaxed text-oriana-navy/80">
             {group.items.map((item) => (
               <li key={item} className="flex gap-2">
-                <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-oriana-blue" />
+                <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-oriana-navy/35" />
                 <span>{item}</span>
               </li>
             ))}
           </ul>
-        </div>
+        </article>
       ))}
     </div>
   )
 }
 
-export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props) {
+export function ProductSeriesDetail({
+  series,
+  related = [],
+  relatedHref,
+  initialModelSlug,
+  formId,
+}: Props) {
   const [tab, setTab] = useState<TabId>('overview')
 
   const resolveSlug = (preferred?: string | null) =>
@@ -577,12 +512,6 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
 
   if (!selected) return null
 
-  const typeLabel = productCardTypeLabel(
-    seriesSegmentLabel(series, series.categorySlug),
-    series.categorySlug,
-  )
-  const headline = seriesHeadline(series, selected)
-  const title = heroTitle(series, selected)
   const audience = AUDIENCE_LABEL[selected.segmentKey] ?? AUDIENCE_LABEL[series.segmentKey]
   const pageData = getOnGridSeriesPageData(
     selected.modelSeries,
@@ -597,215 +526,315 @@ export function ProductSeriesDetail({ series, initialModelSlug, formId }: Props)
     series.categorySlug,
     selected.datasheetUrl ?? series.variants.find((item) => item.datasheetUrl)?.datasheetUrl,
   )
+  const exploreHref = relatedHref ?? `/products/category/${series.categorySlug}`
+  const relatedTitle = relatedSectionHeading(selected.segmentKey ?? series.segmentKey)
+  const powerLabel =
+    pageData?.ratedAcOutputPower ?? formatProductPowerLabel(series.powerRange)
+  const heroSupport = isSerialLikeCopy(series, series.description)
+    ? series.category
+    : series.description
+
+  const selectTab = (next: TabId) => {
+    setTab(next)
+    if (typeof window === 'undefined') return
+    const url = new URL(window.location.href)
+    if (next === 'documents') url.searchParams.set('tab', 'documents')
+    else url.searchParams.delete('tab')
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`)
+  }
 
   const downloads = [
     {
       title: 'Datasheet',
-      detail: `${series.series} Datasheet`,
+      detail: powerLabel ? `${powerLabel} datasheet` : 'Product datasheet',
       href: datasheetUrl,
       external: isFileDocument(datasheetUrl),
     },
     {
       title: 'User Manual',
-      detail: `${series.series} User Manual`,
+      detail: powerLabel ? `${powerLabel} user manual` : 'User manual',
       href: '/resources/downloads',
       external: false,
     },
     {
       title: 'Quick Installation Guide',
-      detail: `${series.series} Quick Installation Guide`,
+      detail: powerLabel ? `${powerLabel} quick installation guide` : 'Quick installation guide',
       href: '/resources/downloads',
       external: false,
     },
     {
       title: 'Installation Video',
-      detail: `${series.series} Installation Video`,
+      detail: powerLabel ? `${powerLabel} installation video` : 'Installation video',
       href: '/resources/videos',
       external: false,
     },
   ]
 
-  return (
-    <>
-      {/* Sungrow-style hero: copy left, product render right, soft studio gradient */}
-      <section
-        className="relative overflow-hidden"
-        style={{
-          background:
-            'linear-gradient(180deg, #d9dee6 0%, #e8ecf1 42%, #f4f6f8 78%, #ffffff 100%)',
-        }}
-      >
-        <div className="container grid items-center gap-10 py-12 lg:grid-cols-2 lg:gap-16 lg:py-20">
-          <div className="order-2 lg:order-1">
-            <p className="text-sm font-medium text-oriana-muted md:text-base">{headline}</p>
-            <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl lg:text-[2.5rem] lg:leading-tight">
-              {title}
-            </h1>
-            {series.description ? (
-              <p className="mt-5 max-w-xl text-sm leading-relaxed text-oriana-muted md:text-base">
-                {series.description}
-              </p>
-            ) : null}
-
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full border border-oriana-navy/10 bg-white/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-oriana-navy backdrop-blur">
-                {audience}
-              </span>
-              {typeLabel ? (
-                <span className="rounded-full border border-oriana-navy/10 bg-white/50 px-3 py-1.5 text-xs font-medium text-oriana-muted">
-                  {typeLabel}
-                </span>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="order-1 lg:order-2">
-            <div className="mx-auto max-w-md lg:max-w-none">
-              <ProductImage
-                name={series.series}
-                categorySlug={series.categorySlug}
-                src={selected.heroImageUrl ?? series.heroImageUrl}
-                alt={selected.heroImageAlt ?? series.heroImageAlt}
-                className="aspect-square w-full bg-transparent"
-                plain
-                priority
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="sticky top-[var(--site-header-height,5rem)] z-20 border-b border-oriana-navy/10 bg-white/95 backdrop-blur-md">
-        <div className="container">
-          <div role="tablist" aria-label="Product sections" className="flex gap-1">
-            {(
-              [
-                { id: 'overview', label: 'Overview' },
-                { id: 'documents', label: 'Documents & Installation' },
-              ] as const
-            ).map((item) => {
-              const active = tab === item.id
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => setTab(item.id)}
+  const tabBar = (
+    <div
+      id="product-tabs"
+      className="sticky top-[var(--site-header-height,5rem)] z-20 border-b border-oriana-navy/10 bg-white/95 backdrop-blur-md"
+    >
+      <div className="container">
+        <div role="tablist" aria-label="Product sections" className="flex justify-center gap-1">
+          {(
+            [
+              { id: 'overview', label: 'Overview' },
+              { id: 'documents', label: 'Documents & Installation' },
+            ] as const
+          ).map((item) => {
+            const active = tab === item.id
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                aria-controls={`product-panel-${item.id}`}
+                id={`product-tab-${item.id}`}
+                onClick={() => selectTab(item.id)}
+                className={cn(
+                  'relative px-5 py-4 text-sm font-semibold transition md:px-8 md:text-base',
+                  active ? 'text-oriana-blue' : 'text-oriana-muted hover:text-oriana-navy',
+                )}
+              >
+                {item.label}
+                <span
                   className={cn(
-                    'relative px-4 py-4 text-sm font-semibold transition md:px-6 md:text-base',
-                    active ? 'text-oriana-navy' : 'text-oriana-muted hover:text-oriana-navy',
+                    'absolute inset-x-4 bottom-0 h-1 rounded-full bg-oriana-blue transition-transform duration-200',
+                    active ? 'scale-x-100' : 'scale-x-0',
                   )}
-                >
-                  {item.label}
-                  <span
-                    className={cn(
-                      'absolute inset-x-3 bottom-0 h-1 rounded-full bg-oriana-blue transition-transform duration-200',
-                      active ? 'scale-x-100' : 'scale-x-0',
-                    )}
-                  />
-                </button>
-              )
-            })}
-          </div>
+                />
+              </button>
+            )
+          })}
         </div>
       </div>
+    </div>
+  )
 
+  const productShot = (
+    <ProductImage
+      name={series.series}
+      categorySlug={series.categorySlug}
+      src={selected.heroImageUrl ?? series.heroImageUrl}
+      alt={selected.heroImageAlt ?? series.heroImageAlt}
+      className="aspect-square w-full bg-transparent"
+      plain
+      priority={tab === 'overview'}
+    />
+  )
+
+  return (
+    <>
       {tab === 'overview' ? (
-        <section className="bg-white py-12 lg:py-16" role="tabpanel">
-          <div className="container">
-            {featureList?.length ? (
-              <FeatureIconList items={featureList} />
-            ) : (
-              <FeatureQuadrant groups={features} />
-            )}
-
-            <div className="mx-auto mt-16 max-w-lg">
-              <ProductImage
-                name={series.series}
-                categorySlug={series.categorySlug}
-                src={selected.heroImageUrl ?? series.heroImageUrl}
-                alt={selected.heroImageAlt ?? series.heroImageAlt}
-                className="aspect-square w-full bg-transparent"
-                plain
-              />
+        <section
+          className="relative overflow-hidden"
+          style={{
+            background:
+              'linear-gradient(180deg, #d9dee6 0%, #e8ecf1 42%, #f4f6f8 78%, #ffffff 100%)',
+          }}
+        >
+          <div className="container grid items-center gap-10 py-12 lg:grid-cols-2 lg:gap-16 lg:py-20">
+            <div className="order-2 lg:order-1">
+              <h1 className="font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl">
+                {powerLabel || series.category}
+              </h1>
+              {heroSupport ? (
+                <p className="mt-4 max-w-xl text-sm leading-relaxed text-oriana-muted md:text-base">
+                  {heroSupport}
+                </p>
+              ) : null}
+              <div className="mt-8">
+                <span className="inline-flex items-center rounded-full border border-oriana-navy/10 bg-white/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-oriana-navy backdrop-blur">
+                  {audience}
+                </span>
+              </div>
             </div>
-
-            <div className="mt-14">
-              <h2 className="text-center font-display text-2xl font-semibold text-oriana-navy md:text-3xl">
-                {title}
-              </h2>
-              <dl className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                {tiles.map((tile) => (
-                  <div key={tile.label} className="text-center">
-                    <dt className="font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl">
-                      {tile.value}
-                    </dt>
-                    <dd className="mt-2 text-sm text-oriana-muted">{tile.label}</dd>
-                  </div>
-                ))}
-              </dl>
+            <div className="order-1 lg:order-2">
+              <div className="mx-auto max-w-md lg:max-w-none">{productShot}</div>
             </div>
           </div>
         </section>
-      ) : (
-        <section className="bg-white py-12 lg:py-16" role="tabpanel">
-          <div className="container max-w-3xl">
-            <h2 className="font-display text-2xl font-semibold text-oriana-navy">Downloads</h2>
-            <ul className="mt-8 divide-y divide-oriana-navy/10 border-y border-oriana-navy/10">
-              {downloads.map((doc) => {
-                const inner = (
-                  <>
-                    <span className="inline-flex items-start gap-3">
-                      <FileText className="mt-0.5 h-4 w-4 shrink-0 text-oriana-blue" />
+      ) : null}
+
+      {/* Sticky scope ends before Contact so the tab bar does not overlay the form. */}
+      <div>
+        {tabBar}
+
+        {tab === 'overview' ? (
+          <>
+            <section
+              id="product-panel-overview"
+              role="tabpanel"
+              aria-labelledby="product-tab-overview"
+              className="bg-oriana-surface py-12 lg:py-16"
+            >
+              <div className="container">
+                {featureList?.length ? (
+                  <div className="rounded-2xl bg-white px-6 py-10 shadow-[0_8px_28px_rgba(7,21,37,0.06)] sm:px-10">
+                    <FeatureIconList items={featureList} />
+                  </div>
+                ) : (
+                  <FeatureQuadrant groups={features} />
+                )}
+              </div>
+            </section>
+
+            {related.length > 0 ? (
+              <section className="bg-white py-12 lg:py-16" aria-labelledby="related-products-heading">
+                <div className="container">
+                  <h2
+                    id="related-products-heading"
+                    className="font-display text-2xl font-semibold text-oriana-navy md:text-3xl"
+                  >
+                    {relatedTitle}
+                  </h2>
+                  <div className="mt-8 grid items-stretch gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    {related.slice(0, 3).map((card) => (
+                      <ProductSeriesCard
+                        key={card.slug}
+                        href={`/products/${card.slug}`}
+                        title={formatProductPowerLabel(card.powerRange)}
+                        name={card.series}
+                        categorySlug={card.categorySlug}
+                        imageSrc={card.heroImageUrl}
+                        imageAlt={card.heroImageAlt}
+                      />
+                    ))}
+                  </div>
+                  <div className="mt-10 flex justify-center">
+                    <Link
+                      href={exploreHref}
+                      className="inline-flex min-h-11 items-center justify-center rounded-full border-2 border-oriana-blue px-8 py-2.5 text-sm font-semibold text-oriana-blue transition hover:bg-oriana-blue hover:text-white"
+                    >
+                      Explore more
+                    </Link>
+                  </div>
+                </div>
+              </section>
+            ) : null}
+          </>
+        ) : (
+          <section
+            id="product-panel-documents"
+            role="tabpanel"
+            aria-labelledby="product-tab-documents"
+            className="bg-white"
+          >
+            <div
+              className="relative overflow-hidden"
+              style={{
+                background:
+                  'linear-gradient(180deg, #d9dee6 0%, #e8ecf1 42%, #f4f6f8 78%, #ffffff 100%)',
+              }}
+            >
+              <div className="container grid items-center gap-12 py-14 lg:grid-cols-2 lg:gap-16 lg:py-24">
+                <div className="order-2 lg:order-1">
+                  <h1 className="font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl">
+                    {powerLabel || series.category}
+                  </h1>
+                  {tiles.length > 0 ? (
+                    <dl className="mt-10 grid sm:grid-cols-2">
+                      {tiles.map((tile, index) => {
+                        const isTopRow = index < 2
+                        const isLeft = index % 2 === 0
+                        return (
+                          <div
+                            key={tile.label}
+                            className={cn(
+                              'py-6',
+                              isTopRow && tiles.length > 2 ? 'border-b border-oriana-navy/10' : null,
+                              isLeft ? 'sm:pr-10' : 'sm:pl-10',
+                            )}
+                          >
+                            <dt className="font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl">
+                              {tile.value}
+                            </dt>
+                            <dd className="mt-2 text-sm text-oriana-muted">{tile.label}</dd>
+                          </div>
+                        )
+                      })}
+                    </dl>
+                  ) : (
+                    <p className="mt-6 max-w-md text-base leading-relaxed text-oriana-muted">
+                      {series.category} documents, manuals, and installation guides.
+                    </p>
+                  )}
+                </div>
+                <div className="order-1 mx-auto w-full max-w-xl lg:order-2 lg:max-w-none">
+                  <ProductImage
+                    name={series.series}
+                    categorySlug={series.categorySlug}
+                    src={selected.heroImageUrl ?? series.heroImageUrl}
+                    alt={selected.heroImageAlt ?? series.heroImageAlt}
+                    className="aspect-[4/5] w-full bg-transparent sm:aspect-square"
+                    plain
+                    priority
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="container py-14 lg:py-20">
+              <h2 className="text-center font-display text-2xl font-semibold text-oriana-navy md:text-3xl">
+                Downloads
+              </h2>
+              <ul className="mx-auto mt-10 grid max-w-5xl gap-5 sm:grid-cols-2">
+                {downloads.map((doc) => {
+                  const inner = (
+                    <>
                       <span>
-                        <span className="block font-semibold">{doc.title}</span>
-                        <span className="mt-1 block text-xs font-normal text-oriana-muted">
+                        <span className="block truncate font-display text-[17px] font-medium text-oriana-blue transition-colors group-hover:text-white">
+                          {doc.title}
+                        </span>
+                        <span className="mt-2.5 block text-base leading-normal text-oriana-muted transition-colors group-hover:text-white/85">
                           {doc.detail}
                         </span>
                       </span>
-                    </span>
-                    <span className="text-xs font-medium text-oriana-muted">
-                      {doc.external ? 'PDF' : 'View'}
-                    </span>
-                  </>
-                )
-                return (
-                  <li key={doc.title}>
-                    {doc.external ? (
-                      <a
-                        href={doc.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between gap-4 py-5 text-sm text-oriana-navy transition hover:text-oriana-blue"
-                      >
-                        {inner}
-                      </a>
-                    ) : (
-                      <Link
-                        href={doc.href}
-                        className="flex items-center justify-between gap-4 py-5 text-sm text-oriana-navy transition hover:text-oriana-blue"
-                      >
-                        {inner}
-                      </Link>
-                    )}
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        </section>
-      )}
+                      <CircleChevronRight
+                        className="mt-10 h-8 w-8 text-oriana-navy/55 transition-colors group-hover:text-white"
+                        strokeWidth={1.6}
+                        aria-hidden
+                      />
+                    </>
+                  )
+                  const cardClass =
+                    'group flex h-full min-h-[14.25rem] flex-col justify-between rounded-[22px] bg-[#f1f3f7] px-10 py-9 transition-colors hover:bg-oriana-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue/40'
+                  return (
+                    <li key={doc.title}>
+                      {doc.external ? (
+                        <a
+                          href={doc.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={cardClass}
+                        >
+                          {inner}
+                        </a>
+                      ) : (
+                        <Link href={doc.href} className={cardClass}>
+                          {inner}
+                        </Link>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          </section>
+        )}
+      </div>
 
-      <section className="border-t border-oriana-navy/10 bg-oriana-surface">
+      <section className="relative z-0 border-t border-oriana-navy/10 bg-oriana-surface">
         <div className="container grid gap-10 py-12 lg:grid-cols-2 lg:items-start lg:gap-16 lg:py-16">
           <div>
             <h2 className="font-display text-2xl font-semibold uppercase tracking-wide text-oriana-navy md:text-3xl">
               Contact us
             </h2>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-oriana-muted md:text-base">
-              Ask about {series.series} — availability, design support, and supply through
-              authorised Oriana distributors.
+              Ask about availability, design support, and supply through authorised Oriana
+              distributors.
             </p>
           </div>
           <ProductInquiryForm seriesName={series.series} formId={formId} />

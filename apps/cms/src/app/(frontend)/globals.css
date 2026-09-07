@@ -61,14 +61,13 @@
   --font-display: var(--font-montserrat), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
   --font-product: var(--font-montserrat), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
 
-  /* Oriana brand — headings/body use soft gray (#606060, Sungrow system-gray).
-     Keep deep navy for dark section backgrounds via oriana-deep. */
-  --color-oriana-navy: #606060;
+  /* Oriana brand — navy for headings/text, blue for actions, muted for secondary copy. */
+  --color-oriana-navy: #071525;
   --color-oriana-deep: #071525;
   --color-oriana-blue: #1a428a;
   --color-oriana-sky: #4da3ff;
   --color-oriana-sun: #f5b942;
-  --color-oriana-ink: #606060;
+  --color-oriana-ink: #5a6b82;
   --color-oriana-silver: #eef2f8;
   --color-oriana-muted: #5a6b82;
   --color-oriana-surface: #f7f9fc;
@@ -76,12 +75,12 @@
 
 @layer utilities {
   .text-oriana-ink {
-    color: #606060;
+    color: #5a6b82;
   }
 
-  /* Soft charcoal headings (Sungrow system-gray) — explicit so HMR/theme always picks it up */
+  /* Explicit so Tailwind/HMR always applies brand navy (not a cached gray). */
   .text-oriana-navy {
-    color: #606060;
+    color: #071525;
   }
 
   .bg-oriana-deep {
@@ -98,7 +97,7 @@
     font-size: 20px;
     font-weight: 500;
     line-height: 1.375;
-    color: #606060;
+    color: #071525;
   }
 
   .category-hero {
@@ -155,9 +154,9 @@
 :root {
   --site-header-height: 8.5rem;
   --background: #ffffff;
-  --foreground: #606060;
+  --foreground: #071525;
   --card: #f7f9fc;
-  --card-foreground: #606060;
+  --card-foreground: #071525;
   --border: #e2e8f0;
   --primary: #1a428a;
   --primary-foreground: #ffffff;
@@ -252,7 +251,7 @@ body,
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.01em;
-  color: #1a1a1a;
+  color: #071525;
 }
 
 .category-intro-body {
@@ -265,7 +264,7 @@ body,
   font-size: 15px;
   font-weight: 400;
   line-height: 1.85;
-  color: #666666;
+  color: #5a6b82;
 }
 
 .category-intro-body p + p {
@@ -278,13 +277,13 @@ body,
   font-size: 22px;
   font-weight: 600;
   line-height: 1.3;
-  color: #333333;
+  color: #071525;
 }
 
 .category-filter-note {
   margin: 0 0 1.75rem;
   font-size: 14px;
-  color: #666666;
+  color: #5a6b82;
 }
 
 .category-filter-note a {

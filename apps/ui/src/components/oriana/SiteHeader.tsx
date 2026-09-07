@@ -174,7 +174,10 @@ export function SiteHeader({
     'inline-flex items-center gap-1.5 text-xs font-medium tracking-wide text-oriana-navy/70 transition-colors hover:text-oriana-blue'
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-white/90 shadow-sm backdrop-blur-xl backdrop-saturate-150">
+    <header
+      ref={headerRef}
+      className="fixed inset-x-0 top-0 z-50 bg-white/90 shadow-sm backdrop-blur-xl backdrop-saturate-150"
+    >
       <div
         className="relative"
         onMouseLeave={() => {

@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ProductSeriesDetail } from '@/components/oriana/ProductSeriesDetail'
-import { getProductBySlug, getSeriesBySlug } from '@/utilities/getCatalogue'
+import { seriesToCatalogueCard } from '@/utilities/allProductsCatalogue'
+import { getProductBySlug, getSeriesByCategory, getSeriesBySlug } from '@/utilities/getCatalogue'
 import { getContact } from '@/utilities/getMarketing'
 import type { Form } from '@/payload-types'
 
@@ -37,14 +38,23 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params
-  const [series, contact] = await Promise.all([getSeriesBySlug(slug), getContact()])
+  const [series, contact, deepLinkedProduct] = await Promise.all([
+    getSeriesBySlug(slug),
+    getContact(),
+    getProductBySlug(slug),
+  ])
   if (!series) notFound()
 
-  const deepLinkedProduct = await getProductBySlug(slug)
+  const relatedSeries = await getSeriesByCategory(series.categorySlug)
   const initialModelSlug =
     deepLinkedProduct && series.variants.some((v) => v.slug === deepLinkedProduct.slug)
       ? deepLinkedProduct.slug
       : series.variants[0]?.slug
+
+  const related = relatedSeries
+    .filter((item) => item.slug !== series.slug)
+    .slice(0, 3)
+    .map(seriesToCatalogueCard)
 
   return (
     <main className="bg-white pt-[var(--site-header-height,8.25rem)]">
@@ -58,6 +68,8 @@ export default async function ProductDetailPage({ params }: Props) {
 
       <ProductSeriesDetail
         series={series}
+        related={related}
+        relatedHref={`/products/category/${series.categorySlug}`}
         initialModelSlug={initialModelSlug}
         formId={formIdFromRelation(contact?.form)}
       />
