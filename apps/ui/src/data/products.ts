@@ -1,4 +1,5 @@
 import type { CatalogueCategory, CatalogueProduct } from '@/types/catalogue'
+import { getOnGridSeriesPageData } from './onGridProductPage'
 import {
   categorySlug,
   productMasterCategories,
@@ -277,6 +278,21 @@ export const staticProducts: CatalogueProduct[] = productCatalog.flatMap((catego
         : category.name
       const lead =
         phases === '—' ? 'Home battery energy storage' : `${phases} ${categoryLabel}`
+      const pageData = getOnGridSeriesPageData(family.productName)
+      const specs = [
+        { label: 'Model', value: model.modelNo },
+        { label: 'Model Series', value: family.productName },
+        { label: 'Capacity', value: power },
+        { label: 'Series', value: family.series },
+      ]
+      if (pageData) {
+        specs.push(
+          { label: 'Max. PV Input Voltage', value: pageData.maxPvInputVoltage },
+          { label: 'Rated AC Output Power', value: pageData.ratedAcOutputPower },
+          { label: 'Rated AC Voltage', value: pageData.ratedAcVoltage },
+          { label: 'Max. Efficiency', value: pageData.maxEfficiency },
+        )
+      }
       return {
         slug: slugifyLabel(model.modelNo),
         name: compact ? `${compact} ${model.modelNo}` : model.modelNo,
@@ -285,18 +301,13 @@ export const staticProducts: CatalogueProduct[] = productCatalog.flatMap((catego
         segment,
         segmentKey: segmentKeyOf(category.name, family),
         powerRange: power,
-        efficiency: '—',
+        efficiency: pageData?.maxEfficiency ?? '—',
         phases,
         warranty: '10 Years',
         featured: index === 0,
         description: `${lead} — ${power} model in the ${family.productName} series.`,
         modelSeries: family.productName,
-        specs: [
-          { label: 'Model', value: model.modelNo },
-          { label: 'Model Series', value: family.productName },
-          { label: 'Capacity', value: power },
-          { label: 'Series', value: family.series },
-        ],
+        specs,
       } satisfies CatalogueProduct
     }),
   ),

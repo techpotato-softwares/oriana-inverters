@@ -142,6 +142,7 @@
 }
 
 :root {
+  --site-header-height: 8.5rem;
   --background: #ffffff;
   --foreground: #071525;
   --card: #f7f9fc;

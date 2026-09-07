@@ -80,6 +80,7 @@ export function SiteHeader({
   const reduceMotion = useReducedMotion()
   const refreshedEmptyMenu = useRef(false)
   const lastScrollY = useRef(0)
+  const headerRef = useRef<HTMLElement>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState<MegaMenuKey | null>(null)
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
@@ -145,6 +146,27 @@ export function SiteHeader({
     refreshedEmptyMenu.current = true
     router.refresh()
   }, [catalogueMenu.length, router])
+
+  useEffect(() => {
+    const header = headerRef.current
+    if (!header) return
+
+    const syncHeight = () => {
+      document.documentElement.style.setProperty(
+        '--site-header-height',
+        `${Math.ceil(header.getBoundingClientRect().height)}px`,
+      )
+    }
+
+    syncHeight()
+    const observer = new ResizeObserver(syncHeight)
+    observer.observe(header)
+    window.addEventListener('resize', syncHeight)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', syncHeight)
+    }
+  }, [navCollapsed, mobileOpen, openMenu])
 
   const linkClass =
     'relative px-3 py-3.5 text-sm font-medium text-oriana-navy transition-colors hover:text-oriana-blue'

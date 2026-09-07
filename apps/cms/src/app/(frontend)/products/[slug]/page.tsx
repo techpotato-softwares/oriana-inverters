@@ -47,7 +47,7 @@ export default async function ProductDetailPage({ params }: Props) {
       : series.variants[0]?.slug
 
   return (
-    <main className="bg-white pt-20 lg:pt-24">
+    <main className="bg-white pt-[var(--site-header-height,8.25rem)]">
       <Breadcrumbs
         items={[
           { label: 'All Products', href: '/products' },

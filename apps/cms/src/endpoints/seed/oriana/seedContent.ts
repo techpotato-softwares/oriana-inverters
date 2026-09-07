@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 
 import { caseStudies } from '@/data/caseStudies'
 import { staticDistributors } from '@/data/distributors'
-import { mainNav, megaMenus } from '@/config/navigation'
+import { megaMenus } from '@/config/navigation'
 import { footerNav } from '@/config/footer'
 
 const filename = fileURLToPath(import.meta.url)
