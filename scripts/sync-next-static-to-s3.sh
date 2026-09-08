@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
-# Sync Next.js static assets to the S3 bucket used by CloudFront for /_next/static/*.
+# Sync Next.js static assets to the S3 bucket used by CloudFront for:
+#   /_next/static/*  (hashed build output)
+#   /assets/*        (public folder — videos, posters, logos)
 #
 # Prefer --source-dir pointing at the exact .next/static tree from the deployed
 # Lambda image (CI does this). Fallback: scrape multiple Lambda HTML pages and
 # upload referenced assets (must include / — admin alone misses app/(frontend)/*).
 #
+# Public /assets must be synced from disk (not Lambda) — buffered Function URL
+# responses are capped at 6 MB and large videos return CloudFront 502.
+#
 # Usage:
 #   ./scripts/sync-next-static-to-s3.sh qa
 #   ./scripts/sync-next-static-to-s3.sh qa --source-dir /tmp/lambda-next-static
+#   ./scripts/sync-next-static-to-s3.sh qa --assets-dir /tmp/lambda-public-assets
 
 set -euo pipefail
 
@@ -18,11 +24,14 @@ APP="${APP_NAME:-oriana-invertors-web}"
 REGION="${AWS_REGION:-ap-south-1}"
 STACK="${APP}-${ENV}"
 FN="${APP}-${ENV}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 LAMBDA_URL=""
 STATIC_BUCKET=""
 SITE_URL=""
 SOURCE_DIR=""
+ASSETS_DIR=""
 WAIT_SECONDS=180
 
 while [ $# -gt 0 ]; do
@@ -31,10 +40,19 @@ while [ $# -gt 0 ]; do
     --bucket) STATIC_BUCKET="$2"; shift 2 ;;
     --site-url) SITE_URL="$2"; shift 2 ;;
     --source-dir) SOURCE_DIR="$2"; shift 2 ;;
+    --assets-dir) ASSETS_DIR="$2"; shift 2 ;;
     --wait-seconds) WAIT_SECONDS="$2"; shift 2 ;;
     *) echo "Unknown arg: $1" >&2; exit 1 ;;
   esac
 done
+
+if [ -z "$ASSETS_DIR" ]; then
+  if [ -d "$REPO_ROOT/apps/cms/public/assets" ]; then
+    ASSETS_DIR="$REPO_ROOT/apps/cms/public/assets"
+  elif [ -d "$REPO_ROOT/apps/ui/public/assets" ]; then
+    ASSETS_DIR="$REPO_ROOT/apps/ui/public/assets"
+  fi
+fi
 
 if [ -z "$LAMBDA_URL" ]; then
   LAMBDA_URL=$(aws cloudformation describe-stacks \
@@ -159,6 +177,21 @@ sync_from_local() {
     --delete \
     --cache-control "public,max-age=31536000,immutable"
   upload_encoded_aliases
+}
+
+sync_public_assets() {
+  if [ -z "$ASSETS_DIR" ] || [ ! -d "$ASSETS_DIR" ]; then
+    echo "  skip public /assets: no --assets-dir and none found under apps/*/public/assets" >&2
+    return 0
+  fi
+
+  echo "  assets: $ASSETS_DIR → s3://${STATIC_BUCKET}/assets"
+  # Not content-hashed — moderate cache + invalidate on deploy.
+  aws s3 sync "$ASSETS_DIR" "s3://${STATIC_BUCKET}/assets" \
+    --delete \
+    --cache-control "public,max-age=86400" \
+    --exclude ".DS_Store" \
+    --exclude "**/.DS_Store"
 }
 
 extract_paths_from_html() {
@@ -318,6 +351,8 @@ else
   sync_from_lambda_html
 fi
 
+sync_public_assets
+
 DIST_ID=$(aws cloudfront list-distributions \
   --query "DistributionList.Items[?contains(Comment, '${APP}-${ENV}')].Id | [0]" \
   --output text 2>/dev/null || true)
@@ -325,6 +360,6 @@ DIST_ID=$(aws cloudfront list-distributions \
 if [ -n "$DIST_ID" ] && [ "$DIST_ID" != "None" ]; then
   aws cloudfront create-invalidation \
     --distribution-id "$DIST_ID" \
-    --paths "/_next/static/*" >/dev/null
-  echo "Invalidated CloudFront distribution $DIST_ID for /_next/static/*"
+    --paths "/_next/static/*" "/assets/*" >/dev/null
+  echo "Invalidated CloudFront distribution $DIST_ID for /_next/static/* and /assets/*"
 fi

@@ -55,7 +55,7 @@ export class WebCloudFrontConstruct extends Construct {
     const additionalBehaviors: Record<string, cloudfront.BehaviorOptions> = {};
     const isProd = config.environment === "prod";
 
-    // Serve hashed Next.js assets from S3 so page loads do not burst the Lambda URL (429).
+    // Serve hashed Next.js assets + public /assets from S3 (avoids Lambda 429 / 6 MB limit).
     this.staticAssetsBucket = new s3.Bucket(this, "StaticAssetsBucket", {
       bucketName: `${APP_NAME}-static-${config.environment}`,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
@@ -69,6 +69,16 @@ export class WebCloudFrontConstruct extends Construct {
     );
 
     additionalBehaviors["/_next/static/*"] = {
+      origin: staticOrigin,
+      viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+      cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+      compress: true,
+    };
+
+    // Public Next.js assets (hero videos, posters, logos). Must not go through
+    // Lambda buffered Function URL — 6 MB response limit causes CloudFront 502.
+    additionalBehaviors["/assets/*"] = {
       origin: staticOrigin,
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,

@@ -97,7 +97,7 @@ export function ImpactStats({
                 {eyebrow}
               </p>
             ) : null}
-            <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl lg:text-5xl">
+            <h2 className="mt-3 font-display text-3xl font-semibold text-[#606060] md:text-4xl lg:text-5xl">
               {title || 'Our Impact'}
             </h2>
             {body ? (
@@ -113,7 +113,7 @@ export function ImpactStats({
                 <stat.icon className="h-10 w-10 stroke-[1.3] text-oriana-sky" aria-hidden />
                 <AnimatedCounter
                   value={stat.value}
-                  className="mt-5 block font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl"
+                  className="mt-5 block font-display text-3xl font-semibold tracking-tight text-[#606060] md:text-4xl"
                 />
                 <p className="mt-3 max-w-[12rem] text-sm leading-snug text-oriana-muted">
                   {stat.label}

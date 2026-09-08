@@ -313,7 +313,7 @@ jobs:
 
           IMAGE_URI=$(aws lambda get-function --function-name "$FN" --query 'Code.ImageUri' --output text)
           if [ -z "$IMAGE_URI" ] || [ "$IMAGE_URI" = "None" ]; then
-            echo "Lambda image URI not found; falling back to HTML scrape sync"
+            echo "Lambda image URI not found; falling back to HTML scrape + repo /assets"
             ./scripts/sync-next-static-to-s3.sh "$ENV" --wait-seconds 240
             exit 0
           fi
@@ -324,8 +324,11 @@ jobs:
 
           docker pull "$IMAGE_URI"
           CONTAINER_ID=$(docker create "$IMAGE_URI")
-          rm -rf /tmp/lambda-next-static
+          rm -rf /tmp/lambda-next-static /tmp/lambda-public-assets
           docker cp "$CONTAINER_ID:/app/apps/cms/.next/static" /tmp/lambda-next-static
+          docker cp "$CONTAINER_ID:/app/apps/cms/public/assets" /tmp/lambda-public-assets
           docker rm "$CONTAINER_ID"
 
-          ./scripts/sync-next-static-to-s3.sh "$ENV" --source-dir /tmp/lambda-next-static
+          ./scripts/sync-next-static-to-s3.sh "$ENV" \
+            --source-dir /tmp/lambda-next-static \
+            --assets-dir /tmp/lambda-public-assets

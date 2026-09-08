@@ -6,6 +6,7 @@ import { Activity, BarChart3, CircleChevronRight, Shield, Waves } from 'lucide-r
 import { ProductImage } from './ProductImage'
 import {
   formatProductPowerLabel,
+  productCardTypeLabel,
   ProductSeriesCard,
 } from '@/components/oriana/ProductSeriesCard'
 import {
@@ -38,11 +39,31 @@ const AUDIENCE_LABEL: Record<CatalogueProduct['segmentKey'], string> = {
   storage: 'Homeowners',
 }
 
-function isSerialLikeCopy(series: CatalogueSeries, value?: string | null): boolean {
-  const text = value?.trim() ?? ''
-  if (!text) return true
-  if (text.startsWith(series.series)) return true
-  return /^ORI[-_(]/i.test(text)
+function seriesTypeLabel(series: CatalogueSeries, selected: CatalogueProduct): string {
+  const pageData = getOnGridSeriesPageData(
+    selected.modelSeries,
+    series.series,
+    series.slug,
+    selected.slug,
+  )
+  if (pageData?.heroType) return pageData.heroType
+
+  const group = selected.phases || series.segment || series.phases || ''
+  return productCardTypeLabel(group, series.categorySlug)
+}
+
+/** Sungrow-style: "1~4kW ORI-(1/1.5/…)K-…" */
+function heroProductTitle(series: CatalogueSeries, selected: CatalogueProduct): string {
+  const pageData = getOnGridSeriesPageData(
+    selected.modelSeries,
+    series.series,
+    series.slug,
+    selected.slug,
+  )
+  const modelName = selected.modelSeries || series.series
+  const power = pageData?.ratedAcOutputPower ?? formatProductPowerLabel(series.powerRange)
+  if (power && modelName) return `${power.replace(/\s+/g, '')} ${modelName}`
+  return modelName
 }
 
 function relatedSectionHeading(segmentKey: CatalogueProduct['segmentKey']): string {
@@ -530,9 +551,8 @@ export function ProductSeriesDetail({
   const relatedTitle = relatedSectionHeading(selected.segmentKey ?? series.segmentKey)
   const powerLabel =
     pageData?.ratedAcOutputPower ?? formatProductPowerLabel(series.powerRange)
-  const heroSupport = isSerialLikeCopy(series, series.description)
-    ? series.category
-    : series.description
+  const productTitle = heroProductTitle(series, selected)
+  const typeLabel = seriesTypeLabel(series, selected)
 
   const selectTab = (next: TabId) => {
     setTab(next)
@@ -637,15 +657,13 @@ export function ProductSeriesDetail({
         >
           <div className="container grid items-center gap-10 py-12 lg:grid-cols-2 lg:gap-16 lg:py-20">
             <div className="order-2 lg:order-1">
-              <h1 className="font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl">
-                {powerLabel || series.category}
+              <h1 className="font-display text-3xl font-light tracking-tight text-[#606060] md:text-4xl lg:text-[2.5rem] lg:leading-tight">
+                {productTitle}
               </h1>
-              {heroSupport ? (
-                <p className="mt-4 max-w-xl text-sm leading-relaxed text-oriana-muted md:text-base">
-                  {heroSupport}
-                </p>
+              {typeLabel ? (
+                <p className="mt-3 text-base font-medium text-oriana-muted md:text-lg">{typeLabel}</p>
               ) : null}
-              <div className="mt-8">
+              <div className="mt-8 flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center rounded-full border border-oriana-navy/10 bg-white/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-oriana-navy backdrop-blur">
                   {audience}
                 </span>
@@ -731,9 +749,14 @@ export function ProductSeriesDetail({
             >
               <div className="container grid items-center gap-12 py-14 lg:grid-cols-2 lg:gap-16 lg:py-24">
                 <div className="order-2 lg:order-1">
-                  <h1 className="font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl">
-                    {powerLabel || series.category}
+                  <h1 className="font-display text-3xl font-light tracking-tight text-[#606060] md:text-4xl lg:text-[2.5rem] lg:leading-tight">
+                    {productTitle}
                   </h1>
+                  {typeLabel ? (
+                    <p className="mt-3 text-base font-medium text-oriana-muted md:text-lg">
+                      {typeLabel}
+                    </p>
+                  ) : null}
                   {tiles.length > 0 ? (
                     <dl className="mt-10 grid sm:grid-cols-2">
                       {tiles.map((tile, index) => {
