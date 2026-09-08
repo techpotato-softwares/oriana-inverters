@@ -28,6 +28,9 @@ const TRACK_GUTTER = 'max(1.5rem, 6vw)'
 const CARD_RADIUS = 24
 /** Sticky horizontal scrub needs room; below this use scroll-snap instead. */
 const STICKY_MIN_WIDTH = 1024
+const STICKY_MIN_HEIGHT = 820
+/** Floor so sticky cards never collapse into thin strips on short viewports. */
+const STICKY_CARD_MIN_HEIGHT = 'min(320px, 45svh)'
 
 /**
  * Sungrow "Our Commitment to Innovation and Excellence" pattern:
@@ -61,20 +64,21 @@ function WhyChooseCardFace({ card }: { card: WhyChooseCard }) {
         aria-hidden
       />
       <div
-        className="relative flex h-full flex-col justify-start text-white"
+        className="relative flex h-full flex-col justify-start text-center text-white lg:text-left"
         style={{ padding: 'clamp(1.25rem, 3vw, 2.25rem)' }}
       >
         <h3
-          className="max-w-sm font-display font-medium leading-tight"
+          className="mx-auto max-w-sm font-display font-medium leading-tight lg:mx-0"
           style={{ fontSize: 'clamp(1.25rem, 2vw, 1.85rem)' }}
         >
           {card.title}
         </h3>
         {card.href ? (
-          <div className="mt-5">
+          <div className="mt-5 flex justify-center lg:justify-start">
             <Link
               href={card.href}
-              className="inline-flex items-center justify-center rounded-full border border-oriana-blue bg-oriana-blue px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-oriana-deep hover:border-oriana-deep"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-oriana-blue bg-oriana-blue px-7 py-2.5 text-sm font-semibold text-white transition hover:border-oriana-deep hover:bg-oriana-deep"
+              style={{ minWidth: '10.5rem' }}
             >
               {card.ctaLabel || 'Explore more'}
             </Link>
@@ -144,10 +148,12 @@ function SectionIntro({
 function CardsScrollSnap({ cards }: { cards: WhyChooseCard[] }) {
   return (
     <div
-      className="mt-8 flex gap-4 overflow-x-auto overscroll-x-contain px-[max(1rem,5vw)] pb-2 sm:gap-6 sm:px-[max(1.5rem,6vw)]"
+      className="mt-8 flex gap-4 overflow-x-auto overscroll-x-contain px-[max(1rem,5vw)] pb-3 sm:gap-6 sm:px-[max(1.5rem,6vw)]"
+      data-lenis-prevent
       style={{
         scrollSnapType: 'x mandatory',
         WebkitOverflowScrolling: 'touch',
+        touchAction: 'pan-x pinch-zoom',
       }}
     >
       {cards.map((card) => (
@@ -156,7 +162,7 @@ function CardsScrollSnap({ cards }: { cards: WhyChooseCard[] }) {
           className="relative shrink-0 overflow-hidden"
           style={{
             width: 'min(551px, 85vw)',
-            height: 'min(400px, 58svh)',
+            height: 'max(280px, min(400px, 58svh))',
             borderRadius: CARD_RADIUS,
             scrollSnapAlign: 'center',
           }}
@@ -185,11 +191,16 @@ export function WhyChooseOrianaSection({
   const [useStickyScrub, setUseStickyScrub] = useState(false)
 
   useEffect(() => {
-    const mq = window.matchMedia(`(min-width: ${STICKY_MIN_WIDTH}px)`)
-    const sync = () => setUseStickyScrub(mq.matches)
+    const widthMq = window.matchMedia(`(min-width: ${STICKY_MIN_WIDTH}px)`)
+    const heightMq = window.matchMedia(`(min-height: ${STICKY_MIN_HEIGHT}px)`)
+    const sync = () => setUseStickyScrub(widthMq.matches && heightMq.matches)
     sync()
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
+    widthMq.addEventListener('change', sync)
+    heightMq.addEventListener('change', sync)
+    return () => {
+      widthMq.removeEventListener('change', sync)
+      heightMq.removeEventListener('change', sync)
+    }
   }, [])
 
   useEffect(() => {
@@ -301,6 +312,7 @@ export function WhyChooseOrianaSection({
             className="relative w-full overflow-hidden"
             style={{
               height: 'min(420px, 100%)',
+              minHeight: STICKY_CARD_MIN_HEIGHT,
               maxHeight: '100%',
             }}
           >

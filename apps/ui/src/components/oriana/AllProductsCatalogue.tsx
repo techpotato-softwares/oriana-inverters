@@ -176,12 +176,12 @@ export function AllProductsCatalogue({
       <nav
         aria-label="Product categories"
         className={cn(
-          'sticky top-[4.25rem] border-b border-oriana-navy/10 bg-white/95 backdrop-blur-md',
+          'sticky top-[var(--site-header-height,4.25rem)] border-b border-oriana-navy/10 bg-white/95 backdrop-blur-md',
           filterOpen ? 'z-[55]' : 'z-30',
         )}
       >
         <div className="container flex items-center gap-3">
-          <ul role="tablist" aria-label="Product categories" className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
+          <ul role="tablist" aria-label="Product categories" className="flex min-w-0 flex-1 gap-1 overflow-x-auto" data-lenis-prevent style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pinch-zoom' }}>
             {tabs.map((tab) => {
               const active = tab.slug === activeSlug
               return (

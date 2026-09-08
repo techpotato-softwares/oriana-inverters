@@ -510,6 +510,7 @@ export function ProductSeriesDetail({
   formId,
 }: Props) {
   const [tab, setTab] = useState<TabId>('overview')
+  const [compactDownloads, setCompactDownloads] = useState(true)
 
   const resolveSlug = (preferred?: string | null) =>
     series.variants.find((variant) => variant.slug === preferred)?.slug ??
@@ -517,6 +518,14 @@ export function ProductSeriesDetail({
     ''
 
   const [selectedSlug, setSelectedSlug] = useState(() => resolveSlug(initialModelSlug))
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)')
+    const sync = () => setCompactDownloads(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
 
   useEffect(() => {
     const params =
@@ -758,13 +767,30 @@ export function ProductSeriesDetail({
               </div>
             </div>
 
-            <div className="container py-14 lg:py-20">
+            <div className="container scroll-mt-[calc(var(--site-header-height,5rem)+3.75rem)] py-14 pt-16 lg:py-20">
               <h2 className="text-center font-display text-2xl font-semibold text-oriana-navy md:text-3xl">
                 Downloads
               </h2>
               <ul className="mx-auto mt-10 grid max-w-5xl gap-5 sm:grid-cols-2">
                 {downloads.map((doc) => {
-                  const inner = (
+                  const inner = compactDownloads ? (
+                    <>
+                      <span className="block text-center">
+                        <span className="block font-display text-[17px] font-medium text-oriana-blue transition-colors group-hover:text-white">
+                          {doc.title}
+                        </span>
+                        <span className="mt-2.5 block text-base leading-normal text-oriana-muted transition-colors group-hover:text-white/85">
+                          {doc.detail}
+                        </span>
+                      </span>
+                      <span className="mt-8 flex justify-center">
+                        <span className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-oriana-navy/15 bg-white px-5 text-sm font-semibold text-oriana-navy transition-colors group-hover:border-white/40 group-hover:bg-white/15 group-hover:text-white">
+                          View
+                          <CircleChevronRight className="h-4 w-4" strokeWidth={1.8} aria-hidden />
+                        </span>
+                      </span>
+                    </>
+                  ) : (
                     <>
                       <span>
                         <span className="block truncate font-display text-[17px] font-medium text-oriana-blue transition-colors group-hover:text-white">
@@ -781,10 +807,11 @@ export function ProductSeriesDetail({
                       />
                     </>
                   )
-                  const cardClass =
-                    'group flex h-full min-h-[14.25rem] flex-col justify-between rounded-[22px] bg-[#f1f3f7] px-10 py-9 transition-colors hover:bg-oriana-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue/40'
+                  const cardClass = compactDownloads
+                    ? 'group flex h-full min-h-[14.25rem] w-full flex-col justify-between rounded-[22px] bg-[#f1f3f7] px-6 py-7 transition-colors hover:bg-oriana-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue/40'
+                    : 'group flex h-full min-h-[14.25rem] flex-col justify-between rounded-[22px] bg-[#f1f3f7] px-10 py-9 transition-colors hover:bg-oriana-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue/40'
                   return (
-                    <li key={doc.title}>
+                    <li key={doc.title} className="w-full">
                       {doc.external ? (
                         <a
                           href={doc.href}

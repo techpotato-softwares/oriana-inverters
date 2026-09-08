@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { useReducedMotion } from 'framer-motion'
 
 import { GrowingAccentLine } from './GrowingAccentLine'
@@ -80,11 +80,83 @@ function AccentMark() {
 /** Sticky pin runway: lift beats + short hold so the card can unpin and scroll away. */
 const LIFT_VH_PER_CARD = 90
 const EXIT_HOLD_VH = 40
+/** Sticky split needs room; below this use stacked cards (same content). */
+const STICKY_MIN_WIDTH = 1024
+const STICKY_MIN_HEIGHT = 820
+const CARD_RADIUS = 40
+
+function CompactVisionCards({
+  title,
+  cards,
+  sectionRef,
+  ariaLabel,
+  className,
+}: {
+  title?: string
+  cards: VisionMissionCard[]
+  sectionRef: RefObject<HTMLElement | null>
+  ariaLabel: string
+  className: string
+}) {
+  return (
+    <section
+      ref={sectionRef}
+      className={`relative bg-white py-14 lg:py-16 ${className}`.trim()}
+      aria-label={ariaLabel}
+    >
+      <div className="container">
+        {title ? (
+          <div className="mx-auto mb-10 max-w-3xl text-center">
+            <h2 className="font-display text-3xl font-semibold text-[#606060] md:text-4xl lg:text-5xl">
+              {title}
+            </h2>
+            <GrowingAccentLine reduceMotion size="heading" className="mt-3" progress={1} />
+          </div>
+        ) : null}
+        <div className="grid gap-4 lg:grid-cols-2">
+          {cards.map((card) => {
+            const primary = card.headline || card.body
+            const support = card.headline && card.body ? card.body : null
+            return (
+              <article key={card.id} className="overflow-hidden rounded-[2rem] border border-black/5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={card.image}
+                  alt={card.alt || card.label}
+                  className="aspect-[4/3] w-full object-cover"
+                />
+                <div className="p-6 text-center sm:p-8 sm:text-left">
+                  <p className="font-display text-[#8a8a8a]">{card.label}</p>
+                  {primary ? (
+                    <p className="mt-4 font-display text-xl text-[#606060]">{primary}</p>
+                  ) : null}
+                  {support ? (
+                    <p className="mt-3 text-sm leading-relaxed text-oriana-muted">{support}</p>
+                  ) : null}
+                  {card.href ? (
+                    <Link
+                      href={card.href}
+                      className="mt-6 inline-flex min-h-11 items-center justify-center border border-oriana-blue bg-white px-7 py-3 text-center text-sm font-semibold text-oriana-blue transition hover:bg-oriana-blue hover:text-white"
+                      style={{ borderRadius: '0.8rem', minWidth: '10.5rem' }}
+                    >
+                      {card.ctaLabel || 'Explore more'}
+                    </Link>
+                  ) : null}
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
 
 /**
  * Sticky split cards — Sungrow “Greener Tomorrow” stack:
  * top image slides up as a panel; next image is visible underneath the whole time.
  * After the last lift, the sticky card unpins and scrolls up before the next section.
+ * Compact / short viewports use a stacked card grid (same content).
  * @see https://www.sungrowpower.com/en
  */
 export function VisionMissionSection({
@@ -98,12 +170,26 @@ export function VisionMissionSection({
   const layerRefs = useRef<(HTMLDivElement | null)[]>([])
   const textRefs = useRef<(HTMLDivElement | null)[]>([])
   const targetRatio = useRef(0)
+  const [useStickyScrub, setUseStickyScrub] = useState(false)
 
   const liftVh = Math.max(cards.length - 1, 1) * LIFT_VH_PER_CARD
   const runwayVh = 100 + liftVh + EXIT_HOLD_VH
 
   useEffect(() => {
-    if (!cards.length || reduceMotion) return
+    const widthMq = window.matchMedia(`(min-width: ${STICKY_MIN_WIDTH}px)`)
+    const heightMq = window.matchMedia(`(min-height: ${STICKY_MIN_HEIGHT}px)`)
+    const sync = () => setUseStickyScrub(widthMq.matches && heightMq.matches)
+    sync()
+    widthMq.addEventListener('change', sync)
+    heightMq.addEventListener('change', sync)
+    return () => {
+      widthMq.removeEventListener('change', sync)
+      heightMq.removeEventListener('change', sync)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!cards.length || reduceMotion || !useStickyScrub) return
 
     const readRatio = () => {
       const section = sectionRef.current
@@ -168,41 +254,19 @@ export function VisionMissionSection({
       running = false
       window.cancelAnimationFrame(raf)
     }
-  }, [cards, reduceMotion, liftVh])
+  }, [cards, reduceMotion, useStickyScrub, liftVh])
 
   if (!cards.length) return null
 
-  if (reduceMotion) {
+  if (reduceMotion || !useStickyScrub) {
     return (
-      <section
-        ref={sectionRef}
-        className={`relative bg-white py-14 lg:py-16 ${className}`.trim()}
-        aria-label={ariaLabel}
-      >
-        <div className="container">
-          {title ? (
-            <div className="mx-auto mb-10 max-w-3xl text-center">
-              <h2 className="font-display text-3xl font-semibold text-[#606060] md:text-4xl lg:text-5xl">
-                {title}
-              </h2>
-              <GrowingAccentLine reduceMotion size="heading" className="mt-3" progress={1} />
-            </div>
-          ) : null}
-          <div className="grid gap-4
-           lg:grid-cols-2">
-            {cards.map((card) => (
-              <article key={card.id} className="overflow-hidden rounded-[2rem] border border-black/5">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={card.image} alt={card.alt || card.label} className="aspect-[4/3] w-full object-cover" />
-                <div className="p-8">
-                  <p className="font-display text-[#8a8a8a]">{card.label}</p>
-                  <p className="mt-4 font-display text-xl text-[#606060]">{card.headline || card.body}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CompactVisionCards
+        title={title}
+        cards={cards}
+        sectionRef={sectionRef}
+        ariaLabel={ariaLabel}
+        className={className}
+      />
     )
   }
 
@@ -247,11 +311,11 @@ export function VisionMissionSection({
           <div
             className="mx-auto grid h-full w-full max-w-7xl grid-cols-1 overflow-hidden lg:grid-cols-2"
             style={{
-              borderRadius: 40,
+              borderRadius: CARD_RADIUS,
               border: '1px solid rgba(7, 21, 37, 0.06)',
             }}
           >
-            {/* Copy panel */}
+            {/* Copy panel — scrollable so Explore stays reachable on constrained heights */}
             <div className="relative order-2 h-full min-h-0 bg-white lg:order-1">
               {cards.map((card, i) => {
                 const primary = card.headline || card.body
@@ -263,19 +327,21 @@ export function VisionMissionSection({
                     ref={(node) => {
                       textRefs.current[i] = node
                     }}
-                    className="absolute inset-0 box-border"
+                    className="absolute inset-0 box-border min-h-0 overflow-y-auto overscroll-contain"
                     style={{
                       opacity: i === 0 ? 1 : 0,
                       zIndex: i === 0 ? 2 : 1,
                       pointerEvents: i === 0 ? 'auto' : 'none',
                       transform: 'translateY(0px)',
                       willChange: 'opacity, transform',
-                      padding: 'clamp(2rem, 4.2vw, 3.5rem)',
+                      // Inset past 40px radius so text/CTA never merge into clipped corners
+                      padding:
+                        'max(1.5rem, min(2.5rem, 3.5vw)) max(1.5rem, min(3.5rem, 4.2vw)) max(1.75rem, min(2.5rem, 3.5vw))',
                     }}
                     aria-hidden={i !== 0}
                   >
-                    <div className="flex h-full w-full max-w-lg flex-col justify-center">
-                      <div>
+                    <div className="flex min-h-full w-full max-w-lg flex-col justify-center py-1">
+                      <div className="shrink-0">
                         <p
                           className="font-display font-medium text-[#8a8a8a]"
                           style={{
@@ -292,10 +358,10 @@ export function VisionMissionSection({
                       <p
                         className="font-display font-medium text-[#606060]"
                         style={{
-                          fontSize: 'clamp(1.35rem, 1.9vw, 2.1rem)',
+                          fontSize: 'clamp(1.2rem, 1.7vw, 2.1rem)',
                           lineHeight: 1.35,
                           maxWidth: '26rem',
-                          marginTop: '1.5rem',
+                          marginTop: 'clamp(0.85rem, 1.5vw, 1.5rem)',
                         }}
                       >
                         {primary}
@@ -304,9 +370,9 @@ export function VisionMissionSection({
                         <p
                           className="text-oriana-muted"
                           style={{
-                            fontSize: 'clamp(0.95rem, 1.05vw, 1.05rem)',
+                            fontSize: 'clamp(0.9rem, 1.05vw, 1.05rem)',
                             lineHeight: 1.65,
-                            marginTop: '1rem',
+                            marginTop: 'clamp(0.65rem, 1vw, 1rem)',
                             maxWidth: '26rem',
                           }}
                         >
@@ -318,9 +384,10 @@ export function VisionMissionSection({
                         <Link
                           href={card.href}
                           tabIndex={i === 0 ? 0 : -1}
-                          className="inline-flex w-fit items-center justify-center border border-oriana-blue font-medium text-oriana-blue transition hover:bg-oriana-blue hover:text-white"
+                          className="inline-flex w-fit shrink-0 items-center justify-center border border-oriana-blue font-medium text-oriana-blue transition hover:bg-oriana-blue hover:text-white"
                           style={{
-                            marginTop: '2.25rem',
+                            marginTop: 'clamp(1.25rem, 2vw, 2.25rem)',
+                            marginBottom: '0.25rem',
                             minWidth: '11.5rem',
                             padding: '0.85rem 1.85rem',
                             borderRadius: '0.8rem',

@@ -83,7 +83,7 @@ export function PeekStackImages({
 
   return (
     <section
-      className={`relative bg-white ${className}`.trim()}
+      className={`relative overflow-hidden bg-white ${className}`.trim()}
       aria-label={ariaLabel}
       data-parallax-scrolling
     >
@@ -125,22 +125,26 @@ export function PeekStackImages({
             Sungrow fixed viewport mask: rounded window just under the nav.
             White spread shadow paints the page around it so content scrolling
             up under the header gets matching top rounded corners.
-            Inline shadow — Tailwind arbitrary shadow utilities are not emitted here.
+            Outer fixed inset clip keeps the 6.25vw ring from causing horizontal scroll.
           */}
-          <motion.div
-            initial={FRAME_EXPANDED}
-            animate={frameControls}
-            transition={FRAME_TRANSITION}
+          <div
+            className="pointer-events-none fixed inset-0 z-40 overflow-hidden"
             aria-hidden
-            className="pointer-events-none fixed left-1/2 z-40 -translate-x-1/2 overflow-hidden"
-            style={{
-              top: insetTopPx,
-              height: '100vh',
-              borderRadius: '2.083vw',
-              boxShadow: '0 0 0 6.25vw #fff',
-              visibility: ringVisible ? 'visible' : 'hidden',
-            }}
-          />
+            style={{ visibility: ringVisible ? 'visible' : 'hidden' }}
+          >
+            <motion.div
+              initial={FRAME_EXPANDED}
+              animate={frameControls}
+              transition={FRAME_TRANSITION}
+              className="absolute left-1/2 -translate-x-1/2 overflow-hidden"
+              style={{
+                top: insetTopPx,
+                height: '100vh',
+                borderRadius: '2.083vw',
+                boxShadow: '0 0 0 6.25vw #fff',
+              }}
+            />
+          </div>
         </>
       )}
     </section>

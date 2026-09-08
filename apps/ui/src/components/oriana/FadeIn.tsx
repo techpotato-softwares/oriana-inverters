@@ -11,11 +11,12 @@ type FadeInProps = {
   duration?: number
 }
 
+/** Prefer smaller X + slight Y on left/right to avoid transient horizontal overflow. */
 const offsets = {
   up: { y: 36 },
   down: { y: -36 },
-  left: { x: 40 },
-  right: { x: -40 },
+  left: { x: 24, y: 12 },
+  right: { x: -24, y: 12 },
   none: {},
 } as const
 

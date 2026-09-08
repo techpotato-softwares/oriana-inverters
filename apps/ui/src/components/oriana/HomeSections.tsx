@@ -106,7 +106,7 @@ export function ImpactStats({
           </div>
         </FadeIn>
 
-        <Stagger className="mt-14 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:mt-16 lg:grid-cols-5 lg:gap-8">
+        <Stagger className="mt-14 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:mt-16 xl:grid-cols-5 xl:gap-8">
           {resolved.map((stat) => (
             <StaggerItem key={stat.label}>
               <div className="flex flex-col items-center text-center">
