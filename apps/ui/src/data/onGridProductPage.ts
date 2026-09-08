@@ -61,7 +61,7 @@ export const onGridSeriesPageData: Record<string, OnGridSeriesPageData> = {
     ratedAcOutputPower: '1~4 kW',
     ratedAcVoltage: '230 V',
     maxEfficiency: '97.3%',
-    heroType: '1-Phase String Inverter',
+    heroType: '1-Phase On Grid Inverter',
     featureLayout: 'quadrant',
     featureGroups: [
       {
@@ -87,7 +87,7 @@ export const onGridSeriesPageData: Record<string, OnGridSeriesPageData> = {
     ratedAcOutputPower: '3.6~6.2 kW',
     ratedAcVoltage: '230 V',
     maxEfficiency: '97.5%',
-    heroType: '1-Phase String Inverter',
+    heroType: '1-Phase On Grid Inverter',
     featureLayout: 'quadrant',
     // docs image3
     featureGroups: [
@@ -114,7 +114,7 @@ export const onGridSeriesPageData: Record<string, OnGridSeriesPageData> = {
     ratedAcOutputPower: '5~15 kW',
     ratedAcVoltage: '415~440 V',
     maxEfficiency: '98.5%',
-    heroType: '3-Phase String Inverter',
+    heroType: '3-Phase On Grid Inverter',
     featureLayout: 'list',
     // docs image4
     featureList: [
@@ -127,7 +127,7 @@ export const onGridSeriesPageData: Record<string, OnGridSeriesPageData> = {
     ratedAcOutputPower: '18~25 kW',
     ratedAcVoltage: '415~440 V',
     maxEfficiency: '98.5%',
-    heroType: '3-Phase String Inverter',
+    heroType: '3-Phase On Grid Inverter',
     featureLayout: 'list',
     // docs image5 (feature line shows 98.6% in the asset)
     featureList: [
@@ -140,7 +140,7 @@ export const onGridSeriesPageData: Record<string, OnGridSeriesPageData> = {
     ratedAcOutputPower: '30~36 kW',
     ratedAcVoltage: '415~440 V',
     maxEfficiency: '98.6%',
-    heroType: '3-Phase String Inverter',
+    heroType: '3-Phase On Grid Inverter',
     featureLayout: 'list',
     // docs image6
     featureList: [
@@ -153,7 +153,7 @@ export const onGridSeriesPageData: Record<string, OnGridSeriesPageData> = {
     ratedAcOutputPower: '40~50 kW',
     ratedAcVoltage: '415~440 V',
     maxEfficiency: '98.7%',
-    heroType: '3-Phase String Inverter',
+    heroType: '3-Phase On Grid Inverter',
     featureLayout: 'list',
     // docs image7
     featureList: [
@@ -167,7 +167,7 @@ export const onGridSeriesPageData: Record<string, OnGridSeriesPageData> = {
     ratedAcOutputPower: '60~80 kW',
     ratedAcVoltage: '415~440 V',
     maxEfficiency: '98.7%',
-    heroType: '3-Phase String Inverter',
+    heroType: '3-Phase On Grid Inverter',
     featureLayout: 'list',
     // docs image8
     featureList: [
@@ -181,7 +181,7 @@ export const onGridSeriesPageData: Record<string, OnGridSeriesPageData> = {
     ratedAcOutputPower: '70~110 kW',
     ratedAcVoltage: '415~440 V',
     maxEfficiency: '98.8%',
-    heroType: '3-Phase String Inverter',
+    heroType: '3-Phase On Grid Inverter',
     featureLayout: 'list',
     // docs image9
     featureList: [
@@ -195,7 +195,7 @@ export const onGridSeriesPageData: Record<string, OnGridSeriesPageData> = {
     ratedAcOutputPower: '120~136 kW',
     ratedAcVoltage: '415~440 V',
     maxEfficiency: '98.8%',
-    heroType: '3-Phase String Inverter',
+    heroType: '3-Phase On Grid Inverter',
     featureLayout: 'list',
     // docs image10
     featureList: [

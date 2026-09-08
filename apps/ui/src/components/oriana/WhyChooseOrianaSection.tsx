@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { useReducedMotion } from 'framer-motion'
 
 import { GrowingAccentLine } from './GrowingAccentLine'
@@ -25,12 +25,15 @@ export type WhyChooseOrianaSectionProps = {
 }
 
 const TRACK_GUTTER = 'max(1.5rem, 6vw)'
+const CARD_RADIUS = 24
+/** Sticky horizontal scrub needs room; below this use scroll-snap instead. */
+const STICKY_MIN_WIDTH = 1024
 
 /**
  * Sungrow "Our Commitment to Innovation and Excellence" pattern:
- * - sticky full viewport, vertically centered
+ * - desktop: sticky full viewport; scroll drives horizontal translateX
+ * - compact: normal flow + horizontal scroll-snap (avoids clipped cards)
  * - title + GrowingAccentLine + ScrollRevealText (same as Introduction)
- * - cards always visible; scroll only drives horizontal translateX
  * @see https://www.sungrowpower.com/en
  */
 function clamp01(n: number) {
@@ -82,6 +85,89 @@ function WhyChooseCardFace({ card }: { card: WhyChooseCard }) {
   )
 }
 
+function SectionIntro({
+  title,
+  body,
+  sectionRef,
+  reduceMotion,
+  textProgressRef,
+}: {
+  title: string
+  body: string
+  sectionRef: RefObject<HTMLElement | null>
+  reduceMotion: boolean
+  textProgressRef?: RefObject<number>
+}) {
+  return (
+    <div className="w-full shrink-0">
+      <div className="container">
+        <div className="mx-auto w-full max-w-4xl text-center">
+          <h2
+            className="font-display font-medium leading-snug tracking-tight"
+            style={{ color: '#606060', fontSize: 'clamp(1.75rem, 3vw, 2.75rem)' }}
+          >
+            {title}
+          </h2>
+
+          <GrowingAccentLine
+            sectionRef={sectionRef}
+            reduceMotion={reduceMotion}
+            className="mt-8 lg:mt-10"
+            progress={reduceMotion ? 1 : undefined}
+          />
+
+          {reduceMotion ? (
+            <p
+              className="mx-auto mt-4 font-medium leading-relaxed text-[#606060]"
+              style={{ maxWidth: '56rem', fontSize: 'clamp(1rem, 1.55vw, 1.4rem)' }}
+            >
+              {body}
+            </p>
+          ) : (
+            <ScrollRevealText
+              text={body}
+              reduceMotion={false}
+              progressRef={textProgressRef}
+              className="mx-auto font-medium leading-relaxed"
+              style={{
+                maxWidth: '56rem',
+                fontSize: 'clamp(1rem, 1.55vw, 1.4rem)',
+              }}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CardsScrollSnap({ cards }: { cards: WhyChooseCard[] }) {
+  return (
+    <div
+      className="mt-8 flex gap-4 overflow-x-auto overscroll-x-contain px-[max(1rem,5vw)] pb-2 sm:gap-6 sm:px-[max(1.5rem,6vw)]"
+      style={{
+        scrollSnapType: 'x mandatory',
+        WebkitOverflowScrolling: 'touch',
+      }}
+    >
+      {cards.map((card) => (
+        <article
+          key={card.id}
+          className="relative shrink-0 overflow-hidden"
+          style={{
+            width: 'min(551px, 85vw)',
+            height: 'min(400px, 58svh)',
+            borderRadius: CARD_RADIUS,
+            scrollSnapAlign: 'center',
+          }}
+        >
+          <WhyChooseCardFace card={card} />
+        </article>
+      ))}
+    </div>
+  )
+}
+
 export function WhyChooseOrianaSection({
   title = 'Why Choose Oriana Inverters?',
   body = 'Oriana Inverters brings together advanced power electronics, intelligent technology, and precision engineering to deliver reliable solar power solutions for homes, businesses, and large-scale applications.',
@@ -96,9 +182,18 @@ export function WhyChooseOrianaSection({
   const targetRatio = useRef(0)
   /** Finishes Introduction-style char reveal once the sticky pin freezes layout */
   const textProgressRef = useRef(0)
+  const [useStickyScrub, setUseStickyScrub] = useState(false)
 
   useEffect(() => {
-    if (!cards.length || reduceMotion) return
+    const mq = window.matchMedia(`(min-width: ${STICKY_MIN_WIDTH}px)`)
+    const sync = () => setUseStickyScrub(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
+
+  useEffect(() => {
+    if (!cards.length || reduceMotion || !useStickyScrub) return
 
     const getMaxTranslate = () => {
       const track = trackRef.current
@@ -121,14 +216,16 @@ export function WhyChooseOrianaSection({
     let current = 0
     let running = true
 
+    const onResize = () => {
+      targetRatio.current = readRatio()
+    }
+
     const tick = () => {
       if (!running) return
       targetRatio.current = readRatio()
-      // Soft follow (works with Lenis) — card scrub only
       current += (targetRatio.current - current) * 0.12
       if (Math.abs(targetRatio.current - current) < 0.00015) current = targetRatio.current
 
-      // Sticky freezes viewport mid-reveal — finish chars in the first ~8% of the pin
       textProgressRef.current = smoothstep(0, 0.08, current)
 
       const max = getMaxTranslate()
@@ -141,126 +238,71 @@ export function WhyChooseOrianaSection({
     }
 
     raf = window.requestAnimationFrame(tick)
-    window.addEventListener('resize', () => {
-      targetRatio.current = readRatio()
-    })
+    window.addEventListener('resize', onResize)
 
     return () => {
       running = false
       window.cancelAnimationFrame(raf)
+      window.removeEventListener('resize', onResize)
     }
-  }, [cards, reduceMotion])
+  }, [cards, reduceMotion, useStickyScrub])
 
   if (!cards.length) return null
 
-  // Sungrow Commitment runway ≈ 4.5× viewport for 4 cards → scale with count
-  const runwayVh = Math.max(280, 80 + cards.length * 55)
-
-  if (reduceMotion) {
+  // Compact / reduced-motion: full cards in normal flow (no sticky clip)
+  if (reduceMotion || !useStickyScrub) {
     return (
       <section
         ref={sectionRef}
         className={`relative bg-white py-14 lg:py-16 ${className}`.trim()}
         aria-label={ariaLabel}
       >
-        <div className="container">
-          <div className="mx-auto max-w-4xl text-center">
-            <h2
-              className="font-display font-semibold tracking-tight"
-              style={{ color: '#606060', fontSize: 'clamp(1.85rem, 3.2vw, 3rem)' }}
-            >
-              {title}
-            </h2>
-            <GrowingAccentLine
-              sectionRef={sectionRef}
-              reduceMotion
-              className="mt-10"
-              progress={1}
-            />
-            <p
-              className="mx-auto mt-4 font-medium leading-relaxed text-[#606060]"
-              style={{ maxWidth: '56rem', fontSize: 'clamp(1rem, 1.55vw, 1.4rem)' }}
-            >
-              {body}
-            </p>
-          </div>
-        </div>
-        <div
-          className="mt-10 flex gap-6 overflow-x-auto px-[max(1.5rem,6vw)] pb-2"
-          style={{ scrollSnapType: 'x mandatory' }}
-        >
-          {cards.map((card) => (
-            <article
-              key={card.id}
-              className="relative shrink-0 overflow-hidden"
-              style={{
-                width: 'min(551px, 78vw)',
-                height: 'min(425px, 52svh)',
-                borderRadius: 24,
-                scrollSnapAlign: 'start',
-              }}
-            >
-              <WhyChooseCardFace card={card} />
-            </article>
-          ))}
-        </div>
+        <SectionIntro
+          title={title}
+          body={body}
+          sectionRef={sectionRef}
+          reduceMotion
+        />
+        <CardsScrollSnap cards={cards} />
       </section>
     )
   }
+
+  // Desktop sticky scrub — scale runway with card count
+  const runwayVh = Math.max(280, 80 + cards.length * 55)
 
   return (
     <section
       ref={sectionRef}
       className={`relative bg-white ${className}`.trim()}
-      style={{ height: `${runwayVh}svh`, marginTop: 0, marginBottom: 0 }}
+      style={{ height: `${runwayVh}svh` }}
       aria-label={ariaLabel}
     >
-      {/* Sungrow: sticky top-0 flex flex-col justify-center h-dvh overflow-hidden */}
       <div
-        className="sticky top-0 z-10 flex h-[100svh] flex-col justify-center overflow-hidden bg-white"
+        className="sticky top-0 z-10 flex h-[100svh] max-h-[100svh] flex-col overflow-hidden bg-white"
         style={{
-          gap: 'clamp(1.25rem, 3.5vw, 2.75rem)',
           paddingTop: 'calc(4.5rem + env(safe-area-inset-top, 0px))',
-          paddingBottom: '1.5rem',
+          paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom, 0px))',
+          gap: 'clamp(1rem, 2vw, 1.75rem)',
         }}
       >
-        <div className="w-full shrink-0">
-          <div className="container">
-            <div className="mx-auto w-full max-w-4xl text-center">
-              <h2
-                className="font-display font-medium leading-snug tracking-tight"
-                style={{ color: '#606060', fontSize: 'clamp(1.75rem, 3vw, 2.75rem)' }}
-              >
-                {title}
-              </h2>
+        <SectionIntro
+          title={title}
+          body={body}
+          sectionRef={sectionRef}
+          reduceMotion={false}
+          textProgressRef={textProgressRef}
+        />
 
-              {/* Same GrowingAccentLine + ScrollRevealText as Introduction */}
-              <GrowingAccentLine
-                sectionRef={sectionRef}
-                reduceMotion={!!reduceMotion}
-                className="mt-10"
-              />
-
-              <ScrollRevealText
-                text={body}
-                reduceMotion={!!reduceMotion}
-                progressRef={textProgressRef}
-                className="mx-auto font-medium leading-relaxed"
-                style={{
-                  maxWidth: '56rem',
-                  fontSize: 'clamp(1rem, 1.55vw, 1.4rem)',
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Cards always visible — only motion is horizontal scrub */}
-        <div className="relative w-full shrink-0">
+        {/* flex-1 + min-h-0 keeps cards inside the sticky viewport (fixes clipped bottoms / square corners) */}
+        <div className="relative flex min-h-0 w-full flex-1 flex-col justify-center py-1">
           <div
             ref={viewportRef}
             className="relative w-full overflow-hidden"
-            style={{ height: 'min(420px, 48svh)' }}
+            style={{
+              height: 'min(420px, 100%)',
+              maxHeight: '100%',
+            }}
           >
             <div
               aria-hidden
@@ -293,8 +335,8 @@ export function WhyChooseOrianaSection({
                   key={card.id}
                   className="relative h-full shrink-0 overflow-hidden"
                   style={{
-                    width: 'min(551px, 78vw)',
-                    borderRadius: 24,
+                    width: 'min(551px, 42vw)',
+                    borderRadius: CARD_RADIUS,
                     isolation: 'isolate',
                   }}
                 >
