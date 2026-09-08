@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight, SlidersHorizontal, X } from 'lucide-react'
 import { ProductImage } from './ProductImage'
-import { formatProductPowerLabel } from './ProductSeriesCard'
 import { ProductSeriesSections } from './ProductSeriesSections'
 import { listingSectionTitle } from '@/data/productMaster'
 import { cn } from '@/utilities/ui'
@@ -342,10 +341,9 @@ export function AllProductsCatalogue({
                   <span className="inline-flex w-fit rounded-sm bg-oriana-sun px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.18em] text-oriana-navy">
                     New
                   </span>
-                  <h3 className="mt-5 font-display text-2xl font-semibold tracking-tight text-white md:text-4xl">
-                    {formatProductPowerLabel(featured.powerRange) || featured.powerRange}
+                  <h3 className="mt-5 font-display text-xl font-semibold tracking-tight text-white md:text-3xl lg:text-4xl">
+                    {featured.series}
                   </h3>
-                  <p className="sr-only">{featured.series}</p>
                   <span className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-oriana-blue px-5 py-2.5 text-sm font-semibold text-white">
                     Explore
                     <ArrowRight className="h-4 w-4" />

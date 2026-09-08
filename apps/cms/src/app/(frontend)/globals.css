@@ -108,10 +108,11 @@
 
   .product-card-name {
     font-family: var(--font-product);
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 500;
-    line-height: 1.375;
+    line-height: 1.4;
     color: #071525;
+    word-break: break-word;
   }
 
   .category-hero {
