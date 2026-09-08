@@ -676,63 +676,27 @@ export function ProductSeriesDetail({
         </section>
       ) : null}
 
-      {/* Sticky scope ends before Contact so the tab bar does not overlay the form. */}
+      {/* Sticky tab bar only spans product content — related products sit outside so the bar unpins. */}
       <div>
         {tabBar}
 
         {tab === 'overview' ? (
-          <>
-            <section
-              id="product-panel-overview"
-              role="tabpanel"
-              aria-labelledby="product-tab-overview"
-              className="bg-oriana-surface py-12 lg:py-16"
-            >
-              <div className="container">
-                {featureList?.length ? (
-                  <div className="rounded-2xl bg-white px-6 py-10 shadow-[0_8px_28px_rgba(7,21,37,0.06)] sm:px-10">
-                    <FeatureIconList items={featureList} />
-                  </div>
-                ) : (
-                  <FeatureQuadrant groups={features} />
-                )}
-              </div>
-            </section>
-
-            {related.length > 0 ? (
-              <section className="bg-white py-12 lg:py-16" aria-labelledby="related-products-heading">
-                <div className="container">
-                  <h2
-                    id="related-products-heading"
-                    className="font-display text-2xl font-semibold text-oriana-navy md:text-3xl"
-                  >
-                    {relatedTitle}
-                  </h2>
-                  <div className="mt-8 grid items-stretch gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                    {related.slice(0, 3).map((card) => (
-                      <ProductSeriesCard
-                        key={card.slug}
-                        href={`/products/${card.slug}`}
-                        title={formatProductPowerLabel(card.powerRange)}
-                        name={card.series}
-                        categorySlug={card.categorySlug}
-                        imageSrc={card.heroImageUrl}
-                        imageAlt={card.heroImageAlt}
-                      />
-                    ))}
-                  </div>
-                  <div className="mt-10 flex justify-center">
-                    <Link
-                      href={exploreHref}
-                      className="inline-flex min-h-11 items-center justify-center rounded-full border-2 border-oriana-blue px-8 py-2.5 text-sm font-semibold text-oriana-blue transition hover:bg-oriana-blue hover:text-white"
-                    >
-                      Explore more
-                    </Link>
-                  </div>
+          <section
+            id="product-panel-overview"
+            role="tabpanel"
+            aria-labelledby="product-tab-overview"
+            className="bg-oriana-surface py-12 lg:py-16"
+          >
+            <div className="container">
+              {featureList?.length ? (
+                <div className="rounded-2xl bg-white px-6 py-10 shadow-[0_8px_28px_rgba(7,21,37,0.06)] sm:px-10">
+                  <FeatureIconList items={featureList} />
                 </div>
-              </section>
-            ) : null}
-          </>
+              ) : (
+                <FeatureQuadrant groups={features} />
+              )}
+            </div>
+          </section>
         ) : (
           <section
             id="product-panel-documents"
@@ -752,11 +716,6 @@ export function ProductSeriesDetail({
                   <h1 className="font-display text-3xl font-light tracking-tight text-[#606060] md:text-4xl lg:text-[2.5rem] lg:leading-tight">
                     {productTitle}
                   </h1>
-                  {typeLabel ? (
-                    <p className="mt-3 text-base font-medium text-oriana-muted md:text-lg">
-                      {typeLabel}
-                    </p>
-                  ) : null}
                   {tiles.length > 0 ? (
                     <dl className="mt-10 grid sm:grid-cols-2">
                       {tiles.map((tile, index) => {
@@ -771,7 +730,7 @@ export function ProductSeriesDetail({
                               isLeft ? 'sm:pr-10' : 'sm:pl-10',
                             )}
                           >
-                            <dt className="font-display text-3xl font-semibold tracking-tight text-oriana-navy md:text-4xl">
+                            <dt className="font-display text-3xl font-light tracking-tight text-[#606060] md:text-4xl">
                               {tile.value}
                             </dt>
                             <dd className="mt-2 text-sm text-oriana-muted">{tile.label}</dd>
@@ -848,6 +807,40 @@ export function ProductSeriesDetail({
           </section>
         )}
       </div>
+
+      {tab === 'overview' && related.length > 0 ? (
+        <section className="bg-white py-12 lg:py-16" aria-labelledby="related-products-heading">
+          <div className="container">
+            <h2
+              id="related-products-heading"
+              className="font-display text-2xl font-semibold text-oriana-navy md:text-3xl"
+            >
+              {relatedTitle}
+            </h2>
+            <div className="mt-8 grid items-stretch gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {related.slice(0, 3).map((card) => (
+                <ProductSeriesCard
+                  key={card.slug}
+                  href={`/products/${card.slug}`}
+                  title={formatProductPowerLabel(card.powerRange)}
+                  name={card.series}
+                  categorySlug={card.categorySlug}
+                  imageSrc={card.heroImageUrl}
+                  imageAlt={card.heroImageAlt}
+                />
+              ))}
+            </div>
+            <div className="mt-10 flex justify-center">
+              <Link
+                href={exploreHref}
+                className="inline-flex min-h-11 items-center justify-center rounded-full border-2 border-oriana-blue px-8 py-2.5 text-sm font-semibold text-oriana-blue transition hover:bg-oriana-blue hover:text-white"
+              >
+                Explore more
+              </Link>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="relative z-0 border-t border-oriana-navy/10 bg-oriana-surface">
         <div className="container grid gap-10 py-12 lg:grid-cols-2 lg:items-start lg:gap-16 lg:py-16">
