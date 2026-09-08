@@ -52,18 +52,9 @@ function seriesTypeLabel(series: CatalogueSeries, selected: CatalogueProduct): s
   return productCardTypeLabel(group, series.categorySlug)
 }
 
-/** Sungrow-style: "1~4kW ORI-(1/1.5/…)K-…" */
+/** Product model name only — capacity lives in the spec tiles, not the title. */
 function heroProductTitle(series: CatalogueSeries, selected: CatalogueProduct): string {
-  const pageData = getOnGridSeriesPageData(
-    selected.modelSeries,
-    series.series,
-    series.slug,
-    selected.slug,
-  )
-  const modelName = selected.modelSeries || series.series
-  const power = pageData?.ratedAcOutputPower ?? formatProductPowerLabel(series.powerRange)
-  if (power && modelName) return `${power.replace(/\s+/g, '')} ${modelName}`
-  return modelName
+  return selected.modelSeries || series.series
 }
 
 function relatedSectionHeading(segmentKey: CatalogueProduct['segmentKey']): string {
@@ -79,8 +70,9 @@ function featureGroups(series: CatalogueSeries, selected: CatalogueProduct) {
     series.slug,
     selected.slug,
   )
-  if (pageData?.featureGroups?.length) {
-    return pageData.featureGroups.map((group) => ({
+  // Explicit page data wins — empty featureGroups means advantages are deferred.
+  if (pageData) {
+    return (pageData.featureGroups ?? []).map((group) => ({
       title: group.title,
       items: group.items,
     }))
@@ -92,115 +84,12 @@ function featureGroups(series: CatalogueSeries, selected: CatalogueProduct) {
       : 'Installer-backed aftercare and warranty support'
   const category = series.categorySlug
 
-  if (category === 'hybrid-inverters') {
-    return [
-      {
-        title: 'HIGH YIELD',
-        items: [
-          'Hybrid conversion for PV generation and battery storage',
-          'Designed to raise self-consumption on residential and C&I sites',
-          'Stable output across a wide operating window',
-        ],
-      },
-      {
-        title: 'SAFE AND RELIABLE',
-        items: [
-          'Grid-tied protection for everyday operation',
-          'Built for continuous indoor or sheltered outdoor use',
-          warranty,
-        ],
-      },
-      {
-        title: 'USER FRIENDLY SETUP',
-        items: [
-          'Compact installation for homes and commercial plant rooms',
-          'Straightforward commissioning for certified installers',
-          'Clear operating status at a glance',
-        ],
-      },
-      {
-        title: 'SMART MANAGEMENT',
-        items: [
-          'Ready for remote monitoring and plant visibility',
-          'Supports time-of-use and backup energy strategies',
-          'Fits Oriana installer service workflows',
-        ],
-      },
-    ]
-  }
-
-  if (category === 'utility-scale-inverters') {
-    return [
-      {
-        title: 'HIGH YIELD',
-        items: [
-          'High-capacity conversion for utility PV plants',
-          'Engineered to sustain output across long operating hours',
-          'Supports high-voltage array architectures',
-        ],
-      },
-      {
-        title: 'SAFE AND RELIABLE',
-        items: [
-          'Plant-grade grid protection and isolation',
-          'Designed for continuous utility-site duty',
-          warranty,
-        ],
-      },
-      {
-        title: 'USER FRIENDLY SETUP',
-        items: [
-          'Cabinet form factor for utility skids and e-houses',
-          'Service access for commissioning teams',
-          'Clear status indication for plant operators',
-        ],
-      },
-      {
-        title: 'SMART MANAGEMENT',
-        items: [
-          'Integrates with plant monitoring and SCADA workflows',
-          'Supports fleet-level performance visibility',
-          'Built for long-term O&M programmes',
-        ],
-      },
-    ]
-  }
-
-  if (category === 'bess') {
-    return [
-      {
-        title: 'HIGH YIELD',
-        items: [
-          'Home battery storage from 5 kWh to 16 kWh',
-          'Stores surplus PV for evening and backup use',
-          'Sized for typical residential loads',
-        ],
-      },
-      {
-        title: 'SAFE AND RELIABLE',
-        items: [
-          'Residential energy storage with layered protection',
-          'Designed for daily charge and discharge cycles',
-          warranty,
-        ],
-      },
-      {
-        title: 'USER FRIENDLY SETUP',
-        items: [
-          'Compact home installation with certified installers',
-          'Pairs with Oriana hybrid and on-grid systems',
-          'Quiet, indoor-friendly operation',
-        ],
-      },
-      {
-        title: 'SMART MANAGEMENT',
-        items: [
-          'Monitor stored energy and household use',
-          'Supports self-consumption optimisation',
-          'Ready for installer aftercare',
-        ],
-      },
-    ]
+  if (
+    category === 'hybrid-inverters' ||
+    category === 'utility-scale-inverters' ||
+    category === 'bess'
+  ) {
+    return []
   }
 
   return [
@@ -257,11 +146,24 @@ function specTiles(series: CatalogueSeries, selected: CatalogueProduct) {
     selected.slug,
   )
   if (pageData) {
+    const labels = pageData.tileLabels
     return [
-      { value: pageData.maxPvInputVoltage, label: 'Max. PV Input Voltage' },
-      { value: pageData.ratedAcOutputPower, label: 'Rated AC Output Power' },
-      { value: pageData.ratedAcVoltage, label: 'Rated AC Voltage' },
-      { value: pageData.maxEfficiency, label: 'Max. Efficiency' },
+      {
+        value: pageData.maxPvInputVoltage,
+        label: labels?.maxPvInputVoltage ?? 'Max. PV Input Voltage',
+      },
+      {
+        value: pageData.ratedAcOutputPower,
+        label: labels?.ratedAcOutputPower ?? 'Rated AC Output Power',
+      },
+      {
+        value: pageData.ratedAcVoltage,
+        label: labels?.ratedAcVoltage ?? 'Rated AC Voltage',
+      },
+      {
+        value: pageData.maxEfficiency,
+        label: labels?.maxEfficiency ?? 'Max. Efficiency',
+      },
     ]
   }
 
@@ -666,12 +568,14 @@ export function ProductSeriesDetail({
         >
           <div className="container grid items-center gap-10 py-12 lg:grid-cols-2 lg:gap-16 lg:py-20">
             <div className="order-2 lg:order-1">
-              <h1 className="font-display text-3xl font-light tracking-tight text-[#606060] md:text-4xl lg:text-[2.5rem] lg:leading-tight">
+              {typeLabel ? (
+                <p className="text-sm font-medium text-oriana-muted md:text-base">{typeLabel}</p>
+              ) : null}
+              <h1
+                className={`font-display text-xl font-light tracking-tight text-[#606060] md:text-2xl lg:text-[1.65rem] lg:leading-snug ${typeLabel ? 'mt-2' : ''}`}
+              >
                 {productTitle}
               </h1>
-              {typeLabel ? (
-                <p className="mt-3 text-base font-medium text-oriana-muted md:text-lg">{typeLabel}</p>
-              ) : null}
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center rounded-full border border-oriana-navy/10 bg-white/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-oriana-navy backdrop-blur">
                   {audience}
@@ -690,22 +594,31 @@ export function ProductSeriesDetail({
         {tabBar}
 
         {tab === 'overview' ? (
-          <section
-            id="product-panel-overview"
-            role="tabpanel"
-            aria-labelledby="product-tab-overview"
-            className="bg-oriana-surface py-12 lg:py-16"
-          >
-            <div className="container">
-              {featureList?.length ? (
-                <div className="rounded-2xl bg-white px-6 py-10 shadow-[0_8px_28px_rgba(7,21,37,0.06)] sm:px-10">
-                  <FeatureIconList items={featureList} />
-                </div>
-              ) : (
-                <FeatureQuadrant groups={features} />
-              )}
-            </div>
-          </section>
+          featureList?.length || features.length > 0 ? (
+            <section
+              id="product-panel-overview"
+              role="tabpanel"
+              aria-labelledby="product-tab-overview"
+              className="bg-oriana-surface py-12 lg:py-16"
+            >
+              <div className="container">
+                {featureList?.length ? (
+                  <div className="rounded-2xl bg-white px-6 py-10 shadow-[0_8px_28px_rgba(7,21,37,0.06)] sm:px-10">
+                    <FeatureIconList items={featureList} />
+                  </div>
+                ) : (
+                  <FeatureQuadrant groups={features} />
+                )}
+              </div>
+            </section>
+          ) : (
+            <div
+              id="product-panel-overview"
+              role="tabpanel"
+              aria-labelledby="product-tab-overview"
+              className="sr-only"
+            />
+          )
         ) : (
           <section
             id="product-panel-documents"
@@ -722,7 +635,12 @@ export function ProductSeriesDetail({
             >
               <div className="container grid items-center gap-12 py-14 lg:grid-cols-2 lg:gap-16 lg:py-24">
                 <div className="order-2 lg:order-1">
-                  <h1 className="font-display text-3xl font-light tracking-tight text-[#606060] md:text-4xl lg:text-[2.5rem] lg:leading-tight">
+                  {typeLabel ? (
+                    <p className="text-sm font-medium text-oriana-muted md:text-base">{typeLabel}</p>
+                  ) : null}
+                  <h1
+                    className={`font-display text-xl font-light tracking-tight text-[#606060] md:text-2xl lg:text-[1.65rem] lg:leading-snug ${typeLabel ? 'mt-2' : ''}`}
+                  >
                     {productTitle}
                   </h1>
                   {tiles.length > 0 ? (
@@ -849,7 +767,7 @@ export function ProductSeriesDetail({
                 <ProductSeriesCard
                   key={card.slug}
                   href={`/products/${card.slug}`}
-                  title={formatProductPowerLabel(card.powerRange)}
+                  title={card.series}
                   name={card.series}
                   categorySlug={card.categorySlug}
                   imageSrc={card.heroImageUrl}

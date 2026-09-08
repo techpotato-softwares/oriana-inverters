@@ -182,6 +182,7 @@ export const productCatalog: ProductCategorySeed[] = [
           { modelNo: 'ORI-OG6-EH3P10K02-NV-YD-L', rating: '10 kW' },
           { modelNo: 'ORI-OG6-EH3P12K02-NV-YD-L', rating: '12 kW' },
           { modelNo: 'ORI-OG6-EH3P15K02-NV-YD-L', rating: '15 kW' },
+          { modelNo: 'ORI-OG6-EH3P18K02-NV-YD-L', rating: '18 kW' },
         ],
       },
       {
@@ -286,11 +287,24 @@ export const staticProducts: CatalogueProduct[] = productCatalog.flatMap((catego
         { label: 'Series', value: family.series },
       ]
       if (pageData) {
+        const labels = pageData.tileLabels
         specs.push(
-          { label: 'Max. PV Input Voltage', value: pageData.maxPvInputVoltage },
-          { label: 'Rated AC Output Power', value: pageData.ratedAcOutputPower },
-          { label: 'Rated AC Voltage', value: pageData.ratedAcVoltage },
-          { label: 'Max. Efficiency', value: pageData.maxEfficiency },
+          {
+            label: labels?.maxPvInputVoltage ?? 'Max. PV Input Voltage',
+            value: pageData.maxPvInputVoltage,
+          },
+          {
+            label: labels?.ratedAcOutputPower ?? 'Rated AC Output Power',
+            value: pageData.ratedAcOutputPower,
+          },
+          {
+            label: labels?.ratedAcVoltage ?? 'Rated AC Voltage',
+            value: pageData.ratedAcVoltage,
+          },
+          {
+            label: labels?.maxEfficiency ?? 'Max. Efficiency',
+            value: pageData.maxEfficiency,
+          },
         )
       }
       return {

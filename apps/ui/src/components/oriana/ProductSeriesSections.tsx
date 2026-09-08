@@ -1,7 +1,4 @@
-import {
-  formatProductPowerLabel,
-  ProductSeriesCard,
-} from './ProductSeriesCard'
+import { ProductSeriesCard } from './ProductSeriesCard'
 import { listingSectionTitle } from '@/data/productMaster'
 import { groupCardsBySegment, type AllProductsCard } from '@/utilities/allProductsCatalogue'
 
@@ -23,7 +20,7 @@ export function ProductSeriesSections({ cards }: { cards: AllProductsCard[] }) {
                 <ProductSeriesCard
                   key={card.slug}
                   href={`/products/${card.slug}`}
-                  title={formatProductPowerLabel(card.powerRange)}
+                  title={card.series}
                   name={card.series}
                   categorySlug={card.categorySlug}
                   imageSrc={card.heroImageUrl}
