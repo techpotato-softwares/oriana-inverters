@@ -32,8 +32,6 @@ export type WhyChooseOrianaSectionProps = {
 
 const TRACK_GUTTER = 'max(1rem, 4vw)'
 const CARD_RADIUS = 24
-/** Fluid card height — tracks short Windows / laptop chrome and tall desktops. */
-const STICKY_CARD_MIN_HEIGHT = 'clamp(10rem, 38svh, 26rem)'
 
 /**
  * Sungrow "Our Commitment to Innovation and Excellence" pattern:
@@ -68,19 +66,19 @@ function WhyChooseCardFace({ card }: { card: WhyChooseCard }) {
       />
       <div
         className="relative flex h-full flex-col justify-start text-center text-white lg:text-left"
-        style={{ padding: 'clamp(1.25rem, 3vw, 2.25rem)' }}
+        style={{ padding: 'clamp(1rem, 2.5vw, 2.25rem)' }}
       >
         <h3
           className="mx-auto max-w-sm font-display font-medium leading-tight lg:mx-0"
-          style={{ fontSize: 'clamp(1.25rem, 2vw, 1.85rem)' }}
+          style={{ fontSize: 'clamp(1.1rem, 2vw, 1.85rem)' }}
         >
           {card.title}
         </h3>
         {card.href ? (
-          <div className="mt-5 flex justify-center lg:justify-start">
+          <div className="mt-4 flex justify-center lg:mt-5 lg:justify-start">
             <Link
               href={card.href}
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-oriana-blue bg-oriana-blue px-7 py-2.5 text-sm font-semibold text-white transition hover:border-oriana-deep hover:bg-oriana-deep"
+              className="inline-flex min-h-10 items-center justify-center rounded-full border border-oriana-blue bg-oriana-blue px-6 py-2 text-sm font-semibold text-white transition hover:border-oriana-deep hover:bg-oriana-deep sm:min-h-11 sm:px-7 sm:py-2.5"
               style={{ minWidth: '10.5rem' }}
             >
               {card.ctaLabel || 'Explore more'}
@@ -98,20 +96,28 @@ function SectionIntro({
   sectionRef,
   reduceMotion,
   textProgressRef,
+  compact,
 }: {
   title: string
   body: string
   sectionRef: RefObject<HTMLElement | null>
   reduceMotion: boolean
   textProgressRef?: RefObject<number>
+  /** Sticky pin: shorter accent + tighter so cards fit the viewport. */
+  compact?: boolean
 }) {
   return (
-    <div className="w-full shrink-0">
+    <div className="relative z-20 w-full shrink-0 bg-white">
       <div className="container">
         <div className="mx-auto w-full max-w-4xl text-center">
           <h2
             className="font-display font-medium leading-snug tracking-tight"
-            style={{ color: '#606060', fontSize: 'clamp(1.75rem, 3vw, 2.75rem)' }}
+            style={{
+              color: '#606060',
+              fontSize: compact
+                ? 'clamp(1.35rem, 2.6vw, 2.35rem)'
+                : 'clamp(1.75rem, 3vw, 2.75rem)',
+            }}
           >
             {title}
           </h2>
@@ -119,14 +125,20 @@ function SectionIntro({
           <GrowingAccentLine
             sectionRef={sectionRef}
             reduceMotion={reduceMotion}
-            className="mt-8 lg:mt-10"
+            size={compact ? 'fluid' : 'default'}
+            className={compact ? 'mt-3 sm:mt-4' : 'mt-8 lg:mt-10'}
             progress={reduceMotion ? 1 : undefined}
           />
 
           {reduceMotion ? (
             <p
-              className="mx-auto mt-4 font-medium leading-relaxed text-[#606060]"
-              style={{ maxWidth: '56rem', fontSize: 'clamp(1rem, 1.55vw, 1.4rem)' }}
+              className="mx-auto mt-3 font-medium leading-relaxed text-[#606060] sm:mt-4"
+              style={{
+                maxWidth: '56rem',
+                fontSize: compact
+                  ? 'clamp(0.9rem, 1.35vw, 1.2rem)'
+                  : 'clamp(1rem, 1.55vw, 1.4rem)',
+              }}
             >
               {body}
             </p>
@@ -135,10 +147,12 @@ function SectionIntro({
               text={body}
               reduceMotion={false}
               progressRef={textProgressRef}
-              className="mx-auto font-medium leading-relaxed"
+              className="mx-auto mt-3 font-medium leading-relaxed sm:mt-4"
               style={{
                 maxWidth: '56rem',
-                fontSize: 'clamp(1rem, 1.55vw, 1.4rem)',
+                fontSize: compact
+                  ? 'clamp(0.9rem, 1.35vw, 1.2rem)'
+                  : 'clamp(1rem, 1.55vw, 1.4rem)',
               }}
             />
           )}
@@ -286,9 +300,9 @@ export function WhyChooseOrianaSection({
           top: STICKY_BELOW_NAV_TOP,
           height: STICKY_BELOW_NAV_HEIGHT,
           maxHeight: STICKY_BELOW_NAV_HEIGHT,
-          paddingTop: '0.75rem',
-          paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))',
-          gap: 'clamp(0.75rem, 1.6vw, 1.75rem)',
+          paddingTop: '0.5rem',
+          paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))',
+          gap: 'clamp(0.5rem, 1.2svh, 1rem)',
         }}
       >
         <SectionIntro
@@ -297,19 +311,12 @@ export function WhyChooseOrianaSection({
           sectionRef={sectionRef}
           reduceMotion={false}
           textProgressRef={textProgressRef}
+          compact
         />
 
-        {/* flex-1 + min-h-0 keeps cards inside the sticky viewport (fixes clipped bottoms / square corners) */}
-        <div className="relative flex min-h-0 w-full flex-1 flex-col justify-center py-1">
-          <div
-            ref={viewportRef}
-            className="relative w-full overflow-hidden"
-            style={{
-              height: 'min(26rem, 100%)',
-              minHeight: STICKY_CARD_MIN_HEIGHT,
-              maxHeight: '100%',
-            }}
-          >
+        {/* Remaining sticky height only — no min-height / justify-center (those overlapped the copy). */}
+        <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col pt-1">
+          <div ref={viewportRef} className="relative h-full min-h-0 w-full flex-1 overflow-hidden">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 sm:w-12"
@@ -329,7 +336,7 @@ export function WhyChooseOrianaSection({
               ref={trackRef}
               className="flex h-full w-max items-stretch"
               style={{
-                gap: '1.5rem',
+                gap: 'clamp(0.75rem, 1.5vw, 1.5rem)',
                 paddingLeft: TRACK_GUTTER,
                 paddingRight: TRACK_GUTTER,
                 transform: 'translate3d(0, 0, 0)',
@@ -341,7 +348,7 @@ export function WhyChooseOrianaSection({
                   key={card.id}
                   className="relative h-full shrink-0 overflow-hidden"
                   style={{
-                    width: 'clamp(15rem, 70vw, 34.4rem)',
+                    width: 'clamp(14rem, 58vw, 34.4rem)',
                     borderRadius: CARD_RADIUS,
                     isolation: 'isolate',
                   }}

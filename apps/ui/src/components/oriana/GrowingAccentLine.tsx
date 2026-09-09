@@ -10,8 +10,8 @@ type GrowingAccentLineProps = {
   className?: string
   /** @deprecated Kept for call-site compatibility; growth is viewport-based now. */
   offset?: unknown
-  /** Compact / micro = shorter; heading = 10rem; tall ≈ Sungrow vw-h-[240] */
-  size?: 'default' | 'compact' | 'micro' | 'tall' | 'heading'
+  /** Compact / micro = shorter; heading = 10rem; tall ≈ Sungrow; fluid = short-viewport safe */
+  size?: 'default' | 'compact' | 'micro' | 'tall' | 'heading' | 'fluid'
   origin?: 'top' | 'bottom'
   /**
    * Optional 0–1 progress from a parent sticky scrubber.
@@ -94,9 +94,11 @@ export function GrowingAccentLine({
         ? { height: '5.75rem', minHeight: '5.75rem' }
         : size === 'heading'
           ? { height: '10rem', minHeight: '10rem' }
-          : size === 'tall'
-            ? { height: 'min(12.5vw, 12rem)', minHeight: '7.5rem' }
-            : { height: 'min(12.5vw, 12rem)', minHeight: '6rem' }
+          : size === 'fluid'
+            ? { height: 'clamp(2.5rem, 5.5svh, 6rem)', minHeight: '2.5rem' }
+            : size === 'tall'
+              ? { height: 'min(12.5vw, 12rem)', minHeight: '7.5rem' }
+              : { height: 'min(12.5vw, 12rem)', minHeight: '6rem' }
 
   return (
     <div
