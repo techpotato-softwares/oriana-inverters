@@ -126,7 +126,11 @@ function SectionIntro({
             sectionRef={sectionRef}
             reduceMotion={reduceMotion}
             size={compact ? 'fluid' : 'default'}
-            className={compact ? 'mt-3 sm:mt-4' : 'mt-8 lg:mt-10'}
+            className={
+              compact
+                ? 'mt-[clamp(0.5rem,1.5svh,1rem)]'
+                : 'mt-[clamp(1.25rem,3svh,2.5rem)]'
+            }
             progress={reduceMotion ? 1 : undefined}
           />
 

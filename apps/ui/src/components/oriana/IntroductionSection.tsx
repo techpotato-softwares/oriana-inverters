@@ -52,7 +52,8 @@ export function IntroductionSection({
           <GrowingAccentLine
             sectionRef={sectionRef}
             reduceMotion={!!reduceMotion}
-            className="mt-10"
+            size="default"
+            className="mt-[clamp(1.25rem,3svh,2.5rem)]"
           />
 
           <ScrollRevealText

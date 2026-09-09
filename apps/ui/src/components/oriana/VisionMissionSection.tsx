@@ -295,7 +295,7 @@ export function VisionMissionSection({
                 sectionRef={sectionRef}
                 reduceMotion={!!reduceMotion}
                 size="heading"
-                className="mt-3"
+                className="mt-[clamp(0.5rem,1.5svh,0.75rem)]"
               />
             </>
           ) : null}

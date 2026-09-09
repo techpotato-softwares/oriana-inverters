@@ -4,20 +4,33 @@ import { type CSSProperties, type RefObject, useEffect, useRef } from 'react'
 
 const LINE = '#1a428a'
 
+export type GrowingAccentLineSize =
+  | 'default'
+  | 'compact'
+  | 'micro'
+  | 'tall'
+  | 'heading'
+  | 'fluid'
+
 type GrowingAccentLineProps = {
   sectionRef?: RefObject<HTMLElement | null>
   reduceMotion?: boolean
   className?: string
   /** @deprecated Kept for call-site compatibility; growth is viewport-based now. */
   offset?: unknown
-  /** Compact / micro = shorter; heading = 10rem; tall ≈ Sungrow; fluid = short-viewport safe */
-  size?: 'default' | 'compact' | 'micro' | 'tall' | 'heading' | 'fluid'
+  /**
+   * Semantic length preset — all sizes use svh clamps so the line shortens on
+   * short Windows / laptop chrome and grows on tall desktops.
+   */
+  size?: GrowingAccentLineSize
   origin?: 'top' | 'bottom'
   /**
    * Optional 0–1 progress from a parent sticky scrubber.
    * When omitted, grows from the line's own position in the viewport (Sungrow-smooth).
    */
   progress?: number
+  /** Optional CSS height override (still prefers clamp(…svh…) from callers). */
+  height?: string
 }
 
 function clamp01(n: number) {
@@ -25,8 +38,22 @@ function clamp01(n: number) {
 }
 
 /**
+ * Viewport-fluid box heights. Min stays readable; max caps on large screens;
+ * middle term tracks small visual viewport height (svh).
+ */
+const SIZE_HEIGHT: Record<GrowingAccentLineSize, string> = {
+  micro: 'clamp(1.5rem, 3.25svh, 3.25rem)',
+  compact: 'clamp(2rem, 5svh, 5.5rem)',
+  fluid: 'clamp(2.25rem, 5.5svh, 6rem)',
+  /** Sticky section headings (Vision / Mission) — must not eat the pin. */
+  heading: 'clamp(2.25rem, 6.5svh, 7.5rem)',
+  default: 'clamp(2.5rem, 8svh, 10rem)',
+  tall: 'clamp(2.75rem, 10svh, 12rem)',
+}
+
+/**
  * Thin brand accent that grows on scroll (Sungrow: origin-top + scaleY).
- * Uses rAF + lerped scale written to the DOM — avoids stepped React updates with Lenis.
+ * Box height always scales with the viewport via svh.
  */
 export function GrowingAccentLine({
   reduceMotion = false,
@@ -34,6 +61,7 @@ export function GrowingAccentLine({
   size = 'default',
   origin = 'top',
   progress: progressProp,
+  height,
 }: GrowingAccentLineProps) {
   const boxRef = useRef<HTMLDivElement>(null)
   const lineRef = useRef<HTMLDivElement>(null)
@@ -87,18 +115,12 @@ export function GrowingAccentLine({
     }
   }, [reduceMotion, external])
 
-  const boxStyle: CSSProperties =
-    size === 'micro'
-      ? { height: '3.25rem', minHeight: '3.25rem' }
-      : size === 'compact'
-        ? { height: '5.75rem', minHeight: '5.75rem' }
-        : size === 'heading'
-          ? { height: '10rem', minHeight: '10rem' }
-          : size === 'fluid'
-            ? { height: 'clamp(2.5rem, 5.5svh, 6rem)', minHeight: '2.5rem' }
-            : size === 'tall'
-              ? { height: 'min(12.5vw, 12rem)', minHeight: '7.5rem' }
-              : { height: 'min(12.5vw, 12rem)', minHeight: '6rem' }
+  const resolvedHeight = height?.trim() || SIZE_HEIGHT[size]
+  const boxStyle: CSSProperties = {
+    height: resolvedHeight,
+    minHeight: '1.5rem',
+    maxHeight: 'min(12rem, 18svh)',
+  }
 
   return (
     <div
