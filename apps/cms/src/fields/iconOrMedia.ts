@@ -11,6 +11,7 @@ export const lucideIconOptions = [
   { label: 'Phone', value: 'phone' },
   { label: 'Mail', value: 'mail' },
   { label: 'Map pin', value: 'mapPin' },
+  { label: 'Map', value: 'map' },
   { label: 'Download', value: 'download' },
   { label: 'Wrench', value: 'wrench' },
   { label: 'Users', value: 'users' },

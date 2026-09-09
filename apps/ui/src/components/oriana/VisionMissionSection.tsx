@@ -1,10 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 import { useReducedMotion } from 'framer-motion'
 
 import { GrowingAccentLine } from './GrowingAccentLine'
+import {
+  readSiteHeaderHeightPx,
+  STICKY_BELOW_NAV_HEIGHT,
+  STICKY_BELOW_NAV_TOP,
+  useStickyScrub,
+} from './useStickyScrub'
 
 export type VisionMissionCard = {
   id: string
@@ -80,9 +86,6 @@ function AccentMark() {
 /** Sticky pin runway: lift beats + short hold so the card can unpin and scroll away. */
 const LIFT_VH_PER_CARD = 90
 const EXIT_HOLD_VH = 40
-/** Sticky split needs room; below this use stacked cards (same content). */
-const STICKY_MIN_WIDTH = 1024
-const STICKY_MIN_HEIGHT = 820
 const CARD_RADIUS = 40
 
 function CompactVisionCards({
@@ -170,34 +173,23 @@ export function VisionMissionSection({
   const layerRefs = useRef<(HTMLDivElement | null)[]>([])
   const textRefs = useRef<(HTMLDivElement | null)[]>([])
   const targetRatio = useRef(0)
-  const [useStickyScrub, setUseStickyScrub] = useState(false)
+  const useStickyLayout = useStickyScrub()
 
   const liftVh = Math.max(cards.length - 1, 1) * LIFT_VH_PER_CARD
   const runwayVh = 100 + liftVh + EXIT_HOLD_VH
 
   useEffect(() => {
-    const widthMq = window.matchMedia(`(min-width: ${STICKY_MIN_WIDTH}px)`)
-    const heightMq = window.matchMedia(`(min-height: ${STICKY_MIN_HEIGHT}px)`)
-    const sync = () => setUseStickyScrub(widthMq.matches && heightMq.matches)
-    sync()
-    widthMq.addEventListener('change', sync)
-    heightMq.addEventListener('change', sync)
-    return () => {
-      widthMq.removeEventListener('change', sync)
-      heightMq.removeEventListener('change', sync)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!cards.length || reduceMotion || !useStickyScrub) return
+    if (!cards.length || reduceMotion || !useStickyLayout) return
 
     const readRatio = () => {
       const section = sectionRef.current
       if (!section) return 0
-      const vh = window.innerHeight
+      const headerH = readSiteHeaderHeightPx()
+      const pinHeight = Math.max(window.innerHeight - headerH, 1)
       const rect = section.getBoundingClientRect()
-      const scrollSpan = Math.max(section.offsetHeight - vh, 1)
-      const scrolled = Math.min(Math.max(-rect.top, 0), scrollSpan)
+      const scrollSpan = Math.max(section.offsetHeight - pinHeight, 1)
+      // 0 while the heading is still approaching the nav; effect starts once pinned below it
+      const scrolled = Math.min(Math.max(headerH - rect.top, 0), scrollSpan)
       // Map only the lift portion — exit hold keeps last card fully visible while unpin starts
       const liftSpan = Math.max(scrollSpan * (liftVh / (liftVh + EXIT_HOLD_VH)), 1)
       return clamp01(scrolled / liftSpan)
@@ -254,11 +246,11 @@ export function VisionMissionSection({
       running = false
       window.cancelAnimationFrame(raf)
     }
-  }, [cards, reduceMotion, useStickyScrub, liftVh])
+  }, [cards, reduceMotion, useStickyLayout, liftVh])
 
   if (!cards.length) return null
 
-  if (reduceMotion || !useStickyScrub) {
+  if (reduceMotion || !useStickyLayout) {
     return (
       <CompactVisionCards
         title={title}
@@ -283,14 +275,16 @@ export function VisionMissionSection({
       aria-label={ariaLabel}
     >
       <div
-        className="sticky top-0 z-10 flex flex-col overflow-hidden bg-white"
-        style={{ height: '100svh', maxHeight: '100svh' }}
+        className="sticky z-10 flex flex-col overflow-hidden bg-white"
+        style={{
+          top: STICKY_BELOW_NAV_TOP,
+          height: STICKY_BELOW_NAV_HEIGHT,
+          maxHeight: STICKY_BELOW_NAV_HEIGHT,
+        }}
       >
         <div
           className="flex shrink-0 flex-col items-center px-4"
-          style={{
-            paddingTop: 'max(3.75rem, calc(env(safe-area-inset-top, 0px) + 3.25rem))',
-          }}
+          style={{ paddingTop: '0.75rem' }}
         >
           {title ? (
             <>

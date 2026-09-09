@@ -4,7 +4,15 @@ import { authenticated } from '@/access/authenticated'
 import { simpleLinkFields } from '@/fields/simpleLink'
 import { revalidateHeader } from '@/Header/hooks/revalidateHeader'
 
-const megaMenuKeys = [{ label: 'Products', value: 'products' }]
+const megaMenuKeys = [
+  { label: 'Products', value: 'products' },
+  // Legacy keys still present on Header version rows — required for schema:push enum casts.
+  { label: 'Home', value: 'home' },
+  { label: 'About', value: 'about' },
+  { label: 'Business', value: 'business' },
+  { label: 'Utility', value: 'utility' },
+  { label: 'Support', value: 'support' },
+]
 
 export const Header: GlobalConfig = {
   slug: 'header',

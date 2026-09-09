@@ -9,7 +9,7 @@ export type SiteFooterColumn = {
 }
 
 export type SiteSocialLink = {
-  platform: 'linkedin' | 'facebook' | 'youtube' | 'instagram'
+  platform: 'linkedin' | 'facebook' | 'youtube' | 'instagram' | 'x'
   href: string
 }
 

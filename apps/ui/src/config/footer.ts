@@ -56,4 +56,5 @@ export const socialLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/orianainverters' },
   { label: 'YouTube', href: 'https://www.youtube.com/@orianainverters' },
   { label: 'Instagram', href: 'https://www.instagram.com/orianainverters' },
+  { label: 'X', href: 'https://x.com/orianainverters' },
 ] as const

@@ -11,226 +11,22 @@ import { ProductCategoriesSection } from '@/components/oriana/ProductCategoriesS
 import { VideoHero } from '@/components/oriana/VideoHero'
 import { VisionMissionSection } from '@/components/oriana/VisionMissionSection'
 import { WhyChooseOrianaSection } from '@/components/oriana/WhyChooseOrianaSection'
+import { HOME_SEO } from '@/data/homeFallback'
 import { getHome } from '@/utilities/getMarketing'
-
-const HOME_VIDEO_HERO = {
-  videoSrc: '/assets/home/hero.mp4',
-  posterSrc: '/assets/home/hero-poster.jpg',
-  captions: [
-    'Clean power that crosses borders',
-    'To power that transforms businesses',
-    'Energy platforms partners trust',
-  ],
-}
-
-const HOME_INTRODUCTION = {
-  title: 'Introduction',
-  paragraphs: [
-    'At Oriana, we are building the next generation of solar inverter technology with a focus on efficiency, reliability, intelligent performance, and long-term value.',
-    "Backed by industry experience and a strong understanding of India's solar ecosystem, Oriana Inverters are designed to meet the evolving requirements of residential, commercial, industrial, and utility-scale solar applications.",
-  ],
-  tagline: 'Built in India. Designed for the Future.',
-}
-
-const HOME_PEEK_IMAGES = [
-  {
-    id: 'home',
-    title: 'For Home',
-    href: '/solutions/residential',
-    image:
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80',
-  },
-  {
-    id: 'business',
-    title: 'For Business',
-    href: '/solutions/commercial',
-    image:
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80',
-  },
-  {
-    id: 'utility',
-    title: 'For Utility',
-    href: '/solutions/utility',
-    image:
-     'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80',
-  },
-  {
-    id: 'storage',
-    title: 'For Storage',
-    href: '/solutions/storage',
-    image:
-      'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1920&q=80',
-  },
-]
-
-const HOME_VISION_MISSION = [
-  {
-    id: 'vision',
-    label: 'Our Vision',
-    body: 'To become a globally trusted solar inverter brand, powering a smarter, cleaner, and more sustainable energy future.',
-    image:
-      'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1920&q=80',
-    href: '/about',
-    ctaLabel: 'Explore more',
-  },
-  {
-    id: 'mission',
-    label: 'Our Mission',
-    body: 'To deliver innovative, reliable, and high-performance solar inverters through advanced technology, precision manufacturing, and exceptional customer service.',
-    image:
-      'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1920&q=80',
-    href: '/about',
-    ctaLabel: 'Explore more',
-  },
-]
-
-const HOME_IMPACT = {
-  title: 'Our Impact',
-  body: 'As a trusted solar inverter brand, we are committed to powering India\'s clean energy transition through advanced technology, nationwide reach, and exceptional customer support.',
-  link: { label: 'Discover who we are', href: '/about' },
-  stats: [
-    { iconKey: 'award', value: '10+ Years', label: 'Solar industry project experience' },
-    { iconKey: 'map', value: 'PAN India', label: 'Market presence' },
-    { iconKey: 'zap', value: 'GW+', label: 'Inverter distribution & experience' },
-    { iconKey: 'building', value: '500+', label: 'Channel & service partners' },
-    { iconKey: 'leaf', value: '99.6%', label: 'Peak conversion efficiency' },
-  ],
-}
-
-const HOME_PRODUCT_CATEGORIES = [
-  {
-    id: 'on-grid',
-    label: 'On Grid Inverters',
-    href: '/products/category/on-grid-inverters',
-    image:
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Residential rooftop solar installation',
-  },
-  {
-    id: 'hybrid',
-    label: 'Hybrid Inverters',
-    href: '/products/category/hybrid-inverters',
-    image:
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Hybrid inverter and battery energy storage',
-  },
-  {
-    id: 'utility',
-    label: 'Utility Scale Inverters',
-    href: '/products/category/utility-scale-inverters',
-    image:
-      'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Utility-scale solar farm',
-  },
-  {
-    id: 'bess',
-    label: 'BESS',
-    href: '/products/category/bess',
-    image:
-      'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Battery energy storage system',
-  },
-]
-
-const HOME_WHY_CHOOSE = {
-  title: 'Why Choose Oriana Inverters?',
-  body: 'Oriana Inverters brings together advanced power electronics, intelligent technology, and precision engineering to deliver reliable solar power solutions for homes, businesses, and large-scale applications.',
-  cards: [
-    {
-      id: 'expertise',
-      title: 'Solar Industry Expertise',
-      href: '/about',
-      image:
-        'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1400&q=80',
-      alt: 'Solar industry expertise',
-    },
-    {
-      id: 'ai-tech',
-      title: 'AI Technology Driven',
-      href: '/about',
-      image:
-        'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1400&q=80',
-      alt: 'AI technology driven solutions',
-    },
-    {
-      id: 'quality',
-      title: 'Quality Focused',
-      href: '/about/certifications',
-      image:
-        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1400&q=80',
-      alt: 'Quality focused manufacturing',
-    },
-    {
-      id: 'application',
-      title: 'Application Focused',
-      href: '/products',
-      image:
-        'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1400&q=80',
-      alt: 'Application focused solar solutions',
-    },
-    {
-      id: 'service',
-      title: 'Professional Service',
-      href: '/support',
-      image:
-        'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1400&q=80',
-      alt: 'Professional customer service',
-    },
-  ],
-}
-
-const HOME_GREEN_MISSION = {
-  title: 'Green Mission. Greener World',
-  image:
-    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1920&q=80',
-  alt: 'Lush green landscape representing sustainability',
-  href: '/sustainability',
-  ctaLabel: 'Explore more',
-}
-
-const HOME_FOLLOW_ORIANA = {
-  title: 'Follow Oriana',
-  links: [
-    {
-      platform: 'linkedin' as const,
-      label: 'LinkedIn',
-      href: 'https://www.linkedin.com/company/oriana-inverters',
-    },
-    {
-      platform: 'instagram' as const,
-      label: 'Instagram',
-      href: 'https://www.instagram.com/orianainverters',
-    },
-    {
-      platform: 'facebook' as const,
-      label: 'Facebook',
-      href: 'https://www.facebook.com/orianainverters',
-    },
-    {
-      platform: 'x' as const,
-      label: 'X',
-      href: 'https://x.com/orianainverters',
-    },
-    {
-      platform: 'youtube' as const,
-      label: 'YouTube',
-      href: 'https://www.youtube.com/@orianainverters',
-    },
-  ],
-}
+import { getSiteSettings } from '@/utilities/getSiteSettings'
+import { mapHomePage } from '@/utilities/mapHomePage'
 
 export async function generateMetadata(): Promise<Metadata> {
   const { home } = await getHome()
   return {
-    title: home?.seo?.metaTitle || 'Oriana Inverters | Solar Inverter & Energy Storage Solutions',
-    description:
-      home?.seo?.metaDescription ||
-      'Oriana manufactures high-efficiency string, hybrid, and utility-scale solar inverters for residential, commercial, and utility partners worldwide.',
+    title: home?.seo?.metaTitle || HOME_SEO.metaTitle,
+    description: home?.seo?.metaDescription || HOME_SEO.metaDescription,
   }
 }
 
 export default async function HomePage() {
-  const { home } = await getHome()
+  const [{ home }, settings] = await Promise.all([getHome(), getSiteSettings()])
+  const view = mapHomePage(home, settings.socialLinks)
 
   let livePosts: {
     title: string
@@ -238,13 +34,13 @@ export default async function HomePage() {
     publishedAt?: string | null
     heroImage?: unknown
   }[] = []
-  if (home?.newsSection?.mode !== 'manual') {
+  if (view.news.mode !== 'manual') {
     try {
       const payload = await getPayload({ config: configPromise })
       const result = await payload.find({
         collection: 'posts',
         depth: 1,
-        limit: home?.newsSection?.postsLimit || 5,
+        limit: view.news.postsLimit || 5,
         where: { _status: { equals: 'published' } },
         sort: '-publishedAt',
       })
@@ -254,8 +50,6 @@ export default async function HomePage() {
     }
   }
 
-  const news = home?.newsSection
-
   const mediaUrl = (value: unknown): string | undefined => {
     if (value && typeof value === 'object' && 'url' in value && typeof value.url === 'string') {
       return value.url
@@ -264,14 +58,8 @@ export default async function HomePage() {
   }
 
   const newsItems =
-    news?.mode === 'manual' && news.manualItems?.length
-      ? news.manualItems.map((item) => ({
-          title: item.title || '',
-          date: item.date || '',
-          href: item.href || '/posts',
-          type: item.type || 'News',
-          image: mediaUrl((item as { image?: unknown }).image),
-        }))
+    view.news.mode === 'manual' && view.news.manualItems.length
+      ? view.news.manualItems
       : livePosts.map((post) => ({
           title: post.title,
           date: post.publishedAt
@@ -288,29 +76,32 @@ export default async function HomePage() {
 
   return (
     <main className="bg-white">
-      <VideoHero {...HOME_VIDEO_HERO} />
-      <IntroductionSection {...HOME_INTRODUCTION} />
-      <PeekStackImages images={HOME_PEEK_IMAGES} ariaLabel="Customer scenarios" />
-      <VisionMissionSection cards={HOME_VISION_MISSION} />
+      <VideoHero {...view.videoHero} />
+      <IntroductionSection {...view.introduction} />
+      <PeekStackImages images={view.peekImages} ariaLabel="Customer scenarios" />
+      <VisionMissionSection cards={view.visionMission} />
       <ImpactStats
-        title={HOME_IMPACT.title}
-        body={HOME_IMPACT.body}
-        link={HOME_IMPACT.link}
-        stats={HOME_IMPACT.stats}
+        title={view.impact.title}
+        body={view.impact.body}
+        link={view.impact.link}
+        stats={view.impact.stats}
       />
-      <ProductCategoriesSection categories={HOME_PRODUCT_CATEGORIES} />
+      <ProductCategoriesSection
+        title={view.productCategories.title}
+        categories={view.productCategories.categories}
+      />
       <WhyChooseOrianaSection
-        title={HOME_WHY_CHOOSE.title}
-        body={HOME_WHY_CHOOSE.body}
-        cards={HOME_WHY_CHOOSE.cards}
+        title={view.whyChoose.title}
+        body={view.whyChoose.body}
+        cards={view.whyChoose.cards}
       />
-      <GreenMissionSection {...HOME_GREEN_MISSION} />
+      <GreenMissionSection {...view.greenMission} />
       <NewsEventsSection
-        title={news?.title ?? undefined}
-        link={news?.link?.href ? { label: news.link.label || '', href: news.link.href } : undefined}
+        title={view.news.title}
+        link={view.news.link}
         items={newsItems}
       />
-      <FollowOrianaSection title={HOME_FOLLOW_ORIANA.title} links={HOME_FOLLOW_ORIANA.links} />
+      <FollowOrianaSection title={view.follow.title} links={view.follow.links} />
     </main>
   )
 }

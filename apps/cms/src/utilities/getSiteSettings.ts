@@ -86,7 +86,8 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
             (platform === 'linkedin' ||
               platform === 'facebook' ||
               platform === 'youtube' ||
-              platform === 'instagram') &&
+              platform === 'instagram' ||
+              platform === 'x') &&
             href
           ) {
             return [{ platform, href } satisfies SiteSocialLink]

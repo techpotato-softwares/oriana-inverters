@@ -5,8 +5,20 @@ import { fileURLToPath } from 'url'
 
 import { caseStudies } from '@/data/caseStudies'
 import { staticDistributors } from '@/data/distributors'
+import {
+  HOME_FOLLOW_ORIANA,
+  HOME_GREEN_MISSION,
+  HOME_IMPACT,
+  HOME_INTRODUCTION,
+  HOME_PEEK_IMAGES,
+  HOME_PRODUCT_CATEGORIES,
+  HOME_SEO,
+  HOME_VIDEO_HERO,
+  HOME_VISION_MISSION,
+  HOME_WHY_CHOOSE,
+} from '@/data/homeFallback'
 import { megaMenus } from '@/config/navigation'
-import { footerNav } from '@/config/footer'
+import { footerNav, socialLinks as defaultSocialLinks } from '@/config/footer'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -280,6 +292,10 @@ export async function seedOrianaContent({
       })),
       ...(mediaMap.logoLight ? { logoLight: mediaMap.logoLight } : {}),
       ...(mediaMap.logoDark ? { logoDark: mediaMap.logoDark } : {}),
+      socialLinks: defaultSocialLinks.map((item) => ({
+        platform: item.label.toLowerCase(),
+        href: item.href,
+      })),
     } as never,
     overrideAccess: true,
     context: { disableRevalidate: true },
@@ -289,145 +305,71 @@ export async function seedOrianaContent({
   await payload.updateGlobal({
     slug: 'home',
     data: {
-      heroMode: 'fallback',
-      fallbackHero: {
-        eyebrow: 'Oriana',
-        headline: 'Clean power that crosses borders',
-        subheadline:
-          'High-efficiency inverters and storage platforms for homes, industry, and utility grids — engineered for partners who ship projects worldwide.',
-        primaryCta: { label: 'Explore solutions', href: '/solutions/residential' },
-        secondaryCta: { label: 'Become a partner', href: '/contact' },
+      hero: {
+        captions: HOME_VIDEO_HERO.captions?.map((text) => ({ text })) ?? [],
       },
-      strategiesSection: {
-        eyebrow: 'Go-to-market strategies',
-        title: 'One platform. Four ways to win.',
-        intro:
-          "Meet Ori's crew — each strategy tailored for the partners and projects shaping the global energy transition.",
-        items: [
-          {
-            idKey: 'home',
-            label: 'For Home',
-            title: 'Residential energy independence',
-            description:
-              'Hybrid inverters and storage that keep households powered — quietly, efficiently, every day.',
-            href: '/solutions/residential',
-          },
-          {
-            idKey: 'business',
-            label: 'For Business',
-            title: 'Commercial & industrial scale',
-            description:
-              'Rooftop and carport platforms built for uptime, bankability, and fast commissioning.',
-            href: '/solutions/commercial',
-          },
-          {
-            idKey: 'utility',
-            label: 'For Utility',
-            title: 'Utility-scale grid strength',
-            description:
-              'Central and string architectures for multi-megawatt farms and IPP portfolios.',
-            href: '/solutions/utility',
-          },
-          {
-            idKey: 'storage',
-            label: 'For Storage',
-            title: 'Flexible energy services',
-            description:
-              'Hybrid conversion for peak shaving, backup, and emerging grid-service markets.',
-            href: '/solutions/storage',
-          },
-        ],
+      introduction: {
+        title: HOME_INTRODUCTION.title,
+        paragraphs: HOME_INTRODUCTION.paragraphs.map((text) => ({ text })),
+        tagline: HOME_INTRODUCTION.tagline,
       },
+      peekImages: HOME_PEEK_IMAGES.map((item) => ({
+        idKey: item.id,
+        title: item.title,
+        href: item.href,
+        alt: item.alt,
+      })),
+      visionMission: HOME_VISION_MISSION.map((item) => ({
+        idKey: item.id,
+        label: item.label,
+        body: item.body,
+        href: item.href,
+        ctaLabel: item.ctaLabel,
+        alt: item.alt,
+      })),
       impactSection: {
-        title: 'Our Impact',
-        body: 'As a trusted solar inverter brand, we are committed to powering India\'s clean energy transition through advanced technology, nationwide reach, and exceptional customer support.',
-        link: { label: 'Discover who we are', href: '/about' },
-        stats: [
-          { iconKey: 'award', value: '10+ Years', label: 'Solar industry project experience' },
-          { iconKey: 'map', value: 'PAN India', label: 'Market presence' },
-          { iconKey: 'zap', value: 'GW+', label: 'Inverter distribution & experience' },
-          { iconKey: 'building', value: '500+', label: 'Channel & service partners' },
-          { iconKey: 'leaf', value: '99.6%', label: 'Peak conversion efficiency' },
-        ],
+        title: HOME_IMPACT.title,
+        body: HOME_IMPACT.body,
+        link: HOME_IMPACT.link,
+        stats: HOME_IMPACT.stats,
+      },
+      productCategories: {
+        title: 'Product Categories',
+        items: HOME_PRODUCT_CATEGORIES.map((item) => ({
+          idKey: item.id,
+          label: item.label,
+          href: item.href,
+          alt: item.alt,
+        })),
       },
       whySection: {
-        eyebrow: 'Why Oriana',
-        title: 'Excellence that travels with every shipment',
-        body: 'From first sample to fleet deployment, we help international clients specify, certify, and scale clean power conversion with confidence.',
-        items: [
-          {
-            iconKey: 'microscope',
-            title: 'Technological innovation',
-            copy: 'Continuous R&D across conversion efficiency, grid codes, and intelligent monitoring.',
-            href: '/about',
-          },
-          {
-            iconKey: 'shield',
-            title: 'Bankable manufacturing',
-            copy: 'Certified production, rigorous QA, and supply chains ready for multi-region delivery.',
-            href: '/about/certifications',
-          },
-          {
-            iconKey: 'globe',
-            title: 'Local presence, global reach',
-            copy: 'Distributor networks and support coverage that follow your projects across borders.',
-            href: '/where-to-buy',
-          },
-          {
-            iconKey: 'headphones',
-            title: 'Partner-grade service',
-            copy: 'Training, documentation, and responsive after-sales for installers and EPCs.',
-            href: '/support',
-          },
-        ],
+        title: HOME_WHY_CHOOSE.title,
+        body: HOME_WHY_CHOOSE.body,
+        cards: HOME_WHY_CHOOSE.cards.map((item) => ({
+          idKey: item.id,
+          title: item.title,
+          href: item.href,
+          alt: item.alt,
+        })),
       },
-      reachSection: {
-        eyebrow: 'International clients',
-        title: 'Ready wherever your next project lands',
-        body: 'Regional documentation, certification pathways, and partner enablement — so cross-border deals move from RFQ to commissioning without friction.',
-        regions: [
-          { name: 'North America', focus: 'UL / NEC ready platforms' },
-          { name: 'Europe & UK', focus: 'Grid-code compliant portfolios' },
-          { name: 'Middle East', focus: 'High-irradiance utility lines' },
-          { name: 'Asia Pacific', focus: 'C&I + storage growth markets' },
-          { name: 'Latin America', focus: 'Distributed generation & EPCs' },
-          { name: 'Africa', focus: 'Resilient off-grid & hybrid' },
-        ],
-        cta: { label: 'Find a distributor', href: '/where-to-buy' },
-      },
-      caseStudiesSection: {
-        eyebrow: 'Customer success',
-        title: 'Case studies',
-        link: { label: 'View all', href: '/case-studies' },
-        limit: 3,
+      greenMission: {
+        title: HOME_GREEN_MISSION.title,
+        alt: HOME_GREEN_MISSION.alt,
+        href: HOME_GREEN_MISSION.href,
+        ctaLabel: HOME_GREEN_MISSION.ctaLabel,
       },
       newsSection: {
-        eyebrow: 'News & media',
         title: 'Trending News & Events',
         mode: 'live',
         postsLimit: 5,
         link: { label: 'Explore more', href: '/posts' },
       },
-      supportStrip: {
-        hotlineLabel: 'Customer Hotline',
-        hotlineNote: 'Customer hotline: +1 (800) ORIANA-1',
-        downloads: [
-          { label: 'Datasheets', href: '/resources/downloads' },
-          { label: 'Installation manuals', href: '/resources/downloads' },
-          { label: 'Certificates', href: '/resources/downloads' },
-          { label: 'Warranty documents', href: '/resources/downloads' },
-        ],
-        partnerCta: {
-          title: 'Partner with us',
-          body: "Looking to distribute Oriana across a new market? Let's talk territory, training, and co-marketing.",
-          label: 'Request partnership',
-          href: '/contact',
-        },
+      followSection: {
+        title: HOME_FOLLOW_ORIANA.title,
       },
       seo: {
-        metaTitle: 'Oriana Inverters | Advanced Solar Inverter Solutions',
-        metaDescription:
-          'High-efficiency string, hybrid, and utility-scale solar inverters for residential, commercial, and utility applications.',
+        metaTitle: HOME_SEO.metaTitle,
+        metaDescription: HOME_SEO.metaDescription,
       },
       _status: 'published',
     } as never,

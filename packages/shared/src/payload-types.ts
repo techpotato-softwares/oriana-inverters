@@ -598,7 +598,7 @@ export interface Product {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Product families (e.g. On Grid Inverters). Create these first, then assign products to them.
+ * Product families (e.g. On Grid Inverters). Create these first, then assign products to them. Products mega-menu tile photos: Catalogue → Categories → open a category → Segments. Segment names must match tile labels (Single Phase, Three Phase, C&I, Utility Grid-Tied PV Inverter, ORIANA BESS Home).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
@@ -1070,6 +1070,7 @@ export interface StatsGridBlock {
           | 'phone'
           | 'mail'
           | 'mapPin'
+          | 'map'
           | 'download'
           | 'wrench'
           | 'users'
@@ -1112,6 +1113,7 @@ export interface CardGridBlock {
           | 'phone'
           | 'mail'
           | 'mapPin'
+          | 'map'
           | 'download'
           | 'wrench'
           | 'users'
@@ -1191,6 +1193,7 @@ export interface IconFeatureBlock {
         | 'phone'
         | 'mail'
         | 'mapPin'
+        | 'map'
         | 'download'
         | 'wrench'
         | 'users'
@@ -2940,7 +2943,7 @@ export interface SiteSetting {
     | null;
   socialLinks?:
     | {
-        platform: 'linkedin' | 'facebook' | 'youtube' | 'instagram';
+        platform: 'linkedin' | 'facebook' | 'youtube' | 'instagram' | 'x';
         href: string;
         id?: string | null;
       }[]
@@ -2949,75 +2952,88 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
- * Homepage hero, strategies, stats, and section copy.
+ * Homepage video hero, intro, scenario images, vision/mission, impact, products, and related section copy.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home".
  */
 export interface Home {
   id: number;
-  heroMode?: ('fallback' | 'slides') | null;
-  fallbackHero?: {
-    eyebrow?: string | null;
-    headline?: string | null;
-    subheadline?: string | null;
-    primaryCta: {
-      label: string;
-      /**
-       * Internal path (/about) or full URL (https://…).
-       */
-      href: string;
-      id?: string | null;
-    };
-    secondaryCta?: {
+  hero?: {
+    /**
+     * MP4 (or other browser-supported) hero video. If empty, the page uses /assets/home/hero.mp4.
+     */
+    video?: (number | null) | Media;
+    /**
+     * Poster image shown while the video loads. If empty, the page uses /assets/home/hero-poster.jpg.
+     */
+    poster?: (number | null) | Media;
+    /**
+     * Rotating captions in the bottom-right of the hero.
+     */
+    captions?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  introduction?: {
+    title?: string | null;
+    paragraphs?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    tagline?: string | null;
+  };
+  /**
+   * Stacked full-viewport scenario images (For Home, Business, Utility, Storage).
+   */
+  peekImages?:
+    | {
+        /**
+         * Stable id used by the UI (home, business, utility, storage).
+         */
+        idKey: string;
+        title: string;
+        href: string;
+        /**
+         * If empty, the page uses the built-in Unsplash fallback for this card.
+         */
+        image?: (number | null) | Media;
+        alt?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  visionMission?:
+    | {
+        /**
+         * Stable id (vision, mission).
+         */
+        idKey: string;
+        label: string;
+        body?: string | null;
+        /**
+         * If empty, the page uses the built-in Unsplash fallback for this card.
+         */
+        image?: (number | null) | Media;
+        alt?: string | null;
+        href?: string | null;
+        ctaLabel?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  impactSection?: {
+    title?: string | null;
+    body?: string | null;
+    link?: {
       label?: string | null;
       /**
        * Internal path (/about) or full URL (https://…).
        */
       href?: string | null;
-    };
-  };
-  heroSlides?:
-    | {
-        image: number | Media;
-        linkType: 'product' | 'post' | 'custom';
-        product?: (number | null) | Product;
-        post?: (number | null) | Post;
-        href?: string | null;
-        headline?: string | null;
-        ctaLabel?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  strategiesSection?: {
-    eyebrow?: string | null;
-    title?: string | null;
-    intro?: string | null;
-    items?:
-      | {
-          idKey: string;
-          label: string;
-          title: string;
-          description: string;
-          href: string;
-          /**
-           * Optional card image; UI may use mascot by idKey.
-           */
-          image?: (number | null) | Media;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  impactSection: {
-    eyebrow?: string | null;
-    title?: string | null;
-    link: {
-      label: string;
-      /**
-       * Internal path (/about) or full URL (https://…).
-       */
-      href: string;
-      id?: string | null;
     };
     stats?:
       | {
@@ -3039,6 +3055,7 @@ export interface Home {
                 | 'phone'
                 | 'mail'
                 | 'mapPin'
+                | 'map'
                 | 'download'
                 | 'wrench'
                 | 'users'
@@ -3053,83 +3070,53 @@ export interface Home {
         }[]
       | null;
   };
-  whySection?: {
-    eyebrow?: string | null;
+  productCategories?: {
     title?: string | null;
-    body?: string | null;
     items?:
       | {
           /**
-           * Preferred: upload an SVG/PNG icon.
+           * Stable id (on-grid, hybrid, utility, bess).
            */
-          icon?: (number | null) | Media;
-          /**
-           * Fallback Lucide icon when no upload is set.
-           */
-          iconKey?:
-            | (
-                | 'award'
-                | 'globe'
-                | 'headphones'
-                | 'leaf'
-                | 'microscope'
-                | 'shield'
-                | 'phone'
-                | 'mail'
-                | 'mapPin'
-                | 'download'
-                | 'wrench'
-                | 'users'
-                | 'building'
-                | 'zap'
-                | 'checkCircle'
-              )
-            | null;
-          title: string;
-          copy: string;
+          idKey: string;
+          label: string;
           href: string;
+          /**
+           * If empty, the page uses the built-in Unsplash fallback for this tab.
+           */
+          image?: (number | null) | Media;
+          alt?: string | null;
           id?: string | null;
         }[]
       | null;
   };
-  reachSection: {
-    eyebrow?: string | null;
+  whySection?: {
     title?: string | null;
     body?: string | null;
-    regions?:
+    cards?:
       | {
-          name: string;
-          focus: string;
+          idKey: string;
+          title: string;
+          href?: string | null;
+          /**
+           * If empty, the page uses the built-in Unsplash fallback for this card.
+           */
+          image?: (number | null) | Media;
+          alt?: string | null;
           id?: string | null;
         }[]
       | null;
-    cta: {
-      label: string;
-      /**
-       * Internal path (/about) or full URL (https://…).
-       */
-      href: string;
-      id?: string | null;
-    };
   };
-  caseStudiesSection: {
-    eyebrow?: string | null;
+  greenMission?: {
     title?: string | null;
-    link: {
-      label: string;
-      /**
-       * Internal path (/about) or full URL (https://…).
-       */
-      href: string;
-      id?: string | null;
-    };
     /**
-     * How many published case studies to show.
+     * Background image. If empty, the page uses the built-in Unsplash fallback.
      */
-    limit?: number | null;
+    image?: (number | null) | Media;
+    alt?: string | null;
+    href?: string | null;
+    ctaLabel?: string | null;
   };
-  newsSection: {
-    eyebrow?: string | null;
+  newsSection?: {
     title?: string | null;
     mode?: ('live' | 'manual') | null;
     manualItems?:
@@ -3138,41 +3125,24 @@ export interface Home {
           date?: string | null;
           href: string;
           type?: string | null;
+          image?: (number | null) | Media;
           id?: string | null;
         }[]
       | null;
     postsLimit?: number | null;
-    link: {
-      label: string;
+    link?: {
+      label?: string | null;
       /**
        * Internal path (/about) or full URL (https://…).
        */
-      href: string;
-      id?: string | null;
+      href?: string | null;
     };
   };
-  supportStrip: {
-    hotlineLabel?: string | null;
-    hotlineNote?: string | null;
-    downloads?:
-      | {
-          label: string;
-          /**
-           * Internal path (/about) or full URL (https://…).
-           */
-          href: string;
-          id?: string | null;
-        }[]
-      | null;
-    partnerCta: {
-      title?: string | null;
-      body?: string | null;
-      label: string;
-      /**
-       * Internal path (/about) or full URL (https://…).
-       */
-      href: string;
-    };
+  /**
+   * Social URLs come from Site Settings → Footer → Social links. Only the heading is edited here.
+   */
+  followSection?: {
+    title?: string | null;
   };
   seo?: {
     metaTitle?: string | null;
@@ -3301,6 +3271,7 @@ export interface Support {
               | 'phone'
               | 'mail'
               | 'mapPin'
+              | 'map'
               | 'download'
               | 'wrench'
               | 'users'
@@ -3439,6 +3410,7 @@ export interface Contact {
               | 'phone'
               | 'mail'
               | 'mapPin'
+              | 'map'
               | 'download'
               | 'wrench'
               | 'users'
@@ -3594,68 +3566,62 @@ export interface SiteSettingsSelect<T extends boolean = true> {
  * via the `definition` "home_select".
  */
 export interface HomeSelect<T extends boolean = true> {
-  heroMode?: T;
-  fallbackHero?:
+  hero?:
     | T
     | {
-        eyebrow?: T;
-        headline?: T;
-        subheadline?: T;
-        primaryCta?:
+        video?: T;
+        poster?: T;
+        captions?:
           | T
           | {
-              label?: T;
-              href?: T;
+              text?: T;
               id?: T;
             };
-        secondaryCta?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
       };
-  heroSlides?:
+  introduction?:
     | T
     | {
-        image?: T;
-        linkType?: T;
-        product?: T;
-        post?: T;
+        title?: T;
+        paragraphs?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        tagline?: T;
+      };
+  peekImages?:
+    | T
+    | {
+        idKey?: T;
+        title?: T;
         href?: T;
-        headline?: T;
-        ctaLabel?: T;
+        image?: T;
+        alt?: T;
         id?: T;
       };
-  strategiesSection?:
+  visionMission?:
     | T
     | {
-        eyebrow?: T;
-        title?: T;
-        intro?: T;
-        items?:
-          | T
-          | {
-              idKey?: T;
-              label?: T;
-              title?: T;
-              description?: T;
-              href?: T;
-              image?: T;
-              id?: T;
-            };
+        idKey?: T;
+        label?: T;
+        body?: T;
+        image?: T;
+        alt?: T;
+        href?: T;
+        ctaLabel?: T;
+        id?: T;
       };
   impactSection?:
     | T
     | {
-        eyebrow?: T;
         title?: T;
+        body?: T;
         link?:
           | T
           | {
               label?: T;
               href?: T;
-              id?: T;
             };
         stats?:
           | T
@@ -3667,62 +3633,49 @@ export interface HomeSelect<T extends boolean = true> {
               id?: T;
             };
       };
-  whySection?:
+  productCategories?:
     | T
     | {
-        eyebrow?: T;
         title?: T;
-        body?: T;
         items?:
           | T
           | {
-              icon?: T;
-              iconKey?: T;
-              title?: T;
-              copy?: T;
+              idKey?: T;
+              label?: T;
               href?: T;
+              image?: T;
+              alt?: T;
               id?: T;
             };
       };
-  reachSection?:
+  whySection?:
     | T
     | {
-        eyebrow?: T;
         title?: T;
         body?: T;
-        regions?:
+        cards?:
           | T
           | {
-              name?: T;
-              focus?: T;
-              id?: T;
-            };
-        cta?:
-          | T
-          | {
-              label?: T;
+              idKey?: T;
+              title?: T;
               href?: T;
+              image?: T;
+              alt?: T;
               id?: T;
             };
       };
-  caseStudiesSection?:
+  greenMission?:
     | T
     | {
-        eyebrow?: T;
         title?: T;
-        link?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-              id?: T;
-            };
-        limit?: T;
+        image?: T;
+        alt?: T;
+        href?: T;
+        ctaLabel?: T;
       };
   newsSection?:
     | T
     | {
-        eyebrow?: T;
         title?: T;
         mode?: T;
         manualItems?:
@@ -3732,6 +3685,7 @@ export interface HomeSelect<T extends boolean = true> {
               date?: T;
               href?: T;
               type?: T;
+              image?: T;
               id?: T;
             };
         postsLimit?: T;
@@ -3740,29 +3694,12 @@ export interface HomeSelect<T extends boolean = true> {
           | {
               label?: T;
               href?: T;
-              id?: T;
             };
       };
-  supportStrip?:
+  followSection?:
     | T
     | {
-        hotlineLabel?: T;
-        hotlineNote?: T;
-        downloads?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-              id?: T;
-            };
-        partnerCta?:
-          | T
-          | {
-              title?: T;
-              body?: T;
-              label?: T;
-              href?: T;
-            };
+        title?: T;
       };
   seo?:
     | T

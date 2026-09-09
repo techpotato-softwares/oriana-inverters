@@ -1,11 +1,17 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 import { useReducedMotion } from 'framer-motion'
 
 import { GrowingAccentLine } from './GrowingAccentLine'
 import { ScrollRevealText } from './ScrollRevealText'
+import {
+  readSiteHeaderHeightPx,
+  STICKY_BELOW_NAV_HEIGHT,
+  STICKY_BELOW_NAV_TOP,
+  useStickyScrub,
+} from './useStickyScrub'
 
 export type WhyChooseCard = {
   id: string
@@ -26,11 +32,8 @@ export type WhyChooseOrianaSectionProps = {
 
 const TRACK_GUTTER = 'max(1.5rem, 6vw)'
 const CARD_RADIUS = 24
-/** Sticky horizontal scrub needs room; below this use scroll-snap instead. */
-const STICKY_MIN_WIDTH = 1024
-const STICKY_MIN_HEIGHT = 820
 /** Floor so sticky cards never collapse into thin strips on short viewports. */
-const STICKY_CARD_MIN_HEIGHT = 'min(320px, 45svh)'
+const STICKY_CARD_MIN_HEIGHT = 'min(280px, 42svh)'
 
 /**
  * Sungrow "Our Commitment to Innovation and Excellence" pattern:
@@ -188,23 +191,10 @@ export function WhyChooseOrianaSection({
   const targetRatio = useRef(0)
   /** Finishes Introduction-style char reveal once the sticky pin freezes layout */
   const textProgressRef = useRef(0)
-  const [useStickyScrub, setUseStickyScrub] = useState(false)
+  const useStickyLayout = useStickyScrub()
 
   useEffect(() => {
-    const widthMq = window.matchMedia(`(min-width: ${STICKY_MIN_WIDTH}px)`)
-    const heightMq = window.matchMedia(`(min-height: ${STICKY_MIN_HEIGHT}px)`)
-    const sync = () => setUseStickyScrub(widthMq.matches && heightMq.matches)
-    sync()
-    widthMq.addEventListener('change', sync)
-    heightMq.addEventListener('change', sync)
-    return () => {
-      widthMq.removeEventListener('change', sync)
-      heightMq.removeEventListener('change', sync)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!cards.length || reduceMotion || !useStickyScrub) return
+    if (!cards.length || reduceMotion || !useStickyLayout) return
 
     const getMaxTranslate = () => {
       const track = trackRef.current
@@ -216,11 +206,12 @@ export function WhyChooseOrianaSection({
     const readRatio = () => {
       const section = sectionRef.current
       if (!section) return 0
-      const vh = window.innerHeight
+      const headerH = readSiteHeaderHeightPx()
+      const pinHeight = Math.max(window.innerHeight - headerH, 1)
       const rect = section.getBoundingClientRect()
-      const scrollSpan = Math.max(section.offsetHeight - vh, 1)
-      const scrolled = Math.min(Math.max(-rect.top, 0), scrollSpan)
-      return scrolled / scrollSpan
+      const scrollSpan = Math.max(section.offsetHeight - pinHeight, 1)
+      // 0 while the heading is still approaching the nav; effect starts once pinned below it
+      return Math.min(Math.max(headerH - rect.top, 0), scrollSpan) / scrollSpan
     }
 
     let raf = 0
@@ -256,12 +247,12 @@ export function WhyChooseOrianaSection({
       window.cancelAnimationFrame(raf)
       window.removeEventListener('resize', onResize)
     }
-  }, [cards, reduceMotion, useStickyScrub])
+  }, [cards, reduceMotion, useStickyLayout])
 
   if (!cards.length) return null
 
   // Compact / reduced-motion: full cards in normal flow (no sticky clip)
-  if (reduceMotion || !useStickyScrub) {
+  if (reduceMotion || !useStickyLayout) {
     return (
       <section
         ref={sectionRef}
@@ -290,11 +281,14 @@ export function WhyChooseOrianaSection({
       aria-label={ariaLabel}
     >
       <div
-        className="sticky top-0 z-10 flex h-[100svh] max-h-[100svh] flex-col overflow-hidden bg-white"
+        className="sticky z-10 flex flex-col overflow-hidden bg-white"
         style={{
-          paddingTop: 'calc(4.5rem + env(safe-area-inset-top, 0px))',
-          paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom, 0px))',
-          gap: 'clamp(1rem, 2vw, 1.75rem)',
+          top: STICKY_BELOW_NAV_TOP,
+          height: STICKY_BELOW_NAV_HEIGHT,
+          maxHeight: STICKY_BELOW_NAV_HEIGHT,
+          paddingTop: '0.75rem',
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))',
+          gap: 'clamp(0.75rem, 1.6vw, 1.75rem)',
         }}
       >
         <SectionIntro

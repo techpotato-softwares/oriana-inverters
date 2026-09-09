@@ -4,28 +4,6 @@ import { unstable_cache } from 'next/cache'
 
 import { mainNav, type MainNavEntry } from '@/config/navigation'
 import type { Distributor } from '@/data/distributors'
-import { slugifySeries } from '@/utilities/series'
-import type { HomeHeroSlide } from '@/types/homeHero'
-
-function relationId(value: unknown): number | null {
-  if (typeof value === 'number' && Number.isFinite(value)) return value
-  if (typeof value === 'string' && value !== '') {
-    const n = Number(value)
-    if (Number.isFinite(n)) return n
-  }
-  if (value && typeof value === 'object' && 'id' in value) {
-    return relationId((value as { id: unknown }).id)
-  }
-  return null
-}
-
-function mediaUrl(value: unknown): string | null {
-  if (value && typeof value === 'object' && 'url' in value) {
-    const url = (value as { url?: string | null }).url
-    return url || null
-  }
-  return null
-}
 
 export type HeaderNavView = {
   hotlineLabel: string
@@ -80,135 +58,19 @@ export const getHeaderNav = unstable_cache(fetchHeaderNav, ['header-nav', 'partn
   tags: ['global_header'],
 })
 
-async function fetchHomeHeroFromGlobal(): Promise<HomeHeroSlide[]> {
-  try {
-    const payload = await getPayload({ config: configPromise })
-    const home = await payload.findGlobal({
-      slug: 'home',
-      depth: 1,
-    })
-
-    if (home.heroMode !== 'slides' || !home.heroSlides?.length) return []
-
-    const productIds = new Set<number>()
-    const postIds = new Set<number>()
-    for (const slide of home.heroSlides) {
-      const productId = relationId(slide.product)
-      const postId = relationId(slide.post)
-      if (slide.linkType === 'product' && productId !== null) productIds.add(productId)
-      if (slide.linkType === 'post' && postId !== null) postIds.add(postId)
-    }
-
-    const [products, posts] = await Promise.all([
-      productIds.size
-        ? payload.find({
-            collection: 'products',
-            depth: 0,
-            limit: productIds.size,
-            pagination: false,
-            where: { id: { in: [...productIds] } },
-          })
-        : Promise.resolve({ docs: [] as { id: number; slug: string; name: string; modelSeries?: string | null }[] }),
-      postIds.size
-        ? payload.find({
-            collection: 'posts',
-            depth: 0,
-            limit: postIds.size,
-            pagination: false,
-            where: {
-              and: [{ id: { in: [...postIds] } }, { _status: { equals: 'published' } }],
-            },
-          })
-        : Promise.resolve({ docs: [] as { id: number; slug: string; title: string }[] }),
-    ])
-
-    const productsById = new Map(products.docs.map((doc) => [doc.id, doc]))
-    const postsById = new Map(posts.docs.map((doc) => [doc.id, doc]))
-
-    return home.heroSlides.flatMap((slide, index): HomeHeroSlide[] => {
-      const image = slide.image
-      const url = mediaUrl(image)
-      if (!url) return []
-      const alt =
-        image && typeof image === 'object' && 'alt' in image
-          ? String((image as { alt?: string }).alt || '')
-          : ''
-
-      if (slide.linkType === 'product') {
-        const product = productsById.get(relationId(slide.product) ?? -1)
-        if (!product?.slug) return []
-        const seriesSlug = product.modelSeries ? slugifySeries(product.modelSeries) : product.slug
-        const href =
-          seriesSlug && seriesSlug !== product.slug
-            ? `/products/${seriesSlug}?model=${encodeURIComponent(product.slug)}`
-            : `/products/${product.slug}`
-        return [
-          {
-            id: index,
-            imageUrl: url,
-            imageAlt: alt || product.name,
-            href,
-            headline: slide.headline?.trim() || product.name,
-            ctaLabel: slide.ctaLabel?.trim() || 'View product',
-            linkType: 'product',
-          },
-        ]
-      }
-
-      if (slide.linkType === 'post') {
-        const post = postsById.get(relationId(slide.post) ?? -1)
-        if (!post?.slug) return []
-        return [
-          {
-            id: index,
-            imageUrl: url,
-            imageAlt: alt || post.title,
-            href: `/posts/${post.slug}`,
-            headline: slide.headline?.trim() || post.title,
-            ctaLabel: slide.ctaLabel?.trim() || 'Read article',
-            linkType: 'post',
-          },
-        ]
-      }
-
-      if (slide.linkType === 'custom' && slide.href) {
-        return [
-          {
-            id: index,
-            imageUrl: url,
-            imageAlt: alt || slide.headline || 'Hero',
-            href: slide.href,
-            headline: slide.headline?.trim() || 'Oriana',
-            ctaLabel: slide.ctaLabel?.trim() || 'Learn more',
-            linkType: 'product',
-          },
-        ]
-      }
-
-      return []
-    })
-  } catch (error) {
-    console.error('[getHomeHeroFromGlobal] failed:', error)
-    return []
-  }
-}
-
 export const getHome = unstable_cache(
   async () => {
     try {
       const payload = await getPayload({ config: configPromise })
-      const [home, heroSlides] = await Promise.all([
-        payload.findGlobal({ slug: 'home', depth: 1 }),
-        fetchHomeHeroFromGlobal(),
-      ])
-      return { home, heroSlides }
+      const home = await payload.findGlobal({ slug: 'home', depth: 1 })
+      return { home }
     } catch (error) {
       console.error('[getHome] failed:', error)
-      return { home: null, heroSlides: [] as HomeHeroSlide[] }
+      return { home: null }
     }
   },
   ['home-global'],
-  { tags: ['home', 'home-hero'] },
+  { tags: ['home'] },
 )
 
 export const getAbout = unstable_cache(

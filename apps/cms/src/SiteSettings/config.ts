@@ -160,6 +160,7 @@ export const SiteSettings: GlobalConfig = {
                     { label: 'Facebook', value: 'facebook' },
                     { label: 'YouTube', value: 'youtube' },
                     { label: 'Instagram', value: 'instagram' },
+                    { label: 'X', value: 'x' },
                   ],
                 },
                 { name: 'href', type: 'text', required: true },
