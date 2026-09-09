@@ -24,6 +24,7 @@ export const HOME_PEEK_IMAGES = [
     href: '/solutions/residential',
     image:
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Residential solar solution for home',
   },
   {
     id: 'business',
@@ -31,6 +32,7 @@ export const HOME_PEEK_IMAGES = [
     href: '/solutions/commercial',
     image:
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Commercial and industrial solar solution',
   },
   {
     id: 'utility',
@@ -38,6 +40,7 @@ export const HOME_PEEK_IMAGES = [
     href: '/solutions/utility',
     image:
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Utility-scale solar installation',
   },
   {
     id: 'storage',
@@ -45,6 +48,7 @@ export const HOME_PEEK_IMAGES = [
     href: '/solutions/storage',
     image:
       'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Energy storage solution',
   },
 ]
 
@@ -57,6 +61,7 @@ export const HOME_VISION_MISSION = [
       'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1920&q=80',
     href: '/about',
     ctaLabel: 'Explore more',
+    alt: 'Solar panels under open sky representing our vision',
   },
   {
     id: 'mission',
@@ -66,6 +71,7 @@ export const HOME_VISION_MISSION = [
       'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1920&q=80',
     href: '/about',
     ctaLabel: 'Explore more',
+    alt: 'Renewable energy landscape representing our mission',
   },
 ]
 
