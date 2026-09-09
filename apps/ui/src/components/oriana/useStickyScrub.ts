@@ -1,14 +1,8 @@
-import { useLayoutEffect, useState } from 'react'
-
-/** Desktop sticky scrub: wide enough for split / horizontal track. */
-export const STICKY_MIN_WIDTH = 1024
 /**
- * Floor for sticky pin layouts. Keep this below typical laptop chrome
- * (13" ~1440×900 minus browser UI is often 650–780px, not 820+).
+ * Sticky scrub pin under the fixed SiteHeader.
+ * Uses svh so the pin always tracks the real viewport (Windows scaling, laptop
+ * chrome, mobile browser UI) — no min-width / min-height gate that disables it.
  */
-export const STICKY_MIN_HEIGHT = 560
-
-/** Pin sticky sections under the fixed SiteHeader. */
 export const STICKY_BELOW_NAV_TOP = 'var(--site-header-height, 5rem)'
 export const STICKY_BELOW_NAV_HEIGHT = 'calc(100svh - var(--site-header-height, 5rem))'
 
@@ -20,22 +14,11 @@ export function readSiteHeaderHeightPx(fallback = 80) {
   return Number.isFinite(n) && n > 0 ? n : fallback
 }
 
-/** True when the viewport can run sticky scroll-scrub sections. */
+/**
+ * Sticky Vision / Why Choose scrub runs on every machine and resolution.
+ * Pin height is fluid (`100svh - header`). Sections still use the compact
+ * stacked / scroll-snap UI when `prefers-reduced-motion` is set.
+ */
 export function useStickyScrub() {
-  const [enabled, setEnabled] = useState(false)
-
-  useLayoutEffect(() => {
-    const widthMq = window.matchMedia(`(min-width: ${STICKY_MIN_WIDTH}px)`)
-    const heightMq = window.matchMedia(`(min-height: ${STICKY_MIN_HEIGHT}px)`)
-    const sync = () => setEnabled(widthMq.matches && heightMq.matches)
-    sync()
-    widthMq.addEventListener('change', sync)
-    heightMq.addEventListener('change', sync)
-    return () => {
-      widthMq.removeEventListener('change', sync)
-      heightMq.removeEventListener('change', sync)
-    }
-  }, [])
-
-  return enabled
+  return true
 }

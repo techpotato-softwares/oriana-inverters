@@ -30,15 +30,15 @@ export type WhyChooseOrianaSectionProps = {
   className?: string
 }
 
-const TRACK_GUTTER = 'max(1.5rem, 6vw)'
+const TRACK_GUTTER = 'max(1rem, 4vw)'
 const CARD_RADIUS = 24
-/** Floor so sticky cards never collapse into thin strips on short viewports. */
-const STICKY_CARD_MIN_HEIGHT = 'min(280px, 42svh)'
+/** Fluid card height — tracks short Windows / laptop chrome and tall desktops. */
+const STICKY_CARD_MIN_HEIGHT = 'clamp(10rem, 38svh, 26rem)'
 
 /**
  * Sungrow "Our Commitment to Innovation and Excellence" pattern:
- * - desktop: sticky full viewport; scroll drives horizontal translateX
- * - compact: normal flow + horizontal scroll-snap (avoids clipped cards)
+ * - all viewports: sticky full viewport; scroll drives horizontal translateX
+ * - reduced-motion: normal flow + horizontal scroll-snap (avoids motion)
  * - title + GrowingAccentLine + ScrollRevealText (same as Introduction)
  * @see https://www.sungrowpower.com/en
  */
@@ -305,7 +305,7 @@ export function WhyChooseOrianaSection({
             ref={viewportRef}
             className="relative w-full overflow-hidden"
             style={{
-              height: 'min(420px, 100%)',
+              height: 'min(26rem, 100%)',
               minHeight: STICKY_CARD_MIN_HEIGHT,
               maxHeight: '100%',
             }}
@@ -341,7 +341,7 @@ export function WhyChooseOrianaSection({
                   key={card.id}
                   className="relative h-full shrink-0 overflow-hidden"
                   style={{
-                    width: 'min(551px, 42vw)',
+                    width: 'clamp(15rem, 70vw, 34.4rem)',
                     borderRadius: CARD_RADIUS,
                     isolation: 'isolate',
                   }}
