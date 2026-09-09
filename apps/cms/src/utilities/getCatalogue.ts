@@ -2,7 +2,7 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
 
-import { staticCategories } from '@/data/products'
+import { staticCategories, staticProducts } from '@/data/products'
 import {
   familyToSeries,
   findFamilyBySlug,
@@ -91,10 +91,13 @@ function overlayMasterPhotos(series: CatalogueSeries): CatalogueSeries {
   }
 }
 
-/** Products come only from Payload Admin (published). No hardcoded product fallback. */
+/** Published products from Payload; current static catalogue when API fails. */
 async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
   const payload = await getPayloadSafe()
-  if (!payload) return []
+  if (!payload) {
+    console.warn('[getCatalogue] Payload unavailable — using staticProducts fallback')
+    return staticProducts
+  }
 
   try {
     // depth:0 — populating media via depth≥1 used to throw on Lambda when seed
@@ -128,7 +131,7 @@ async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
     const categoriesById = new Map(categoriesResult.docs.map((doc) => [doc.id, doc]))
     const mediaById = new Map(mediaResult.docs.map((doc) => [doc.id, doc]))
 
-    return result.docs
+    const products = result.docs
       .map((doc) => {
         const categoryId = relationId(doc.category)
         const categoryDoc =
@@ -146,16 +149,20 @@ async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
         })
       })
       .filter((product) => isCanonicalCategorySlug(product.categorySlug))
+
+    return products
   } catch (error) {
-    console.error('[getCatalogue] products query failed:', error)
-    return []
+    console.error('[getCatalogue] products query failed — using staticProducts fallback:', error)
+    return staticProducts
   }
 }
 
-/** Categories come from Admin; empty CMS returns no categories (create them in Admin). */
 async function fetchCategories(): Promise<CatalogueCategory[]> {
   const payload = await getPayloadSafe()
-  if (!payload) return []
+  if (!payload) {
+    console.warn('[getCatalogue] Payload unavailable — using staticCategories fallback')
+    return staticCategories
+  }
 
   try {
     const result = await payload.find({
@@ -166,7 +173,7 @@ async function fetchCategories(): Promise<CatalogueCategory[]> {
       sort: 'sortOrder',
     })
 
-    if (!result.docs.length) return []
+    if (!result.docs.length) return staticCategories
 
     const mediaIds = new Set<number>()
     for (const doc of result.docs) {
@@ -215,8 +222,8 @@ async function fetchCategories(): Promise<CatalogueCategory[]> {
 
     return mapped.sort((a, b) => order.indexOf(a.slug) - order.indexOf(b.slug))
   } catch (error) {
-    console.error('[getCatalogue] categories query failed:', error)
-    return []
+    console.error('[getCatalogue] categories query failed — using staticCategories fallback:', error)
+    return staticCategories
   }
 }
 
@@ -242,7 +249,7 @@ async function fetchDownloads(): Promise<CatalogueDownload[]> {
 
 export const getCatalogueProducts = unstable_cache(
   fetchPublishedProducts,
-  ['catalogue-products', 'canonical-v1'],
+  ['catalogue-products', 'canonical-v2-product-page'],
   {
     tags: ['products'],
   },
@@ -250,7 +257,7 @@ export const getCatalogueProducts = unstable_cache(
 
 export const getCatalogueCategories = unstable_cache(
   fetchCategories,
-  ['catalogue-categories', 'canonical-v1'],
+  ['catalogue-categories', 'canonical-v2-product-page'],
   {
     tags: ['categories'],
   },
@@ -296,6 +303,19 @@ export async function getCatalogueNav(): Promise<CatalogueNavItem[]> {
     .filter((cat) => cat.products.length > 0)
 }
 
+function seriesFromStaticCatalogue(slug: string): CatalogueSeries | null {
+  const seriesList = groupProductsIntoSeries(staticProducts)
+  const bySeriesSlug = seriesList.find((s) => s.slug === slug)
+  if (bySeriesSlug) return bySeriesSlug
+  const product = staticProducts.find((p) => p.slug === slug)
+  if (!product) return null
+  return seriesList.find((s) => s.series === seriesNameOf(product)) ?? null
+}
+
+function productFromStaticCatalogue(slug: string): CatalogueProduct | null {
+  return staticProducts.find((p) => p.slug === slug) ?? null
+}
+
 export async function getProductBySlug(slug: string): Promise<CatalogueProduct | null> {
   const products = await getCatalogueProducts()
   const cached = products.find((p) => p.slug === slug)
@@ -306,8 +326,7 @@ export async function getProductBySlug(slug: string): Promise<CatalogueProduct |
   const fromCms = fresh.find((p) => p.slug === slug)
   if (fromCms) return fromCms
 
-  const master = findFamilyBySlug(slug)
-  return master ? familyToSeries(master.category, master.family).variants[0] ?? null : null
+  return productFromStaticCatalogue(slug)
 }
 
 export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | null> {
@@ -323,9 +342,6 @@ export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | n
     if (byDeepLink) return overlayMasterPhotos(byDeepLink)
   }
 
-  const master = findFamilyBySlug(slug)
-  if (master) return overlayMasterPhotos(familyToSeries(master.category, master.family))
-
   // Recovery path: if cache was populated during a transient Payload init
   // failure, unstable_cache can hold an empty catalogue and produce false 404s.
   const freshProducts = await fetchPublishedProducts()
@@ -335,9 +351,11 @@ export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | n
   const freshProduct = freshProducts.find((p) => p.slug === slug)
   if (freshProduct) {
     const series = freshSeriesList.find((s) => s.series === seriesNameOf(freshProduct))
-    return series ? overlayMasterPhotos(series) : null
+    if (series) return overlayMasterPhotos(series)
   }
-  return null
+
+  const fromStatic = seriesFromStaticCatalogue(slug)
+  return fromStatic ? overlayMasterPhotos(fromStatic) : null
 }
 
 export async function getProductsByCategory(categorySlug: string): Promise<CatalogueProduct[]> {

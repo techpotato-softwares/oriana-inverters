@@ -224,6 +224,120 @@ export const Products: CollectionConfig = {
           ],
         },
         {
+          label: 'Product Page',
+          fields: [
+            {
+              name: 'productPage',
+              type: 'group',
+              admin: {
+                description:
+                  'Hero tiles and advantages for the public product detail page. Leave blank to use the built-in fallback for this model series.',
+              },
+              fields: [
+                {
+                  name: 'heroType',
+                  type: 'text',
+                  admin: {
+                    description: 'Subtitle under the product name, e.g. "1-Phase Hybrid Inverter".',
+                  },
+                },
+                {
+                  name: 'featureLayout',
+                  type: 'select',
+                  defaultValue: 'quadrant',
+                  options: [
+                    { label: 'Quadrant cards', value: 'quadrant' },
+                    { label: 'Icon list', value: 'list' },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'maxPvInputVoltage',
+                      type: 'text',
+                      admin: { description: 'Hero tile 1 value', width: '25%' },
+                    },
+                    {
+                      name: 'ratedAcOutputPower',
+                      type: 'text',
+                      admin: { description: 'Hero tile 2 value', width: '25%' },
+                    },
+                    {
+                      name: 'ratedAcVoltage',
+                      type: 'text',
+                      admin: { description: 'Hero tile 3 value', width: '25%' },
+                    },
+                    {
+                      name: 'maxEfficiency',
+                      type: 'text',
+                      admin: { description: 'Hero tile 4 value', width: '25%' },
+                    },
+                  ],
+                },
+                {
+                  name: 'tileLabels',
+                  type: 'group',
+                  admin: {
+                    description: 'Optional label overrides (BESS uses Battery Type, Capacity, etc.).',
+                  },
+                  fields: [
+                    { name: 'maxPvInputVoltage', type: 'text' },
+                    { name: 'ratedAcOutputPower', type: 'text' },
+                    { name: 'ratedAcVoltage', type: 'text' },
+                    { name: 'maxEfficiency', type: 'text' },
+                  ],
+                },
+                {
+                  name: 'featureGroups',
+                  type: 'array',
+                  labels: { singular: 'Feature group', plural: 'Feature groups' },
+                  admin: {
+                    description: 'Quadrant advantage cards (title + bullet list).',
+                    condition: (_, siblingData) => siblingData?.featureLayout !== 'list',
+                  },
+                  fields: [
+                    { name: 'title', type: 'text', required: true },
+                    {
+                      name: 'items',
+                      type: 'array',
+                      labels: { singular: 'Bullet', plural: 'Bullets' },
+                      fields: [{ name: 'text', type: 'textarea', required: true }],
+                    },
+                  ],
+                },
+                {
+                  name: 'featureList',
+                  type: 'array',
+                  labels: { singular: 'Feature', plural: 'Feature list' },
+                  admin: {
+                    description: 'Icon list advantages (used when layout is Icon list).',
+                    condition: (_, siblingData) => siblingData?.featureLayout === 'list',
+                  },
+                  fields: [
+                    {
+                      name: 'icon',
+                      type: 'select',
+                      required: true,
+                      defaultValue: 'chart',
+                      options: [
+                        { label: 'Chart', value: 'chart' },
+                        { label: 'Export', value: 'export' },
+                        { label: 'Monitor', value: 'monitor' },
+                        { label: 'Wave', value: 'wave' },
+                        { label: 'PID', value: 'pid' },
+                        { label: 'SPD', value: 'spd' },
+                        { label: 'LV', value: 'lv' },
+                      ],
+                    },
+                    { name: 'text', type: 'textarea', required: true },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
           label: 'Content & SEO',
           fields: [
             {

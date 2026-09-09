@@ -10,10 +10,10 @@ import {
   ProductSeriesCard,
 } from '@/components/oriana/ProductSeriesCard'
 import {
-  getOnGridSeriesPageData,
   type OnGridFeatureIcon,
   type OnGridFeatureListItem,
 } from '@/data/onGridProductPage'
+import { resolveProductPageData } from '@/utilities/mapProductPage'
 import {
   isFileDocument,
   resolveDatasheetUrl,
@@ -40,12 +40,7 @@ const AUDIENCE_LABEL: Record<CatalogueProduct['segmentKey'], string> = {
 }
 
 function seriesTypeLabel(series: CatalogueSeries, selected: CatalogueProduct): string {
-  const pageData = getOnGridSeriesPageData(
-    selected.modelSeries,
-    series.series,
-    series.slug,
-    selected.slug,
-  )
+  const pageData = resolveProductPageData(series, selected)
   if (pageData?.heroType) return pageData.heroType
 
   const group = selected.phases || series.segment || series.phases || ''
@@ -64,12 +59,7 @@ function relatedSectionHeading(segmentKey: CatalogueProduct['segmentKey']): stri
 }
 
 function featureGroups(series: CatalogueSeries, selected: CatalogueProduct) {
-  const pageData = getOnGridSeriesPageData(
-    selected.modelSeries,
-    series.series,
-    series.slug,
-    selected.slug,
-  )
+  const pageData = resolveProductPageData(series, selected)
   // Explicit page data wins — empty featureGroups means advantages are deferred.
   if (pageData) {
     return (pageData.featureGroups ?? []).map((group) => ({
@@ -139,12 +129,7 @@ function findSpec(product: CatalogueProduct, ...labels: string[]): string | null
 }
 
 function specTiles(series: CatalogueSeries, selected: CatalogueProduct) {
-  const pageData = getOnGridSeriesPageData(
-    selected.modelSeries,
-    series.series,
-    series.slug,
-    selected.slug,
-  )
+  const pageData = resolveProductPageData(series, selected)
   if (pageData) {
     const labels = pageData.tileLabels
     return [
@@ -445,12 +430,7 @@ export function ProductSeriesDetail({
   if (!selected) return null
 
   const audience = AUDIENCE_LABEL[selected.segmentKey] ?? AUDIENCE_LABEL[series.segmentKey]
-  const pageData = getOnGridSeriesPageData(
-    selected.modelSeries,
-    series.series,
-    series.slug,
-    selected.slug,
-  )
+  const pageData = resolveProductPageData(series, selected)
   const features = featureGroups(series, selected)
   const featureList = pageData?.featureLayout === 'list' ? pageData.featureList ?? [] : null
   const tiles = specTiles(series, selected)

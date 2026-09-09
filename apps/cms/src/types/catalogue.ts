@@ -1,3 +1,5 @@
+import type { OnGridSeriesPageData } from '@/data/onGridProductPage'
+
 export type CatalogueProduct = {
   id?: number | string
   slug: string
@@ -17,6 +19,8 @@ export type CatalogueProduct = {
   heroImageUrl?: string | null
   heroImageAlt?: string | null
   datasheetUrl?: string | null
+  /** CMS product-page chrome when present; UI falls back to onGridProductPage.ts. */
+  productPage?: OnGridSeriesPageData | null
 }
 
 /** Datasheet model series (Excel col F) with capacity variants (cols H/I/J). */

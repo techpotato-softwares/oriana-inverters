@@ -6,6 +6,7 @@ import type {
   CatalogueProduct,
   CatalogueSegmentImage,
 } from '@/types/catalogue'
+import { productPageFromDoc } from '@/utilities/mapProductPage'
 
 const segmentLabels: Record<string, string> = {
   residential: 'Residential',
@@ -88,6 +89,7 @@ export function mapProduct(doc: Product): CatalogueProduct {
     heroImageAlt:
       doc.heroImage && typeof doc.heroImage === 'object' ? doc.heroImage.alt ?? doc.name : doc.name,
     datasheetUrl: mediaUrl(doc.datasheetPdf),
+    productPage: productPageFromDoc(doc),
   }
 }
 

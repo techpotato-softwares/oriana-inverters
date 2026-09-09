@@ -569,6 +569,66 @@ export interface Product {
    */
   manualPdf?: (number | null) | Media;
   /**
+   * Hero tiles and advantages for the public product detail page. Leave blank to use the built-in fallback for this model series.
+   */
+  productPage?: {
+    /**
+     * Subtitle under the product name, e.g. "1-Phase Hybrid Inverter".
+     */
+    heroType?: string | null;
+    featureLayout?: ('quadrant' | 'list') | null;
+    /**
+     * Hero tile 1 value
+     */
+    maxPvInputVoltage?: string | null;
+    /**
+     * Hero tile 2 value
+     */
+    ratedAcOutputPower?: string | null;
+    /**
+     * Hero tile 3 value
+     */
+    ratedAcVoltage?: string | null;
+    /**
+     * Hero tile 4 value
+     */
+    maxEfficiency?: string | null;
+    /**
+     * Optional label overrides (BESS uses Battery Type, Capacity, etc.).
+     */
+    tileLabels?: {
+      maxPvInputVoltage?: string | null;
+      ratedAcOutputPower?: string | null;
+      ratedAcVoltage?: string | null;
+      maxEfficiency?: string | null;
+    };
+    /**
+     * Quadrant advantage cards (title + bullet list).
+     */
+    featureGroups?:
+      | {
+          title: string;
+          items?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Icon list advantages (used when layout is Icon list).
+     */
+    featureList?:
+      | {
+          icon: 'chart' | 'export' | 'monitor' | 'wave' | 'pid' | 'spd' | 'lv';
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
    * Long-form product content (optional).
    */
   fullDescription?: {
@@ -2078,6 +2138,43 @@ export interface ProductsSelect<T extends boolean = true> {
       };
   datasheetPdf?: T;
   manualPdf?: T;
+  productPage?:
+    | T
+    | {
+        heroType?: T;
+        featureLayout?: T;
+        maxPvInputVoltage?: T;
+        ratedAcOutputPower?: T;
+        ratedAcVoltage?: T;
+        maxEfficiency?: T;
+        tileLabels?:
+          | T
+          | {
+              maxPvInputVoltage?: T;
+              ratedAcOutputPower?: T;
+              ratedAcVoltage?: T;
+              maxEfficiency?: T;
+            };
+        featureGroups?:
+          | T
+          | {
+              title?: T;
+              items?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        featureList?:
+          | T
+          | {
+              icon?: T;
+              text?: T;
+              id?: T;
+            };
+      };
   fullDescription?: T;
   seo?:
     | T

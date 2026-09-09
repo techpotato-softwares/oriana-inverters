@@ -322,6 +322,7 @@ export const staticProducts: CatalogueProduct[] = productCatalog.flatMap((catego
         description: `${lead} — ${power} model in the ${family.productName} series.`,
         modelSeries: family.productName,
         specs,
+        productPage: pageData ?? null,
       } satisfies CatalogueProduct
     }),
   ),

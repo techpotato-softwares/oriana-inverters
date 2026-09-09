@@ -17,12 +17,12 @@ From `apps/cms/src/app/(frontend)/globals.css`:
 
 | Token | Role |
 |-------|------|
-| `oriana-navy` `#071525` | Primary dark / text / dark heroes |
+| `oriana-ink` / `oriana-muted` / `oriana-navy` (text) `#606060` | Headings, descriptions, body copy |
+| `oriana-deep` `#071525` | Dark surfaces / dark heroes |
 | `oriana-blue` `#1a428a` | Primary action / links |
 | `oriana-sky` `#4da3ff` | Highlights / mesh accents |
 | `oriana-sun` `#f5b942` | Sparse accent only |
 | `oriana-silver` `#eef2f8` | Soft fills |
-| `oriana-muted` `#5a6b82` | Secondary body |
 | `oriana-surface` `#f7f9fc` | Page background |
 | `font-display` / Montserrat | Headings + UI |
 

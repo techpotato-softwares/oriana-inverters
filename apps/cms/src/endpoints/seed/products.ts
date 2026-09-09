@@ -4,6 +4,8 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { staticCategories, staticProducts } from '@/data/products'
+import { getOnGridSeriesPageData } from '@/data/onGridProductPage'
+import { productPageSeedData } from '@/utilities/mapProductPage'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const assetsDir = path.resolve(dirname, '../../../public/assets/products')
@@ -158,6 +160,9 @@ export async function seedProducts({ payload }: { payload: Payload }) {
         undefined,
       featured: product.featured ?? false,
       keySpecs: product.specs.map((s) => ({ label: s.label, value: s.value })),
+      productPage: productPageSeedData(
+        product.productPage ?? getOnGridSeriesPageData(product.modelSeries),
+      ),
       // Clear broken local-disk media refs when S3 isn't available (Lambda-safe).
       heroImage: canUploadMedia ? heroImageId : null,
       _status: 'published' as const,

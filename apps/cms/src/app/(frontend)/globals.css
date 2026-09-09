@@ -75,26 +75,27 @@
   --font-display: var(--font-montserrat), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
   --font-product: var(--font-montserrat), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
 
-  /* Oriana brand — navy for headings/text, blue for actions, muted for secondary copy. */
-  --color-oriana-navy: #071525;
+  /* Oriana brand — #606060 for headings/body copy, deep navy for dark surfaces, blue for actions. */
+  --color-oriana-navy: #606060;
   --color-oriana-deep: #071525;
   --color-oriana-blue: #1a428a;
   --color-oriana-sky: #4da3ff;
   --color-oriana-sun: #f5b942;
-  --color-oriana-ink: #5a6b82;
+  --color-oriana-ink: #606060;
   --color-oriana-silver: #eef2f8;
-  --color-oriana-muted: #5a6b82;
+  --color-oriana-muted: #606060;
   --color-oriana-surface: #f7f9fc;
 }
 
 @layer utilities {
+  /* Copy color: homepage #606060 for headings, descriptions, and body text. */
   .text-oriana-ink {
-    color: #5a6b82;
+    color: #606060;
   }
 
-  /* Explicit so Tailwind/HMR always applies brand navy (not a cached gray). */
+  /* Explicit so Tailwind/HMR always applies homepage copy color (not a cached navy). */
   .text-oriana-navy {
-    color: #071525;
+    color: #606060;
   }
 
   .bg-oriana-deep {
@@ -111,7 +112,7 @@
     font-size: 15px;
     font-weight: 500;
     line-height: 1.4;
-    color: #071525;
+    color: #606060;
     word-break: break-word;
   }
 
@@ -169,14 +170,14 @@
 :root {
   --site-header-height: 8.5rem;
   --background: #ffffff;
-  --foreground: #071525;
+  --foreground: #606060;
   --card: #f7f9fc;
-  --card-foreground: #071525;
+  --card-foreground: #606060;
   --border: #e2e8f0;
   --primary: #1a428a;
   --primary-foreground: #ffffff;
   --muted: #eef2f8;
-  --muted-foreground: #5a6b82;
+  --muted-foreground: #606060;
   --radius: 0.75rem;
 }
 
@@ -231,7 +232,7 @@
     font-family: var(--font-montserrat), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
   }
   body {
-    @apply bg-white text-oriana-navy min-h-screen flex flex-col;
+    @apply bg-white text-oriana-ink min-h-screen flex flex-col;
   }
   .font-sans,
   .font-display {
@@ -266,7 +267,7 @@ body,
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.01em;
-  color: #071525;
+  color: #606060;
 }
 
 .category-intro-body {
@@ -279,7 +280,7 @@ body,
   font-size: 15px;
   font-weight: 400;
   line-height: 1.85;
-  color: #5a6b82;
+  color: #606060;
 }
 
 .category-intro-body p + p {
@@ -292,13 +293,13 @@ body,
   font-size: 22px;
   font-weight: 600;
   line-height: 1.3;
-  color: #071525;
+  color: #606060;
 }
 
 .category-filter-note {
   margin: 0 0 1.75rem;
   font-size: 14px;
-  color: #5a6b82;
+  color: #606060;
 }
 
 .category-filter-note a {
@@ -313,6 +314,18 @@ body,
 .category-page article {
   box-shadow: 0 8px 28px rgba(7, 21, 37, 0.06);
   border: 1px solid rgba(7, 21, 37, 0.06);
+}
+
+.prose {
+  --tw-prose-body: #606060;
+  --tw-prose-headings: #606060;
+  --tw-prose-lead: #606060;
+  --tw-prose-links: #1a428a;
+  --tw-prose-bold: #606060;
+  --tw-prose-counters: #606060;
+  --tw-prose-bullets: #606060;
+  --tw-prose-quotes: #606060;
+  --tw-prose-captions: #606060;
 }
 
 @media (min-width: 64rem) {
