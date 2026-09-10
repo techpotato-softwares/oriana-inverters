@@ -57,7 +57,10 @@ export default async function ProductDetailPage({ params }: Props) {
     .map(seriesToCatalogueCard)
 
   return (
-    <main className="bg-white pt-[var(--site-header-height,8.25rem)]">
+    <main
+      className="bg-white pt-[var(--site-header-height,8.25rem)]"
+      style={{ ['--product-breadcrumb-height' as string]: '3.25rem' }}
+    >
       <Breadcrumbs
         items={[
           { label: 'All Products', href: '/products' },

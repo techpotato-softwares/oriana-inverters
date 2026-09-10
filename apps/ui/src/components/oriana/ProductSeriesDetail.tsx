@@ -530,7 +530,7 @@ export function ProductSeriesDetail({
       categorySlug={series.categorySlug}
       src={selected.heroImageUrl ?? series.heroImageUrl}
       alt={selected.heroImageAlt ?? series.heroImageAlt}
-      className="aspect-square w-full bg-transparent"
+      className="mx-auto aspect-square w-full max-w-[min(100%,min(28rem,52svh))] bg-transparent"
       plain
       priority={tab === 'overview'}
     />
@@ -540,30 +540,37 @@ export function ProductSeriesDetail({
     <>
       {tab === 'overview' ? (
         <section
-          className="relative overflow-hidden"
+          className="relative flex items-center overflow-hidden"
           style={{
+            // One screen below site header + breadcrumb strip (cap on very tall displays)
+            height:
+              'min(1200px, calc(100svh - var(--site-header-height, 5rem) - var(--product-breadcrumb-height, 3.25rem)))',
+            maxHeight:
+              'min(1200px, calc(100svh - var(--site-header-height, 5rem) - var(--product-breadcrumb-height, 3.25rem)))',
             background:
               'linear-gradient(180deg, #d9dee6 0%, #e8ecf1 42%, #f4f6f8 78%, #ffffff 100%)',
           }}
         >
-          <div className="container grid items-center gap-10 py-12 lg:grid-cols-2 lg:gap-16 lg:py-20">
-            <div className="order-2 lg:order-1">
+          <div className="container grid h-full max-h-full w-full items-center gap-6 py-[clamp(0.75rem,2.5svh,2rem)] lg:grid-cols-2 lg:gap-10 lg:py-[clamp(1rem,3svh,2.5rem)]">
+            <div className="order-2 min-w-0 lg:order-1">
               {typeLabel ? (
                 <p className="text-sm font-medium text-oriana-muted md:text-base">{typeLabel}</p>
               ) : null}
               <h1
-                className={`font-display text-xl font-light tracking-tight text-[#606060] md:text-2xl lg:text-[1.65rem] lg:leading-snug ${typeLabel ? 'mt-2' : ''}`}
+                className={`font-display text-xl font-light tracking-tight text-[#606060] md:text-2xl lg:text-[clamp(1.25rem,2.2vw,1.65rem)] lg:leading-snug ${typeLabel ? 'mt-2' : ''}`}
               >
                 {productTitle}
               </h1>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div className="mt-[clamp(1rem,2.5svh,2rem)] flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center rounded-full border border-oriana-navy/10 bg-white/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-oriana-navy backdrop-blur">
                   {audience}
                 </span>
               </div>
             </div>
-            <div className="order-1 lg:order-2">
-              <div className="mx-auto max-w-md lg:max-w-none">{productShot}</div>
+            <div className="order-1 flex min-h-0 items-center justify-center lg:order-2">
+              <div className="mx-auto flex h-full max-h-full w-full max-w-md items-center justify-center lg:max-w-none">
+                {productShot}
+              </div>
             </div>
           </div>
         </section>
