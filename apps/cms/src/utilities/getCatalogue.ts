@@ -303,10 +303,40 @@ export async function getCatalogueNav(): Promise<CatalogueNavItem[]> {
     .filter((cat) => cat.products.length > 0)
 }
 
+/** Accept legacy C&I slugs that dropped "&" as "c-i" instead of "c-and-i". */
+function ampersandSlugAliases(slug: string): string[] {
+  const aliases = new Set<string>([slug])
+  if (slug.includes('-c-and-i')) {
+    aliases.add(slug.replace(/-c-and-i(?=-|$)/g, '-c-i'))
+  }
+  if (/(^|-)c-i(?=-|$)/.test(slug) && !slug.includes('-c-and-i')) {
+    aliases.add(slug.replace(/(^|-)c-i(?=-|$)/g, '$1c-and-i'))
+  }
+  return [...aliases]
+}
+
+function findSeriesBySlug(
+  seriesList: CatalogueSeries[],
+  slug: string,
+): CatalogueSeries | undefined {
+  for (const candidate of ampersandSlugAliases(slug)) {
+    const match = seriesList.find((s) => s.slug === candidate)
+    if (match) return match
+  }
+  // Master catalogue uses slugifyLabel (c-and-i); keep that as a final match key.
+  return seriesList.find(
+    (s) => slugifyLabel(s.series) === slug || ampersandSlugAliases(slug).includes(slugifyLabel(s.series)),
+  )
+}
+
 function seriesFromStaticCatalogue(slug: string): CatalogueSeries | null {
   const seriesList = groupProductsIntoSeries(staticProducts)
-  const bySeriesSlug = seriesList.find((s) => s.slug === slug)
+  const bySeriesSlug = findSeriesBySlug(seriesList, slug)
   if (bySeriesSlug) return bySeriesSlug
+  const fromMaster = seriesFromProductMaster().find(
+    (s) => s.slug === slug || ampersandSlugAliases(slug).includes(s.slug),
+  )
+  if (fromMaster) return fromMaster
   const product = staticProducts.find((p) => p.slug === slug)
   if (!product) return null
   return seriesList.find((s) => s.series === seriesNameOf(product)) ?? null
@@ -331,7 +361,7 @@ export async function getProductBySlug(slug: string): Promise<CatalogueProduct |
 
 export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | null> {
   const seriesList = await getCatalogueSeries()
-  const bySeriesSlug = seriesList.find((s) => s.slug === slug)
+  const bySeriesSlug = findSeriesBySlug(seriesList, slug)
   if (bySeriesSlug) return overlayMasterPhotos(bySeriesSlug)
 
   // Deep link: CMS model slug → parent series
@@ -346,7 +376,7 @@ export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | n
   // failure, unstable_cache can hold an empty catalogue and produce false 404s.
   const freshProducts = await fetchPublishedProducts()
   const freshSeriesList = groupProductsIntoSeries(freshProducts)
-  const freshBySeriesSlug = freshSeriesList.find((s) => s.slug === slug)
+  const freshBySeriesSlug = findSeriesBySlug(freshSeriesList, slug)
   if (freshBySeriesSlug) return overlayMasterPhotos(freshBySeriesSlug)
   const freshProduct = freshProducts.find((p) => p.slug === slug)
   if (freshProduct) {

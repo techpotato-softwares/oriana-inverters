@@ -1,10 +1,12 @@
 import type { CatalogueProduct, CatalogueSeries } from '@/types/catalogue'
 
-/** Stable URL slug for a datasheet model series name (Excel column F). */
+/** Stable URL slug for a datasheet model series name (Excel column F).
+ * Must match slugifyLabel so C&I → c-and-i (not c-i). */
 export function slugifySeries(series: string): string {
   return series
     .trim()
     .toLowerCase()
+    .replace(/&/g, ' and ')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 }
