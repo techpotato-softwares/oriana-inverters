@@ -52,6 +52,9 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: 'summary_large_image',
       creator: settings.twitterHandle,
+      title: settings.seoTitle,
+      description: settings.seoDescription,
+      images: settings.ogImageUrl ? [settings.ogImageUrl] : undefined,
     },
     icons: {
       icon: [

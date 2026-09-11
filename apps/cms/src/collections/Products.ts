@@ -6,17 +6,27 @@ import { publishedOnly } from '../access/publishedOnly'
 import { seoFields } from '../fields/seo'
 import { defaultLexical } from '@/fields/defaultLexical'
 
+function slugifyModel(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 export const Products: CollectionConfig = {
   slug: 'products',
   labels: {
-    singular: 'Product',
-    plural: 'Products',
+    singular: 'Product family',
+    plural: 'Product families',
   },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'category', 'modelSeries', 'powerRange', 'featured', '_status', 'updatedAt'],
+    defaultColumns: ['name', 'category', 'powerRange', 'featured', '_status', 'updatedAt'],
     group: 'Catalogue',
-    description: 'Inverter models shown on the public product catalogue. Publish to appear on the website.',
+    description:
+      'One row = one datasheet family (series), e.g. ORI-(1…4)K-OG04P1-…. Capacity models live under Capacity variants — not as separate products.',
   },
   access: {
     create: authenticated,
@@ -25,6 +35,31 @@ export const Products: CollectionConfig = {
     update: authenticated,
   },
   hooks: {
+    beforeChange: [
+      ({ data }) => {
+        if (!data) return data
+        if (!data.modelSeries?.trim() && data.name?.trim()) {
+          data.modelSeries = data.name.trim()
+        }
+        if (Array.isArray(data.capacityVariants)) {
+          data.capacityVariants = data.capacityVariants.map(
+            (variant: {
+              modelNo?: string | null
+              slug?: string | null
+              powerRange?: string | null
+              featured?: boolean | null
+              id?: string | null
+            }) => ({
+              ...variant,
+              slug:
+                variant.slug?.trim() ||
+                (variant.modelNo ? slugifyModel(variant.modelNo) : variant.slug),
+            }),
+          )
+        }
+        return data
+      },
+    ],
     afterChange: [
       async ({ doc, previousDoc, req: { payload, context } }) => {
         if (context.disableRevalidate) return doc
@@ -36,19 +71,26 @@ export const Products: CollectionConfig = {
           if (!product) return [] as string[]
           const seriesName =
             product.modelSeries ||
+            product.name ||
             product.keySpecs?.find(
               (s: { label?: string | null; value?: string | null }) =>
                 s.label?.toLowerCase() === 'model series',
             )?.value
           const seriesSlug = seriesName ? slugifySeries(String(seriesName)) : null
+          const variantSlugs =
+            product.capacityVariants?.flatMap(
+              (variant: { slug?: string | null } | null) =>
+                variant?.slug ? [`/products/${variant.slug}`] : [],
+            ) ?? []
           return [
             `/products/${product.slug}`,
             ...(seriesSlug ? [`/products/${seriesSlug}`] : []),
+            ...variantSlugs,
           ]
         }
 
         if (doc._status === 'published') {
-          payload.logger.info(`Revalidating product: /products/${doc.slug}`)
+          payload.logger.info(`Revalidating product family: /products/${doc.slug}`)
           for (const path of seriesPaths(doc)) revalidatePath(path)
           revalidatePath('/products')
           if (doc.category && typeof doc.category === 'object' && 'slug' in doc.category) {
@@ -91,7 +133,8 @@ export const Products: CollectionConfig = {
               type: 'text',
               required: true,
               admin: {
-                description: 'Website label, e.g. "4kW ORI-4K-OG04P1-EU-CM1".',
+                description:
+                  'Datasheet family / productName, e.g. "ORI-(1/1.5/2/…/4)K-OG04P1-EU-CM1" or "ORIANA-BESS Home-(5-16)kWh".',
               },
             },
             slugField({ fieldToUse: 'name' }),
@@ -101,14 +144,15 @@ export const Products: CollectionConfig = {
               relationTo: 'categories',
               required: true,
               admin: {
-                description: 'Product family / category. Create categories first under Catalogue → Categories.',
+                description: 'Category bucket (On Grid, Hybrid, Utility, BESS).',
               },
             },
             {
               name: 'modelSeries',
               type: 'text',
               admin: {
-                description: 'Datasheet model series (family productName). Used to group models on category pages.',
+                description:
+                  'Usually the same as Name. Auto-filled from Name on save if left empty. Used for public grouping.',
               },
             },
             {
@@ -136,8 +180,52 @@ export const Products: CollectionConfig = {
               type: 'checkbox',
               defaultValue: false,
               admin: {
-                description: 'Show in the Featured Models table on /products.',
+                description: 'Show this family in the Featured Models table on /products.',
               },
+            },
+          ],
+        },
+        {
+          label: 'Capacity variants',
+          fields: [
+            {
+              name: 'capacityVariants',
+              type: 'array',
+              labels: { singular: 'Capacity', plural: 'Capacity variants' },
+              admin: {
+                description:
+                  'Individual kW / kWh models in this family. These appear in the capacity picker on the product page — they are not separate catalogue rows.',
+              },
+              fields: [
+                {
+                  name: 'modelNo',
+                  type: 'text',
+                  required: true,
+                  admin: { description: 'Exact model number, e.g. ORI-4K-OG04P1-EU-CM1.' },
+                },
+                {
+                  name: 'powerRange',
+                  type: 'text',
+                  required: true,
+                  admin: { description: 'e.g. 4 kW or 5 kWh', width: '50%' },
+                },
+                {
+                  name: 'slug',
+                  type: 'text',
+                  admin: {
+                    description:
+                      'URL slug for deep links. Auto-derived from model number on save if empty.',
+                  },
+                },
+                {
+                  name: 'featured',
+                  type: 'checkbox',
+                  defaultValue: false,
+                  admin: {
+                    description: 'Prefer this capacity when the family is featured.',
+                  },
+                },
+              ],
             },
           ],
         },
@@ -150,7 +238,10 @@ export const Products: CollectionConfig = {
                 {
                   name: 'powerRange',
                   type: 'text',
-                  admin: { description: 'e.g. 5 kW or 3.8 – 11.4 kW', width: '50%' },
+                  admin: {
+                    description: 'Family capacity range, e.g. 1 kW to 4 kW',
+                    width: '50%',
+                  },
                 },
                 {
                   name: 'efficiency',
@@ -179,7 +270,8 @@ export const Products: CollectionConfig = {
               type: 'array',
               labels: { singular: 'Spec', plural: 'Key Specs' },
               admin: {
-                description: 'Additional rows on the product detail specs table (weight, dimensions, MPPT, etc.).',
+                description:
+                  'Shared family specs (weight, dimensions, MPPT, etc.). Capacity-specific Model / Capacity rows are added from variants automatically.',
               },
               fields: [
                 { name: 'label', type: 'text', required: true },

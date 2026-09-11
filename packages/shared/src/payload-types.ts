@@ -487,7 +487,7 @@ export interface Download {
   createdAt: string;
 }
 /**
- * Inverter models shown on the public product catalogue. Publish to appear on the website.
+ * One row = one datasheet family (series), e.g. ORI-(1…4)K-OG04P1-…. Capacity models live under Capacity variants — not as separate products.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products".
@@ -495,7 +495,7 @@ export interface Download {
 export interface Product {
   id: number;
   /**
-   * Website label, e.g. "4kW ORI-4K-OG04P1-EU-CM1".
+   * Datasheet family / productName, e.g. "ORI-(1/1.5/2/…/4)K-OG04P1-EU-CM1" or "ORIANA-BESS Home-(5-16)kWh".
    */
   name: string;
   /**
@@ -504,11 +504,11 @@ export interface Product {
   generateSlug?: boolean | null;
   slug: string;
   /**
-   * Product family / category. Create categories first under Catalogue → Categories.
+   * Category bucket (On Grid, Hybrid, Utility, BESS).
    */
   category: number | Category;
   /**
-   * Datasheet model series (family productName). Used to group models on category pages.
+   * Usually the same as Name. Auto-filled from Name on save if left empty. Used for public grouping.
    */
   modelSeries?: string | null;
   /**
@@ -520,11 +520,35 @@ export interface Product {
    */
   shortDescription?: string | null;
   /**
-   * Show in the Featured Models table on /products.
+   * Show this family in the Featured Models table on /products.
    */
   featured?: boolean | null;
   /**
-   * e.g. 5 kW or 3.8 – 11.4 kW
+   * Individual kW / kWh models in this family. These appear in the capacity picker on the product page — they are not separate catalogue rows.
+   */
+  capacityVariants?:
+    | {
+        /**
+         * Exact model number, e.g. ORI-4K-OG04P1-EU-CM1.
+         */
+        modelNo: string;
+        /**
+         * e.g. 4 kW or 5 kWh
+         */
+        powerRange: string;
+        /**
+         * URL slug for deep links. Auto-derived from model number on save if empty.
+         */
+        slug?: string | null;
+        /**
+         * Prefer this capacity when the family is featured.
+         */
+        featured?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Family capacity range, e.g. 1 kW to 4 kW
    */
   powerRange?: string | null;
   /**
@@ -540,7 +564,7 @@ export interface Product {
    */
   warranty?: string | null;
   /**
-   * Additional rows on the product detail specs table (weight, dimensions, MPPT, etc.).
+   * Shared family specs (weight, dimensions, MPPT, etc.). Capacity-specific Model / Capacity rows are added from variants automatically.
    */
   keySpecs?:
     | {
@@ -687,6 +711,19 @@ export interface Category {
    */
   image?: (number | null) | Media;
   /**
+   * Full-bleed banner on /products/category/{slug} (On Grid, Hybrid, BESS, …). Leave empty to use the default category banner.
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Intro copy under the category title on the category landing page. Leave empty to use the built-in fallback copy.
+   */
+  introParagraphs?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Photos shown in the Products mega-menu for this category. Name must match the segment label (Single Phase, Three Phase, C&I, Utility Grid-Tied PV Inverter, ORIANA BESS Home, …).
    */
   segments?:
@@ -707,7 +744,7 @@ export interface Category {
       }[]
     | null;
   /**
-   * Optional longer intro copy for the category landing page (SEO).
+   * Optional rich-text SEO body. Public category pages use Intro paragraphs above; this field is not shown on the site.
    */
   categoryIntroBody?: {
     root: {
@@ -2117,6 +2154,15 @@ export interface ProductsSelect<T extends boolean = true> {
   segment?: T;
   shortDescription?: T;
   featured?: T;
+  capacityVariants?:
+    | T
+    | {
+        modelNo?: T;
+        powerRange?: T;
+        slug?: T;
+        featured?: T;
+        id?: T;
+      };
   powerRange?: T;
   efficiency?: T;
   phases?: T;
@@ -2327,6 +2373,13 @@ export interface CategoriesSelect<T extends boolean = true> {
   sortOrder?: T;
   description?: T;
   image?: T;
+  heroImage?: T;
+  introParagraphs?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
   segments?:
     | T
     | {

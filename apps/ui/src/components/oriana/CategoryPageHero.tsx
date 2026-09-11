@@ -1,10 +1,19 @@
 import { CATEGORY_HERO_IMAGE } from '@/data/categoryPageCopy'
 
-export function CategoryPageHero({ title }: { title: string }) {
+export function CategoryPageHero({
+  title,
+  imageUrl,
+}: {
+  title: string
+  /** CMS category hero; falls back to the shared default banner. */
+  imageUrl?: string | null
+}) {
+  const src = imageUrl?.trim() || CATEGORY_HERO_IMAGE
+
   return (
     <section className="category-hero" aria-label={`${title} hero`}>
       <img
-        src={CATEGORY_HERO_IMAGE}
+        src={src}
         alt=""
         style={{
           display: 'block',

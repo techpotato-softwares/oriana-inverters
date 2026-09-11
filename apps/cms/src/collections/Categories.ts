@@ -30,7 +30,7 @@ export const Categories: CollectionConfig = {
     defaultColumns: ['title', 'slug', 'sortOrder', 'updatedAt'],
     group: 'Catalogue',
     description:
-      'Product families (e.g. On Grid Inverters). Create these first, then assign products to them. Products mega-menu tile photos: Catalogue → Categories → open a category → Segments. Segment names must match tile labels (Single Phase, Three Phase, C&I, Utility Grid-Tied PV Inverter, ORIANA BESS Home).',
+      'Product families (e.g. On Grid Inverters). Category landing hero + intro: open a category → Hero image / Intro paragraphs. Mega-menu segment photos: Segments list. Then assign product families under Catalogue → Product families.',
   },
   hooks: {
     beforeChange: [
@@ -113,6 +113,34 @@ export const Categories: CollectionConfig = {
       },
     },
     {
+      name: 'heroImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description:
+          'Full-bleed banner on /products/category/{slug} (On Grid, Hybrid, BESS, …). Leave empty to use the default category banner.',
+      },
+    },
+    {
+      name: 'introParagraphs',
+      type: 'array',
+      labels: {
+        singular: 'Paragraph',
+        plural: 'Intro paragraphs',
+      },
+      admin: {
+        description:
+          'Intro copy under the category title on the category landing page. Leave empty to use the built-in fallback copy.',
+      },
+      fields: [
+        {
+          name: 'text',
+          type: 'textarea',
+          required: true,
+        },
+      ],
+    },
+    {
       name: 'segments',
       type: 'array',
       labels: {
@@ -157,7 +185,8 @@ export const Categories: CollectionConfig = {
       type: 'richText',
       editor: defaultLexical,
       admin: {
-        description: 'Optional longer intro copy for the category landing page (SEO).',
+        description:
+          'Optional rich-text SEO body. Public category pages use Intro paragraphs above; this field is not shown on the site.',
       },
     },
   ],
