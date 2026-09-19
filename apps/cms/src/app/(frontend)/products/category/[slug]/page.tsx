@@ -68,7 +68,11 @@ export default async function ProductCategoryPage({ params, searchParams }: Prop
   const allSeries = await getSeriesByCategory(slug)
   const segmentLabel = segment ? segmentLabelForSlug(slug, segment) : null
   const listingLabel = segmentLabel ? listingSectionTitle(segmentLabel) : null
-  const copy = getCategoryPageCopy(slug)
+  const fallbackCopy = getCategoryPageCopy(slug)
+  const introParagraphs =
+    meta.introParagraphs && meta.introParagraphs.length > 0
+      ? meta.introParagraphs
+      : (fallbackCopy?.paragraphs ?? [])
   const seriesList =
     segment && segmentLabel
       ? allSeries.filter((series) => seriesMatchesSegment(series, slug, segment))
@@ -76,7 +80,7 @@ export default async function ProductCategoryPage({ params, searchParams }: Prop
 
   return (
     <main>
-      <CategoryPageHero title={meta.title} />
+      <CategoryPageHero title={meta.title} imageUrl={meta.heroImageUrl} />
       <Breadcrumbs
         items={[
           { label: 'Inverters', href: '/products' },
@@ -90,7 +94,9 @@ export default async function ProductCategoryPage({ params, searchParams }: Prop
 
       <section className="category-page bg-white py-16 lg:py-20">
         <div className="container">
-          {copy ? <CategoryPageIntro title={meta.title} paragraphs={copy.paragraphs} /> : null}
+          {introParagraphs.length > 0 ? (
+            <CategoryPageIntro title={meta.title} paragraphs={introParagraphs} />
+          ) : null}
 
           {listingLabel ? (
             <p className="category-filter-note">

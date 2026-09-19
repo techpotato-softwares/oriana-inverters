@@ -16,7 +16,7 @@ import {
   uniqueProductsMegaMenuImageUrls,
 } from '@/data/productMaster'
 import type { NavMegaCategory } from '@/config/navigation'
-import { mapCategory, mapDownload, mapProduct } from '@/utilities/mapCatalogue'
+import { mapCategory, mapDownload, mapProductDoc } from '@/utilities/mapCatalogue'
 import { groupProductsIntoSeries, seriesNameOf, slugifySeries } from '@/utilities/series'
 import type {
   CatalogueCategory,
@@ -132,7 +132,7 @@ async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
     const mediaById = new Map(mediaResult.docs.map((doc) => [doc.id, doc]))
 
     const products = result.docs
-      .map((doc) => {
+      .flatMap((doc) => {
         const categoryId = relationId(doc.category)
         const categoryDoc =
           categoryId !== null ? categoriesById.get(categoryId) : null
@@ -140,7 +140,7 @@ async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
         const heroId = relationId(doc.heroImage)
         const datasheetId = relationId(doc.datasheetPdf)
 
-        return mapProduct({
+        return mapProductDoc({
           ...doc,
           category: categoryDoc ?? doc.category,
           heroImage: (heroId !== null ? mediaById.get(heroId) : null) ?? doc.heroImage,
@@ -179,6 +179,8 @@ async function fetchCategories(): Promise<CatalogueCategory[]> {
     for (const doc of result.docs) {
       const imageId = relationId(doc.image)
       if (imageId !== null) mediaIds.add(imageId)
+      const heroImageId = relationId(doc.heroImage)
+      if (heroImageId !== null) mediaIds.add(heroImageId)
       for (const segment of doc.segments ?? []) {
         const segmentImageId = relationId(segment.image)
         if (segmentImageId !== null) mediaIds.add(segmentImageId)
@@ -203,9 +205,11 @@ async function fetchCategories(): Promise<CatalogueCategory[]> {
     const mapped = result.docs
       .map((doc) => {
         const imageId = relationId(doc.image)
+        const heroImageId = relationId(doc.heroImage)
         return mapCategory({
           ...doc,
           image: (imageId !== null ? mediaById.get(imageId) : null) ?? doc.image,
+          heroImage: (heroImageId !== null ? mediaById.get(heroImageId) : null) ?? doc.heroImage,
           segments: doc.segments?.map((segment) => {
             const segmentImageId = relationId(segment.image)
             return {
@@ -249,7 +253,7 @@ async function fetchDownloads(): Promise<CatalogueDownload[]> {
 
 export const getCatalogueProducts = unstable_cache(
   fetchPublishedProducts,
-  ['catalogue-products', 'canonical-v2-product-page'],
+  ['catalogue-products', 'canonical-v3-family-products'],
   {
     tags: ['products'],
   },
@@ -257,7 +261,7 @@ export const getCatalogueProducts = unstable_cache(
 
 export const getCatalogueCategories = unstable_cache(
   fetchCategories,
-  ['catalogue-categories', 'canonical-v2-product-page'],
+  ['catalogue-categories', 'canonical-v3-category-hero'],
   {
     tags: ['categories'],
   },

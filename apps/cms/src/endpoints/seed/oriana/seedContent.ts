@@ -286,6 +286,11 @@ export async function seedOrianaContent({
     data: {
       siteName: 'Oriana Inverters',
       hotline: '+1 (800) ORIANA-1',
+      seoTitle: 'Oriana Inverters | Advanced Solar Inverter Solutions',
+      seoTitleTemplate: '%s | Oriana Inverters',
+      seoDescription:
+        'High-efficiency string, hybrid, and utility-scale solar inverters for residential, commercial, and utility applications.',
+      twitterHandle: '@OrianaInverters',
       footerColumns: footerNav.map((col) => ({
         title: col.title,
         links: col.links.map((link) => ({ label: link.label, href: link.href })),

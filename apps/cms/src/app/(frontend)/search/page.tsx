@@ -85,6 +85,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
 
 export function generateMetadata(): Metadata {
   return {
-    title: `Payload Website Template Search`,
+    title: 'Search',
+    description: 'Search Oriana Inverters products, solutions, and resources.',
   }
 }

@@ -57,6 +57,7 @@ export default async function Page() {
 
 export function generateMetadata(): Metadata {
   return {
-    title: `Payload Website Template Posts`,
+    title: 'News & Insights',
+    description: 'News, insights, and updates from Oriana Inverters.',
   }
 }

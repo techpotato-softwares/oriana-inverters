@@ -3,7 +3,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { staticCategories, staticProducts } from '@/data/products'
+import { getCategoryPageCopy } from '@/data/categoryPageCopy'
+import { staticCategories, staticProductFamilies } from '@/data/products'
 import { getOnGridSeriesPageData } from '@/data/onGridProductPage'
 import { productPageSeedData } from '@/utilities/mapProductPage'
 
@@ -51,6 +52,37 @@ export async function seedProducts({ payload }: { payload: Payload }) {
   payload.logger.info('— Seeding product categories...')
 
   const categoryIds: Record<string, number> = {}
+  const canUploadMedia = Boolean(process.env.S3_BUCKET)
+
+  let sharedCategoryHeroId: number | undefined
+  if (canUploadMedia) {
+    try {
+      const existingHero = await payload.find({
+        collection: 'media',
+        where: { filename: { equals: 'category-banner.png' } },
+        limit: 1,
+        ...seedOpts,
+      })
+      if (existingHero.docs[0]) {
+        sharedCategoryHeroId = existingHero.docs[0].id
+      } else {
+        const hero = await payload.create({
+          collection: 'media',
+          data: {
+            alt: 'Oriana product category banner',
+            mediaType: 'image',
+          },
+          file: readLocalImage('category-banner.png'),
+          ...seedOpts,
+        })
+        sharedCategoryHeroId = hero.id
+      }
+    } catch (error) {
+      payload.logger.warn(
+        `— Skipping category hero upload: ${error instanceof Error ? error.message : error}`,
+      )
+    }
+  }
 
   for (const [index, cat] of staticCategories.entries()) {
     const existing = await payload.find({
@@ -60,16 +92,21 @@ export async function seedProducts({ payload }: { payload: Payload }) {
       ...seedOpts,
     })
 
+    const copy = getCategoryPageCopy(cat.slug)
+    const categoryData = {
+      title: cat.title,
+      description: cat.description,
+      sortOrder: index * 10 + 10,
+      introParagraphs: copy?.paragraphs.map((text) => ({ text })) ?? [],
+      ...(sharedCategoryHeroId ? { heroImage: sharedCategoryHeroId } : {}),
+    }
+
     if (existing.docs[0]) {
       categoryIds[cat.slug] = existing.docs[0].id
       await payload.update({
         collection: 'categories',
         id: existing.docs[0].id,
-        data: {
-          title: cat.title,
-          description: cat.description,
-          sortOrder: index * 10 + 10,
-        },
+        data: categoryData,
         ...seedOpts,
       })
       continue
@@ -78,10 +115,8 @@ export async function seedProducts({ payload }: { payload: Payload }) {
     const doc = await payload.create({
       collection: 'categories',
       data: {
-        title: cat.title,
+        ...categoryData,
         slug: cat.slug,
-        description: cat.description,
-        sortOrder: index * 10 + 10,
       },
       ...seedOpts,
     })
@@ -89,33 +124,29 @@ export async function seedProducts({ payload }: { payload: Payload }) {
     categoryIds[cat.slug] = doc.id
   }
 
-  payload.logger.info('— Seeding products...')
+  payload.logger.info('— Seeding product families...')
 
-  if (!staticProducts.length) {
+  if (!staticProductFamilies.length) {
     payload.logger.info(
-      '— No static products to seed. Add products in Admin → Catalogue → Products.',
+      '— No static product families to seed. Add families in Admin → Catalogue → Product families.',
     )
   }
 
-  const canonicalSlugs = new Set(staticProducts.map((p) => p.slug))
+  const canonicalSlugs = new Set(staticProductFamilies.map((family) => family.slug))
 
-  for (const product of staticProducts) {
-    // Prefer canonical model slug; also reclaim any name-based duplicate slug.
+  for (const family of staticProductFamilies) {
     const existing = await payload.find({
       collection: 'products',
       where: {
-        or: [{ slug: { equals: product.slug } }, { name: { equals: product.name } }],
+        or: [{ slug: { equals: family.slug } }, { name: { equals: family.name } }],
       },
       limit: 50,
       ...seedOpts,
     })
 
     const preferred =
-      existing.docs.find((doc) => doc.slug === product.slug) ?? existing.docs[0] ?? null
+      existing.docs.find((doc) => doc.slug === family.slug) ?? existing.docs[0] ?? null
 
-    // Skip uploading seed media unless S3 is configured. Local disk uploads break
-    // Lambda media populate and hide the whole catalogue.
-    const canUploadMedia = Boolean(process.env.S3_BUCKET)
     let heroImageId: number | undefined =
       preferred?.heroImage && typeof preferred.heroImage === 'object'
         ? preferred.heroImage.id
@@ -125,11 +156,11 @@ export async function seedProducts({ payload }: { payload: Payload }) {
 
     if (canUploadMedia && !heroImageId) {
       try {
-        const imageFile = readLocalImage(categoryImages[product.categorySlug] ?? 'segment-string.png')
+        const imageFile = readLocalImage(categoryImages[family.categorySlug] ?? 'segment-string.png')
         const hero = await payload.create({
           collection: 'media',
           data: {
-            alt: product.name,
+            alt: family.name,
             mediaType: 'image',
           },
           file: imageFile,
@@ -138,32 +169,34 @@ export async function seedProducts({ payload }: { payload: Payload }) {
         heroImageId = hero.id
       } catch (error) {
         payload.logger.warn(
-          `— Skipping hero image for ${product.slug}: ${error instanceof Error ? error.message : error}`,
+          `— Skipping hero image for ${family.slug}: ${error instanceof Error ? error.message : error}`,
         )
       }
     }
 
     const data = {
-      name: product.name,
-      slug: product.slug,
+      name: family.name,
+      slug: family.slug,
       generateSlug: false,
-      category: categoryIds[product.categorySlug],
-      segment: product.segmentKey,
-      shortDescription: product.description,
-      powerRange: product.powerRange,
-      efficiency: product.efficiency,
-      phases: product.phases,
-      warranty: product.warranty,
-      modelSeries:
-        product.modelSeries ??
-        product.specs.find((s) => s.label === 'Model Series')?.value ??
-        undefined,
-      featured: product.featured ?? false,
-      keySpecs: product.specs.map((s) => ({ label: s.label, value: s.value })),
+      category: categoryIds[family.categorySlug],
+      segment: family.segmentKey,
+      shortDescription: family.description,
+      powerRange: family.powerRange,
+      efficiency: family.efficiency,
+      phases: family.phases,
+      warranty: family.warranty,
+      modelSeries: family.modelSeries,
+      featured: family.featured,
+      keySpecs: family.specs.map((s) => ({ label: s.label, value: s.value })),
+      capacityVariants: family.capacityVariants.map((variant) => ({
+        modelNo: variant.modelNo,
+        powerRange: variant.powerRange,
+        slug: variant.slug,
+        featured: variant.featured,
+      })),
       productPage: productPageSeedData(
-        product.productPage ?? getOnGridSeriesPageData(product.modelSeries),
+        family.productPage ?? getOnGridSeriesPageData(family.modelSeries),
       ),
-      // Clear broken local-disk media refs when S3 isn't available (Lambda-safe).
       heroImage: canUploadMedia ? heroImageId : null,
       _status: 'published' as const,
     }
@@ -183,21 +216,20 @@ export async function seedProducts({ payload }: { payload: Payload }) {
       })
     }
 
-    // Remove duplicate rows for the same display name / non-canonical slugs.
     for (const doc of existing.docs) {
       if (preferred && doc.id === preferred.id) continue
-      if (doc.name === product.name || !canonicalSlugs.has(doc.slug)) {
+      if (doc.name === family.name || !canonicalSlugs.has(doc.slug)) {
         await payload.delete({
           collection: 'products',
           id: doc.id,
           ...seedOpts,
         })
-        payload.logger.info(`— Removed duplicate product ${doc.slug} (#${doc.id})`)
+        payload.logger.info(`— Removed duplicate / legacy product ${doc.slug} (#${doc.id})`)
       }
     }
   }
 
-  // Remove every product that is not in the new catalogue (old OG6 SKUs, etc.).
+  // Remove every product that is not a canonical family (old capacity SKUs, etc.).
   const leftovers = await payload.find({
     collection: 'products',
     depth: 0,
@@ -212,7 +244,7 @@ export async function seedProducts({ payload }: { payload: Payload }) {
       id: doc.id,
       ...seedOpts,
     })
-    payload.logger.info(`— Removed old product ${doc.slug} (#${doc.id})`)
+    payload.logger.info(`— Removed old capacity SKU / product ${doc.slug} (#${doc.id})`)
   }
 
   const canonicalCategorySlugs = new Set(staticCategories.map((cat) => cat.slug))

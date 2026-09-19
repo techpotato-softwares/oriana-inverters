@@ -2,6 +2,7 @@ import type { CatalogueCategory, CatalogueProduct } from '@/types/catalogue'
 import { getOnGridSeriesPageData } from './onGridProductPage'
 import {
   categorySlug,
+  productMaster,
   productMasterCategories,
   segmentKeyOf,
   slugifyLabel,
@@ -265,67 +266,145 @@ function phasesOf(segment: string | null, categoryName: string): string {
   return 'Three Phase'
 }
 
+function familyCapacityRange(
+  categoryName: string,
+  productName: string,
+  models: ProductModel[],
+): string {
+  for (const category of productMaster.categories) {
+    if (category.name !== categoryName) continue
+    const family = category.families.find((item) => item.productName === productName)
+    if (family?.capacity) return family.capacity
+  }
+  if (models.length === 0) return '—'
+  if (models.length === 1) return models[0]!.rating
+  const last = models[models.length - 1]!.rating
+  const first = models[0]!.rating
+  return `${last} – ${first}`
+}
+
+export type StaticProductFamily = {
+  name: string
+  slug: string
+  category: string
+  categorySlug: string
+  segment: string
+  segmentKey: CatalogueProduct['segmentKey']
+  modelSeries: string
+  powerRange: string
+  efficiency: string
+  phases: string
+  warranty: string
+  featured: boolean
+  description: string
+  specs: { label: string; value: string }[]
+  productPage: CatalogueProduct['productPage']
+  capacityVariants: {
+    modelNo: string
+    powerRange: string
+    slug: string
+    featured: boolean
+  }[]
+}
+
 export const staticCategories: CatalogueCategory[] = productMasterCategories
 
-export const staticProducts: CatalogueProduct[] = productCatalog.flatMap((category) =>
-  category.families.flatMap((family) =>
-    family.models.map((model, index) => {
-      const power = model.rating
-      const compact = power.replace(/\s+/g, '')
-      const phases = phasesOf(family.segment, category.name)
-      const segment = family.segment || family.series
-      const categoryLabel = category.name.endsWith('Inverters')
-        ? category.name.slice(0, -1)
-        : category.name
-      const lead =
-        phases === '—' ? 'Home battery energy storage' : `${phases} ${categoryLabel}`
-      const pageData = getOnGridSeriesPageData(family.productName)
-      const specs = [
-        { label: 'Model', value: model.modelNo },
-        { label: 'Model Series', value: family.productName },
-        { label: 'Capacity', value: power },
-        { label: 'Series', value: family.series },
-      ]
-      if (pageData) {
-        const labels = pageData.tileLabels
-        specs.push(
-          {
-            label: labels?.maxPvInputVoltage ?? 'Max. PV Input Voltage',
-            value: pageData.maxPvInputVoltage,
-          },
-          {
-            label: labels?.ratedAcOutputPower ?? 'Rated AC Output Power',
-            value: pageData.ratedAcOutputPower,
-          },
-          {
-            label: labels?.ratedAcVoltage ?? 'Rated AC Voltage',
-            value: pageData.ratedAcVoltage,
-          },
-          {
-            label: labels?.maxEfficiency ?? 'Max. Efficiency',
-            value: pageData.maxEfficiency,
-          },
-        )
-      }
-      return {
+/** One seed/CMS row per datasheet family (not per capacity SKU). */
+export const staticProductFamilies: StaticProductFamily[] = productCatalog.flatMap((category) =>
+  category.families.map((family) => {
+    const phases = phasesOf(family.segment, category.name)
+    const segment = family.segment || family.series
+    const categoryLabel = category.name.endsWith('Inverters')
+      ? category.name.slice(0, -1)
+      : category.name
+    const lead =
+      phases === '—' ? 'Home battery energy storage' : `${phases} ${categoryLabel}`
+    const pageData = getOnGridSeriesPageData(family.productName)
+    const powerRange = familyCapacityRange(category.name, family.productName, family.models)
+    const specs = [
+      { label: 'Model Series', value: family.productName },
+      { label: 'Series', value: family.series },
+      { label: 'Capacity', value: powerRange },
+    ]
+    if (pageData) {
+      const labels = pageData.tileLabels
+      specs.push(
+        {
+          label: labels?.maxPvInputVoltage ?? 'Max. PV Input Voltage',
+          value: pageData.maxPvInputVoltage,
+        },
+        {
+          label: labels?.ratedAcOutputPower ?? 'Rated AC Output Power',
+          value: pageData.ratedAcOutputPower,
+        },
+        {
+          label: labels?.ratedAcVoltage ?? 'Rated AC Voltage',
+          value: pageData.ratedAcVoltage,
+        },
+        {
+          label: labels?.maxEfficiency ?? 'Max. Efficiency',
+          value: pageData.maxEfficiency,
+        },
+      )
+    }
+
+    return {
+      name: family.productName,
+      slug: slugifyLabel(family.productName),
+      category: category.name,
+      categorySlug: categorySlug(category.name),
+      segment,
+      segmentKey: segmentKeyOf(category.name, family),
+      modelSeries: family.productName,
+      powerRange,
+      efficiency: pageData?.maxEfficiency ?? '—',
+      phases,
+      warranty: '10 Years',
+      featured: true,
+      description: `${lead} — ${powerRange} family (${family.productName}).`,
+      specs,
+      productPage: pageData ?? null,
+      capacityVariants: family.models.map((model, index) => ({
+        modelNo: model.modelNo,
+        powerRange: model.rating,
         slug: slugifyLabel(model.modelNo),
-        name: compact ? `${compact} ${model.modelNo}` : model.modelNo,
-        category: category.name,
-        categorySlug: categorySlug(category.name),
-        segment,
-        segmentKey: segmentKeyOf(category.name, family),
-        powerRange: power,
-        efficiency: pageData?.maxEfficiency ?? '—',
-        phases,
-        warranty: '10 Years',
         featured: index === 0,
-        description: `${lead} — ${power} model in the ${family.productName} series.`,
-        modelSeries: family.productName,
-        specs,
-        productPage: pageData ?? null,
-      } satisfies CatalogueProduct
-    }),
-  ),
+      })),
+    } satisfies StaticProductFamily
+  }),
+)
+
+/** Flattened capacity rows for public fallback / grouping (derived from families). */
+export const staticProducts: CatalogueProduct[] = staticProductFamilies.flatMap((family) =>
+  family.capacityVariants.map((variant) => {
+    const power = variant.powerRange
+    const compact = power.replace(/\s+/g, '')
+    return {
+      slug: variant.slug,
+      name: compact ? `${compact} ${variant.modelNo}` : variant.modelNo,
+      category: family.category,
+      categorySlug: family.categorySlug,
+      segment: family.segment,
+      segmentKey: family.segmentKey,
+      powerRange: power,
+      efficiency: family.efficiency,
+      phases: family.phases,
+      warranty: family.warranty,
+      featured: variant.featured && family.featured,
+      description: family.description,
+      modelSeries: family.modelSeries,
+      specs: [
+        { label: 'Model', value: variant.modelNo },
+        { label: 'Model Series', value: family.modelSeries },
+        { label: 'Capacity', value: power },
+        ...family.specs.filter((spec) => {
+          const label = spec.label.toLowerCase()
+          return label !== 'model' && label !== 'capacity' && label !== 'model series'
+        }),
+      ],
+      productPage: family.productPage,
+    } satisfies CatalogueProduct
+  }),
 )
 
 /** @deprecated Use getCatalogueProducts() */

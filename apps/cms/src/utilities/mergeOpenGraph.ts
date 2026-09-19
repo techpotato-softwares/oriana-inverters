@@ -1,22 +1,33 @@
 import type { Metadata } from 'next'
+
 import { getServerSideURL } from './getURL'
 
+const siteURL = getServerSideURL()
+
+/** Default OG tags when a page does not override them. */
 const defaultOpenGraph: Metadata['openGraph'] = {
   type: 'website',
-  description: 'An open-source website built with Payload and Next.js.',
+  description:
+    'High-efficiency string, hybrid, and utility-scale solar inverters for residential, commercial, and utility applications.',
   images: [
     {
-      url: `${getServerSideURL()}/website-template-OG.webp`,
+      url: `${siteURL}/opengraph-image`,
+      width: 1200,
+      height: 630,
+      alt: 'Oriana Inverters',
     },
   ],
-  siteName: 'Payload Website Template',
-  title: 'Payload Website Template',
+  siteName: 'Oriana Inverters',
+  title: 'Oriana Inverters | Advanced Solar Inverter Solutions',
 }
 
 export const mergeOpenGraph = (og?: Metadata['openGraph']): Metadata['openGraph'] => {
+  const images = og?.images
+  const hasImages = Array.isArray(images) ? images.length > 0 : Boolean(images)
+
   return {
     ...defaultOpenGraph,
     ...og,
-    images: og?.images ? og.images : defaultOpenGraph.images,
+    images: hasImages ? images : defaultOpenGraph.images,
   }
 }

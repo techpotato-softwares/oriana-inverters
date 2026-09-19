@@ -51,6 +51,10 @@ export type CatalogueCategory = {
   description: string
   sortOrder?: number | null
   imageUrl?: string | null
+  /** Category landing page banner; falls back to static default when empty. */
+  heroImageUrl?: string | null
+  /** Intro paragraphs under the category title; falls back to static copy when empty. */
+  introParagraphs?: string[]
   segments?: CatalogueSegmentImage[]
 }
 
