@@ -123,10 +123,10 @@
 
   .category-hero img {
     display: block;
-    width: 100%;
-    height: min(62vh, 640px);
+    width: 100vw;
+    height: auto;
     object-fit: cover;
-    object-position: center bottom;
+    object-position: center;
   }
 
   .container {

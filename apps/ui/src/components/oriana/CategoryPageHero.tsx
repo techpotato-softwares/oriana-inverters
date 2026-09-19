@@ -8,10 +8,10 @@ export function CategoryPageHero({ title }: { title: string }) {
         alt=""
         style={{
           display: 'block',
-          width: '100%',
-          height: 'min(62vh, 640px)',
+          width: '100vw',
+          height: 'auto',
           objectFit: 'cover',
-          objectPosition: 'center bottom',
+          objectPosition: 'center',
         }}
       />
     </section>
