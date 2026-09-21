@@ -3,10 +3,6 @@ export const footerNav = [
   {
     title: 'Products & Solutions',
     links: [
-      { label: 'Residential Solutions', href: '/solutions/residential' },
-      { label: 'C&I PV Solutions', href: '/solutions/commercial' },
-      { label: 'Utility PV Solutions', href: '/solutions/utility' },
-      { label: 'Energy Storage', href: '/solutions/storage' },
       { label: 'On Grid Inverters', href: '/products/category/on-grid-inverters' },
       { label: 'Hybrid Inverters', href: '/products/category/hybrid-inverters' },
       { label: 'Utility Scale Inverters', href: '/products/category/utility-scale-inverters' },
