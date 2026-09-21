@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useReducedMotion } from 'framer-motion'
 import { ProductImage } from './ProductImage'
 import { cn } from '@/utilities/ui'
 import type { ProductGalleryImage } from '@/types/catalogue'
@@ -67,8 +68,22 @@ export function ProductImageCarousel({
 }: ProductImageCarouselProps) {
   const images = carouselImages({ name, heroImageUrl, heroImageAlt, gallery, enabled })
   const [activeIndex, setActiveIndex] = useState(0)
+  const reduceMotion = useReducedMotion()
   const hasMultipleImages = images.length > 1
-  const activeImage = images[activeIndex]
+  const showControls = hasMultipleImages && variant === 'card'
+  const activeImage = images[Math.min(activeIndex, Math.max(images.length - 1, 0))]
+
+  useEffect(() => {
+    setActiveIndex(0)
+  }, [heroImageUrl, gallery, enabled])
+
+  useEffect(() => {
+    if (variant !== 'hero' || !hasMultipleImages || reduceMotion) return
+    const timer = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % images.length)
+    }, 4500)
+    return () => window.clearInterval(timer)
+  }, [variant, hasMultipleImages, reduceMotion, images.length])
 
   const showPrevious = () => {
     setActiveIndex((current) => (current - 1 + images.length) % images.length)
@@ -93,80 +108,101 @@ export function ProductImageCarousel({
 
   return (
     <div
-      className={cn('group/carousel relative overflow-hidden', className)}
+      className={cn(
+        'group/carousel flex flex-col',
+        variant === 'card' ? 'overflow-visible' : 'overflow-hidden',
+        className,
+      )}
       role={hasMultipleImages ? 'region' : undefined}
       aria-roledescription={hasMultipleImages ? 'carousel' : undefined}
       aria-label={hasMultipleImages ? `${name} product images` : undefined}
     >
-      {imageHref ? (
-        <a
-          href={imageHref}
-          aria-label={`View ${name}`}
-          className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue"
-        >
-          {image}
-        </a>
-      ) : (
-        image
-      )}
-
-      {hasMultipleImages ? (
-        <>
-          <button
-            type="button"
-            onClick={showPrevious}
-            aria-label="Show previous product image"
-            className={cn(
-              'absolute left-2 top-1/2 z-10 inline-flex touch-manipulation -translate-y-1/2 items-center justify-center rounded-full border border-oriana-navy/10 bg-white/90 text-oriana-navy shadow-sm backdrop-blur transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue',
-              variant === 'card' ? 'h-9 w-9' : 'left-3 h-11 w-11',
-            )}
+      <div
+        className={cn(
+          'relative min-h-0 w-full',
+          variant === 'card' ? 'aspect-square' : 'h-full flex-1',
+        )}
+      >
+        {imageHref ? (
+          <a
+            href={imageHref}
+            aria-label={`View ${name}`}
+            className="block h-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue"
           >
-            <ChevronLeft className={variant === 'card' ? 'h-4 w-4' : 'h-5 w-5'} aria-hidden />
-          </button>
-          <button
-            type="button"
-            onClick={showNext}
-            aria-label="Show next product image"
-            className={cn(
-              'absolute right-2 top-1/2 z-10 inline-flex touch-manipulation -translate-y-1/2 items-center justify-center rounded-full border border-oriana-navy/10 bg-white/90 text-oriana-navy shadow-sm backdrop-blur transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue',
-              variant === 'card' ? 'h-9 w-9' : 'right-3 h-11 w-11',
-            )}
-          >
-            <ChevronRight className={variant === 'card' ? 'h-4 w-4' : 'h-5 w-5'} aria-hidden />
-          </button>
+            {image}
+          </a>
+        ) : (
+          image
+        )}
 
+        {showControls ? (
+          <>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.preventDefault()
+                event.stopPropagation()
+                showPrevious()
+              }}
+              aria-label="Show previous product image"
+              className="absolute left-0 top-1/2 z-10 inline-flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full border border-oriana-navy/10 bg-white text-oriana-navy shadow-sm transition hover:bg-oriana-silver focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue"
+            >
+              <ChevronLeft className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.preventDefault()
+                event.stopPropagation()
+                showNext()
+              }}
+              aria-label="Show next product image"
+              className="absolute right-0 top-1/2 z-10 inline-flex h-9 w-9 -translate-y-1/2 translate-x-1/2 touch-manipulation items-center justify-center rounded-full border border-oriana-navy/10 bg-white text-oriana-navy shadow-sm transition hover:bg-oriana-silver focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue"
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden />
+            </button>
+          </>
+        ) : null}
+      </div>
+
+      {variant === 'card' ? (
+        hasMultipleImages ? (
           <div
-            className="absolute bottom-2.5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/90 px-2.5 py-1.5 shadow-sm backdrop-blur"
-            aria-label={variant === 'hero' && images.length <= 7 ? 'Choose product image' : undefined}
+            className="mt-3 flex h-4 items-center justify-center gap-1.5"
+            aria-label="Choose product image"
           >
-            {variant === 'card' || images.length > 7 ? (
-              <span className="min-w-8 text-center text-[11px] font-semibold tabular-nums text-oriana-navy">
-                {activeIndex + 1} / {images.length}
-              </span>
-            ) : (
-              images.map((item, index) => (
-                <button
-                  key={item.url}
-                  type="button"
-                  onClick={() => setActiveIndex(index)}
-                  aria-label={`Show product image ${index + 1} of ${images.length}`}
-                  aria-current={index === activeIndex ? 'true' : undefined}
-                  className="flex h-6 w-6 touch-manipulation items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue"
-                >
-                  <span
-                    className={cn(
-                      'h-1.5 w-1.5 rounded-full transition',
-                      index === activeIndex ? 'scale-125 bg-oriana-blue' : 'bg-oriana-navy/30',
-                    )}
-                  />
-                </button>
-              ))
-            )}
+            {images.map((item, index) => (
+              <button
+                key={item.url}
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  setActiveIndex(index)
+                }}
+                aria-label={`Show product image ${index + 1} of ${images.length}`}
+                aria-current={index === activeIndex ? 'true' : undefined}
+                className="flex h-4 w-4 touch-manipulation items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue"
+              >
+                <span
+                  className={cn(
+                    'rounded-full transition',
+                    index === activeIndex ? 'h-2 w-2 bg-oriana-blue' : 'h-1.5 w-1.5 bg-oriana-navy/30',
+                  )}
+                />
+              </button>
+            ))}
+            <p className="sr-only" aria-live="polite">
+              Image {activeIndex + 1} of {images.length}
+            </p>
           </div>
-          <p className="sr-only" aria-live="polite">
-            Image {activeIndex + 1} of {images.length}
-          </p>
-        </>
+        ) : (
+          <div className="mt-3 h-4" aria-hidden />
+        )
+      ) : hasMultipleImages ? (
+        <p className="sr-only" aria-live="polite">
+          Image {activeIndex + 1} of {images.length}
+        </p>
       ) : null}
     </div>
   )
