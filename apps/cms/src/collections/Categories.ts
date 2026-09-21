@@ -109,7 +109,7 @@ export const Categories: CollectionConfig = {
       relationTo: 'media',
       admin: {
         description:
-          'Optional category photo for cards. Segment tiles in the Products mega-menu use the Segments list below.',
+          'Photo for this category tile in the Products hover menu (On Grid, Hybrid, Utility, BESS). Also used on catalogue cards. Prefer PNG/JPG/WebP (not SVG).',
       },
     },
     {

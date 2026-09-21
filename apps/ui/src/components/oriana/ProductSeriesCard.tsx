@@ -1,4 +1,5 @@
-import { ProductImage } from './ProductImage'
+import { ProductImageCarousel } from './ProductImageCarousel'
+import type { ProductGalleryImage } from '@/types/catalogue'
 
 export function productCardTypeLabel(group: string, categorySlug: string): string {
   const hybrid = categorySlug === 'hybrid-inverters'
@@ -49,6 +50,7 @@ export function ProductSeriesCard({
   categorySlug,
   imageSrc,
   imageAlt,
+  gallery,
 }: {
   href: string
   title?: string
@@ -56,22 +58,26 @@ export function ProductSeriesCard({
   categorySlug: string
   imageSrc?: string | null
   imageAlt?: string | null
+  gallery?: ProductGalleryImage[]
 }) {
   const documentsHref = `${href}?tab=documents`
 
   return (
     <article className="flex h-full flex-col rounded-3xl bg-white px-8 pb-8 pt-6 shadow-sm">
-      <a href={href} className="mx-auto flex w-40 items-center justify-center py-8">
-        <ProductImage
+      <div className="mx-auto flex w-40 items-center justify-center py-8">
+        <ProductImageCarousel
           name={name}
           categorySlug={categorySlug}
-          src={imageSrc}
-          alt={imageAlt}
-          plain
-          className="aspect-square w-40 bg-transparent"
+          heroImageUrl={imageSrc}
+          heroImageAlt={imageAlt}
+          gallery={gallery}
+          imageHref={href}
+          variant="card"
+          className="aspect-square w-40"
+          imageClassName="aspect-square"
           sizes="160px"
         />
-      </a>
+      </div>
 
       {title ? <h3 className="product-card-name text-center leading-snug">{title}</h3> : null}
 

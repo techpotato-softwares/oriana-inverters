@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Activity, BarChart3, CircleChevronRight, Shield, Waves } from 'lucide-react'
-import { ProductImage } from './ProductImage'
+import { ProductImageCarousel } from './ProductImageCarousel'
 import {
   formatProductPowerLabel,
   productCardTypeLabel,
@@ -444,6 +444,8 @@ export function ProductSeriesDetail({
     pageData?.ratedAcOutputPower ?? formatProductPowerLabel(series.powerRange)
   const productTitle = heroProductTitle(series, selected)
   const typeLabel = seriesTypeLabel(series, selected)
+  const enableHeroCarousel = Boolean(selected.enableHeroCarousel ?? series.enableHeroCarousel)
+  const gallery = selected.gallery?.length ? selected.gallery : series.gallery
 
   const selectTab = (next: TabId) => {
     setTab(next)
@@ -525,13 +527,16 @@ export function ProductSeriesDetail({
   )
 
   const productShot = (
-    <ProductImage
+    <ProductImageCarousel
+      key={selected.slug}
       name={series.series}
       categorySlug={series.categorySlug}
-      src={selected.heroImageUrl ?? series.heroImageUrl}
-      alt={selected.heroImageAlt ?? series.heroImageAlt}
+      heroImageUrl={selected.heroImageUrl ?? series.heroImageUrl}
+      heroImageAlt={selected.heroImageAlt ?? series.heroImageAlt}
+      gallery={gallery}
+      enabled={enableHeroCarousel}
       className="mx-auto aspect-square w-full max-w-[min(100%,min(28rem,52svh))] bg-transparent"
-      plain
+      imageClassName="aspect-square"
       priority={tab === 'overview'}
     />
   )
@@ -659,13 +664,16 @@ export function ProductSeriesDetail({
                   )}
                 </div>
                 <div className="order-1 mx-auto w-full max-w-xl lg:order-2 lg:max-w-none">
-                  <ProductImage
+                  <ProductImageCarousel
+                    key={`${selected.slug}-documents`}
                     name={series.series}
                     categorySlug={series.categorySlug}
-                    src={selected.heroImageUrl ?? series.heroImageUrl}
-                    alt={selected.heroImageAlt ?? series.heroImageAlt}
+                    heroImageUrl={selected.heroImageUrl ?? series.heroImageUrl}
+                    heroImageAlt={selected.heroImageAlt ?? series.heroImageAlt}
+                    gallery={gallery}
+                    enabled={enableHeroCarousel}
                     className="aspect-[4/5] w-full bg-transparent sm:aspect-square"
-                    plain
+                    imageClassName="aspect-[4/5] sm:aspect-square"
                     priority
                   />
                 </div>
@@ -759,6 +767,7 @@ export function ProductSeriesDetail({
                   categorySlug={card.categorySlug}
                   imageSrc={card.heroImageUrl}
                   imageAlt={card.heroImageAlt}
+                  gallery={card.gallery}
                 />
               ))}
             </div>

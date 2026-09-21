@@ -32,6 +32,20 @@ function mediaUrl(media?: number | Media | null): string | null {
   return `/${url}`
 }
 
+function productGallery(doc: Product): CatalogueProduct['gallery'] {
+  return (
+    doc.gallery?.flatMap((item) => {
+      const url = mediaUrl(item.image)
+      if (!url) return []
+      const alt =
+        item.image && typeof item.image === 'object'
+          ? item.image.alt?.trim() || doc.name
+          : doc.name
+      return [{ url, alt }]
+    }) ?? []
+  )
+}
+
 export function mapCategory(doc: Category): CatalogueCategory {
   const segments: CatalogueSegmentImage[] =
     doc.segments?.flatMap((segment) => {
@@ -97,6 +111,8 @@ function baseProductFields(doc: Product): Omit<
     heroImageUrl: mediaUrl(doc.heroImage),
     heroImageAlt:
       doc.heroImage && typeof doc.heroImage === 'object' ? doc.heroImage.alt ?? doc.name : doc.name,
+    enableHeroCarousel: Boolean(doc.enableHeroCarousel),
+    gallery: productGallery(doc),
     datasheetUrl: mediaUrl(doc.datasheetPdf),
     productPage: productPageFromDoc(doc),
   }

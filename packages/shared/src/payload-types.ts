@@ -578,9 +578,16 @@ export interface Product {
    * Main product image on the detail page.
    */
   heroImage?: (number | null) | Media;
+  /**
+   * Show gallery images as a carousel in the product page hero. When off, the hero shows only the hero image. Catalogue cards always use the carousel.
+   */
+  enableHeroCarousel?: boolean | null;
+  /**
+   * Additional product photos for the carousel on catalogue cards, and in the product page hero when Enable hero carousel is on. The hero image is always the first slide.
+   */
   gallery?:
     | {
-        image?: (number | null) | Media;
+        image: number | Media;
         id?: string | null;
       }[]
     | null;
@@ -682,7 +689,7 @@ export interface Product {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Product families (e.g. On Grid Inverters). Create these first, then assign products to them. Products mega-menu tile photos: Catalogue → Categories → open a category → Segments. Segment names must match tile labels (Single Phase, Three Phase, C&I, Utility Grid-Tied PV Inverter, ORIANA BESS Home).
+ * Product families (e.g. On Grid Inverters). Category landing hero + intro: open a category → Hero image / Intro paragraphs. Mega-menu segment photos: Segments list. Then assign product families under Catalogue → Product families.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
@@ -707,7 +714,7 @@ export interface Category {
    */
   description?: string | null;
   /**
-   * Optional category photo for cards. Segment tiles in the Products mega-menu use the Segments list below.
+   * Photo for this category tile in the Products hover menu (On Grid, Hybrid, Utility, BESS). Also used on catalogue cards. Prefer PNG/JPG/WebP (not SVG).
    */
   image?: (number | null) | Media;
   /**
@@ -2176,6 +2183,7 @@ export interface ProductsSelect<T extends boolean = true> {
         id?: T;
       };
   heroImage?: T;
+  enableHeroCarousel?: T;
   gallery?:
     | T
     | {

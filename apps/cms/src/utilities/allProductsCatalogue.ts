@@ -1,5 +1,9 @@
 import { seriesSegmentLabel } from '@/data/productMaster'
-import type { CatalogueProduct, CatalogueSeries } from '@/types/catalogue'
+import type {
+  CatalogueProduct,
+  CatalogueSeries,
+  ProductGalleryImage,
+} from '@/types/catalogue'
 
 export type AllProductsTab = {
   slug: string
@@ -21,6 +25,7 @@ export type AllProductsCard = {
   variantCount: number
   heroImageUrl?: string | null
   heroImageAlt?: string | null
+  gallery?: ProductGalleryImage[]
   datasheetUrl?: string | null
   featured: boolean
   categorySlug: string
@@ -54,6 +59,7 @@ export function seriesToCatalogueCard(series: CatalogueSeries): AllProductsCard 
     variantCount: series.variants.length,
     heroImageUrl: featuredVariant?.heroImageUrl ?? series.heroImageUrl,
     heroImageAlt: featuredVariant?.heroImageAlt ?? series.heroImageAlt ?? series.series,
+    gallery: featuredVariant?.gallery?.length ? featuredVariant.gallery : series.gallery,
     datasheetUrl,
     featured: series.variants.some((variant) => variant.featured),
     categorySlug: series.categorySlug,

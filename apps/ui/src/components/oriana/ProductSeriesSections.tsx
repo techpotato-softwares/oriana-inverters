@@ -25,6 +25,7 @@ export function ProductSeriesSections({ cards }: { cards: AllProductsCard[] }) {
                   categorySlug={card.categorySlug}
                   imageSrc={card.heroImageUrl}
                   imageAlt={card.heroImageAlt}
+                  gallery={card.gallery}
                 />
               ))}
             </div>

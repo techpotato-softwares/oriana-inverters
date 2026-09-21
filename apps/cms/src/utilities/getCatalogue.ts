@@ -144,6 +144,14 @@ async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
           ...doc,
           category: categoryDoc ?? doc.category,
           heroImage: (heroId !== null ? mediaById.get(heroId) : null) ?? doc.heroImage,
+          gallery: doc.gallery?.map((item) => {
+            const imageId = relationId(item.image)
+            return {
+              ...item,
+              image:
+                (imageId !== null ? mediaById.get(imageId) : null) ?? item.image,
+            }
+          }),
           datasheetPdf:
             (datasheetId !== null ? mediaById.get(datasheetId) : null) ?? doc.datasheetPdf,
         })

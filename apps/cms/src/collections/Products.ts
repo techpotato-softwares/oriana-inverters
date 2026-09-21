@@ -291,13 +291,29 @@ export const Products: CollectionConfig = {
               admin: { description: 'Main product image on the detail page.' },
             },
             {
+              name: 'enableHeroCarousel',
+              type: 'checkbox',
+              label: 'Enable hero carousel',
+              defaultValue: false,
+              admin: {
+                description:
+                  'Show gallery images as a carousel in the product page hero. When off, the hero shows only the hero image. Catalogue cards always use the carousel.',
+              },
+            },
+            {
               name: 'gallery',
               type: 'array',
+              labels: { singular: 'Gallery image', plural: 'Gallery images' },
+              admin: {
+                description:
+                  'Additional product photos for the carousel on catalogue cards, and in the product page hero when Enable hero carousel is on. The hero image is always the first slide.',
+              },
               fields: [
                 {
                   name: 'image',
                   type: 'upload',
                   relationTo: 'media',
+                  required: true,
                 },
               ],
             },

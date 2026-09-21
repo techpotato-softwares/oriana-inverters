@@ -1,5 +1,10 @@
 import type { OnGridSeriesPageData } from '@/data/onGridProductPage'
 
+export type ProductGalleryImage = {
+  url: string
+  alt: string
+}
+
 export type CatalogueProduct = {
   id?: number | string
   slug: string
@@ -18,6 +23,8 @@ export type CatalogueProduct = {
   specs: { label: string; value: string }[]
   heroImageUrl?: string | null
   heroImageAlt?: string | null
+  enableHeroCarousel?: boolean
+  gallery?: ProductGalleryImage[]
   datasheetUrl?: string | null
   /** CMS product-page chrome when present; UI falls back to onGridProductPage.ts. */
   productPage?: OnGridSeriesPageData | null
@@ -36,6 +43,8 @@ export type CatalogueSeries = {
   description: string
   heroImageUrl?: string | null
   heroImageAlt?: string | null
+  enableHeroCarousel?: boolean
+  gallery?: ProductGalleryImage[]
   variants: CatalogueProduct[]
 }
 

@@ -59,6 +59,8 @@ export function groupProductsIntoSeries(products: CatalogueProduct[]): Catalogue
         `${first.phases} ${first.category} — ${sorted.length} capacity variants.`,
       heroImageUrl: first.heroImageUrl,
       heroImageAlt: first.heroImageAlt ?? series,
+      enableHeroCarousel: first.enableHeroCarousel,
+      gallery: first.gallery,
       variants: sorted,
     }
   })
