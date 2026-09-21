@@ -116,12 +116,34 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
       }
     }
 
+    const removedFooterLabels = new Set([
+      'Residential Solutions',
+      'C&I PV Solutions',
+      'Utility PV Solutions',
+      'Energy Storage',
+    ])
+    const removedFooterHrefs = new Set([
+      '/solutions/residential',
+      '/solutions/commercial',
+      '/solutions/utility',
+      '/solutions/storage',
+    ])
+
     const resolvedFooter =
       footerColumns.length > 0 ? footerColumns : defaultSettings.footerColumns
     const partnersFromConfig = defaultSettings.footerColumns.find((col) => col.title === 'Partners')
-    const footerWithPartners = partnersFromConfig
-      ? resolvedFooter.map((col) => (col.title === 'Partners' ? partnersFromConfig : col))
-      : resolvedFooter
+    const productsFromConfig = defaultSettings.footerColumns.find(
+      (col) => col.title === 'Products & Solutions',
+    )
+    const footerWithConfigColumns = resolvedFooter.flatMap((col) => {
+      if (col.title === 'Partners' && partnersFromConfig) return [partnersFromConfig]
+      if (col.title === 'Products & Solutions' && productsFromConfig) return [productsFromConfig]
+      const links = col.links.filter(
+        (link) => !removedFooterLabels.has(link.label) && !removedFooterHrefs.has(link.href),
+      )
+      if (!links.length) return []
+      return [{ ...col, links }]
+    })
 
     return {
       siteName: text(doc.siteName, defaultSettings.siteName),
@@ -134,7 +156,7 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
       ogImageUrl,
       googleAnalyticsId: optionalId(doc.googleAnalyticsId),
       googleTagManagerId: optionalId(doc.googleTagManagerId),
-      footerColumns: footerWithPartners,
+      footerColumns: footerWithConfigColumns,
       legalLinks: legalLinks.length ? legalLinks : defaultSettings.legalLinks,
       socialLinks: socialLinks.length ? socialLinks : defaultSettings.socialLinks,
     }

@@ -64,8 +64,7 @@ export function ProductSeriesCard({
 
   return (
     <article className="flex h-full flex-col rounded-3xl bg-white px-8 pb-8 pt-6 shadow-sm">
-      {/* px-5 clears the arrow overhang (half of a 36px control) on both edges. */}
-      <div className="mx-auto flex w-full max-w-[12.5rem] items-center justify-center px-5 py-6">
+      <div className="mx-auto flex w-full max-w-[12.5rem] items-center justify-center py-6">
         <ProductImageCarousel
           name={name}
           categorySlug={categorySlug}

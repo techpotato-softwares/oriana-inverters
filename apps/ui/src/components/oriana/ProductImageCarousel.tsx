@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useReducedMotion } from 'framer-motion'
 import { ProductImage } from './ProductImage'
 import { cn } from '@/utilities/ui'
@@ -70,7 +69,6 @@ export function ProductImageCarousel({
   const [activeIndex, setActiveIndex] = useState(0)
   const reduceMotion = useReducedMotion()
   const hasMultipleImages = images.length > 1
-  const showControls = hasMultipleImages && variant === 'card'
   const activeImage = images[Math.min(activeIndex, Math.max(images.length - 1, 0))]
 
   useEffect(() => {
@@ -85,13 +83,42 @@ export function ProductImageCarousel({
     return () => window.clearInterval(timer)
   }, [variant, hasMultipleImages, reduceMotion, images.length])
 
-  const showPrevious = () => {
-    setActiveIndex((current) => (current - 1 + images.length) % images.length)
-  }
-
-  const showNext = () => {
-    setActiveIndex((current) => (current + 1) % images.length)
-  }
+  const dots = hasMultipleImages ? (
+    <div
+      className={cn(
+        'flex h-4 shrink-0 items-center justify-center gap-1.5',
+        variant === 'card' ? 'mt-3' : 'mt-2 pb-1',
+      )}
+      aria-label="Choose product image"
+    >
+      {images.map((item, index) => (
+        <button
+          key={item.url}
+          type="button"
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            setActiveIndex(index)
+          }}
+          aria-label={`Show product image ${index + 1} of ${images.length}`}
+          aria-current={index === activeIndex ? 'true' : undefined}
+          className="flex h-4 w-4 touch-manipulation items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue"
+        >
+          <span
+            className={cn(
+              'rounded-full transition',
+              index === activeIndex ? 'h-2 w-2 bg-oriana-blue' : 'h-1.5 w-1.5 bg-oriana-navy/30',
+            )}
+          />
+        </button>
+      ))}
+      <p className="sr-only" aria-live="polite">
+        Image {activeIndex + 1} of {images.length}
+      </p>
+    </div>
+  ) : variant === 'card' ? (
+    <div className="mt-3 h-4" aria-hidden />
+  ) : null
 
   const image = (
     <ProductImage
@@ -120,7 +147,7 @@ export function ProductImageCarousel({
       <div
         className={cn(
           'relative min-h-0 w-full',
-          variant === 'card' ? 'aspect-square' : 'h-full flex-1',
+          variant === 'card' ? 'aspect-square' : 'flex-1',
         )}
       >
         {imageHref ? (
@@ -134,76 +161,9 @@ export function ProductImageCarousel({
         ) : (
           image
         )}
-
-        {showControls ? (
-          <>
-            <button
-              type="button"
-              onClick={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                showPrevious()
-              }}
-              aria-label="Show previous product image"
-              className="absolute left-0 top-1/2 z-10 inline-flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full border border-oriana-navy/10 bg-white text-oriana-navy shadow-sm transition hover:bg-oriana-silver focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue"
-            >
-              <ChevronLeft className="h-4 w-4" aria-hidden />
-            </button>
-            <button
-              type="button"
-              onClick={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                showNext()
-              }}
-              aria-label="Show next product image"
-              className="absolute right-0 top-1/2 z-10 inline-flex h-9 w-9 -translate-y-1/2 translate-x-1/2 touch-manipulation items-center justify-center rounded-full border border-oriana-navy/10 bg-white text-oriana-navy shadow-sm transition hover:bg-oriana-silver focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue"
-            >
-              <ChevronRight className="h-4 w-4" aria-hidden />
-            </button>
-          </>
-        ) : null}
       </div>
 
-      {variant === 'card' ? (
-        hasMultipleImages ? (
-          <div
-            className="mt-3 flex h-4 items-center justify-center gap-1.5"
-            aria-label="Choose product image"
-          >
-            {images.map((item, index) => (
-              <button
-                key={item.url}
-                type="button"
-                onClick={(event) => {
-                  event.preventDefault()
-                  event.stopPropagation()
-                  setActiveIndex(index)
-                }}
-                aria-label={`Show product image ${index + 1} of ${images.length}`}
-                aria-current={index === activeIndex ? 'true' : undefined}
-                className="flex h-4 w-4 touch-manipulation items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue"
-              >
-                <span
-                  className={cn(
-                    'rounded-full transition',
-                    index === activeIndex ? 'h-2 w-2 bg-oriana-blue' : 'h-1.5 w-1.5 bg-oriana-navy/30',
-                  )}
-                />
-              </button>
-            ))}
-            <p className="sr-only" aria-live="polite">
-              Image {activeIndex + 1} of {images.length}
-            </p>
-          </div>
-        ) : (
-          <div className="mt-3 h-4" aria-hidden />
-        )
-      ) : hasMultipleImages ? (
-        <p className="sr-only" aria-live="polite">
-          Image {activeIndex + 1} of {images.length}
-        </p>
-      ) : null}
+      {dots}
     </div>
   )
 }
