@@ -10,10 +10,11 @@
  */
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
   if (!url) return ''
+  if (!cacheTag) return url
 
-  if (cacheTag && cacheTag !== '') {
-    cacheTag = encodeURIComponent(cacheTag)
-  }
+  // Payload already appends `?prefix=…` for S3-backed uploads, so a second `?`
+  // would fold the cache tag into the prefix value and the file request 403s.
+  const separator = url.includes('?') ? '&' : '?'
 
-  return cacheTag ? `${url}?${cacheTag}` : url
+  return `${url}${separator}v=${encodeURIComponent(cacheTag)}`
 }
