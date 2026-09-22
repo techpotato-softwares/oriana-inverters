@@ -34,7 +34,7 @@ export default function InstallersSupportPage() {
               </div>
               <div className="p-8 border border-gray-100 rounded-2xl bg-oriana-surface hover:shadow-md transition">
                 <h3 className="text-xl font-display font-medium text-oriana-navy mb-4">Warranty Claims</h3>
-                <p className="text-oriana-muted mb-6">Quickly file and track warranty claims for your customers' installations.</p>
+                <p className="text-oriana-muted mb-6">Quickly file and track warranty claims for customer installations.</p>
                 <Link href="/support/warranty" className="text-oriana-blue font-medium hover:underline">File a Claim &rarr;</Link>
               </div>
             </div>

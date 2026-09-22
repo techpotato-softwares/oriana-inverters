@@ -45,30 +45,30 @@ export const supportMegaMenuCategories: NavMegaCategory[] = [
       {
         title: 'Oriana Service',
         links: [
-          { label: 'Service Brand', href: '/support' },
-          { label: 'Service Stories', href: '/support' },
+          { label: 'Service Brand', href: '/support#service-brand' },
+          { label: 'Service Stories', href: '/support#service-stories' },
         ],
       },
       {
         title: 'Support for You',
         links: [
-          { label: 'Installers Support', href: '/support' },
-          { label: 'Homeowners Support', href: '/support' },
-          { label: 'Business Owners Support', href: '/support' },
+          { label: 'Installers Support', href: '/support/installers' },
+          { label: 'Homeowners Support', href: '/support/homeowners' },
+          { label: 'Business Owners Support', href: '/support/business' },
         ],
       },
       {
         title: 'Resources',
         links: [
-          { label: 'Product Documentation', href: '/support' },
-          { label: 'FAQs', href: '/support' },
-          { label: 'Warranty', href: '/support' },
+          { label: 'Product Documentation', href: '/resources/downloads' },
+          { label: 'FAQs', href: '/resources/faqs' },
+          { label: 'Warranty', href: '/support/warranty' },
         ],
       },
       {
         title: 'Success Stories',
         links: [
-          { label: 'Cases & Stories', href: '/support' },
+          { label: 'Cases & Stories', href: '/case-studies' },
         ],
       },
     ],

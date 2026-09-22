@@ -1,96 +1,121 @@
-'use client'
-
-import { useState } from 'react'
+import Link from 'next/link'
+import { ArrowUpRight } from 'lucide-react'
 import { FadeIn, Stagger, StaggerItem } from '../FadeIn'
-import { cn } from '@/utilities/ui'
 
-const categories = ['All', 'On-grid', 'Hybrid', 'Utility', 'BESS']
-
-const stories = [
+const categories = [
   {
-    category: 'Utility',
-    title: '150MW Solar Farm in Rajasthan',
-    image: 'https://images.unsplash.com/photo-1592833159155-c62df1b65634?auto=format&fit=crop&q=80&w=800',
+    title: 'On-grid',
+    description: 'Rooftop and ground-mount systems feeding the grid.',
+    image:
+      'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&q=80&w=1000',
+    offset: '',
   },
   {
-    category: 'Hybrid',
-    title: 'Smart Home Energy System',
-    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=800',
+    title: 'Hybrid',
+    description: 'Solar paired with storage for round-the-clock supply.',
+    image:
+      'https://images.unsplash.com/photo-1548337138-e87d889cc369?auto=format&fit=crop&q=80&w=1000',
+    offset: 'lg:translate-y-10',
   },
   {
-    category: 'On-grid',
-    title: 'Commercial Factory Rooftop',
-    image: 'https://images.unsplash.com/photo-1548611716-3001a1a72f10?auto=format&fit=crop&q=80&w=800',
+    title: 'Utility',
+    description: 'Large-scale plants engineered for long-term yield.',
+    image:
+      'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&q=80&w=1000',
+    offset: '',
   },
   {
-    category: 'BESS',
-    title: 'Grid Stabilization Project',
-    image: 'https://images.unsplash.com/photo-1623345805780-8f01f714e65f?auto=format&fit=crop&q=80&w=800',
+    title: 'BESS',
+    description: 'Battery energy storage for resilience and peak control.',
+    image:
+      'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&q=80&w=1000',
+    offset: 'lg:translate-y-10',
   },
 ]
 
 export function SuccessStories() {
-  const [activeTab, setActiveTab] = useState('All')
-
-  const filteredStories = stories.filter(
-    (story) => activeTab === 'All' || story.category === activeTab
-  )
-
   return (
-    <section className="py-24 bg-oriana-surface">
-      <div className="container max-w-7xl">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-display font-semibold text-oriana-navy md:text-4xl">
-            Success Stories
-          </h2>
-          <p className="mt-4 text-oriana-muted max-w-2xl mx-auto">
-            Discover how Oriana Inverters are powering projects worldwide.
-          </p>
-        </div>
+    <section
+      id="success-stories"
+      className="relative scroll-mt-40 overflow-hidden bg-oriana-deep py-20 lg:py-28"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-32 -top-24 h-[32rem] w-[32rem] rounded-full"
+        style={{
+          background: 'radial-gradient(circle, rgba(26,66,138,0.55) 0%, rgba(7,21,37,0) 70%)',
+        }}
+      />
 
-        <FadeIn className="flex flex-wrap justify-center gap-3 mb-12">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveTab(cat)}
-              className={cn(
-                "px-6 py-2 rounded-full text-sm font-medium transition-colors border",
-                activeTab === cat 
-                  ? "bg-oriana-blue text-white border-oriana-blue" 
-                  : "bg-white text-oriana-navy border-gray-200 hover:border-oriana-blue hover:text-oriana-blue"
-              )}
+      <div className="container relative">
+        <FadeIn className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-sky">
+              <span className="h-px w-10 bg-oriana-sky/60" aria-hidden />
+              Cases &amp; stories
+            </p>
+            <h2
+              className="mt-6 max-w-2xl font-display font-medium tracking-[-0.02em] text-white"
+              style={{ fontSize: 'clamp(2rem, 3.8vw, 3.5rem)', lineHeight: 1.08 }}
             >
-              {cat}
-            </button>
-          ))}
+              Projects, by system type
+            </h2>
+            <p className="mt-6 max-w-xl text-base leading-8 text-white/70">
+              Explore how Oriana inverters perform in the field as our case library grows across
+              on-grid, hybrid, utility, and storage installations.
+            </p>
+          </div>
+          <Link
+            href="/case-studies"
+            className="group inline-flex min-h-12 w-fit items-center gap-2 rounded-full border border-white/30 px-7 text-sm font-semibold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-oriana-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+          >
+            View all case studies
+            <ArrowUpRight
+              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              aria-hidden
+            />
+          </Link>
         </FadeIn>
 
-        <Stagger key={activeTab} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredStories.map((story, i) => (
-            <StaggerItem key={i}>
-              <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100">
-                <div className="h-48 overflow-hidden relative">
-                  <img 
-                    src={story.image} 
-                    alt={story.title} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        <Stagger className="mt-14 grid gap-5 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4 lg:pb-10">
+          {categories.map((category) => (
+            <StaggerItem key={category.title} className={`h-full ${category.offset}`}>
+              <Link
+                href="/case-studies"
+                className="group relative flex h-full min-h-[24rem] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-oriana-navy/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white lg:min-h-[28rem]"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={category.image}
+                  alt=""
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.07]"
+                />
+                <div
+                  aria-hidden
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      'linear-gradient(180deg, rgba(7,21,37,0.1) 0%, rgba(7,21,37,0.3) 45%, rgba(7,21,37,0.94) 100%)',
+                  }}
+                />
+                <div className="relative p-6 lg:p-7">
+                  <span
+                    aria-hidden
+                    className="block h-px w-10 origin-left bg-oriana-sky transition-transform duration-500 ease-out group-hover:scale-x-[2.4]"
                   />
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-oriana-blue uppercase tracking-wider">
-                    {story.category}
+                  <div className="mt-4 flex items-center justify-between gap-4">
+                    <h3 className="font-display text-xl font-medium text-white lg:text-2xl">
+                      {category.title}
+                    </h3>
+                    <ArrowUpRight
+                      className="h-5 w-5 text-white/70 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-oriana-sky"
+                      aria-hidden
+                    />
                   </div>
+                  <p className="mt-3 text-sm leading-6 text-white/70">{category.description}</p>
                 </div>
-                <div className="p-6">
-                  <h3 className="font-semibold text-oriana-navy mb-2 line-clamp-2 group-hover:text-oriana-blue transition-colors">
-                    {story.title}
-                  </h3>
-                  <a href="#" className="text-sm text-oriana-muted group-hover:text-oriana-blue transition-colors inline-flex items-center">
-                    Read Story
-                    <svg className="w-3 h-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
+              </Link>
             </StaggerItem>
           ))}
         </Stagger>

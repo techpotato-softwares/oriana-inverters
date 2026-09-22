@@ -1,101 +1,151 @@
 'use client'
 
-import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
-import { Stagger, StaggerItem } from '../FadeIn'
-import { cn } from '@/utilities/ui'
+import Link from 'next/link'
+import { ArrowUpRight } from 'lucide-react'
+import { motion, useReducedMotion, useScroll, useSpring } from 'framer-motion'
 
 const steps = [
   {
     title: 'Identify',
-    description: 'We proactively identify the scope and precise nature of any operational issue or requirement through advanced monitoring.',
-    number: '01'
+    description:
+      'Capture the operating condition, site context, and support requirement so nothing is assumed.',
+    image:
+      'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&q=80&w=1200',
   },
   {
     title: 'Diagnose',
-    description: 'Our technical experts run advanced diagnostics to pinpoint the root cause accurately, leveraging big data from our global installations.',
-    number: '02'
+    description:
+      'Review monitoring data, event logs, and system design to isolate the most likely root cause.',
+    image:
+      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=1200',
   },
   {
     title: 'Resolve',
-    description: 'We implement efficient, field-level or remote solutions to resolve the issue swiftly, deploying certified technicians where needed.',
-    number: '03'
+    description:
+      'Deliver a clear remote fix or coordinate field assistance to bring the plant back to full output.',
+    image:
+      'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&q=80&w=1200',
   },
   {
     title: 'Support',
-    description: 'Ongoing monitoring and continuous assistance ensure minimal downtime moving forward, protecting your renewable assets long-term.',
-    number: '04'
+    description:
+      'Confirm the outcome, share preventive guidance, and stay engaged across the product lifecycle.',
+    image:
+      'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&q=80&w=1200',
   },
 ]
 
 export function SupportApproach() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start center', 'end center']
-  })
+  const trackRef = useRef<HTMLOListElement>(null)
+  const reduceMotion = useReducedMotion()
 
-  // Height of the progress line connecting the steps
-  const lineHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
+  const { scrollYProgress } = useScroll({
+    target: trackRef,
+    offset: ['start 70%', 'end 65%'],
+  })
+  const railScale = useSpring(scrollYProgress, { stiffness: 90, damping: 26, mass: 0.4 })
 
   return (
-    <section ref={containerRef} className="py-24 lg:py-32 bg-oriana-surface relative overflow-hidden">
-      <div className="container max-w-5xl relative z-10">
-        <div className="text-center mb-16 lg:mb-24">
-          <h2 className="text-3xl font-display font-semibold text-oriana-navy md:text-5xl tracking-tight">
-            Our Approach
-          </h2>
-          <p className="mt-6 text-lg text-oriana-muted max-w-2xl mx-auto leading-relaxed">
-            A systematic, four-step methodology designed to ensure maximum reliability and swift resolution for every installation.
+    <section
+      id="our-approach"
+      className="relative scroll-mt-40 overflow-hidden bg-oriana-surface py-20 lg:py-28"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-32 top-16 h-[34rem] w-[34rem] rounded-full opacity-70"
+        style={{
+          background: 'radial-gradient(circle, rgba(77,163,255,0.16) 0%, rgba(247,249,252,0) 70%)',
+        }}
+      />
+
+      <div className="container relative grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+        <div className="lg:sticky lg:top-[calc(var(--site-header-height,5rem)+6rem)] lg:self-start">
+          <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-blue">
+            <span className="h-px w-10 bg-oriana-blue/50" aria-hidden />
+            Our approach
           </p>
+          <h2
+            className="mt-6 font-display font-medium tracking-[-0.02em] text-oriana-navy"
+            style={{ fontSize: 'clamp(2rem, 3.8vw, 3.5rem)', lineHeight: 1.08 }}
+          >
+            One sequence,
+            <br className="hidden sm:block" /> every service case
+          </h2>
+          <p className="mt-6 max-w-md text-base leading-8 text-oriana-muted">
+            Identify, diagnose, resolve, support. A consistent method keeps communication clear from
+            the first observation through to long-term performance.
+          </p>
+          <Link
+            href="/contact"
+            className="group mt-9 inline-flex min-h-12 items-center gap-2 rounded-full bg-oriana-blue px-7 text-sm font-semibold text-white transition-colors duration-300 hover:bg-oriana-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-oriana-blue"
+          >
+            Raise a service request
+            <ArrowUpRight
+              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              aria-hidden
+            />
+          </Link>
         </div>
 
-        <div className="relative">
-          {/* Vertical Track */}
-          <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-oriana-navy/10 transform md:-translate-x-1/2" />
-          
-          {/* Animated Progress Line */}
-          <motion.div 
-            className="absolute left-4 md:left-1/2 top-0 w-[2px] bg-oriana-blue transform md:-translate-x-1/2 origin-top"
-            style={{ height: lineHeight }}
+        <ol ref={trackRef} className="relative pl-14 sm:pl-20">
+          <span
+            aria-hidden
+            className="absolute bottom-6 left-[1.4rem] top-4 w-px bg-oriana-deep/10 sm:left-[2rem]"
+          />
+          <motion.span
+            aria-hidden
+            className="absolute bottom-6 left-[1.4rem] top-4 w-px origin-top sm:left-[2rem]"
+            style={{
+              scaleY: reduceMotion ? 1 : railScale,
+              background: 'linear-gradient(180deg, #4da3ff 0%, #1a428a 100%)',
+            }}
           />
 
-          <div className="space-y-12 md:space-y-24">
-            {steps.map((step, i) => {
-              const isEven = i % 2 === 0
-              return (
-                <div key={step.title} className="relative flex flex-col md:flex-row items-start md:items-center group">
-                  {/* Timeline Dot */}
-                  <div className="absolute left-4 md:left-1/2 w-4 h-4 rounded-full border-2 border-oriana-blue bg-white transform -translate-x-[7px] md:-translate-x-1/2 mt-2 md:mt-0 z-10 transition-transform duration-500 group-hover:scale-150 group-hover:bg-oriana-blue" />
-                  
-                  {/* Content Box */}
-                  <div className={cn(
-                    "ml-12 md:ml-0 md:w-1/2",
-                    isEven ? "md:pr-16 md:text-right" : "md:pl-16 md:ml-auto"
-                  )}>
-                    <motion.div 
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-100px" }}
-                      transition={{ duration: 0.6, delay: 0.1 }}
-                      className="bg-white p-8 rounded-2xl shadow-sm border border-black/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-                    >
-                      <span className="text-5xl font-display font-bold text-oriana-silver/50 block mb-4">
-                        {step.number}
-                      </span>
-                      <h3 className="text-2xl font-semibold text-oriana-navy mb-3">
-                        {step.title}
-                      </h3>
-                      <p className="text-oriana-muted leading-relaxed">
-                        {step.description}
-                      </p>
-                    </motion.div>
-                  </div>
+          {steps.map((step, index) => (
+            <motion.li
+              key={step.title}
+              className="relative pb-12 last:pb-0"
+              initial={reduceMotion ? undefined : { opacity: 0, y: 40 }}
+              whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-15%' }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <span className="absolute -left-14 top-0 flex h-11 w-11 items-center justify-center rounded-full border border-oriana-blue/20 bg-white font-display text-sm font-semibold text-oriana-blue shadow-[0_10px_30px_-18px_rgba(7,21,37,0.6)] sm:-left-20 sm:h-[3.25rem] sm:w-[3.25rem] sm:text-base">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+
+              <div className="group overflow-hidden rounded-3xl bg-white shadow-[0_28px_70px_-56px_rgba(7,21,37,0.7)] transition-shadow duration-500 hover:shadow-[0_34px_80px_-46px_rgba(7,21,37,0.55)]">
+                <div className="relative aspect-[16/8] overflow-hidden sm:aspect-[16/7]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={step.image}
+                    alt=""
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05]"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        'linear-gradient(120deg, rgba(7,21,37,0.55) 0%, rgba(7,21,37,0.05) 60%)',
+                    }}
+                  />
+                  <h3
+                    className="absolute bottom-5 left-6 font-display font-medium text-white"
+                    style={{ fontSize: 'clamp(1.4rem, 2.2vw, 2rem)' }}
+                  >
+                    {step.title}
+                  </h3>
                 </div>
-              )
-            })}
-          </div>
-        </div>
+                <p className="px-6 py-6 text-sm leading-7 text-oriana-muted sm:text-base sm:leading-8">
+                  {step.description}
+                </p>
+              </div>
+            </motion.li>
+          ))}
+        </ol>
       </div>
     </section>
   )

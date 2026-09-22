@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { FadeIn } from '@/components/oriana/FadeIn'
 import { SupportHero } from '@/components/oriana/support/SupportHero'
+import { SupportSubNav } from '@/components/oriana/support/SupportSubNav'
 import { SupportStrengths } from '@/components/oriana/support/SupportStrengths'
 import { SupportApproach } from '@/components/oriana/support/SupportApproach'
 import { GlobalPresence } from '@/components/oriana/support/GlobalPresence'
@@ -16,25 +16,16 @@ export const metadata: Metadata = {
 
 export default function SupportPage() {
   return (
-    <main className="flex flex-col min-h-screen">
+    <main className="min-h-screen">
       <SupportHero />
+      <SupportSubNav />
       <SupportStrengths />
       <SupportApproach />
-      <FadeIn>
-        <GlobalPresence />
-      </FadeIn>
-      <FadeIn>
-        <ServiceStories />
-      </FadeIn>
-      <FadeIn>
-        <SupportForYou />
-      </FadeIn>
-      <FadeIn>
-        <SupportResources />
-      </FadeIn>
-      <FadeIn>
-        <SuccessStories />
-      </FadeIn>
+      <GlobalPresence />
+      <ServiceStories />
+      <SupportForYou />
+      <SupportResources />
+      <SuccessStories />
     </main>
   )
 }
