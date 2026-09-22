@@ -83,18 +83,19 @@ export function NavMegaPanel({
     <div className="border-t border-oriana-navy/8 bg-white" role="region" aria-label={ariaLabel ?? `${label} menu`}>
       <div className="container flex min-h-[280px] items-start gap-10 py-10 lg:min-h-[320px] lg:gap-16 lg:py-12">
         <aside className="w-52 shrink-0 lg:w-60">
-          {isSegmentMenu ? (
+          {isSegmentMenu || categories.length === 1 ? (
             <Link
-              href={viewAllHref}
+              href={categories.length === 1 ? active.href : viewAllHref}
               className="mb-1 flex items-center gap-1 py-3 text-sm font-medium text-oriana-navy transition hover:text-oriana-blue"
             >
-              {viewAllLabel}
+              {categories.length === 1 ? label : viewAllLabel}
               <ChevronRight className="h-4 w-4" aria-hidden />
             </Link>
           ) : (
             <p className="mb-4 font-display text-xl font-semibold text-oriana-navy lg:text-2xl">{label}</p>
           )}
-          <ul>
+          {categories.length > 1 && (
+            <ul>
             {categories.map((category, index) => {
               const isActive = activeIndex === index
               return (
@@ -119,7 +120,8 @@ export function NavMegaPanel({
                 </li>
               )
             })}
-          </ul>
+            </ul>
+          )}
         </aside>
 
         {activeHasSubitems ? (

@@ -37,67 +37,38 @@ export function megaItemHasSubitems(categories: NavMegaCategory[] | undefined): 
 /** Products mega-menu — driven by productMaster.json (category → segment → product). */
 export const productsMegaMenuCategories: NavMegaCategory[] = buildProductsMegaMenu()
 
-/** Service & Support mega-menu */
 export const supportMegaMenuCategories: NavMegaCategory[] = [
   {
-    label: 'Service & Support',
+    label: 'Overview', // We can hide this or use it as the main trigger
     href: '/support',
     columns: [
       {
         title: 'Oriana Service',
         links: [
-          { label: 'Service & Support', href: '/support' },
-          { label: 'Contact Support', href: '/support' },
-          { label: 'Security Incident Response', href: '/support/security' },
+          { label: 'Service Brand', href: '/support' },
+          { label: 'Service Stories', href: '/support' },
+        ],
+      },
+      {
+        title: 'Support for You',
+        links: [
+          { label: 'Installers Support', href: '/support' },
+          { label: 'Homeowners Support', href: '/support' },
+          { label: 'Business Owners Support', href: '/support' },
         ],
       },
       {
         title: 'Resources',
         links: [
-          { label: 'Download Center', href: '/resources/downloads' },
-          { label: 'Installation Videos', href: '/resources/videos' },
-          { label: 'FAQs', href: '/resources/faqs' },
-        ],
-      },
-    ],
-  },
-  {
-    label: 'Warranty',
-    href: '/support/warranty',
-    columns: [
-      {
-        title: 'Warranty',
-        links: [
-          { label: 'Warranty Overview', href: '/support/warranty' },
-          { label: 'Product Documentation', href: '/resources/downloads' },
+          { label: 'Product Documentation', href: '/support' },
+          { label: 'FAQs', href: '/support' },
+          { label: 'Warranty', href: '/support' },
         ],
       },
       {
-        title: 'Support',
+        title: 'Success Stories',
         links: [
-          { label: 'Contact Support', href: '/support' },
-          { label: 'Where to Buy', href: '/where-to-buy' },
-        ],
-      },
-    ],
-  },
-  {
-    label: 'Documentation',
-    href: '/resources/downloads',
-    columns: [
-      {
-        title: 'Downloads',
-        links: [
-          { label: 'Download Center', href: '/resources/downloads' },
-          { label: 'Product Documentation', href: '/resources/downloads' },
-          { label: 'Installation Videos', href: '/resources/videos' },
-        ],
-      },
-      {
-        title: 'Help',
-        links: [
-          { label: 'FAQs', href: '/resources/faqs' },
-          { label: 'Case Studies', href: '/case-studies' },
+          { label: 'Cases & Stories', href: '/support' },
         ],
       },
     ],
