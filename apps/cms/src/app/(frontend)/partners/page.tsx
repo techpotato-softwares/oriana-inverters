@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { Handshake, Store, Wrench } from 'lucide-react'
+import { Handshake, Store } from 'lucide-react'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
 
@@ -8,26 +8,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Partners',
     description:
-      'Grow with Oriana — installer, distributor, and partnership programmes for solar and storage professionals.',
+      'Grow with Oriana — distributor and partnership programmes for solar and storage professionals.',
   }
 }
 
 const tracks = [
   {
-    icon: Wrench,
-    title: 'Installers',
-    href: '/partners/installers',
-    description:
-      'Certified installer partners get technical support, training, and marketing resources to deliver Oriana systems with confidence.',
-    cta: 'Oriana for Installers',
-  },
-  {
     icon: Store,
     title: 'Distributors',
-    href: '/partners/distributors',
+    href: '/partners/become-a-distributor',
     description:
       'Authorized distributors access a full product portfolio, supply-chain support, and joint go-to-market programmes.',
-    cta: 'Oriana for Distributors',
+    cta: 'Become a Distributor',
   },
   {
     icon: Handshake,
@@ -45,13 +37,13 @@ export default function PartnersHubPage() {
       <PageHero
         eyebrow="Partners"
         title="Grow together with Oriana"
-        description="Join a global network of installers, distributors, and technology partners delivering bankable solar, storage, and hybrid solutions."
+        description="Join distributors and technology partners delivering bankable solar, storage, and hybrid solutions."
       />
       <Breadcrumbs items={[{ label: 'Partners' }]} />
 
       <section className="py-12 lg:py-16">
         <div className="container">
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-6 lg:grid-cols-2">
             {tracks.map((track) => (
               <Link
                 key={track.href}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Mail, MapPin, Phone, type LucideIcon } from 'lucide-react'
 
 export type ContactCard = {
@@ -9,10 +9,36 @@ export type ContactCard = {
   detail: string
 }
 
+type ContactIntent = 'sales' | 'quote' | 'career'
+
 type ContactFormProps = {
   cards: ContactCard[]
   formId: number | null
   successMessage: string
+  intent?: string | null
+}
+
+const intentCopy: Record<ContactIntent, { title: string; placeholder: string; prefix: string }> = {
+  sales: {
+    title: 'Sales enquiry',
+    placeholder: 'Products, volume, and the market you sell into.',
+    prefix: 'Sales enquiry',
+  },
+  quote: {
+    title: 'Request a quote',
+    placeholder: 'System size, location, and the timeline you are working toward.',
+    prefix: 'Quote request',
+  },
+  career: {
+    title: 'Career application',
+    placeholder: 'The role you want, your location, and a short note on your experience.',
+    prefix: 'Career application',
+  },
+}
+
+function asIntent(value: string | null | undefined): ContactIntent | null {
+  if (value === 'sales' || value === 'quote' || value === 'career') return value
+  return null
 }
 
 const iconByKey: Record<string, LucideIcon> = {
@@ -21,9 +47,20 @@ const iconByKey: Record<string, LucideIcon> = {
   mapPin: MapPin,
 }
 
-export function ContactForm({ cards, formId, successMessage }: ContactFormProps) {
+export function ContactForm({ cards, formId, successMessage, intent }: ContactFormProps) {
+  const topic = asIntent(intent)
+  const copy = topic ? intentCopy[topic] : null
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    if (!topic && window.location.hash !== '#contact-form') return
+    const form = document.getElementById('contact-form')
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    form?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+    const name = document.getElementById('name')
+    if (name instanceof HTMLInputElement) name.focus()
+  }, [topic])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -31,10 +68,13 @@ export function ContactForm({ cards, formId, successMessage }: ContactFormProps)
     const fd = new FormData(form)
     const fields = ['name', 'email', 'company', 'message'] as const
     const submissionData = fields
-      .map((field) => ({
-        field,
-        value: String(fd.get(field) ?? ''),
-      }))
+      .map((field) => {
+        const raw = String(fd.get(field) ?? '')
+        if (field === 'message' && copy && raw.trim()) {
+          return { field, value: `[${copy.prefix}]\n${raw}` }
+        }
+        return { field, value: raw }
+      })
       .filter((row) => row.field === 'company' || row.value)
 
     if (!formId) {
@@ -88,7 +128,7 @@ export function ContactForm({ cards, formId, successMessage }: ContactFormProps)
         </div>
       </div>
 
-      <div className="lg:col-span-3">
+      <div id="contact-form" className="scroll-mt-32 lg:col-span-3">
         {status === 'sent' ? (
           <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center">
             <p className="font-display text-xl font-bold text-green-800">Message Received</p>
@@ -99,6 +139,14 @@ export function ContactForm({ cards, formId, successMessage }: ContactFormProps)
             onSubmit={handleSubmit}
             className="rounded-2xl border border-oriana-navy/8 bg-white p-8 shadow-sm lg:p-10"
           >
+            <h2 className="font-display text-2xl font-bold text-oriana-navy">
+              {copy?.title || 'Send a message'}
+            </h2>
+            <p className="mt-2 mb-6 text-sm text-oriana-muted">
+              {copy
+                ? 'This form goes to the Oriana team. Include enough detail for a useful reply.'
+                : 'Share your project and we will route it to the right team.'}
+            </p>
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm font-medium text-oriana-navy" htmlFor="name">
@@ -143,7 +191,7 @@ export function ContactForm({ cards, formId, successMessage }: ContactFormProps)
                 name="message"
                 rows={5}
                 required
-                placeholder="Tell us about your project size, location, and timeline..."
+                placeholder={copy?.placeholder || 'Tell us about your project size, location, and timeline...'}
                 className="w-full rounded-xl border border-oriana-navy/12 bg-oriana-surface px-4 py-3 text-sm focus:border-oriana-blue focus:outline-none focus:ring-2 focus:ring-oriana-blue/15"
               />
             </div>

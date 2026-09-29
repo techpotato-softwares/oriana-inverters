@@ -16,8 +16,8 @@ import { FadeIn, Stagger, StaggerItem } from './FadeIn'
 const impactStats = [
   {
     icon: Award,
-    value: '10+ Years',
-    label: 'Solar industry project experience',
+    value: '10+',
+    label: 'Years experience in renewable sector',
   },
   {
     icon: MapPin,
@@ -26,13 +26,13 @@ const impactStats = [
   },
   {
     icon: Zap,
-    value: 'GW+',
-    label: 'Inverter distribution & experience',
+    value: '5 GW+',
+    label: 'Distribution and service experience',
   },
   {
     icon: Building2,
-    value: '500+',
-    label: 'Channel & service partners',
+    value: '50+',
+    label: 'Channels and service',
   },
   {
     icon: Leaf,

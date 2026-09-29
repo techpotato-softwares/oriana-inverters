@@ -4,7 +4,6 @@ import { getPayload } from 'payload'
 
 import { SustainabilityOverview } from '@/components/oriana/sustainability/SustainabilityOverview'
 import type { ReportCard } from '@/components/oriana/sustainability/sustainabilityData'
-import { fallbackReports } from '@/components/oriana/sustainability/sustainabilityData'
 import { getAwards, getSustainability, getSustainabilityReports } from '@/utilities/getMarketing'
 import type { Award, Media, SustainabilityReport } from '@/payload-types'
 
@@ -29,15 +28,12 @@ export default async function SustainabilityPage() {
     getAwards(),
   ])
 
-  const reports: ReportCard[] =
-    (reportDocs as SustainabilityReport[]).length > 0
-      ? (reportDocs as SustainabilityReport[]).map((doc) => ({
-          title: doc.title,
-          year: doc.year,
-          href: mediaUrl(doc.file) || doc.externalUrl || '/resources/downloads',
-          tag: 'Enterprise',
-        }))
-      : fallbackReports
+  const reports: ReportCard[] = (reportDocs as SustainabilityReport[]).map((doc) => ({
+    title: doc.title,
+    year: doc.year,
+    href: mediaUrl(doc.file) || doc.externalUrl || '/resources/downloads',
+    tag: 'Enterprise',
+  }))
 
   const honors =
     (awardDocs as Award[]).length > 0
@@ -45,7 +41,7 @@ export default async function SustainabilityPage() {
           title: award.title,
           image: null,
         }))
-      : undefined
+      : []
 
   let news: { title: string; href: string; date?: string }[] = []
   try {
@@ -76,6 +72,7 @@ export default async function SustainabilityPage() {
   const heroImage =
     mediaUrl(data?.image) ||
     'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1920&q=80'
+  const hasStrategyContent = Boolean(data?.strategySections?.length)
 
   return (
     <SustainabilityOverview
@@ -84,6 +81,7 @@ export default async function SustainabilityPage() {
       reports={reports}
       honors={honors}
       news={news}
+      hasStrategyContent={hasStrategyContent}
     />
   )
 }

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
+import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
 import { getPartners } from '@/utilities/getMarketing'
 import type { Partner } from '@/payload-types'
@@ -8,21 +9,6 @@ export const metadata = {
   title: 'Partners',
   description: 'Oriana strategic partners — distributors, EPCs, and technology alliances.',
 }
-
-const fallbackPartnerTypes = [
-  {
-    category: 'Distribution Partners',
-    partners: ['SolarEdge Distribution NA', 'GreenPower Wholesale', 'EuroSolar Components', 'APAC Energy Solutions'],
-  },
-  {
-    category: 'Technology Alliances',
-    partners: ['Leading Battery OEMs', 'Monitoring Platform Integrators', 'EV Charger Manufacturers', 'Smart Home Ecosystems'],
-  },
-  {
-    category: 'EPC & Developer Partners',
-    partners: ['Tier-1 Solar Developers', 'Commercial Rooftop Specialists', 'Utility-Scale EPC Firms', 'Microgrid Integrators'],
-  },
-]
 
 function groupPartners(docs: Partner[]) {
   const order: string[] = []
@@ -43,7 +29,23 @@ function groupPartners(docs: Partner[]) {
 
 export default async function PartnersPage() {
   const docs = (await getPartners()) as Partner[]
-  const partnerTypes = docs.length > 0 ? groupPartners(docs) : fallbackPartnerTypes
+
+  if (docs.length === 0) {
+    return (
+      <main>
+        <ComingSoon
+          eyebrow="About"
+          title="Partners"
+          description="Named partner listings will appear here once published. Explore distributor programmes meanwhile."
+          breadcrumbs={[{ label: 'About', href: '/about' }, { label: 'Partners' }]}
+          primaryHref="/partners/become-a-distributor"
+          primaryLabel="Become a distributor"
+        />
+      </main>
+    )
+  }
+
+  const partnerTypes = groupPartners(docs)
 
   return (
     <main>
@@ -59,39 +61,23 @@ export default async function PartnersPage() {
           {partnerTypes.map((group) => (
             <div key={group.category} className="mb-12">
               <h2 className="font-display text-xl font-bold text-oriana-navy">{group.category}</h2>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {group.partners.map((partner) => (
-                  <div
-                    key={partner}
-                    className="flex items-center justify-center rounded border border-oriana-navy/8 bg-oriana-silver/30 px-6 py-8 text-center text-sm font-medium text-oriana-navy"
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {group.partners.map((name) => (
+                  <li
+                    key={name}
+                    className="rounded border border-oriana-navy/8 bg-white px-5 py-4 text-sm font-medium text-oriana-navy"
                   >
-                    {partner}
-                  </div>
+                    {name}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           ))}
 
-          <div className="rounded border border-oriana-blue/20 bg-oriana-deep p-8 text-white lg:p-12">
-            <h2 className="font-display text-2xl font-bold">Partner with Oriana</h2>
-            <p className="mt-3 max-w-xl text-white/70">
-              Access technical training, co-marketing resources, and dedicated commercial support as an authorized
-              Oriana partner.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-4">
-              <Link
-                href="/partners/partnership"
-                className="rounded bg-white px-6 py-3 text-sm font-bold text-oriana-navy hover:bg-oriana-silver"
-              >
-                Become a Partner
-              </Link>
-              <Link
-                href="/where-to-buy"
-                className="rounded border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10"
-              >
-                Find a Distributor
-              </Link>
-            </div>
+          <div className="mt-8">
+            <Link href="/partners" className="text-sm font-semibold text-oriana-blue hover:underline">
+              Explore partner programmes →
+            </Link>
           </div>
         </div>
       </section>

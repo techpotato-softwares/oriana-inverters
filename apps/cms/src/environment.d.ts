@@ -18,6 +18,12 @@ declare global {
       ADMIN_EMAIL?: string
       ADMIN_PASSWORD?: string
       ADMIN_NAME?: string
+      DISTRIBUTOR_NOTIFY_EMAIL?: string
+      SMTP_HOST?: string
+      SMTP_PORT?: string
+      SMTP_USER?: string
+      SMTP_PASS?: string
+      SMTP_FROM?: string
     }
   }
 }

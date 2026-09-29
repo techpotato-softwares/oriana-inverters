@@ -262,7 +262,7 @@ export async function seedOrianaContent({
       loginLabel: 'Login',
       loginHref: '/contact',
       whereToBuy: { label: 'Where to Buy', href: '/where-to-buy' },
-      requestQuote: { label: 'Request a Quote', href: '/contact' },
+      requestQuote: { label: 'Request a Quote', href: '/contact?intent=quote#contact-form' },
       primaryNav: [
         {
           key: 'products',
@@ -442,11 +442,11 @@ export async function seedOrianaContent({
           'Build the future of clean power conversion with a global team of engineers, makers, and problem-solvers.',
       },
       ...(mediaMap.careers ? { image: mediaMap.careers } : {}),
-      whyTitle: 'Why Oriana',
+      whyTitle: 'Life at Oriana',
       whyBody:
         'We offer competitive benefits, hybrid work options for eligible roles, and the opportunity to work on products deployed across 25 countries.',
       openingsTitle: 'Open Positions',
-      applyHref: '/contact',
+      applyHref: '/contact?intent=career#contact-form',
       applyLabel: 'Apply Now',
       seo: { metaTitle: 'Careers', metaDescription: 'Join the Oriana team.' },
       _status: 'published',

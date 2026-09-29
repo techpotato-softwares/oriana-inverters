@@ -34,6 +34,7 @@ const requiredTables = [
   'faqs',
   'videos',
   'distributors',
+  'distributor_applications',
   'jobs',
   'certifications',
   'awards',

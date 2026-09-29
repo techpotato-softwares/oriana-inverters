@@ -77,6 +77,7 @@ export interface Config {
     faqs: Faq;
     videos: Video;
     distributors: Distributor;
+    'distributor-applications': DistributorApplication;
     jobs: Job;
     certifications: Certification;
     awards: Award;
@@ -112,6 +113,7 @@ export interface Config {
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     distributors: DistributorsSelect<false> | DistributorsSelect<true>;
+    'distributor-applications': DistributorApplicationsSelect<false> | DistributorApplicationsSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
     certifications: CertificationsSelect<false> | CertificationsSelect<true>;
     awards: AwardsSelect<false> | AwardsSelect<true>;
@@ -1420,6 +1422,27 @@ export interface Distributor {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Applications submitted from Become a Distributor.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "distributor-applications".
+ */
+export interface DistributorApplication {
+  id: number;
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  cityState: string;
+  message: string;
+  /**
+   * Whether the notification to info@orianainverters.com was sent.
+   */
+  emailStatus?: ('sent' | 'failed' | 'not-configured') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "jobs".
  */
@@ -1793,6 +1816,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'distributors';
         value: number | Distributor;
+      } | null)
+    | ({
+        relationTo: 'distributor-applications';
+        value: number | DistributorApplication;
       } | null)
     | ({
         relationTo: 'jobs';
@@ -2500,6 +2527,21 @@ export interface DistributorsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "distributor-applications_select".
+ */
+export interface DistributorApplicationsSelect<T extends boolean = true> {
+  name?: T;
+  company?: T;
+  email?: T;
+  phone?: T;
+  cityState?: T;
+  message?: T;
+  emailStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3381,6 +3423,9 @@ export interface Career {
   whyTitle?: string | null;
   whyBody?: string | null;
   openingsTitle?: string | null;
+  /**
+   * Where Apply buttons send candidates. Prefer the contact form with intent=career.
+   */
   applyHref?: string | null;
   applyLabel?: string | null;
   seo?: {

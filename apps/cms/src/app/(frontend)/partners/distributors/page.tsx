@@ -119,10 +119,10 @@ export default function DistributorsPage() {
             </p>
             <div className="mt-6 flex flex-wrap gap-4">
               <Link
-                href="/contact"
+                href="/partners/become-a-distributor"
                 className="rounded bg-white px-6 py-3 text-sm font-bold text-oriana-navy hover:bg-oriana-silver"
               >
-                Partner Inquiry
+                Become a Distributor
               </Link>
               <Link
                 href="/where-to-buy"

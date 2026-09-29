@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
+import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
 import { getWarrantyPlans } from '@/utilities/getMarketing'
 import type { WarrantyPlan } from '@/payload-types'
@@ -9,34 +10,13 @@ export const metadata = {
   description: 'Oriana inverter warranty terms, registration, and claim process.',
 }
 
-const fallbackTiers = [
-  {
-    product: 'Residential String & Hybrid',
-    standard: '10 Years',
-    extended: 'Up to 20 Years (optional)',
-  },
-  {
-    product: 'Commercial Three-Phase',
-    standard: '10 Years',
-    extended: 'Up to 15 Years (optional)',
-  },
-  {
-    product: 'Utility-Scale Central',
-    standard: '10 Years',
-    extended: 'Custom O&M agreements',
-  },
-]
-
 export default async function WarrantyPage() {
   const plans = (await getWarrantyPlans()) as WarrantyPlan[]
-  const warrantyTiers =
-    plans.length > 0
-      ? plans.map((p) => ({
-          product: p.productLine,
-          standard: p.standard,
-          extended: p.extended || '',
-        }))
-      : fallbackTiers
+  const warrantyTiers = plans.map((p) => ({
+    product: p.productLine,
+    standard: p.standard,
+    extended: p.extended || '',
+  }))
 
   return (
     <main>
@@ -50,26 +30,40 @@ export default async function WarrantyPage() {
       <section className="py-12 lg:py-16">
         <div className="container max-w-4xl">
           <h2 className="font-display text-2xl font-bold text-oriana-navy">Coverage by Product Line</h2>
-          <div className="mt-6 overflow-x-auto">
-            <table className="w-full min-w-[480px] border-collapse text-sm">
-              <thead>
-                <tr className="border-b-2 border-oriana-navy/15 bg-oriana-silver/50 text-left">
-                  <th className="px-4 py-3 font-semibold text-oriana-navy">Product Line</th>
-                  <th className="px-4 py-3 font-semibold text-oriana-navy">Standard Warranty</th>
-                  <th className="px-4 py-3 font-semibold text-oriana-navy">Extended Options</th>
-                </tr>
-              </thead>
-              <tbody>
-                {warrantyTiers.map((row) => (
-                  <tr key={row.product} className="border-b border-oriana-navy/8">
-                    <td className="px-4 py-4 font-medium text-oriana-navy">{row.product}</td>
-                    <td className="px-4 py-4 text-oriana-muted">{row.standard}</td>
-                    <td className="px-4 py-4 text-oriana-muted">{row.extended}</td>
+          {warrantyTiers.length === 0 ? (
+            <div className="mt-6">
+              <ComingSoon
+                compact
+                title="Warranty matrix coming soon"
+                description="Published coverage by product line will appear here. Contact support to register a product or start a claim."
+                primaryHref="/contact#contact-form"
+                primaryLabel="Contact support"
+                secondaryHref="/resources/downloads"
+                secondaryLabel="Downloads"
+              />
+            </div>
+          ) : (
+            <div className="mt-6 overflow-x-auto">
+              <table className="w-full min-w-[480px] border-collapse text-sm">
+                <thead>
+                  <tr className="border-b-2 border-oriana-navy/15 bg-oriana-silver/50 text-left">
+                    <th className="px-4 py-3 font-semibold text-oriana-navy">Product Line</th>
+                    <th className="px-4 py-3 font-semibold text-oriana-navy">Standard Warranty</th>
+                    <th className="px-4 py-3 font-semibold text-oriana-navy">Extended Options</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {warrantyTiers.map((row) => (
+                    <tr key={row.product} className="border-b border-oriana-navy/8">
+                      <td className="px-4 py-4 font-medium text-oriana-navy">{row.product}</td>
+                      <td className="px-4 py-4 text-oriana-muted">{row.standard}</td>
+                      <td className="px-4 py-4 text-oriana-muted">{row.extended}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           <div className="mt-12 space-y-8">
             <div>

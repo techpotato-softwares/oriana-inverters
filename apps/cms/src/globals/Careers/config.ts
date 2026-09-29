@@ -30,11 +30,13 @@ export const Careers: GlobalConfig = {
             {
               name: 'whyTitle',
               type: 'text',
-              defaultValue: 'Why Oriana',
+              label: 'Life at Oriana title',
+              defaultValue: 'Life at Oriana',
             },
             {
               name: 'whyBody',
               type: 'textarea',
+              label: 'Life at Oriana body',
             },
             {
               name: 'openingsTitle',
@@ -44,7 +46,10 @@ export const Careers: GlobalConfig = {
             {
               name: 'applyHref',
               type: 'text',
-              defaultValue: '/contact',
+              defaultValue: '/contact?intent=career#contact-form',
+              admin: {
+                description: 'Where Apply buttons send candidates. Prefer the contact form with intent=career.',
+              },
             },
             {
               name: 'applyLabel',

@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { ArrowUpRight, FileText } from 'lucide-react'
+
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
+import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
 import { inverterMegaMenu } from '@/config/navigation'
 import { getCatalogueDownloads } from '@/utilities/getCatalogue'
@@ -31,6 +33,26 @@ export default async function DownloadsPage() {
     }))
     .filter((g) => g.items.length > 0)
 
+  if (grouped.length === 0) {
+    return (
+      <main>
+        <ComingSoon
+          eyebrow="Resources"
+          title="Download Center"
+          description="Datasheets, manuals, and certificates will appear here once product documents are published in the CMS."
+          breadcrumbs={[
+            { label: 'Resources', href: '/resources/downloads' },
+            { label: 'Downloads' },
+          ]}
+          primaryHref="/support"
+          primaryLabel="Contact support"
+          secondaryHref="/products"
+          secondaryLabel="Browse products"
+        />
+      </main>
+    )
+  }
+
   return (
     <main>
       <PageHero
@@ -54,52 +76,42 @@ export default async function DownloadsPage() {
             ))}
           </div>
 
-          {grouped.length === 0 ? (
-            <p className="text-oriana-muted">
-              Documents will appear here once uploaded in the{' '}
-              <Link href="/admin" className="text-oriana-blue hover:underline">
-                Payload admin
-              </Link>
-              . Run <code className="text-sm">npm run seed:catalogue</code> to load sample entries.
-            </p>
-          ) : (
-            <div className="grid gap-10 lg:grid-cols-2">
-              {grouped.map((cat) => (
-                <div key={cat.title} className="rounded border border-oriana-navy/8 bg-white">
-                  <h2 className="border-b border-oriana-navy/8 bg-oriana-silver/40 px-6 py-4 font-display text-lg font-bold text-oriana-navy">
-                    {cat.title}
-                  </h2>
-                  <ul className="divide-y divide-oriana-navy/8">
-                    {cat.items.map((item) => (
-                      <li key={item.id}>
-                        {item.fileUrl ? (
-                          <a
-                            href={item.fileUrl}
-                            className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left transition hover:bg-oriana-silver/30"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <div className="flex items-start gap-3">
-                              <FileText className="mt-0.5 h-5 w-5 shrink-0 text-oriana-blue" />
-                              <div>
-                                <p className="text-sm font-medium text-oriana-navy">{item.title}</p>
-                                {item.relatedProductName && (
-                                  <p className="mt-0.5 text-xs text-oriana-muted">{item.relatedProductName}</p>
-                                )}
-                              </div>
+          <div className="grid gap-10 lg:grid-cols-2">
+            {grouped.map((cat) => (
+              <div key={cat.title} className="rounded border border-oriana-navy/8 bg-white">
+                <h2 className="border-b border-oriana-navy/8 bg-oriana-silver/40 px-6 py-4 font-display text-lg font-bold text-oriana-navy">
+                  {cat.title}
+                </h2>
+                <ul className="divide-y divide-oriana-navy/8">
+                  {cat.items.map((item) => (
+                    <li key={item.id}>
+                      {item.fileUrl ? (
+                        <a
+                          href={item.fileUrl}
+                          className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left transition hover:bg-oriana-silver/30"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <div className="flex items-start gap-3">
+                            <FileText className="mt-0.5 h-5 w-5 shrink-0 text-oriana-blue" />
+                            <div>
+                              <p className="text-sm font-medium text-oriana-navy">{item.title}</p>
+                              {item.relatedProductName && (
+                                <p className="mt-0.5 text-xs text-oriana-muted">{item.relatedProductName}</p>
+                              )}
                             </div>
-                            <ArrowUpRight className="h-4 w-4 shrink-0 text-oriana-blue" />
-                          </a>
-                        ) : (
-                          <span className="flex px-6 py-4 text-sm text-oriana-muted">{item.title}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          )}
+                          </div>
+                          <ArrowUpRight className="h-4 w-4 shrink-0 text-oriana-blue" />
+                        </a>
+                      ) : (
+                        <span className="flex px-6 py-4 text-sm text-oriana-muted">{item.title}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
 
           <p className="mt-10 text-center text-sm text-oriana-muted">
             Can&apos;t find what you need?{' '}

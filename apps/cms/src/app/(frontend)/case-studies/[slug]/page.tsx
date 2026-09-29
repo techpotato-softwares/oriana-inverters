@@ -4,12 +4,6 @@ import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { FadeIn } from '@/components/oriana/FadeIn'
 import { PageHero } from '@/components/oriana/PageHero'
-import {
-  caseStudies,
-  getAllCaseStudySlugs,
-  getCaseStudyBySlug as getStaticCaseStudyBySlug,
-  type CaseStudy as StaticCaseStudy,
-} from '@/data/caseStudies'
 import { getCaseStudies, getCaseStudyBySlug } from '@/utilities/getMarketing'
 import type { CaseStudy as CmsCaseStudy, Media, Product } from '@/payload-types'
 
@@ -19,64 +13,69 @@ function mediaUrl(v: unknown): string | null {
   return v && typeof v === 'object' && 'url' in v && (v as Media).url ? (v as Media).url! : null
 }
 
-type DisplayStudy = StaticCaseStudy
+type DisplayStudy = {
+  slug: string
+  title: string
+  segment: string
+  capacity: string
+  products: string
+  productSlugs: string[]
+  location: string
+  image: string
+  summary: string
+  challenge: string
+  solution: string
+  results: string[]
+  stats: { label: string; value: string }[]
+  year: string
+}
 
 function fromCms(doc: CmsCaseStudy): DisplayStudy {
   const related = (doc.relatedProducts || [])
     .filter((p): p is Product => typeof p === 'object' && p !== null && 'slug' in p)
     .map((p) => p.slug)
-  const staticFallback = getStaticCaseStudyBySlug(doc.slug)
 
   return {
     slug: doc.slug,
     title: doc.title,
     segment: doc.segment,
-    capacity: doc.capacity || staticFallback?.capacity || '',
-    products: doc.products || staticFallback?.products || '',
-    productSlugs: related.length ? related : staticFallback?.productSlugs || [],
-    location: doc.location || staticFallback?.location || '',
-    image: mediaUrl(doc.image) || staticFallback?.image || '/assets/products/three-phase.svg',
+    capacity: doc.capacity || '',
+    products: doc.products || '',
+    productSlugs: related,
+    location: doc.location || '',
+    image: mediaUrl(doc.image) || '/assets/products/three-phase.svg',
     summary: doc.summary,
-    challenge: doc.challenge || staticFallback?.challenge || '',
-    solution: doc.solution || staticFallback?.solution || '',
-    results: (doc.results || []).map((r) => r.text).filter(Boolean).length
-      ? (doc.results || []).map((r) => r.text)
-      : staticFallback?.results || [],
-    stats: (doc.stats || []).filter((s) => s.label && s.value).length
-      ? (doc.stats || []).map((s) => ({ label: s.label, value: s.value }))
-      : staticFallback?.stats || [],
-    year: doc.year || staticFallback?.year || '',
+    challenge: doc.challenge || '',
+    solution: doc.solution || '',
+    results: (doc.results || []).map((r) => r.text).filter(Boolean),
+    stats: (doc.stats || [])
+      .filter((s) => s.label && s.value)
+      .map((s) => ({ label: s.label, value: s.value })),
+    year: doc.year || '',
   }
 }
 
 export async function generateStaticParams() {
   const cmsDocs = (await getCaseStudies()) as CmsCaseStudy[]
-  const slugs = new Set([...getAllCaseStudySlugs(), ...cmsDocs.map((d) => d.slug)])
-  return [...slugs].map((slug) => ({ slug }))
+  return cmsDocs.map((d) => ({ slug: d.slug }))
 }
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params
   const cms = (await getCaseStudyBySlug(slug)) as CmsCaseStudy | null
-  if (cms) {
-    return {
-      title: cms.seo?.metaTitle || cms.title,
-      description: cms.seo?.metaDescription || cms.summary,
-    }
+  if (!cms) return {}
+  return {
+    title: cms.seo?.metaTitle || cms.title,
+    description: cms.seo?.metaDescription || cms.summary,
   }
-  const study = getStaticCaseStudyBySlug(slug)
-  if (!study) return {}
-  return { title: study.title, description: study.summary }
 }
 
 export default async function CaseStudyDetailPage({ params }: Props) {
   const { slug } = await params
   const cms = (await getCaseStudyBySlug(slug)) as CmsCaseStudy | null
-  const study: DisplayStudy | undefined = cms
-    ? fromCms(cms)
-    : getStaticCaseStudyBySlug(slug) || caseStudies.find((cs) => cs.slug === slug)
+  if (!cms) notFound()
 
-  if (!study) notFound()
+  const study = fromCms(cms)
 
   return (
     <main>
@@ -90,104 +89,100 @@ export default async function CaseStudyDetailPage({ params }: Props) {
 
       <section className="py-12 lg:py-16">
         <div className="container">
-          {study.stats.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {study.stats.map((stat, i) => (
-                <FadeIn key={stat.label} delay={i * 0.05}>
-                  <div className="border border-oriana-navy/8 bg-oriana-silver/40 p-6 text-center">
-                    <p className="font-display text-2xl font-light text-oriana-blue">{stat.value}</p>
-                    <p className="mt-2 text-sm text-oriana-muted">{stat.label}</p>
-                  </div>
+          <div className="grid gap-12 lg:grid-cols-3">
+            <div className="lg:col-span-2 space-y-10">
+              {study.challenge ? (
+                <FadeIn>
+                  <h2 className="font-display text-xl font-bold text-oriana-navy">Challenge</h2>
+                  <p className="mt-3 text-sm leading-relaxed text-oriana-muted">{study.challenge}</p>
                 </FadeIn>
-              ))}
+              ) : null}
+              {study.solution ? (
+                <FadeIn delay={0.05}>
+                  <h2 className="font-display text-xl font-bold text-oriana-navy">Solution</h2>
+                  <p className="mt-3 text-sm leading-relaxed text-oriana-muted">{study.solution}</p>
+                </FadeIn>
+              ) : null}
+              {study.results.length > 0 ? (
+                <FadeIn delay={0.1}>
+                  <h2 className="font-display text-xl font-bold text-oriana-navy">Results</h2>
+                  <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-oriana-muted">
+                    {study.results.map((result) => (
+                      <li key={result}>{result}</li>
+                    ))}
+                  </ul>
+                </FadeIn>
+              ) : null}
             </div>
-          ) : null}
 
-          <div className="mt-16 grid gap-12 lg:grid-cols-2 lg:items-start">
-            <FadeIn>
-              <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded border border-oriana-navy/8 bg-gradient-to-br from-oriana-silver to-white">
-                <Image
-                  src={study.image}
-                  alt=""
-                  width={320}
-                  height={220}
-                  className="h-auto max-h-[60%] w-auto opacity-90"
-                  unoptimized
-                />
-              </div>
-              <div className="mt-6 flex flex-wrap gap-2">
+            <aside className="space-y-6">
+              <FadeIn>
+                <div className="relative aspect-[4/3] overflow-hidden rounded border border-oriana-navy/8 bg-oriana-silver/40">
+                  <Image
+                    src={study.image}
+                    alt=""
+                    fill
+                    className="object-contain p-8"
+                    unoptimized
+                  />
+                </div>
+              </FadeIn>
+              <dl className="space-y-3 text-sm">
                 {study.location ? (
-                  <span className="rounded-full bg-oriana-silver px-3 py-1 text-xs font-medium text-oriana-navy">
-                    {study.location}
-                  </span>
+                  <div>
+                    <dt className="text-oriana-muted">Location</dt>
+                    <dd className="font-medium text-oriana-navy">{study.location}</dd>
+                  </div>
                 ) : null}
                 {study.capacity ? (
-                  <span className="rounded-full bg-oriana-blue/10 px-3 py-1 text-xs font-medium text-oriana-blue">
-                    {study.capacity}
-                  </span>
+                  <div>
+                    <dt className="text-oriana-muted">Capacity</dt>
+                    <dd className="font-medium text-oriana-navy">{study.capacity}</dd>
+                  </div>
+                ) : null}
+                {study.products ? (
+                  <div>
+                    <dt className="text-oriana-muted">Products</dt>
+                    <dd className="font-medium text-oriana-navy">{study.products}</dd>
+                  </div>
                 ) : null}
                 {study.year ? (
-                  <span className="rounded-full bg-oriana-deep/5 px-3 py-1 text-xs font-medium text-oriana-muted">
-                    {study.year}
-                  </span>
+                  <div>
+                    <dt className="text-oriana-muted">Year</dt>
+                    <dd className="font-medium text-oriana-navy">{study.year}</dd>
+                  </div>
                 ) : null}
-              </div>
-            </FadeIn>
-
-            <FadeIn delay={0.1}>
-              <h2 className="font-display text-xl font-bold text-oriana-navy">Products Used</h2>
-              <p className="mt-2 font-mono text-sm text-oriana-muted">{study.products}</p>
-              {study.productSlugs.length > 0 ? (
-                <div className="mt-4 flex flex-wrap gap-3">
-                  {study.productSlugs.map((productSlug) => (
-                    <Link
-                      key={productSlug}
-                      href={`/products/${productSlug}`}
-                      className="rounded-full border border-oriana-blue px-4 py-2 text-sm font-semibold text-oriana-blue hover:bg-oriana-blue hover:text-white"
-                    >
-                      View product →
-                    </Link>
+              </dl>
+              {study.stats.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {study.stats.map((stat) => (
+                    <div key={stat.label} className="rounded border border-oriana-navy/8 p-4">
+                      <p className="font-display text-xl font-bold text-oriana-blue">{stat.value}</p>
+                      <p className="mt-1 text-xs text-oriana-muted">{stat.label}</p>
+                    </div>
                   ))}
                 </div>
               ) : null}
-            </FadeIn>
-          </div>
-
-          <div className="mt-16 grid gap-12 lg:grid-cols-3">
-            <FadeIn>
-              <h2 className="font-display text-xl font-bold text-oriana-navy">Challenge</h2>
-              <p className="mt-4 text-sm leading-relaxed text-oriana-muted">{study.challenge}</p>
-            </FadeIn>
-            <FadeIn delay={0.05}>
-              <h2 className="font-display text-xl font-bold text-oriana-navy">Solution</h2>
-              <p className="mt-4 text-sm leading-relaxed text-oriana-muted">{study.solution}</p>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <h2 className="font-display text-xl font-bold text-oriana-navy">Results</h2>
-              <ul className="mt-4 space-y-3">
-                {study.results.map((result) => (
-                  <li key={result} className="flex items-start gap-3 text-sm text-oriana-muted">
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-oriana-blue" />
-                    {result}
-                  </li>
-                ))}
-              </ul>
-            </FadeIn>
-          </div>
-
-          <div className="mt-16 flex flex-wrap gap-4 border-t border-oriana-navy/8 pt-10">
-            <Link
-              href="/case-studies"
-              className="rounded-full border border-oriana-navy/15 px-6 py-3 text-sm font-semibold text-oriana-navy hover:border-oriana-blue"
-            >
-              ← All case studies
-            </Link>
-            <Link
-              href="/contact"
-              className="rounded-full bg-oriana-blue px-6 py-3 text-sm font-semibold text-white hover:bg-oriana-deep"
-            >
-              Request similar project support
-            </Link>
+              {study.productSlugs.length > 0 ? (
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-oriana-muted">
+                    Related products
+                  </p>
+                  <ul className="mt-2 space-y-1">
+                    {study.productSlugs.map((productSlug) => (
+                      <li key={productSlug}>
+                        <Link
+                          href={`/products/${productSlug}`}
+                          className="text-sm font-medium text-oriana-blue hover:underline"
+                        >
+                          {productSlug}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </aside>
           </div>
         </div>
       </section>

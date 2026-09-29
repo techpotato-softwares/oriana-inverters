@@ -1,11 +1,12 @@
 import type { Metadata } from 'next/types'
+import React from 'react'
+import { getPayload } from 'payload'
 
 import { CollectionArchive } from '@/components/CollectionArchive'
+import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageRange } from '@/components/PageRange'
 import { Pagination } from '@/components/Pagination'
 import configPromise from '@payload-config'
-import { getPayload } from 'payload'
-import React from 'react'
 import PageClient from './page.client'
 
 export const dynamic = 'force-dynamic'
@@ -25,6 +26,20 @@ export default async function Page() {
       meta: true,
     },
   })
+
+  if (posts.totalDocs === 0) {
+    return (
+      <main>
+        <ComingSoon
+          eyebrow="News"
+          title="News & Insights"
+          description="Articles and updates will appear here once posts are published in the CMS."
+          primaryHref="/contact#contact-form"
+          primaryLabel="Contact us"
+        />
+      </main>
+    )
+  }
 
   return (
     <div className="pt-24 pb-24">

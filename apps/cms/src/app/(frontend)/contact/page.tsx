@@ -27,8 +27,12 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default async function ContactPage() {
-  const contact = await getContact()
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ intent?: string }>
+}) {
+  const [{ intent }, contact] = await Promise.all([searchParams, getContact()])
   const hero = contact?.hero
   const cards: ContactCard[] = contact?.cards?.length
     ? contact.cards.map((c) => ({
@@ -56,7 +60,12 @@ export default async function ContactPage() {
 
       <section className="py-20 lg:py-28">
         <div className="container">
-          <ContactForm cards={cards} formId={formId} successMessage={successMessage} />
+          <ContactForm
+            cards={cards}
+            formId={formId}
+            successMessage={successMessage}
+            intent={intent}
+          />
         </div>
       </section>
     </main>

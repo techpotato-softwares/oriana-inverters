@@ -234,10 +234,10 @@ export const Home: GlobalConfig = {
                     { name: 'label', type: 'text', required: true },
                   ],
                   defaultValue: [
-                    { iconKey: 'award', value: '10+ Years', label: 'Solar industry project experience' },
+                    { iconKey: 'award', value: '10+', label: 'Years experience in renewable sector' },
                     { iconKey: 'map', value: 'PAN India', label: 'Market presence' },
-                    { iconKey: 'zap', value: 'GW+', label: 'Inverter distribution & experience' },
-                    { iconKey: 'building', value: '500+', label: 'Channel & service partners' },
+                    { iconKey: 'zap', value: '5 GW+', label: 'Distribution and service experience' },
+                    { iconKey: 'building', value: '50+', label: 'Channels and service' },
                     { iconKey: 'leaf', value: '99.6%', label: 'Peak conversion efficiency' },
                   ],
                 },

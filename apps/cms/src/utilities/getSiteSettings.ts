@@ -121,12 +121,15 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
       'C&I PV Solutions',
       'Utility PV Solutions',
       'Energy Storage',
+      'Oriana for Installers',
+      'Oriana for Distributors',
     ])
     const removedFooterHrefs = new Set([
       '/solutions/residential',
       '/solutions/commercial',
       '/solutions/utility',
       '/solutions/storage',
+      '/partners/installers',
     ])
 
     const resolvedFooter =
@@ -166,6 +169,6 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
   }
 }
 
-export const getSiteSettings = unstable_cache(fetchSiteSettings, ['site-settings'], {
+export const getSiteSettings = unstable_cache(fetchSiteSettings, ['site-settings', 'footer-ia-2026-09'], {
   tags: ['global_site-settings'],
 })

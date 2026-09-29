@@ -63,6 +63,27 @@ export function mapFollowLinks(socials: SiteSocialLink[]): FollowSocialLink[] {
 
 type ImpactStat = (typeof HOME_IMPACT.stats)[number]
 
+/** Older seeded homepage copy, replaced on the public site until the CMS global is edited. */
+const IMPACT_STAT_REFRESH: Record<string, Pick<ImpactStat, 'value' | 'label'>> = {
+  'Solar industry project experience': {
+    value: '10+',
+    label: 'Years experience in renewable sector',
+  },
+  'Inverter distribution & experience': {
+    value: '5 GW+',
+    label: 'Distribution and service experience',
+  },
+  'Channel & service partners': {
+    value: '50+',
+    label: 'Channels and service',
+  },
+}
+
+function refreshImpactStat(stat: ImpactStat): ImpactStat {
+  const next = IMPACT_STAT_REFRESH[stat.label]
+  return next ? { ...stat, value: next.value, label: next.label } : stat
+}
+
 export type HomePageView = {
   videoHero: VideoHeroProps
   introduction: typeof HOME_INTRODUCTION
@@ -211,7 +232,7 @@ export function mapHomePage(home: unknown, socials: SiteSocialLink[]): HomePageV
         const value = text(item.value)
         const label = text(item.label)
         if (!value || !label) return []
-        return [{ iconKey: text(item.iconKey) || 'globe', value, label }]
+        return [refreshImpactStat({ iconKey: text(item.iconKey) || 'globe', value, label })]
       })
     : []
 

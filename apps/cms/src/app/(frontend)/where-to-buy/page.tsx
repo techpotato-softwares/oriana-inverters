@@ -1,5 +1,7 @@
 import Link from 'next/link'
+
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
+import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { DistributorLocator } from '@/components/oriana/DistributorLocator'
 import { PageHero } from '@/components/oriana/PageHero'
 import { getDistributors } from '@/utilities/getDistributors'
@@ -11,6 +13,23 @@ export const metadata = {
 
 export default async function WhereToBuyPage() {
   const distributors = await getDistributors()
+
+  if (distributors.length === 0) {
+    return (
+      <main>
+        <ComingSoon
+          eyebrow="Sales"
+          title="Where to Buy"
+          description="Authorized distributor and installer listings will appear here once partners are published in the CMS."
+          breadcrumbs={[{ label: 'Where to Buy' }]}
+          primaryHref="/partners/become-a-distributor"
+          primaryLabel="Become a distributor"
+          secondaryHref="/contact#contact-form"
+          secondaryLabel="Contact sales"
+        />
+      </main>
+    )
+  }
 
   return (
     <main>
@@ -32,7 +51,7 @@ export default async function WhereToBuyPage() {
               commercial terms.
             </p>
             <Link
-              href="/contact"
+              href="/partners/become-a-distributor"
               className="mt-6 inline-block rounded bg-oriana-blue px-6 py-3 text-sm font-bold text-white hover:bg-oriana-deep"
             >
               Partner Inquiry

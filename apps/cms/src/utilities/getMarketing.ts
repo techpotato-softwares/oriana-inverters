@@ -23,7 +23,7 @@ const defaultHeaderNav: HeaderNavView = {
   loginLabel: 'Login',
   loginHref: '/admin',
   whereToBuy: { label: 'Where to Buy', href: '/where-to-buy' },
-  requestQuote: { label: 'Request Quote', href: '/contact' },
+  requestQuote: { label: 'Request Quote', href: '/contact?intent=quote#contact-form' },
   mainNav: [...mainNav],
 }
 
@@ -44,7 +44,7 @@ async function fetchHeaderNav(): Promise<HeaderNavView> {
       },
       requestQuote: {
         label: doc?.requestQuote?.label || defaultHeaderNav.requestQuote.label,
-        href: doc?.requestQuote?.href || defaultHeaderNav.requestQuote.href,
+        href: quoteHref(doc?.requestQuote?.href),
       },
       mainNav: defaultHeaderNav.mainNav,
     }
@@ -54,7 +54,15 @@ async function fetchHeaderNav(): Promise<HeaderNavView> {
   }
 }
 
-export const getHeaderNav = unstable_cache(fetchHeaderNav, ['header-nav', 'partners-installers-distributors'], {
+function quoteHref(href: string | null | undefined): string {
+  const value = href?.trim()
+  if (!value || value === '/contact' || value === '/contact/') {
+    return '/contact?intent=quote#contact-form'
+  }
+  return value
+}
+
+export const getHeaderNav = unstable_cache(fetchHeaderNav, ['header-nav', 'nav-ia-2026-09'], {
   tags: ['global_header'],
 })
 

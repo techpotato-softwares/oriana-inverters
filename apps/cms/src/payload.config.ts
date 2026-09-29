@@ -8,6 +8,7 @@ import { Awards } from './collections/Awards'
 import { CaseStudies } from './collections/CaseStudies'
 import { Categories } from './collections/Categories'
 import { Certifications } from './collections/Certifications'
+import { DistributorApplications } from './collections/DistributorApplications'
 import { Distributors } from './collections/Distributors'
 import { Downloads } from './collections/Downloads'
 import { Faqs } from './collections/Faqs'
@@ -134,6 +135,7 @@ export default buildConfig({
     Faqs,
     Videos,
     Distributors,
+    DistributorApplications,
     Jobs,
     Certifications,
     Awards,

@@ -75,47 +75,8 @@ export const supportMegaMenuCategories: NavMegaCategory[] = [
   },
 ]
 
-const partnerSolutionsColumn: NavMenuColumn = {
-  title: 'Solutions & Cases',
-  links: [
-    { label: 'Solutions for Home', href: '/solutions/residential' },
-    { label: 'Solutions for Business', href: '/solutions/commercial' },
-    { label: 'Cases & Stories', href: '/case-studies' },
-  ],
-}
-
-const partnerHowToBuyColumn: NavMenuColumn = {
-  title: 'How to Buy',
-  links: [{ label: 'Find a Distributor', href: '/where-to-buy' }],
-}
-
-/** Partners mega-menu — left rail is Installers / Distributors only. */
+/** Partners mega-menu — distributors only. Installer pages stay reachable by URL. */
 export const partnersMegaMenuCategories: NavMegaCategory[] = [
-  {
-    label: 'Installers',
-    href: '/partners/installers',
-    columns: [
-      {
-        title: 'Partnership',
-        links: [
-          { label: 'Oriana for Installers', href: '/partners/installers' },
-          { label: 'Become an Installer', href: '/partners/become-an-installer' },
-        ],
-      },
-      partnerSolutionsColumn,
-      partnerHowToBuyColumn,
-      {
-        title: 'Support',
-        links: [
-          { label: 'Installer Support', href: '/support' },
-          { label: 'Product Documentation', href: '/resources/downloads' },
-          { label: 'Installation Videos', href: '/resources/videos' },
-          { label: 'FAQs', href: '/resources/faqs' },
-          { label: 'Warranty', href: '/support/warranty' },
-        ],
-      },
-    ],
-  },
   {
     label: 'Distributors',
     href: '/partners/distributors',
@@ -123,19 +84,8 @@ export const partnersMegaMenuCategories: NavMegaCategory[] = [
       {
         title: 'Partnership',
         links: [
-          { label: 'Oriana for Distributors', href: '/partners/distributors' },
+          { label: 'Become a Distributor', href: '/partners/become-a-distributor' },
           { label: 'Find a Distributor', href: '/where-to-buy' },
-        ],
-      },
-      partnerSolutionsColumn,
-      partnerHowToBuyColumn,
-      {
-        title: 'Support',
-        links: [
-          { label: 'Distributor Support', href: '/support' },
-          { label: 'Product Documentation', href: '/resources/downloads' },
-          { label: 'FAQs', href: '/resources/faqs' },
-          { label: 'Warranty', href: '/support/warranty' },
         ],
       },
     ],
@@ -154,14 +104,7 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
           { label: 'Company Profile', href: '/about' },
           { label: 'Brand Story', href: '/about' },
           { label: 'Certifications & Awards', href: '/about/certifications' },
-        ],
-      },
-      {
-        title: 'Organization',
-        links: [
-          { label: 'Partners', href: '/about/partners' },
           { label: 'Case Studies', href: '/case-studies' },
-          { label: 'Sustainability', href: '/sustainability' },
         ],
       },
     ],
@@ -196,17 +139,12 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
         title: 'Foundation',
         links: [
           { label: 'Our Mission', href: '/about/foundation' },
-          { label: 'Community Programmes', href: '/about/foundation' },
           { label: 'Our Achievements', href: '/about/foundation' },
         ],
       },
       {
         title: 'Get Involved',
-        links: [
-          { label: 'Partner With Us', href: '/contact' },
-          { label: 'Volunteer', href: '/contact' },
-          { label: 'Contact Foundation', href: '/contact' },
-        ],
+        links: [{ label: 'Partner With Us', href: '/contact?intent=sales#contact-form' }],
       },
     ],
   },
@@ -217,17 +155,9 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
       {
         title: 'Careers',
         links: [
-          { label: 'Open Positions', href: '/careers' },
-          { label: 'Life at Oriana', href: '/careers' },
-          { label: 'Their Stories', href: '/careers' },
-        ],
-      },
-      {
-        title: 'Join Us',
-        links: [
-          { label: 'Apply Now', href: '/careers' },
-          { label: 'Recruitment', href: '/careers' },
-          { label: 'Internships', href: '/careers' },
+          { label: 'Open Positions', href: '/careers#openings' },
+          { label: 'Life at Oriana', href: '/careers#life' },
+          { label: 'Apply Now', href: '/careers#apply' },
         ],
       },
     ],
@@ -239,8 +169,8 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
       {
         title: 'Contact',
         links: [
-          { label: 'Contact Oriana', href: '/contact' },
-          { label: 'Sales Enquiry', href: '/contact' },
+          { label: 'Contact Oriana', href: '/contact#contact-form' },
+          { label: 'Sales Enquiry', href: '/contact?intent=sales#contact-form' },
           { label: 'Support', href: '/support' },
         ],
       },
@@ -249,7 +179,7 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
         links: [
           { label: 'Where to Buy', href: '/where-to-buy' },
           { label: 'Find a Distributor', href: '/where-to-buy' },
-          { label: 'Request a Quote', href: '/contact' },
+          { label: 'Request a Quote', href: '/contact?intent=quote#contact-form' },
         ],
       },
     ],
@@ -313,6 +243,7 @@ export const megaMenus: Record<
         links: [
           { label: 'Company Profile', href: '/about' },
           { label: 'Certifications & Awards', href: '/about/certifications' },
+          { label: 'Case Studies', href: '/case-studies' },
         ],
       },
       {

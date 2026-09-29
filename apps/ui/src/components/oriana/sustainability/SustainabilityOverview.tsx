@@ -4,17 +4,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { ArrowRight, Download, Mail } from 'lucide-react'
 
-import { AnimatedCounter } from '@/components/oriana/AnimatedCounter'
+import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { FadeIn } from '@/components/oriana/FadeIn'
 import { SustainabilitySubNav } from '@/components/oriana/sustainability/SustainabilitySubNav'
-import {
-  climateTargets,
-  fallbackHonors,
-  fallbackPolicies,
-  fallbackReports,
-  strategyPillars,
-  type ReportCard,
-} from '@/components/oriana/sustainability/sustainabilityData'
+import { type ReportCard } from '@/components/oriana/sustainability/sustainabilityData'
 import { cn } from '@/utilities/ui'
 
 export type SustainabilityNewsItem = {
@@ -36,22 +29,23 @@ type SustainabilityOverviewProps = {
   honors?: SustainabilityHonor[]
   news?: SustainabilityNewsItem[]
   contactEmail?: string
+  /** When false, climate/strategy highlight sections use Coming Soon instead of static demos. */
+  hasStrategyContent?: boolean
 }
 
 export function SustainabilityOverview({
   heroTitle = 'Green Mission. Better Life',
   heroImage = 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1920&q=80',
-  reports = fallbackReports,
-  policies = fallbackPolicies,
-  honors = fallbackHonors,
+  reports = [],
+  policies = [],
+  honors = [],
   news = [],
   contactEmail = 'esg@orianainverters.com',
+  hasStrategyContent = false,
 }: SustainabilityOverviewProps) {
-  const [activePillar, setActivePillar] = useState(strategyPillars[0].id)
   const [reportTab, setReportTab] = useState<'reports' | 'policies'>('reports')
-
-  const pillar = strategyPillars.find((p) => p.id === activePillar) ?? strategyPillars[0]
   const activeDocs = reportTab === 'reports' ? reports : policies
+  const hasDocs = reports.length > 0 || policies.length > 0
 
   return (
     <main>
@@ -81,36 +75,33 @@ export function SustainabilityOverview({
 
       <section id="climate-targets" className="scroll-mt-24 bg-white py-16 lg:py-24">
         <div className="container">
-          <FadeIn>
-            <h2 className="font-display text-3xl font-semibold text-oriana-navy lg:text-4xl">
-              Oriana Climate Targets
-            </h2>
-            <p className="mt-3 max-w-2xl text-sm text-oriana-muted">
-              Our roadmap aligns operational decarbonisation with supply-chain accountability,
-              following internationally recognised carbon neutrality definitions.
-            </p>
-          </FadeIn>
-
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {climateTargets.map((target, i) => (
-              <FadeIn key={target.year} delay={i * 0.06}>
-                <article
-                  className="flex h-full flex-col overflow-hidden rounded-2xl border border-oriana-navy/8 bg-oriana-silver/30"
-                  style={{ borderRadius: 16 }}
-                >
-                  <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 px-6 py-8 text-white">
-                    <p className="font-display text-5xl font-light">{target.year}</p>
-                    <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-white/75">
-                      {target.scope}
-                    </p>
-                  </div>
-                  <div className="flex flex-1 flex-col px-6 py-6">
-                    <p className="text-sm leading-relaxed text-oriana-navy">{target.title}</p>
-                  </div>
-                </article>
-              </FadeIn>
-            ))}
-          </div>
+          {hasStrategyContent ? (
+            <FadeIn>
+              <h2 className="font-display text-3xl font-semibold text-oriana-navy lg:text-4xl">
+                Oriana Climate Targets
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm text-oriana-muted">
+                Our roadmap aligns operational decarbonisation with supply-chain accountability.
+              </p>
+              <Link
+                href="/sustainability/strategy"
+                className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-oriana-blue hover:underline"
+              >
+                Read the full strategy
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </FadeIn>
+          ) : (
+            <ComingSoon
+              compact
+              title="Climate targets"
+              description="Verified climate targets and roadmap details will appear here once published in the CMS."
+              primaryHref="/sustainability/strategy"
+              primaryLabel="View strategy"
+              secondaryHref="/contact#contact-form"
+              secondaryLabel="Contact ESG"
+            />
+          )}
         </div>
       </section>
 
@@ -121,79 +112,30 @@ export function SustainabilityOverview({
               Sustainability Strategy
             </h2>
           </FadeIn>
-
-          <div className="mt-8 flex flex-wrap gap-2 lg:gap-3">
-            {strategyPillars.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActivePillar(item.id)}
-                className={cn(
-                  'rounded-full px-4 py-2 text-sm font-medium transition',
-                  activePillar === item.id
-                    ? 'bg-oriana-blue text-white shadow-md'
-                    : 'bg-white text-oriana-navy hover:bg-oriana-blue/10',
-                )}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-10 grid gap-8 lg:grid-cols-2 lg:items-stretch">
-            <FadeIn key={pillar.id}>
-              <div
-                className="relative min-h-[280px] overflow-hidden lg:min-h-[360px]"
-                style={{ borderRadius: 16 }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={pillar.image}
-                  alt=""
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-oriana-deep/25" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-oriana-deep/80 to-transparent p-6">
-                  <p className="font-display text-2xl font-semibold text-white">{pillar.label}</p>
-                </div>
-              </div>
-            </FadeIn>
-
-            <FadeIn delay={0.05} key={`${pillar.id}-stats`}>
-              <div
-                className="flex h-full flex-col border border-oriana-navy/8 bg-white p-6 lg:p-8"
-                style={{ borderRadius: 16 }}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <p className="font-display text-xl font-semibold text-oriana-navy">
-                    {pillar.label}
-                  </p>
-                  <Link
-                    href="/sustainability/strategy"
-                    className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-oriana-blue hover:underline"
-                  >
-                    Learn more
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </div>
-                <div className="mt-8 grid flex-1 gap-6 sm:grid-cols-2">
-                  {pillar.stats.map((stat) => (
-                    <div key={stat.label}>
-                      <p className="font-display text-2xl font-light text-oriana-blue lg:text-3xl">
-                        <AnimatedCounter value={stat.value} />
-                      </p>
-                      <p className="mt-1.5 text-sm leading-snug text-oriana-muted">{stat.label}</p>
-                    </div>
-                  ))}
-                </div>
+          <div className="mt-8">
+            {hasStrategyContent ? (
+              <FadeIn delay={0.05}>
+                <p className="max-w-2xl text-sm leading-relaxed text-oriana-muted">
+                  Explore Oriana&apos;s published sustainability strategy, priorities, and long-term
+                  commitments.
+                </p>
                 <Link
                   href="/sustainability/strategy"
-                  className="mt-8 text-sm font-semibold text-oriana-blue hover:underline"
+                  className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-oriana-blue hover:underline"
                 >
-                  All strategies →
+                  All strategies
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
-              </div>
-            </FadeIn>
+              </FadeIn>
+            ) : (
+              <ComingSoon
+                compact
+                title="Strategy details"
+                description="Strategy pillars and performance highlights will appear here once CMS content is ready."
+                primaryHref="/sustainability/strategy"
+                primaryLabel="Open strategy page"
+              />
+            )}
           </div>
         </div>
       </section>
@@ -206,59 +148,77 @@ export function SustainabilityOverview({
             </h2>
           </FadeIn>
 
-          <div className="mt-8 flex gap-6 border-b border-oriana-navy/10">
-            {(['reports', 'policies'] as const).map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setReportTab(tab)}
-                className={cn(
-                  'relative pb-4 text-sm font-semibold capitalize transition',
-                  reportTab === tab
-                    ? 'text-oriana-blue after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-oriana-blue'
-                    : 'text-oriana-muted hover:text-oriana-navy',
-                )}
-              >
-                {tab === 'reports' ? 'Sustainability Report' : 'Sustainability Policy'}
-              </button>
-            ))}
-          </div>
+          {!hasDocs ? (
+            <div className="mt-8">
+              <ComingSoon
+                compact
+                title="Reports & policies"
+                description="ESG reports and policy documents will appear here once uploaded in the CMS."
+                primaryHref="/sustainability/reports"
+                primaryLabel="Reports page"
+              />
+            </div>
+          ) : (
+            <>
+              <div className="mt-8 flex gap-6 border-b border-oriana-navy/10">
+                {(['reports', 'policies'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setReportTab(tab)}
+                    className={cn(
+                      'relative pb-4 text-sm font-semibold capitalize transition',
+                      reportTab === tab
+                        ? 'text-oriana-blue after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-oriana-blue'
+                        : 'text-oriana-muted hover:text-oriana-navy',
+                    )}
+                  >
+                    {tab === 'reports' ? 'Sustainability Report' : 'Sustainability Policy'}
+                  </button>
+                ))}
+              </div>
 
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {activeDocs.slice(0, 3).map((doc, i) => (
-              <FadeIn key={doc.title} delay={i * 0.05}>
+              {activeDocs.length === 0 ? (
+                <p className="mt-8 text-sm text-oriana-muted">No documents in this category yet.</p>
+              ) : (
+                <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {activeDocs.slice(0, 3).map((doc, i) => (
+                    <FadeIn key={doc.title} delay={i * 0.05}>
+                      <Link
+                        href={doc.href}
+                        className="group flex h-full flex-col overflow-hidden border border-oriana-navy/8 bg-oriana-silver/20 transition hover:border-oriana-blue/30 hover:shadow-md"
+                        style={{ borderRadius: 16 }}
+                      >
+                        <div className="flex flex-1 flex-col p-6">
+                          <span className="text-xs font-semibold uppercase tracking-wider text-oriana-blue">
+                            {doc.tag || 'Sustainability'}
+                          </span>
+                          <p className="mt-3 font-display text-lg font-semibold text-oriana-navy group-hover:text-oriana-blue">
+                            {doc.title}
+                          </p>
+                          <p className="mt-2 text-sm text-oriana-muted">{doc.year}</p>
+                        </div>
+                        <div className="flex items-center gap-2 border-t border-oriana-navy/8 px-6 py-4 text-sm font-semibold text-oriana-blue">
+                          <Download className="h-4 w-4" />
+                          Download
+                        </div>
+                      </Link>
+                    </FadeIn>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-8">
                 <Link
-                  href={doc.href}
-                  className="group flex h-full flex-col overflow-hidden border border-oriana-navy/8 bg-oriana-silver/20 transition hover:border-oriana-blue/30 hover:shadow-md"
-                  style={{ borderRadius: 16 }}
+                  href="/sustainability/reports"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-oriana-blue hover:underline"
                 >
-                  <div className="flex flex-1 flex-col p-6">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-oriana-blue">
-                      {doc.tag || 'Sustainability'}
-                    </span>
-                    <p className="mt-3 font-display text-lg font-semibold text-oriana-navy group-hover:text-oriana-blue">
-                      {doc.title}
-                    </p>
-                    <p className="mt-2 text-sm text-oriana-muted">{doc.year}</p>
-                  </div>
-                  <div className="flex items-center gap-2 border-t border-oriana-navy/8 px-6 py-4 text-sm font-semibold text-oriana-blue">
-                    <Download className="h-4 w-4" />
-                    Download
-                  </div>
+                  Explore more
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
-              </FadeIn>
-            ))}
-          </div>
-
-          <div className="mt-8">
-            <Link
-              href="/sustainability/reports"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-oriana-blue hover:underline"
-            >
-              Explore more
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -270,32 +230,44 @@ export function SustainabilityOverview({
             </h2>
           </FadeIn>
 
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {honors.slice(0, 4).map((honor, i) => (
-              <FadeIn key={honor.title} delay={i * 0.05}>
-                <article
-                  className="overflow-hidden border border-oriana-navy/8 bg-white"
-                  style={{ borderRadius: 16 }}
-                >
-                  <div className="relative aspect-[4/3] bg-oriana-silver">
-                    {honor.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={honor.image}
-                        alt=""
-                        className="absolute inset-0 h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-oriana-blue/20 to-emerald-600/20" />
-                    )}
-                  </div>
-                  <p className="p-4 text-sm font-medium leading-snug text-oriana-navy">
-                    {honor.title}
-                  </p>
-                </article>
-              </FadeIn>
-            ))}
-          </div>
+          {honors.length === 0 ? (
+            <div className="mt-8">
+              <ComingSoon
+                compact
+                title="Awards"
+                description="Recognition and awards will appear here once published."
+                secondaryHref="/about"
+                secondaryLabel="About Oriana"
+              />
+            </div>
+          ) : (
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {honors.slice(0, 4).map((honor, i) => (
+                <FadeIn key={honor.title} delay={i * 0.05}>
+                  <article
+                    className="overflow-hidden border border-oriana-navy/8 bg-white"
+                    style={{ borderRadius: 16 }}
+                  >
+                    <div className="relative aspect-[4/3] bg-oriana-silver">
+                      {honor.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={honor.image}
+                          alt=""
+                          className="absolute inset-0 h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-oriana-blue/20 to-emerald-600/20" />
+                      )}
+                    </div>
+                    <p className="p-4 text-sm font-medium leading-snug text-oriana-navy">
+                      {honor.title}
+                    </p>
+                  </article>
+                </FadeIn>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

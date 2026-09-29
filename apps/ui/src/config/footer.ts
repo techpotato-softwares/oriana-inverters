@@ -12,8 +12,7 @@ export const footerNav = [
   {
     title: 'Partners',
     links: [
-      { label: 'Oriana for Installers', href: '/partners/installers' },
-      { label: 'Oriana for Distributors', href: '/partners/distributors' },
+      { label: 'Become a Distributor', href: '/partners/become-a-distributor' },
       { label: 'Find a Distributor', href: '/where-to-buy' },
     ],
   },
