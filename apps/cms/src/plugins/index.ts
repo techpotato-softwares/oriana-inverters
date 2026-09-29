@@ -107,6 +107,9 @@ export const plugins: Plugin[] = [
       media: {
         prefix: 'media',
       },
+      'career-applications': {
+        prefix: 'career-resumes',
+      },
     },
     // Required by the plugin type even when disabled; unused unless enabled.
     bucket: s3Bucket || 'oriana-media-placeholder',

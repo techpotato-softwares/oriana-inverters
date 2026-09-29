@@ -3,6 +3,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { MapPin } from 'lucide-react'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
+import { CareerApplicationForm } from '@/components/oriana/CareerApplicationForm'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { FadeIn } from '@/components/oriana/FadeIn'
 import { MediaHero } from '@/components/oriana/MediaHero'
@@ -15,12 +16,7 @@ function mediaUrl(value: unknown): string | null {
     : null
 }
 
-const careerApplyHref = '/contact?intent=career#contact-form'
-
-function applyHref(url: string | null | undefined, fallback: string): string {
-  if (!url || url === '/contact' || url === '/contact/') return fallback
-  return url
-}
+const applyHrefDefault = '#apply'
 
 export async function generateMetadata(): Promise<Metadata> {
   const careers = await getCareers()
@@ -42,7 +38,6 @@ export default async function CareersPage() {
     'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=2400&q=80'
   const lifeImage =
     'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1600&q=80'
-  const applyHrefDefault = applyHref(careers?.applyHref, careerApplyHref)
   const applyLabel = careers?.applyLabel || 'Apply'
 
   const openings = jobs.map((job) => ({
@@ -50,7 +45,7 @@ export default async function CareersPage() {
     location: job.location,
     department: job.department || '',
     type: job.type || 'Full-time',
-    applyUrl: applyHref(job.applyUrl, applyHrefDefault),
+    applyUrl: `/careers?role=${encodeURIComponent(job.title)}#apply`,
   }))
 
   return (
@@ -114,8 +109,8 @@ export default async function CareersPage() {
                 compact
                 title="Roles coming soon"
                 description="We are preparing current openings. Send your profile below and our team will keep you in mind."
-                primaryHref={applyHrefDefault}
-                primaryLabel="Send your profile"
+                primaryHref="#apply"
+                primaryLabel="Apply now"
                 secondaryHref="#life"
                 secondaryLabel="Life at Oriana"
               />
@@ -146,21 +141,16 @@ export default async function CareersPage() {
         </div>
       </section>
 
-      <section id="apply" className="scroll-mt-32 bg-oriana-deep py-16 text-white lg:py-24">
-        <div className="container grid gap-8 lg:grid-cols-[1.4fr_auto] lg:items-center">
-          <FadeIn>
-            <h2 className="font-display text-3xl font-semibold md:text-4xl">Apply now</h2>
-            <p className="mt-4 max-w-xl text-white/75">
-              Send your profile even if a listed role is not an exact match. Our team reads every application.
+      <section id="apply" className="scroll-mt-32 border-t border-oriana-navy/8 bg-oriana-surface py-16 lg:py-24">
+        <div className="container grid gap-12 lg:grid-cols-5 lg:gap-16">
+          <FadeIn className="lg:col-span-2">
+            <h2 className="font-display text-3xl font-semibold text-oriana-navy md:text-4xl">Apply now</h2>
+            <p className="mt-4 text-sm leading-relaxed text-oriana-muted">
+              Send your resume even if a listed role is not an exact match. Applications are saved for HR and emailed to the team.
             </p>
           </FadeIn>
-          <FadeIn delay={0.08}>
-            <Link
-              href={applyHrefDefault}
-              className="inline-flex rounded-full bg-white px-6 py-3 text-sm font-bold text-oriana-navy transition hover:bg-oriana-silver"
-            >
-              Send your profile
-            </Link>
+          <FadeIn delay={0.08} className="lg:col-span-3">
+            <CareerApplicationForm />
           </FadeIn>
         </div>
       </section>

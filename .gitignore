@@ -35,3 +35,6 @@ cdk/dist/
 # Fetched at build time by scripts/fetch-lambda-adapter.sh
 docker/lambda-adapter
 
+# Career resume uploads (local disk; production uses S3)
+apps/cms/uploads/
+

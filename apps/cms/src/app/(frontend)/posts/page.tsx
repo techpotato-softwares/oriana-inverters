@@ -7,6 +7,7 @@ import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageRange } from '@/components/PageRange'
 import { Pagination } from '@/components/Pagination'
 import configPromise from '@payload-config'
+import { PLACEHOLDER_POST_SLUGS } from '@/utilities/placeholderContent'
 import PageClient from './page.client'
 
 export const dynamic = 'force-dynamic'
@@ -19,6 +20,9 @@ export default async function Page() {
     depth: 1,
     limit: 12,
     overrideAccess: false,
+    where: {
+      slug: { not_in: [...PLACEHOLDER_POST_SLUGS] },
+    },
     select: {
       title: true,
       slug: true,

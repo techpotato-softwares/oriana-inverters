@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache'
 
 import { mainNav, type MainNavEntry } from '@/config/navigation'
 import type { Distributor } from '@/data/distributors'
+import { isPlaceholderSlug, withoutPlaceholderDocs } from '@/utilities/placeholderContent'
 
 export type HeaderNavView = {
   hotlineLabel: string
@@ -161,7 +162,7 @@ async function fetchPublishedCollection<T extends string>(
       where: { _status: { equals: 'published' } },
       overrideAccess: false,
     })
-    return result.docs
+    return withoutPlaceholderDocs(collection, result.docs)
   } catch (error) {
     console.error(`[fetch ${collection}] failed:`, error)
     return []
@@ -170,11 +171,12 @@ async function fetchPublishedCollection<T extends string>(
 
 export const getCaseStudies = unstable_cache(
   () => fetchPublishedCollection('case-studies', '-year'),
-  ['case-studies-list'],
+  ['case-studies-list', 'hide-placeholders'],
   { tags: ['case-studies'] },
 )
 
 export const getCaseStudyBySlug = async (slug: string) => {
+  if (isPlaceholderSlug('case-studies', slug)) return null
   try {
     const payload = await getPayload({ config: configPromise })
     const result = await payload.find({
@@ -193,49 +195,49 @@ export const getCaseStudyBySlug = async (slug: string) => {
 
 export const getFaqs = unstable_cache(
   () => fetchPublishedCollection('faqs'),
-  ['faqs-list'],
+  ['faqs-list', 'hide-placeholders'],
   { tags: ['faqs'] },
 )
 
 export const getVideos = unstable_cache(
   () => fetchPublishedCollection('videos'),
-  ['videos-list'],
+  ['videos-list', 'hide-placeholders'],
   { tags: ['videos'] },
 )
 
 export const getJobs = unstable_cache(
   () => fetchPublishedCollection('jobs'),
-  ['jobs-list'],
+  ['jobs-list', 'hide-placeholders'],
   { tags: ['jobs'] },
 )
 
 export const getCertifications = unstable_cache(
   () => fetchPublishedCollection('certifications'),
-  ['certifications-list'],
+  ['certifications-list', 'hide-placeholders'],
   { tags: ['certifications'] },
 )
 
 export const getAwards = unstable_cache(
   () => fetchPublishedCollection('awards'),
-  ['awards-list'],
+  ['awards-list', 'hide-placeholders'],
   { tags: ['awards'] },
 )
 
 export const getPartners = unstable_cache(
   () => fetchPublishedCollection('partners'),
-  ['partners-list'],
+  ['partners-list', 'hide-placeholders'],
   { tags: ['partners'] },
 )
 
 export const getWarrantyPlans = unstable_cache(
   () => fetchPublishedCollection('warranty-plans'),
-  ['warranty-plans-list'],
+  ['warranty-plans-list', 'hide-placeholders'],
   { tags: ['warranty-plans'] },
 )
 
 export const getSustainabilityReports = unstable_cache(
   () => fetchPublishedCollection('sustainability-reports'),
-  ['sustainability-reports-list'],
+  ['sustainability-reports-list', 'hide-placeholders'],
   { tags: ['sustainability-reports'] },
 )
 
@@ -266,7 +268,7 @@ export async function fetchDistributorsFromCms(): Promise<Distributor[]> {
       pagination: false,
       where: { _status: { equals: 'published' } },
     })
-    return result.docs.map((doc) => ({
+    return withoutPlaceholderDocs('distributors', result.docs).map((doc) => ({
       id: doc.slug || String(doc.id),
       name: doc.name,
       type: doc.type as Distributor['type'],

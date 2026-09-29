@@ -5,6 +5,7 @@ import { getPayload } from 'payload'
 import { SustainabilityOverview } from '@/components/oriana/sustainability/SustainabilityOverview'
 import type { ReportCard } from '@/components/oriana/sustainability/sustainabilityData'
 import { getAwards, getSustainability, getSustainabilityReports } from '@/utilities/getMarketing'
+import { PLACEHOLDER_POST_SLUGS, realStrategySections } from '@/utilities/placeholderContent'
 import type { Award, Media, SustainabilityReport } from '@/payload-types'
 
 function mediaUrl(v: unknown): string | null {
@@ -50,7 +51,7 @@ export default async function SustainabilityPage() {
       collection: 'posts',
       depth: 0,
       limit: 3,
-      where: { _status: { equals: 'published' } },
+      where: { _status: { equals: 'published' }, slug: { not_in: [...PLACEHOLDER_POST_SLUGS] } },
       sort: '-publishedAt',
     })
     news = result.docs.map((post) => ({
@@ -72,7 +73,7 @@ export default async function SustainabilityPage() {
   const heroImage =
     mediaUrl(data?.image) ||
     'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1920&q=80'
-  const hasStrategyContent = Boolean(data?.strategySections?.length)
+  const hasStrategyContent = realStrategySections(data?.strategySections).length > 0
 
   return (
     <SustainabilityOverview

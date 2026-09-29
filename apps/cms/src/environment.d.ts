@@ -19,6 +19,7 @@ declare global {
       ADMIN_PASSWORD?: string
       ADMIN_NAME?: string
       DISTRIBUTOR_NOTIFY_EMAIL?: string
+      CAREER_NOTIFY_EMAIL?: string
       SMTP_HOST?: string
       SMTP_PORT?: string
       SMTP_USER?: string

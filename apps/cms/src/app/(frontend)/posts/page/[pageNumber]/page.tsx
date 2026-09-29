@@ -9,6 +9,8 @@ import React from 'react'
 import PageClient from './page.client'
 import { notFound } from 'next/navigation'
 
+import { PLACEHOLDER_POST_SLUGS } from '@/utilities/placeholderContent'
+
 export const dynamic = 'force-dynamic'
 
 type Args = {
@@ -31,6 +33,9 @@ export default async function Page({ params: paramsPromise }: Args) {
     limit: 12,
     page: sanitizedPageNumber,
     overrideAccess: false,
+    where: {
+      slug: { not_in: [...PLACEHOLDER_POST_SLUGS] },
+    },
   })
 
   return (

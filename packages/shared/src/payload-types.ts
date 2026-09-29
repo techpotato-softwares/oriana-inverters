@@ -78,6 +78,7 @@ export interface Config {
     videos: Video;
     distributors: Distributor;
     'distributor-applications': DistributorApplication;
+    'career-applications': CareerApplication;
     jobs: Job;
     certifications: Certification;
     awards: Award;
@@ -114,6 +115,7 @@ export interface Config {
     videos: VideosSelect<false> | VideosSelect<true>;
     distributors: DistributorsSelect<false> | DistributorsSelect<true>;
     'distributor-applications': DistributorApplicationsSelect<false> | DistributorApplicationsSelect<true>;
+    'career-applications': CareerApplicationsSelect<false> | CareerApplicationsSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
     certifications: CertificationsSelect<false> | CertificationsSelect<true>;
     awards: AwardsSelect<false> | AwardsSelect<true>;
@@ -1443,6 +1445,37 @@ export interface DistributorApplication {
   createdAt: string;
 }
 /**
+ * Applications and resumes submitted from the Careers page. Download the resume from the document.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "career-applications".
+ */
+export interface CareerApplication {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  location?: string | null;
+  role?: string | null;
+  message?: string | null;
+  /**
+   * Whether the notification to HR was sent.
+   */
+  emailStatus?: ('sent' | 'failed' | 'not-configured') | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "jobs".
  */
@@ -1820,6 +1853,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'distributor-applications';
         value: number | DistributorApplication;
+      } | null)
+    | ({
+        relationTo: 'career-applications';
+        value: number | CareerApplication;
       } | null)
     | ({
         relationTo: 'jobs';
@@ -2542,6 +2579,31 @@ export interface DistributorApplicationsSelect<T extends boolean = true> {
   emailStatus?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "career-applications_select".
+ */
+export interface CareerApplicationsSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  phone?: T;
+  location?: T;
+  role?: T;
+  message?: T;
+  emailStatus?: T;
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

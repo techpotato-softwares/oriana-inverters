@@ -5,6 +5,7 @@ import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Awards } from './collections/Awards'
+import { CareerApplications } from './collections/CareerApplications'
 import { CaseStudies } from './collections/CaseStudies'
 import { Categories } from './collections/Categories'
 import { Certifications } from './collections/Certifications'
@@ -136,6 +137,7 @@ export default buildConfig({
     Videos,
     Distributors,
     DistributorApplications,
+    CareerApplications,
     Jobs,
     Certifications,
     Awards,
