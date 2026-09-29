@@ -69,14 +69,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # Public ECR anonymous pulls hit "Data limit exceeded" / 429 on shared runners.
-      # Authenticated pulls raise the monthly quota (must use us-east-1 for ecr-public).
-      - name: Login to Amazon ECR Public
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registry-type: public
-        env:
-          AWS_REGION: us-east-1
+      # Avoid public.ecr.aws (anonymous data/rate limits). Adapter comes from a public Lambda layer.
+      - name: Fetch Lambda Web Adapter binary
+        run: |
+          chmod +x ./scripts/fetch-lambda-adapter.sh
+          ./scripts/fetch-lambda-adapter.sh 0.9.1
 
       - name: CDK bootstrap
         working-directory: cdk

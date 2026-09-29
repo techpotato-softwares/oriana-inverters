@@ -31,3 +31,7 @@ packages/*/node_modules/
 cdk/cdk.out/
 cdk/cdk-outputs.json
 cdk/dist/
+
+# Fetched at build time by scripts/fetch-lambda-adapter.sh
+docker/lambda-adapter
+

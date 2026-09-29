@@ -1,8 +1,5 @@
 # Oriana Invertors Web — Next.js standalone + AWS Lambda Web Adapter
-# Prefer Docker Hub for Node (avoids public.ecr.aws anonymous quotas).
-# For the Lambda adapter COPY below, authenticate Public ECR first:
-#   aws ecr-public get-login-password --region us-east-1 \
-#     | docker login --username AWS --password-stdin public.ecr.aws
+# Node from Docker Hub. Adapter: ./scripts/fetch-lambda-adapter.sh before build.
 FROM node:22-alpine AS base
 
 FROM base AS deps
@@ -50,8 +47,9 @@ ENV AWS_LWA_INVOKE_MODE=response_stream
 
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
-# Lambda Web Adapter
-COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.9.1 /lambda-adapter /opt/extensions/lambda-adapter
+# Lambda Web Adapter (pre-fetched — see scripts/fetch-lambda-adapter.sh)
+COPY docker/lambda-adapter /opt/extensions/lambda-adapter
+
 
 COPY --from=builder /app/apps/cms/public ./apps/cms/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/cms/.next/standalone ./

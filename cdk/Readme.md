@@ -30,11 +30,10 @@ Create Secrets Manager entries **before** first deploy (see root README).
 
 Dockerfile context is the **monorepo root** (`apps/cms/Dockerfile`).
 
-Before a local image build / `cdk deploy`, authenticate Public ECR so the Lambda Web Adapter pull does not hit anonymous rate/data limits:
+Before a local image build / `cdk deploy`, fetch the Lambda Web Adapter binary (avoids `public.ecr.aws` rate limits):
 
 ```bash
-aws ecr-public get-login-password --region us-east-1 \
-  | docker login --username AWS --password-stdin public.ecr.aws
+./scripts/fetch-lambda-adapter.sh 0.9.1
 ```
 
-(`us-east-1` is required for `ecr-public` even if the stack region is `ap-south-1`.)
+This downloads layer `LambdaAdapterLayerX86:25` into `docker/lambda-adapter` (gitignored). The deploy workflow runs the same step automatically.
