@@ -1,5 +1,9 @@
 # Oriana Invertors Web — Next.js standalone + AWS Lambda Web Adapter
-FROM public.ecr.aws/docker/library/node:22-alpine AS base
+# Use Docker Hub for Node to avoid public.ecr.aws anonymous data/rate limits.
+# Lambda adapter still comes from Public ECR — CI/local must `docker login` first:
+#   aws ecr-public get-login-password --region us-east-1 \
+#     | docker login --username AWS --password-stdin public.ecr.aws
+FROM node:22-alpine AS base
 RUN apk add --no-cache libc6-compat
 
 FROM base AS deps

@@ -29,3 +29,12 @@ cd cdk && npm run deploy:qa
 Create Secrets Manager entries **before** first deploy (see root README).
 
 Dockerfile context is the **monorepo root** (`apps/cms/Dockerfile`).
+
+Before a local image build / `cdk deploy`, authenticate Public ECR so the Lambda Web Adapter pull does not hit anonymous rate/data limits:
+
+```bash
+aws ecr-public get-login-password --region us-east-1 \
+  | docker login --username AWS --password-stdin public.ecr.aws
+```
+
+(`us-east-1` is required for `ecr-public` even if the stack region is `ap-south-1`.)
