@@ -15,7 +15,7 @@ export const DistributorApplications: CollectionConfig = {
   slug: 'distributor-applications',
   labels: { singular: 'Distributor application', plural: 'Distributor applications' },
   admin: {
-    group: 'Marketing',
+    group: 'Forms & Leads',
     useAsTitle: 'company',
     defaultColumns: ['company', 'name', 'email', 'cityState', 'emailStatus', 'createdAt'],
     description: 'Applications submitted from Become a Distributor.',

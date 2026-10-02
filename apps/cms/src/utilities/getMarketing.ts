@@ -121,6 +121,19 @@ export const getSupport = unstable_cache(
   { tags: ['support'] },
 )
 
+export const getPartnersPage = unstable_cache(
+  async () => {
+    try {
+      const payload = await getPayload({ config: configPromise })
+      return await payload.findGlobal({ slug: 'partners-page', depth: 1 })
+    } catch {
+      return null
+    }
+  },
+  ['partners-page-global'],
+  { tags: ['partners-page'] },
+)
+
 export const getSustainability = unstable_cache(
   async () => {
     try {

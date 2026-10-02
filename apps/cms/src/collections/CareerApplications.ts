@@ -27,7 +27,7 @@ export const CareerApplications: CollectionConfig = {
   slug: 'career-applications',
   labels: { singular: 'Career application', plural: 'Career applications' },
   admin: {
-    group: 'Marketing',
+    group: 'Forms & Leads',
     useAsTitle: 'name',
     defaultColumns: ['name', 'email', 'role', 'emailStatus', 'createdAt'],
     description: 'Applications and resumes submitted from the Careers page. Download the resume from the document.',

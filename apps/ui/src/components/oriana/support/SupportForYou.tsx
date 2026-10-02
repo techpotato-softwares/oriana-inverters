@@ -1,41 +1,9 @@
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 import { FadeIn, Stagger, StaggerItem } from '../FadeIn'
+import type { CardItem, Intro } from '../marketing/types'
 
-const audiences = [
-  {
-    title: 'Installers',
-    description:
-      'Installation manuals, commissioning guidance, troubleshooting support, and warranty handling for solar professionals.',
-    highlights: ['Installation videos', 'Technical desk', 'Warranty claims'],
-    image:
-      'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&q=80&w=1000',
-    href: '/support/installers',
-    offset: '',
-  },
-  {
-    title: 'Homeowners',
-    description:
-      'Simple product guidance, monitoring help, warranty information, and the fastest route to local support.',
-    highlights: ['App & monitoring', 'Product guides', 'Find a partner'],
-    image:
-      'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=1000',
-    href: '/support/homeowners',
-    offset: 'lg:-translate-y-10',
-  },
-  {
-    title: 'Business owners',
-    description:
-      'Lifecycle support for commercial and industrial assets — diagnostics, maintenance planning, and service coordination.',
-    highlights: ['Plant health checks', 'Maintenance planning', 'Priority response'],
-    image:
-      'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80&w=1000',
-    href: '/support/business',
-    offset: '',
-  },
-]
-
-export function SupportForYou() {
+export function SupportForYou({ intro, audiences }: { intro: Intro; audiences: CardItem[] }) {
   return (
     <section id="support-for-you" className="scroll-mt-40 bg-oriana-surface py-20 lg:py-28">
       <div className="container">
@@ -43,26 +11,30 @@ export function SupportForYou() {
           <div>
             <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-blue">
               <span className="h-px w-10 bg-oriana-blue/50" aria-hidden />
-              Support for you
+              {intro.eyebrow}
             </p>
             <h2
               className="mt-6 font-display font-medium tracking-[-0.02em] text-oriana-navy"
               style={{ fontSize: 'clamp(2rem, 3.8vw, 3.5rem)', lineHeight: 1.08 }}
             >
-              Start where you stand
+              {intro.title}
             </h2>
           </div>
-          <p className="max-w-xl text-base leading-8 text-oriana-muted lg:justify-self-end lg:text-lg">
-            Each pathway brings the documents, tools, and service options most relevant to your
-            role — no hunting through everything else.
-          </p>
+          {intro.description ? (
+            <p className="max-w-xl text-base leading-8 text-oriana-muted lg:justify-self-end lg:text-lg">
+              {intro.description}
+            </p>
+          ) : null}
         </FadeIn>
 
         <Stagger className="grid gap-5 md:grid-cols-3" stagger={0.1}>
-          {audiences.map((item) => (
-            <StaggerItem key={item.title} className={`h-full ${item.offset}`}>
+          {audiences.map((item, index) => (
+            <StaggerItem
+              key={item.title}
+              className={`h-full ${index % 3 === 1 ? 'lg:-translate-y-10' : ''}`}
+            >
               <Link
-                href={item.href}
+                href={item.href || '/support'}
                 className="group relative flex h-full min-h-[30rem] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-oriana-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-oriana-blue lg:min-h-[34rem]"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -91,8 +63,9 @@ export function SupportForYou() {
                     </span>
                   </div>
 
-                  <p className="mt-4 text-sm leading-6 text-white/72">{item.description}</p>
+                  {item.body ? <p className="mt-4 text-sm leading-6 text-white/72">{item.body}</p> : null}
 
+                  {item.highlights?.length ? (
                   <ul className="mt-6 space-y-2 border-t border-white/15 pt-5 transition-all duration-500 ease-out lg:max-h-0 lg:overflow-hidden lg:border-transparent lg:pt-0 lg:opacity-0 lg:group-hover:max-h-40 lg:group-hover:border-white/15 lg:group-hover:pt-5 lg:group-hover:opacity-100">
                     {item.highlights.map((highlight) => (
                       <li
@@ -104,6 +77,7 @@ export function SupportForYou() {
                       </li>
                     ))}
                   </ul>
+                  ) : null}
                 </div>
               </Link>
             </StaggerItem>

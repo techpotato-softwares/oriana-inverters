@@ -35,8 +35,8 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
   createdAt: '2023-01-12T21:47:41.374Z',
   emails: [
     {
-      emailFrom: '"Payload" \u003Cdemo@payloadcms.com\u003E',
-      emailTo: '{{email}}',
+      emailTo: 'info@orianainverters.com',
+      replyTo: '{{email}}',
       message: {
         root: {
           type: 'root',
@@ -50,7 +50,7 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
                   format: 0,
                   mode: 'normal',
                   style: '',
-                  text: 'Your contact form submission was successfully received.',
+                  text: 'New enquiry from the website: {{*:table}}',
                   version: 1,
                 },
               ],
@@ -68,7 +68,7 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
           version: 1,
         },
       },
-      subject: "You've received a new message.",
+      subject: 'New website enquiry from {{name}}',
     },
   ],
   fields: [

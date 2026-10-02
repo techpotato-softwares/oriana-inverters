@@ -3,46 +3,9 @@
 import { useCallback, useRef } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { FadeIn } from '../FadeIn'
+import type { CardItem, Intro } from '../marketing/types'
 
-const stories = [
-  {
-    image:
-      'https://images.unsplash.com/photo-1592833159155-c62df1b65634?auto=format&fit=crop&q=80&w=1000',
-    tag: 'Commissioning',
-    title: 'Final checks before handover',
-    description: 'Supporting site teams through commissioning and first-day performance review.',
-  },
-  {
-    image:
-      'https://images.unsplash.com/photo-1559302504-64aae6ca6b6d?auto=format&fit=crop&q=80&w=1000',
-    tag: 'Commercial',
-    title: 'Rooftop project coordination',
-    description: 'Technical coordination across EPC, electrical, and monitoring stakeholders.',
-  },
-  {
-    image:
-      'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?auto=format&fit=crop&q=80&w=1000',
-    tag: 'Residential',
-    title: 'Guidance that reaches the homeowner',
-    description: 'Clear explanations for installers and owners, without the jargon.',
-  },
-  {
-    image:
-      'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=1000',
-    tag: 'Remote service',
-    title: 'Diagnosis before dispatch',
-    description: 'Operating data reviewed remotely so a site visit is only made when it counts.',
-  },
-  {
-    image:
-      'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&q=80&w=1000',
-    tag: 'Utility',
-    title: 'Large plant performance reviews',
-    description: 'Periodic health checks that protect generation across the asset lifetime.',
-  },
-]
-
-export function ServiceStories() {
+export function ServiceStories({ intro, stories }: { intro: Intro; stories: CardItem[] }) {
   const railRef = useRef<HTMLUListElement>(null)
 
   const scrollByCard = useCallback((direction: 1 | -1) => {
@@ -60,14 +23,17 @@ export function ServiceStories() {
           <div>
             <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-blue">
               <span className="h-px w-10 bg-oriana-blue/50" aria-hidden />
-              Service stories
+              {intro.eyebrow}
             </p>
             <h2
               className="mt-6 max-w-2xl font-display font-medium tracking-[-0.02em] text-oriana-navy"
               style={{ fontSize: 'clamp(2rem, 3.8vw, 3.5rem)', lineHeight: 1.08 }}
             >
-              The work behind reliable solar performance
+              {intro.title}
             </h2>
+            {intro.description ? (
+              <p className="mt-6 max-w-xl text-base leading-8 text-oriana-muted">{intro.description}</p>
+            ) : null}
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -125,13 +91,15 @@ export function ServiceStories() {
                 }}
               />
               <div className="relative flex h-full flex-col justify-end p-7">
-                <span className="inline-flex w-fit rounded-full border border-white/25 bg-white/15 px-3 py-1 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/85">
-                  {story.tag}
-                </span>
-                <h3 className="mt-5 font-display text-2xl font-medium leading-snug text-white">
+                {story.tag ? (
+                  <span className="mb-5 inline-flex w-fit rounded-full border border-white/25 bg-white/15 px-3 py-1 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/85">
+                    {story.tag}
+                  </span>
+                ) : null}
+                <h3 className="font-display text-2xl font-medium leading-snug text-white">
                   {story.title}
                 </h3>
-                <p className="mt-3 text-sm leading-6 text-white/70">{story.description}</p>
+                {story.body ? <p className="mt-3 text-sm leading-6 text-white/70">{story.body}</p> : null}
               </div>
             </article>
           </li>

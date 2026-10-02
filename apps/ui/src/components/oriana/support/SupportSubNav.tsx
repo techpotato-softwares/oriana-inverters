@@ -5,7 +5,9 @@ import { useEffect, useState, type MouseEvent } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { useLenis } from 'lenis/react'
 
-const supportSections = [
+export type SupportSection = { label: string; id: string }
+
+const defaultSections: SupportSection[] = [
   { label: 'Service brand', id: 'service-brand' },
   { label: 'Our strength', id: 'our-strengths' },
   { label: 'Our approach', id: 'our-approach' },
@@ -15,7 +17,11 @@ const supportSections = [
   { label: 'Resources', id: 'resources' },
 ]
 
-export function SupportSubNav() {
+export function SupportSubNav({
+  sections: supportSections = defaultSections,
+}: {
+  sections?: SupportSection[]
+}) {
   const [activeId, setActiveId] = useState(supportSections[0].id)
   const lenis = useLenis()
   const reduceMotion = useReducedMotion()
@@ -37,7 +43,7 @@ export function SupportSubNav() {
     }
 
     return () => observer.disconnect()
-  }, [])
+  }, [supportSections])
 
   function handleClick(event: MouseEvent<HTMLAnchorElement>, id: string) {
     const target = document.getElementById(id)

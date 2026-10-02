@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -30,6 +31,7 @@ import { About } from './globals/About/config'
 import { Careers } from './globals/Careers/config'
 import { Contact } from './globals/Contact/config'
 import { Home } from './globals/Home/config'
+import { PartnersPage } from './globals/PartnersPage/config'
 import { Support } from './globals/Support/config'
 import { Sustainability } from './globals/Sustainability/config'
 import { SiteSettings } from './SiteSettings/config'
@@ -40,6 +42,29 @@ import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+/** Same SMTP settings as distributor/career notifications; without SMTP_HOST, Payload logs emails instead of sending. */
+function smtpEmailAdapter() {
+  const host = process.env.SMTP_HOST?.trim()
+  if (!host) return undefined
+
+  const port = Number(process.env.SMTP_PORT || 587)
+  const user = process.env.SMTP_USER?.trim()
+  const pass = process.env.SMTP_PASS
+  const from = process.env.SMTP_FROM?.trim() || 'Oriana Inverters <info@orianainverters.com>'
+  const match = from.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/)
+
+  return nodemailerAdapter({
+    defaultFromAddress: match ? match[2].trim() : from,
+    defaultFromName: match?.[1]?.trim() || 'Oriana Inverters',
+    transportOptions: {
+      host,
+      port,
+      secure: port === 465,
+      auth: user && pass ? { user, pass } : undefined,
+    },
+  })
+}
 
 export default buildConfig({
   admin: {
@@ -100,6 +125,7 @@ export default buildConfig({
     },
   },
   editor: defaultLexical,
+  email: smtpEmailAdapter(),
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
@@ -149,7 +175,18 @@ export default buildConfig({
   ],
   cors: [getServerSideURL()].filter(Boolean),
   serverURL: getServerSideURL(),
-  globals: [Header, Footer, SiteSettings, Home, About, Careers, Support, Sustainability, Contact],
+  globals: [
+    Header,
+    Footer,
+    SiteSettings,
+    Home,
+    About,
+    PartnersPage,
+    Careers,
+    Support,
+    Sustainability,
+    Contact,
+  ],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,

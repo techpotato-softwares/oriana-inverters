@@ -1,16 +1,3 @@
-export type ClimateTarget = {
-  year: string
-  title: string
-  scope: string
-}
-
-export type StrategyPillar = {
-  id: string
-  label: string
-  image: string
-  stats: { value: string; label: string }[]
-}
-
 export type ReportCard = {
   title: string
   year: string
@@ -18,148 +5,174 @@ export type ReportCard = {
   tag?: string
 }
 
-export const climateTargets: ClimateTarget[] = [
+export type SustainabilityHighlight = {
+  value: string
+  label: string
+  description?: string
+}
+
+export type PillarIcon =
+  | 'shield-check'
+  | 'cpu'
+  | 'factory'
+  | 'boxes'
+  | 'users'
+  | 'map-pin'
+  | 'recycle'
+  | 'refresh-cw'
+  | 'leaf'
+  | 'sun'
+
+export type SustainabilityPillar = {
+  title: string
+  headline: string
+  body: string
+  icon: PillarIcon
+  image: string
+}
+
+export type CalculatorConfig = {
+  title: string
+  description: string
+  kwhPerKw: number
+  co2TonnesPerKw: number
+  treesPerKw: number
+  disclaimer: string
+}
+
+export type SustainabilityCommitment = {
+  phase: string
+  timeframe: string
+  title: string
+  body?: string
+}
+
+export type SectionIntro = {
+  eyebrow?: string
+  title: string
+  description?: string
+}
+
+export type CtaLink = { label: string; href: string }
+
+export type SustainabilityCtaContent = {
+  title: string
+  body?: string
+  primary: CtaLink
+  secondary?: CtaLink
+  image: string
+  contactEmail?: string
+}
+
+const unsplash = (id: string, w = 1600) =>
+  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=75`
+
+export const defaultHero = {
+  eyebrow: 'Our Commitment',
+  title: 'Powering India’s Clean Energy Transition from the Ground Up.',
+  description:
+    'We engineer every unit for product longevity, responsible manufacturing, and circular lifecycles.',
+  videoSrc: '/assets/sustainability/hero.mp4',
+  posterSrc: '/assets/sustainability/hero-poster.jpg',
+}
+
+export const defaultHighlights: SustainabilityHighlight[] = [
   {
-    year: '2030',
-    title: 'Achieving carbon neutrality at the operational level',
-    scope: 'Scope 1 + 2',
+    value: '97%+',
+    label: 'Peak efficiency',
+    description: 'Minimising conversion losses across the grid.',
   },
   {
-    year: '2040',
-    title: 'Achieving carbon neutrality across the supply chain',
-    scope: 'Scope 1 + 2 + 3',
+    value: '100%',
+    label: 'Recyclable packaging goal',
+    description: 'Phasing out single-use expanded plastics.',
   },
   {
-    year: '2050',
-    title: 'Achieving net zero across the supply chain',
-    scope: 'Scope 1 + 2 + 3',
+    value: 'Make in India',
+    label: 'Localised sourcing',
+    description: 'Fewer long-haul carbon miles in every unit.',
   },
 ]
 
-export const strategyPillars: StrategyPillar[] = [
+export const defaultPillarsIntro: SectionIntro = {
+  eyebrow: 'Core pillars',
+  title: 'Sustainability built in, from day one',
+  description: 'Four principles shape how we design, build, and support every Oriana product.',
+}
+
+export const defaultPillars: SustainabilityPillar[] = [
   {
-    id: 'governance',
-    label: 'Governance Excellence',
-    image:
-      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
-    stats: [
-      { value: '12%', label: 'R&D investment of revenue' },
-      { value: '35%', label: 'R&D personnel' },
-      { value: '200+', label: 'Patent applications' },
-      { value: '30%', label: 'Female leadership proportion' },
-    ],
+    title: 'Design for Longevity',
+    headline: 'Built to outlast, not to be replaced',
+    body: 'The greenest hardware is the one that stays out of landfills for decades. Our systems feature high-grade thermal engineering, industrial-grade silicon, and repairable component architecture that maximises uptime and energy yield across India’s harsh climate conditions.',
+    icon: 'shield-check',
+    image: unsplash('1518770660439-4636190af475'),
   },
   {
-    id: 'net-zero',
-    label: 'Net-Zero Transition',
-    image:
-      'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1200&q=80',
-    stats: [
-      { value: '65%', label: 'Renewable electricity usage' },
-      { value: '18%', label: 'Energy use per unit vs 2020 baseline' },
-      { value: '2.4 GWh', label: 'Electricity saved in 2025' },
-      { value: '8 MW', label: 'Rooftop PV installed capacity' },
-    ],
+    title: 'Responsible Manufacturing',
+    headline: 'Cleaner practices on the shop floor',
+    body: 'Clean energy hardware should not be born from dirty manufacturing. We enforce lead-free soldering, RoHS-compliant electronics, water-conscious assembly, and corrugated honeycomb cushioning in place of single-use Styrofoam.',
+    icon: 'factory',
+    image: unsplash('1581092918056-0c4c3acd3789'),
   },
   {
-    id: 'eco-harmony',
-    label: 'Eco-Harmony',
-    image:
-      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80',
-    stats: [
-      { value: '100%', label: 'Environmental management coverage' },
-      { value: '8', label: 'Products with carbon footprint data' },
-      { value: '2', label: 'Eco-design pilot projects' },
-      { value: '88%', label: 'Non-hazardous waste recovery rate' },
-    ],
+    title: 'Local Communities',
+    headline: 'Made in India, building resilience',
+    body: 'Sourcing components locally strengthens domestic manufacturing and cuts international freight emissions. We invest in local engineering talent, transparent workplace safety standards, and regional technician upskilling.',
+    icon: 'users',
+    image: unsplash('1624397640148-949b1732bb0a'),
   },
   {
-    id: 'prosperity',
-    label: 'Mutual Prosperity',
-    image:
-      'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=80',
-    stats: [
-      { value: '96%', label: 'Customer satisfaction' },
-      { value: '98%', label: 'Supplier code signing rate' },
-      { value: '120+', label: 'Suppliers with ESG audits in 2025' },
-      { value: '85+', label: 'Suppliers with carbon inventory' },
-    ],
-  },
-  {
-    id: 'inclusion',
-    label: 'Equity & Inclusion',
-    image:
-      'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80',
-    stats: [
-      { value: '18%', label: 'Female manager proportion' },
-      { value: '97%', label: 'Local hiring rate' },
-      { value: '400+', label: 'Employees with certification support' },
-      { value: '3,500+', label: 'Volunteer service hours' },
-    ],
+    title: 'Circularity & E-Waste',
+    headline: 'Lifecycle responsibility beyond the sale',
+    body: 'Aligned with India’s E-Waste (Management) Rules, our enclosures and modular components are designed for straightforward disassembly, material recovery of aluminium, copper, and PCB silicon, and verified recycling partnerships.',
+    icon: 'recycle',
+    image: unsplash('1532996122724-e3c354a0b15b'),
   },
 ]
 
-export const fallbackReports: ReportCard[] = [
+export const defaultCalculator: CalculatorConfig = {
+  title: 'Sustainability in numbers',
+  description: 'Move the slider to see what a solar installation can displace every year.',
+  kwhPerKw: 1450,
+  co2TonnesPerKw: 1.2,
+  treesPerKw: 15,
+  disclaimer:
+    'Estimates calculated using Central Electricity Authority (CEA) average grid emission factors. Actual results vary with location, orientation, and system design.',
+}
+
+export const defaultCommitmentsIntro: SectionIntro = {
+  eyebrow: 'Roadmap',
+  title: 'Our day-one commitments',
+  description: 'A practical baseline we are delivering on now, and building towards next.',
+}
+
+export const defaultCommitments: SustainabilityCommitment[] = [
   {
-    title: 'Oriana 2025 Sustainability Report',
-    year: '2025',
-    href: '/resources/downloads',
-    tag: 'Enterprise',
+    phase: 'Phase 1',
+    timeframe: 'Current',
+    title: 'Plastic-minimised dispatch and RoHS lines',
+    body: '100% plastic-minimised dispatch boxes and RoHS-compliant manufacturing lines.',
   },
   {
-    title: 'Oriana 2024 Sustainability Report',
-    year: '2024',
-    href: '/resources/downloads',
-    tag: 'Enterprise',
+    phase: 'Phase 2',
+    timeframe: 'Next 12 months',
+    title: 'Solar-powered shop floor',
+    body: 'Moving testing and assembly power consumption to self-hosted rooftop solar.',
   },
   {
-    title: 'Oriana 2023 Sustainability Report',
-    year: '2023',
-    href: '/resources/downloads',
-    tag: 'Enterprise',
+    phase: 'Phase 3',
+    timeframe: 'Long-term',
+    title: 'Closed-loop takeback',
+    body: 'A certified takeback and refurbishment programme for field units across India.',
   },
 ]
 
-export const fallbackPolicies: ReportCard[] = [
-  {
-    title: 'Environmental Management Policy',
-    year: '2025',
-    href: '/resources/downloads',
-    tag: 'Policy',
-  },
-  {
-    title: 'Biodiversity Conservation Policy',
-    year: '2024',
-    href: '/resources/downloads',
-    tag: 'Policy',
-  },
-  {
-    title: 'Equity, Inclusion, and Diversity Policy',
-    year: '2024',
-    href: '/resources/downloads',
-    tag: 'Policy',
-  },
-]
-
-export const fallbackHonors = [
-  {
-    title: 'ISO 14001 Environmental Management',
-    image:
-      'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    title: 'RoHS & REACH Compliance',
-    image:
-      'https://images.unsplash.com/photo-1581091226825-a6a2a5a15815?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    title: 'Clean Energy Innovation Award',
-    image:
-      'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    title: 'Supplier ESG Excellence',
-    image:
-      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80',
-  },
-]
+export const defaultCta: SustainabilityCtaContent = {
+  title: 'Join us in accelerating India’s solar decade.',
+  body: 'Partner with Oriana to deploy efficient, long-lived inverters built responsibly in India.',
+  primary: { label: 'Partner With Us', href: '/contact' },
+  secondary: { label: 'Download Product Spec Sheets', href: '/products' },
+  image: unsplash('1497440001374-f26997328c1b', 2000),
+  contactEmail: 'esg@orianainverters.com',
+}

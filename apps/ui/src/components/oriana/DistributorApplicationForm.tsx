@@ -5,7 +5,15 @@ import { useState } from 'react'
 const fieldClass =
   'w-full rounded-xl border border-oriana-navy/12 bg-oriana-surface px-4 py-3 text-sm text-oriana-navy focus:border-oriana-blue focus:outline-none focus:ring-2 focus:ring-oriana-blue/15'
 
-export function DistributorApplicationForm() {
+type DistributorApplicationFormProps = {
+  successTitle?: string
+  successMessage?: string
+}
+
+export function DistributorApplicationForm({
+  successTitle = 'Application received',
+  successMessage = 'Thank you. Our channel team will review your details and reply within two business days.',
+}: DistributorApplicationFormProps) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -50,10 +58,8 @@ export function DistributorApplicationForm() {
   if (status === 'sent') {
     return (
       <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center" role="status">
-        <p className="font-display text-xl font-bold text-green-800">Application received</p>
-        <p className="mt-2 text-green-700">
-          Thank you. Our channel team will review your details and reply within two business days.
-        </p>
+        <p className="font-display text-xl font-bold text-green-800">{successTitle}</p>
+        <p className="mt-2 text-green-700">{successMessage}</p>
       </div>
     )
   }

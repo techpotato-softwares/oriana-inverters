@@ -1,24 +1,30 @@
-import type { GlobalConfig } from 'payload'
+import type { Field, GlobalConfig } from 'payload'
 
 import { authenticated } from '@/access/authenticated'
+import {
+  cardList,
+  optionalLink,
+  pageMeta,
+  revalidateGlobal,
+  sectionIntro,
+  subpageHero,
+} from '@/fields/marketing'
 import { pageHeroFields } from '@/fields/pageHero'
 import { seoFields } from '@/fields/seo'
 
-const revalidateAbout = ({ doc, req: { context } }: { doc: unknown; req: { context: { disableRevalidate?: boolean } } }) => {
-  if (context.disableRevalidate) return doc
-  void import('next/cache').then(({ revalidatePath, revalidateTag }) => {
-    revalidateTag('about')
-    revalidatePath('/about')
-  })
-  return doc
+const emptyStateField: Field = {
+  name: 'emptyDescription',
+  type: 'textarea',
+  label: 'Coming-soon message',
+  admin: { description: 'Shown while there is nothing published for this page yet.' },
 }
 
 export const About: GlobalConfig = {
   slug: 'about',
-  label: 'About Page',
+  label: 'About Pages',
   admin: {
     group: 'Marketing',
-    description: 'Company about page content.',
+    description: 'About us and its subpages. Leave a field blank to keep the built-in copy.',
   },
   access: {
     read: () => true,
@@ -29,7 +35,8 @@ export const About: GlobalConfig = {
       type: 'tabs',
       tabs: [
         {
-          label: 'Content',
+          label: 'About us',
+          description: '/about',
           fields: [
             pageHeroFields,
             {
@@ -61,12 +68,56 @@ export const About: GlobalConfig = {
             },
           ],
         },
+        {
+          name: 'certifications',
+          label: 'Certifications',
+          description:
+            '/about/certifications — the listings come from the Certifications and Awards collections.',
+          fields: [
+            subpageHero(),
+            {
+              type: 'row',
+              fields: [
+                { name: 'certificationsTitle', type: 'text' },
+                { name: 'awardsTitle', type: 'text' },
+              ],
+            },
+            emptyStateField,
+            pageMeta(),
+          ],
+        },
+        {
+          name: 'partnersNetwork',
+          label: 'Partners',
+          description: '/about/partners — the partner names come from the Partners collection.',
+          fields: [
+            subpageHero(),
+            optionalLink('programmeLink', 'Partner programmes link'),
+            emptyStateField,
+            optionalLink('emptyCta', 'Coming-soon button'),
+            pageMeta(),
+          ],
+        },
+        {
+          name: 'foundation',
+          label: 'Oriana Foundation',
+          description:
+            '/about/foundation — the page shows a coming-soon message until at least one programme is added.',
+          fields: [
+            subpageHero(),
+            sectionIntro('intro', 'Intro'),
+            cardList('programmes', { label: 'Programmes', image: true, link: true }),
+            optionalLink('cta', 'Partner button'),
+            emptyStateField,
+            pageMeta(),
+          ],
+        },
         { label: 'SEO', fields: [seoFields] },
       ],
     },
   ],
   hooks: {
-    afterChange: [revalidateAbout],
+    afterChange: [revalidateGlobal('about', ['/about'])],
   },
   versions: { drafts: true },
 }

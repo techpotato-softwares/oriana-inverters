@@ -1,44 +1,33 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { Handshake, Store } from 'lucide-react'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { CtaBand } from '@/components/oriana/marketing/CtaBand'
+import { LinkTiles } from '@/components/oriana/marketing/LinkTiles'
+import { MarketingIcon } from '@/components/oriana/marketing/MarketingIcon'
+import { partnersHub as defaults } from '@/components/oriana/partners/partnersData'
+import { getPartnersPage } from '@/utilities/getMarketing'
+import {
+  resolveCards,
+  resolveCta,
+  resolveHero,
+  resolveLinks,
+  resolveMeta,
+} from '@/utilities/cmsContent'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: 'Partners',
-    description:
-      'Grow with Oriana — distributor and partnership programmes for solar and storage professionals.',
-  }
+  const data = await getPartnersPage()
+  return resolveMeta(data?.hub?.meta, defaults.meta)
 }
 
-const tracks = [
-  {
-    icon: Store,
-    title: 'Distributors',
-    href: '/partners/become-a-distributor',
-    description:
-      'Authorized distributors access a full product portfolio, supply-chain support, and joint go-to-market programmes.',
-    cta: 'Become a Distributor',
-  },
-  {
-    icon: Handshake,
-    title: 'Partnership',
-    href: '/partners/partnership',
-    description:
-      'EPCs, technology allies, and channel partners collaborate with Oriana on projects, solutions, and long-term market growth.',
-    cta: 'Become a Partner',
-  },
-]
+export default async function PartnersHubPage() {
+  const cms = (await getPartnersPage())?.hub
+  const hero = resolveHero(cms?.hero, defaults.hero)
+  const tracks = resolveCards(cms?.tracks, defaults.tracks)
 
-export default function PartnersHubPage() {
   return (
     <main>
-      <PageHero
-        eyebrow="Partners"
-        title="Grow together with Oriana"
-        description="Join distributors and technology partners delivering bankable solar, storage, and hybrid solutions."
-      />
+      <PageHero eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
       <Breadcrumbs items={[{ label: 'Partners' }]} />
 
       <section className="py-12 lg:py-16">
@@ -46,65 +35,24 @@ export default function PartnersHubPage() {
           <div className="grid gap-6 lg:grid-cols-2">
             {tracks.map((track) => (
               <Link
-                key={track.href}
-                href={track.href}
+                key={track.title}
+                href={track.href || '/contact'}
                 className="group rounded border border-oriana-navy/8 bg-white p-8 transition hover:border-oriana-blue hover:shadow-lg"
               >
-                <track.icon className="h-8 w-8 text-oriana-blue" />
+                <MarketingIcon name={track.icon} className="h-8 w-8 text-oriana-blue" />
                 <h2 className="mt-4 font-display text-xl font-bold text-oriana-navy">{track.title}</h2>
-                <p className="mt-3 text-sm leading-relaxed text-oriana-muted">{track.description}</p>
+                {track.body ? (
+                  <p className="mt-3 text-sm leading-relaxed text-oriana-muted">{track.body}</p>
+                ) : null}
                 <span className="mt-6 inline-block text-sm font-semibold text-oriana-blue group-hover:underline">
-                  {track.cta} →
+                  {track.linkLabel || 'Learn more'} →
                 </span>
               </Link>
             ))}
           </div>
 
-          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <Link
-              href="/where-to-buy"
-              className="flex items-center justify-between rounded border border-oriana-navy/8 bg-oriana-silver/30 px-6 py-4 font-medium text-oriana-navy transition hover:border-oriana-blue hover:bg-white"
-            >
-              Find a Distributor
-              <span className="text-oriana-blue">→</span>
-            </Link>
-            <Link
-              href="/case-studies"
-              className="flex items-center justify-between rounded border border-oriana-navy/8 bg-oriana-silver/30 px-6 py-4 font-medium text-oriana-navy transition hover:border-oriana-blue hover:bg-white"
-            >
-              Cases & Stories
-              <span className="text-oriana-blue">→</span>
-            </Link>
-            <Link
-              href="/support"
-              className="flex items-center justify-between rounded border border-oriana-navy/8 bg-oriana-silver/30 px-6 py-4 font-medium text-oriana-navy transition hover:border-oriana-blue hover:bg-white"
-            >
-              Partner Support
-              <span className="text-oriana-blue">→</span>
-            </Link>
-          </div>
-
-          <div className="mt-16 rounded border border-oriana-blue/20 bg-oriana-deep p-8 text-white lg:p-12">
-            <h2 className="font-display text-2xl font-bold">Ready to partner with Oriana?</h2>
-            <p className="mt-3 max-w-xl text-white/70">
-              Tell us about your business. Our channel and sales teams will follow up with programme details,
-              commercial terms, and next steps.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-4">
-              <Link
-                href="/contact"
-                className="rounded bg-white px-6 py-3 text-sm font-bold text-oriana-navy hover:bg-oriana-silver"
-              >
-                Contact Us
-              </Link>
-              <Link
-                href="/where-to-buy"
-                className="rounded border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10"
-              >
-                Find a Distributor
-              </Link>
-            </div>
-          </div>
+          <LinkTiles links={resolveLinks(cms?.quickLinks, defaults.quickLinks)} />
+          <CtaBand {...resolveCta(cms?.cta, defaults.cta)} />
         </div>
       </section>
     </main>

@@ -1,47 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowUpRight, Headphones, MonitorCog, Wrench } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { AnimatedCounter } from '../AnimatedCounter'
 import { FadeIn, Stagger, StaggerItem } from '../FadeIn'
+import { MarketingIcon } from '../marketing/MarketingIcon'
+import type { GlobalPresenceContent } from './supportData'
 
-const stats = [
-  { value: '500+', label: 'Channel & service partners' },
-  { value: '24/7', label: 'Remote monitoring & response' },
-  { value: '10+', label: 'Years of field experience' },
-  { value: '48h', label: 'Typical on-site mobilisation' },
-]
-
-const pillars = [
-  {
-    title: 'Remote response',
-    description: 'Diagnostics, firmware guidance, and parameter checks handled from the desk.',
-    icon: MonitorCog,
-  },
-  {
-    title: 'Field assistance',
-    description: 'Trained engineers and partners mobilised to site when hands-on work is needed.',
-    icon: Wrench,
-  },
-  {
-    title: 'Customer care',
-    description: 'A single point of contact that keeps owners and installers informed.',
-    icon: Headphones,
-  },
-]
-
-/** Approximate network nodes across India — decorative, labelled for context only. */
-const nodes = [
-  { label: 'Delhi NCR', top: '22%', left: '38%' },
-  { label: 'Ahmedabad', top: '43%', left: '24%' },
-  { label: 'Kolkata', top: '46%', left: '72%' },
-  { label: 'Pune', top: '60%', left: '30%' },
-  { label: 'Hyderabad', top: '66%', left: '46%' },
-  { label: 'Bengaluru', top: '80%', left: '38%' },
-]
-
-export function GlobalPresence() {
+export function GlobalPresence({ content }: { content: GlobalPresenceContent }) {
+  const { intro, stats, cta, pillars, locations: nodes } = content
   const reduceMotion = useReducedMotion()
 
   return (
@@ -72,18 +40,17 @@ export function GlobalPresence() {
           <FadeIn>
             <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-sky">
               <span className="h-px w-10 bg-oriana-sky/60" aria-hidden />
-              Global presence
+              {intro.eyebrow}
             </p>
             <h2
               className="mt-6 max-w-xl font-display font-medium tracking-[-0.02em] text-white"
               style={{ fontSize: 'clamp(2rem, 3.8vw, 3.5rem)', lineHeight: 1.08 }}
             >
-              A service network built around your site
+              {intro.title}
             </h2>
-            <p className="mt-6 max-w-xl text-base leading-8 text-white/70">
-              Oriana pairs remote response with field-level assistance across India and beyond, so
-              the right expertise reaches every system — residential rooftop to utility plant.
-            </p>
+            {intro.description ? (
+              <p className="mt-6 max-w-xl text-base leading-8 text-white/70">{intro.description}</p>
+            ) : null}
           </FadeIn>
 
           <Stagger className="mt-12 grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4 lg:mt-14">
@@ -102,10 +69,10 @@ export function GlobalPresence() {
 
           <FadeIn delay={0.1}>
             <Link
-              href="/contact"
+              href={cta.href}
               className="group mt-12 inline-flex min-h-12 items-center gap-2 rounded-full border border-white/30 px-7 text-sm font-semibold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-oriana-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
-              Find the right support contact
+              {cta.label}
               <ArrowUpRight
                 className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 aria-hidden
@@ -156,11 +123,9 @@ export function GlobalPresence() {
 
             <div className="absolute inset-x-6 bottom-6 rounded-2xl border border-white/10 bg-oriana-deep/85 p-5">
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-oriana-sky">
-                Coverage
+                {content.coverageLabel}
               </p>
-              <p className="mt-2 text-sm leading-6 text-white/75">
-                PAN India service reach supported by regional partners and a central technical desk.
-              </p>
+              <p className="mt-2 text-sm leading-6 text-white/75">{content.coverageBody}</p>
             </div>
           </div>
         </FadeIn>
@@ -168,12 +133,12 @@ export function GlobalPresence() {
 
       <div className="container relative mt-16 lg:mt-20">
         <Stagger className="grid gap-4 md:grid-cols-3">
-          {pillars.map(({ title, description, icon: Icon }) => (
+          {pillars.map(({ title, body, icon }) => (
             <StaggerItem key={title} className="h-full">
               <div className="group h-full rounded-3xl border border-white/10 bg-white/[0.05] p-7 transition-colors duration-500 hover:border-oriana-sky/40 hover:bg-white/[0.09]">
-                <Icon className="h-7 w-7 text-oriana-sky" strokeWidth={1.4} aria-hidden />
+                <MarketingIcon name={icon} className="h-7 w-7 text-oriana-sky" strokeWidth={1.4} />
                 <h3 className="mt-10 font-display text-xl font-medium text-white">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/65">{description}</p>
+                {body ? <p className="mt-3 text-sm leading-6 text-white/65">{body}</p> : null}
               </div>
             </StaggerItem>
           ))}

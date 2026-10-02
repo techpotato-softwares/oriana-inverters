@@ -100,6 +100,30 @@ const PLACEHOLDER_VALUES: Record<string, { field: string; values: Set<string> }>
 
 const PLACEHOLDER_STRATEGY_HEADINGS = new Set(['2030 Targets', 'Product Lifecycle', 'Supply Chain'])
 
+const PLACEHOLDER_SUSTAINABILITY_HIGHLIGHTS = new Set([
+  'Renewable energy at manufacturing sites',
+  'Environmental management certified',
+  'ESG report published',
+  'Clean energy units deployed',
+])
+
+const PLACEHOLDER_SUSTAINABILITY_TITLES = new Set([
+  'Powering a Sustainable Future',
+  'Green Mission. Better Life',
+])
+
+export function realSustainabilityHighlights<T extends { label?: string | null }>(
+  items: T[] | null | undefined,
+): T[] {
+  return (items ?? []).filter(
+    (item) => item.label && !PLACEHOLDER_SUSTAINABILITY_HIGHLIGHTS.has(item.label),
+  )
+}
+
+export function isPlaceholderSustainabilityTitle(title: string | null | undefined): boolean {
+  return !title || PLACEHOLDER_SUSTAINABILITY_TITLES.has(title)
+}
+
 export const PLACEHOLDER_POST_SLUGS = [
   'digital-horizons',
   'global-gaze',

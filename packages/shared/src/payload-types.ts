@@ -145,6 +145,7 @@ export interface Config {
     'site-settings': SiteSetting;
     home: Home;
     about: About;
+    'partners-page': PartnersPage;
     careers: Career;
     support: Support;
     sustainability: Sustainability;
@@ -156,6 +157,7 @@ export interface Config {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     home: HomeSelect<false> | HomeSelect<true>;
     about: AboutSelect<false> | AboutSelect<true>;
+    'partners-page': PartnersPageSelect<false> | PartnersPageSelect<true>;
     careers: CareersSelect<false> | CareersSelect<true>;
     support: SupportSelect<false> | SupportSelect<true>;
     sustainability: SustainabilitySelect<false> | SustainabilitySelect<true>;
@@ -979,6 +981,8 @@ export interface FormBlock {
   blockType: 'formBlock';
 }
 /**
+ * Fields added here appear on the website form. The contact page uses the form chosen in Contact Page, or the form titled "Contact Form".
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "forms".
  */
@@ -1647,6 +1651,8 @@ export interface Redirect {
   createdAt: string;
 }
 /**
+ * Every contact and product enquiry submitted on the website.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
@@ -3418,7 +3424,7 @@ export interface Home {
   createdAt?: string | null;
 }
 /**
- * Company about page content.
+ * About us and its subpages. Leave a field blank to keep the built-in copy.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "about".
@@ -3455,12 +3461,593 @@ export interface About {
         id?: string | null;
       }[]
     | null;
+  certifications?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    certificationsTitle?: string | null;
+    awardsTitle?: string | null;
+    /**
+     * Shown while there is nothing published for this page yet.
+     */
+    emptyDescription?: string | null;
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  partnersNetwork?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    programmeLink?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    /**
+     * Shown while there is nothing published for this page yet.
+     */
+    emptyDescription?: string | null;
+    emptyCta?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  foundation?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    programmes?:
+      | {
+          title: string;
+          body?: string | null;
+          image?: (number | null) | Media;
+          href?: string | null;
+          linkLabel?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    cta?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    /**
+     * Shown while there is nothing published for this page yet.
+     */
+    emptyDescription?: string | null;
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
     canonicalUrl?: string | null;
     noIndex?: boolean | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Content for /partners and its subpages. Any field left blank shows the current default copy.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners-page".
+ */
+export interface PartnersPage {
+  id: number;
+  hub?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    tracks?:
+      | {
+          title: string;
+          body?: string | null;
+          icon?:
+            | (
+                | 'store'
+                | 'handshake'
+                | 'headset'
+                | 'headphones'
+                | 'book-open'
+                | 'globe'
+                | 'megaphone'
+                | 'monitor-cog'
+                | 'wrench'
+                | 'life-buoy'
+                | 'shield-check'
+                | 'badge-check'
+                | 'file-text'
+                | 'circle-help'
+                | 'users'
+                | 'award'
+                | 'zap'
+                | 'leaf'
+              )
+            | null;
+          href?: string | null;
+          linkLabel?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave empty to keep the default links.
+     */
+    quickLinks?:
+      | {
+          label: string;
+          href: string;
+          id?: string | null;
+        }[]
+      | null;
+    cta?: {
+      title?: string | null;
+      body?: string | null;
+      primary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+      secondary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  distributors?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    coverage?:
+      | {
+          title: string;
+          body?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    benefitsTitle?: string | null;
+    /**
+     * Leave empty to keep the default cards.
+     */
+    benefits?:
+      | {
+          title: string;
+          body?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave empty to keep the default links.
+     */
+    links?:
+      | {
+          label: string;
+          href: string;
+          id?: string | null;
+        }[]
+      | null;
+    cta?: {
+      title?: string | null;
+      body?: string | null;
+      primary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+      secondary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  applyDistributor?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+      image?: (number | null) | Media;
+    };
+    heroPrimary?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    heroSecondary?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    points?:
+      | {
+          title: string;
+          body?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    programmeLink?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    /**
+     * Submissions are saved under Forms & Leads → Distributor applications.
+     */
+    form?: {
+      title?: string | null;
+      body?: string | null;
+      successTitle?: string | null;
+      successMessage?: string | null;
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  installers?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    pillars?:
+      | {
+          title: string;
+          body?: string | null;
+          icon?:
+            | (
+                | 'store'
+                | 'handshake'
+                | 'headset'
+                | 'headphones'
+                | 'book-open'
+                | 'globe'
+                | 'megaphone'
+                | 'monitor-cog'
+                | 'wrench'
+                | 'life-buoy'
+                | 'shield-check'
+                | 'badge-check'
+                | 'file-text'
+                | 'circle-help'
+                | 'users'
+                | 'award'
+                | 'zap'
+                | 'leaf'
+              )
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave empty to keep the default links.
+     */
+    quickLinks?:
+      | {
+          label: string;
+          href: string;
+          id?: string | null;
+        }[]
+      | null;
+    cta?: {
+      title?: string | null;
+      body?: string | null;
+      primary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+      secondary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  applyInstaller?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    stepsTitle?: string | null;
+    /**
+     * Leave empty to keep the default cards.
+     */
+    steps?:
+      | {
+          title: string;
+          body?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    benefitsTitle?: string | null;
+    /**
+     * Leave empty to keep the default list.
+     */
+    benefits?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave empty to keep the default links.
+     */
+    links?:
+      | {
+          label: string;
+          href: string;
+          id?: string | null;
+        }[]
+      | null;
+    cta?: {
+      title?: string | null;
+      body?: string | null;
+      primary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+      secondary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  partnership?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    paths?:
+      | {
+          title: string;
+          body?: string | null;
+          href?: string | null;
+          linkLabel?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave empty to keep the default cards.
+     */
+    enablement?:
+      | {
+          title: string;
+          body?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    cta?: {
+      title?: string | null;
+      body?: string | null;
+      primary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+      secondary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  training?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    topics?:
+      | {
+          title: string;
+          body?: string | null;
+          href?: string | null;
+          linkLabel?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave empty to keep the default links.
+     */
+    quickLinks?:
+      | {
+          label: string;
+          href: string;
+          id?: string | null;
+        }[]
+      | null;
+    cta?: {
+      title?: string | null;
+      body?: string | null;
+      primary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+      secondary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -3502,74 +4089,540 @@ export interface Career {
   createdAt?: string | null;
 }
 /**
+ * Content for /support and its subpages. Any field left blank shows the current default copy.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "support".
  */
 export interface Support {
   id: number;
-  hero: {
+  hub?: {
     /**
-     * Small label above the title.
+     * Leave blank to keep the default copy.
      */
-    eyebrow?: string | null;
-    title: string;
-    description?: string | null;
-    image?: (number | null) | Media;
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      /**
+       * Second headline line, shown in sky blue.
+       */
+      highlight?: string | null;
+      description?: string | null;
+      image?: (number | null) | Media;
+      primary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+      secondary?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+      quickLinksLabel?: string | null;
+      /**
+       * Leave empty to keep the default quick links.
+       */
+      quickLinks?:
+        | {
+            label: string;
+            href: string;
+            icon?:
+              | (
+                  | 'store'
+                  | 'handshake'
+                  | 'headset'
+                  | 'headphones'
+                  | 'book-open'
+                  | 'globe'
+                  | 'megaphone'
+                  | 'monitor-cog'
+                  | 'wrench'
+                  | 'life-buoy'
+                  | 'shield-check'
+                  | 'badge-check'
+                  | 'file-text'
+                  | 'circle-help'
+                  | 'users'
+                  | 'award'
+                  | 'zap'
+                  | 'leaf'
+                )
+              | null;
+            id?: string | null;
+          }[]
+        | null;
+    };
   };
-  channels?:
-    | {
-        /**
-         * Preferred: upload an SVG/PNG icon.
-         */
-        icon?: (number | null) | Media;
-        /**
-         * Fallback Lucide icon when no upload is set.
-         */
-        iconKey?:
-          | (
-              | 'award'
-              | 'globe'
-              | 'headphones'
-              | 'leaf'
-              | 'microscope'
-              | 'shield'
-              | 'phone'
-              | 'mail'
-              | 'mapPin'
-              | 'map'
-              | 'download'
-              | 'wrench'
-              | 'users'
-              | 'building'
-              | 'zap'
-              | 'checkCircle'
-            )
-          | null;
-        title: string;
-        detail: string;
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  selfServiceTitle?: string | null;
-  selfServiceLinks?:
-    | {
-        label: string;
-        /**
-         * Internal path (/about) or full URL (https://…).
-         */
-        href: string;
-        id?: string | null;
-      }[]
-    | null;
-  ticketCta: {
-    title?: string | null;
-    body?: string | null;
-    label: string;
+  strengths?: {
     /**
-     * Internal path (/about) or full URL (https://…).
+     * Leave blank to keep the default copy.
      */
-    href: string;
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    items?:
+      | {
+          title: string;
+          body?: string | null;
+          image?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  approach?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    cta?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    steps?:
+      | {
+          title: string;
+          body?: string | null;
+          image?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  presence?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default stats.
+     */
+    stats?:
+      | {
+          value: string;
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+    cta?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    coverageLabel?: string | null;
+    coverageBody?: string | null;
+    /**
+     * Map pins. Position is a percentage from the top and left of the map panel, e.g. 22% / 38%.
+     */
+    locations?:
+      | {
+          label: string;
+          top: string;
+          left: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave empty to keep the default cards.
+     */
+    pillars?:
+      | {
+          title: string;
+          body?: string | null;
+          icon?:
+            | (
+                | 'store'
+                | 'handshake'
+                | 'headset'
+                | 'headphones'
+                | 'book-open'
+                | 'globe'
+                | 'megaphone'
+                | 'monitor-cog'
+                | 'wrench'
+                | 'life-buoy'
+                | 'shield-check'
+                | 'badge-check'
+                | 'file-text'
+                | 'circle-help'
+                | 'users'
+                | 'award'
+                | 'zap'
+                | 'leaf'
+              )
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  stories?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    items?:
+      | {
+          tag?: string | null;
+          title: string;
+          body?: string | null;
+          image?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  audiences?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    items?:
+      | {
+          title: string;
+          body?: string | null;
+          image?: (number | null) | Media;
+          href?: string | null;
+          linkLabel?: string | null;
+          highlights?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  resources?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    feature?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      body?: string | null;
+      image?: (number | null) | Media;
+      cta?: {
+        label?: string | null;
+        /**
+         * Internal path (/contact) or full URL.
+         */
+        href?: string | null;
+      };
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    items?:
+      | {
+          title: string;
+          body?: string | null;
+          icon?:
+            | (
+                | 'store'
+                | 'handshake'
+                | 'headset'
+                | 'headphones'
+                | 'book-open'
+                | 'globe'
+                | 'megaphone'
+                | 'monitor-cog'
+                | 'wrench'
+                | 'life-buoy'
+                | 'shield-check'
+                | 'badge-check'
+                | 'file-text'
+                | 'circle-help'
+                | 'users'
+                | 'award'
+                | 'zap'
+                | 'leaf'
+              )
+            | null;
+          href?: string | null;
+          linkLabel?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  cases?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    cta?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    items?:
+      | {
+          title: string;
+          body?: string | null;
+          image?: (number | null) | Media;
+          href?: string | null;
+          linkLabel?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  homeowners?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    cards?:
+      | {
+          title: string;
+          body?: string | null;
+          href?: string | null;
+          linkLabel?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    faqTitle?: string | null;
+    /**
+     * Leave empty to keep the default questions.
+     */
+    faqs?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    faqLink?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  installers?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    cards?:
+      | {
+          title: string;
+          body?: string | null;
+          href?: string | null;
+          linkLabel?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    faqTitle?: string | null;
+    /**
+     * Leave empty to keep the default questions.
+     */
+    faqs?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    faqLink?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  business?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default cards.
+     */
+    cards?:
+      | {
+          title: string;
+          body?: string | null;
+          href?: string | null;
+          linkLabel?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    faqTitle?: string | null;
+    /**
+     * Leave empty to keep the default questions.
+     */
+    faqs?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+    faqLink?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  warranty?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    matrixTitle?: string | null;
+    /**
+     * Leave empty to keep the default cards.
+     */
+    steps?:
+      | {
+          title: string;
+          body?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    primary?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    secondary?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    /**
+     * Optional PDF. When set, the secondary button links to it.
+     */
+    policyFile?: (number | null) | Media;
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  security?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Leave empty to keep the default sections. Separate paragraphs with a blank line.
+     */
+    sections?:
+      | {
+          heading: string;
+          body: string;
+          id?: string | null;
+        }[]
+      | null;
+    ctaPrompt?: string | null;
+    cta?: {
+      label?: string | null;
+      /**
+       * Internal path (/contact) or full URL.
+       */
+      href?: string | null;
+    };
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
   };
   seo?: {
     metaTitle?: string | null;
@@ -3583,6 +4636,8 @@ export interface Support {
   createdAt?: string | null;
 }
 /**
+ * Sustainability overview page: hero video, impact numbers, pillars, carbon estimator, commitments, and CTA. Empty fields fall back to default copy and stock media.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "sustainability".
  */
@@ -3597,11 +4652,22 @@ export interface Sustainability {
     description?: string | null;
     image?: (number | null) | Media;
   };
+  /**
+   * Background video for the hero (MP4). If empty, a stock solar video is used.
+   */
+  heroVideo?: (number | null) | Media;
+  /**
+   * Hero poster image, shown while the video loads.
+   */
   image?: (number | null) | Media;
+  /**
+   * Big numbers shown directly below the hero (3 recommended).
+   */
   highlights?:
     | {
         value: string;
         label: string;
+        description?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -3617,6 +4683,82 @@ export interface Sustainability {
         id?: string | null;
       }[]
     | null;
+  pillarsIntro?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    description?: string | null;
+  };
+  pillars?:
+    | {
+        title: string;
+        headline: string;
+        body: string;
+        icon?:
+          | (
+              | 'shield-check'
+              | 'cpu'
+              | 'factory'
+              | 'boxes'
+              | 'users'
+              | 'map-pin'
+              | 'recycle'
+              | 'refresh-cw'
+              | 'leaf'
+              | 'sun'
+            )
+          | null;
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  calculator?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Annual kWh generated per kW installed. Default 1450.
+     */
+    kwhPerKw?: number | null;
+    /**
+     * Tonnes of CO2 displaced per kW per year. Default 1.2.
+     */
+    co2TonnesPerKw?: number | null;
+    /**
+     * Equivalent trees planted per kW. Default 15.
+     */
+    treesPerKw?: number | null;
+    disclaimer?: string | null;
+  };
+  commitmentsIntro?: {
+    eyebrow?: string | null;
+    title?: string | null;
+    description?: string | null;
+  };
+  commitments?:
+    | {
+        phase: string;
+        timeframe: string;
+        title: string;
+        body?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  cta?: {
+    title?: string | null;
+    body?: string | null;
+    primary?: {
+      label?: string | null;
+      href?: string | null;
+    };
+    secondary?: {
+      label?: string | null;
+      href?: string | null;
+    };
+    image?: (number | null) | Media;
+    /**
+     * ESG contact email shown under the banner.
+     */
+    contactEmail?: string | null;
+  };
   strategyHero?: {
     eyebrow?: string | null;
     title?: string | null;
@@ -4014,6 +5156,97 @@ export interface AboutSelect<T extends boolean = true> {
         description?: T;
         id?: T;
       };
+  certifications?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        certificationsTitle?: T;
+        awardsTitle?: T;
+        emptyDescription?: T;
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  partnersNetwork?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        programmeLink?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        emptyDescription?: T;
+        emptyCta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  foundation?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        programmes?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              image?: T;
+              href?: T;
+              linkLabel?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        emptyDescription?: T;
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
   seo?:
     | T
     | {
@@ -4022,6 +5255,413 @@ export interface AboutSelect<T extends boolean = true> {
         ogImage?: T;
         canonicalUrl?: T;
         noIndex?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners-page_select".
+ */
+export interface PartnersPageSelect<T extends boolean = true> {
+  hub?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        tracks?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              icon?: T;
+              href?: T;
+              linkLabel?: T;
+              id?: T;
+            };
+        quickLinks?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              primary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              secondary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  distributors?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        coverage?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              id?: T;
+            };
+        benefitsTitle?: T;
+        benefits?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              id?: T;
+            };
+        links?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              primary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              secondary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  applyDistributor?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+              image?: T;
+            };
+        heroPrimary?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        heroSecondary?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        points?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              id?: T;
+            };
+        programmeLink?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        form?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              successTitle?: T;
+              successMessage?: T;
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  installers?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        pillars?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              icon?: T;
+              id?: T;
+            };
+        quickLinks?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              primary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              secondary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  applyInstaller?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        stepsTitle?: T;
+        steps?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              id?: T;
+            };
+        benefitsTitle?: T;
+        benefits?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        links?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              primary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              secondary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  partnership?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        paths?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              href?: T;
+              linkLabel?: T;
+              id?: T;
+            };
+        enablement?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              primary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              secondary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  training?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        topics?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              href?: T;
+              linkLabel?: T;
+              id?: T;
+            };
+        quickLinks?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              primary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              secondary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
       };
   _status?: T;
   updatedAt?: T;
@@ -4066,39 +5706,423 @@ export interface CareersSelect<T extends boolean = true> {
  * via the `definition` "support_select".
  */
 export interface SupportSelect<T extends boolean = true> {
-  hero?:
+  hub?:
     | T
     | {
-        eyebrow?: T;
-        title?: T;
-        description?: T;
-        image?: T;
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              highlight?: T;
+              description?: T;
+              image?: T;
+              primary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              secondary?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              quickLinksLabel?: T;
+              quickLinks?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    icon?: T;
+                    id?: T;
+                  };
+            };
       };
-  channels?:
+  strengths?:
     | T
     | {
-        icon?: T;
-        iconKey?: T;
-        title?: T;
-        detail?: T;
-        note?: T;
-        id?: T;
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        items?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              image?: T;
+              id?: T;
+            };
       };
-  selfServiceTitle?: T;
-  selfServiceLinks?:
+  approach?:
     | T
     | {
-        label?: T;
-        href?: T;
-        id?: T;
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        steps?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              image?: T;
+              id?: T;
+            };
       };
-  ticketCta?:
+  presence?:
     | T
     | {
-        title?: T;
-        body?: T;
-        label?: T;
-        href?: T;
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        stats?:
+          | T
+          | {
+              value?: T;
+              label?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        coverageLabel?: T;
+        coverageBody?: T;
+        locations?:
+          | T
+          | {
+              label?: T;
+              top?: T;
+              left?: T;
+              id?: T;
+            };
+        pillars?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              icon?: T;
+              id?: T;
+            };
+      };
+  stories?:
+    | T
+    | {
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        items?:
+          | T
+          | {
+              tag?: T;
+              title?: T;
+              body?: T;
+              image?: T;
+              id?: T;
+            };
+      };
+  audiences?:
+    | T
+    | {
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        items?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              image?: T;
+              href?: T;
+              linkLabel?: T;
+              highlights?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+      };
+  resources?:
+    | T
+    | {
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        feature?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              body?: T;
+              image?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+            };
+        items?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              icon?: T;
+              href?: T;
+              linkLabel?: T;
+              id?: T;
+            };
+      };
+  cases?:
+    | T
+    | {
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        items?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              image?: T;
+              href?: T;
+              linkLabel?: T;
+              id?: T;
+            };
+      };
+  homeowners?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        cards?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              href?: T;
+              linkLabel?: T;
+              id?: T;
+            };
+        faqTitle?: T;
+        faqs?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        faqLink?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  installers?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        cards?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              href?: T;
+              linkLabel?: T;
+              id?: T;
+            };
+        faqTitle?: T;
+        faqs?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        faqLink?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  business?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        cards?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              href?: T;
+              linkLabel?: T;
+              id?: T;
+            };
+        faqTitle?: T;
+        faqs?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+        faqLink?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  warranty?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        matrixTitle?: T;
+        steps?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              id?: T;
+            };
+        primary?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        secondary?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        policyFile?: T;
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  security?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        sections?:
+          | T
+          | {
+              heading?: T;
+              body?: T;
+              id?: T;
+            };
+        ctaPrompt?: T;
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
       };
   seo?:
     | T
@@ -4127,12 +6151,14 @@ export interface SustainabilitySelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
+  heroVideo?: T;
   image?: T;
   highlights?:
     | T
     | {
         value?: T;
         label?: T;
+        description?: T;
         id?: T;
       };
   approachTitle?: T;
@@ -4143,6 +6169,69 @@ export interface SustainabilitySelect<T extends boolean = true> {
         label?: T;
         href?: T;
         id?: T;
+      };
+  pillarsIntro?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  pillars?:
+    | T
+    | {
+        title?: T;
+        headline?: T;
+        body?: T;
+        icon?: T;
+        image?: T;
+        id?: T;
+      };
+  calculator?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        kwhPerKw?: T;
+        co2TonnesPerKw?: T;
+        treesPerKw?: T;
+        disclaimer?: T;
+      };
+  commitmentsIntro?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  commitments?:
+    | T
+    | {
+        phase?: T;
+        timeframe?: T;
+        title?: T;
+        body?: T;
+        id?: T;
+      };
+  cta?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        primary?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        secondary?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        image?: T;
+        contactEmail?: T;
       };
   strategyHero?:
     | T

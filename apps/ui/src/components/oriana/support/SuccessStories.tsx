@@ -1,39 +1,15 @@
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 import { FadeIn, Stagger, StaggerItem } from '../FadeIn'
+import type { CardItem, Intro, LinkItem } from '../marketing/types'
 
-const categories = [
-  {
-    title: 'On-grid',
-    description: 'Rooftop and ground-mount systems feeding the grid.',
-    image:
-      'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&q=80&w=1000',
-    offset: '',
-  },
-  {
-    title: 'Hybrid',
-    description: 'Solar paired with storage for round-the-clock supply.',
-    image:
-      'https://images.unsplash.com/photo-1548337138-e87d889cc369?auto=format&fit=crop&q=80&w=1000',
-    offset: 'lg:translate-y-10',
-  },
-  {
-    title: 'Utility',
-    description: 'Large-scale plants engineered for long-term yield.',
-    image:
-      'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&q=80&w=1000',
-    offset: '',
-  },
-  {
-    title: 'BESS',
-    description: 'Battery energy storage for resilience and peak control.',
-    image:
-      'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&q=80&w=1000',
-    offset: 'lg:translate-y-10',
-  },
-]
+type SuccessStoriesProps = {
+  intro: Intro
+  cta: LinkItem
+  categories: CardItem[]
+}
 
-export function SuccessStories() {
+export function SuccessStories({ intro, cta, categories }: SuccessStoriesProps) {
   return (
     <section
       id="success-stories"
@@ -52,24 +28,23 @@ export function SuccessStories() {
           <div>
             <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-sky">
               <span className="h-px w-10 bg-oriana-sky/60" aria-hidden />
-              Cases &amp; stories
+              {intro.eyebrow}
             </p>
             <h2
               className="mt-6 max-w-2xl font-display font-medium tracking-[-0.02em] text-white"
               style={{ fontSize: 'clamp(2rem, 3.8vw, 3.5rem)', lineHeight: 1.08 }}
             >
-              Projects, by system type
+              {intro.title}
             </h2>
-            <p className="mt-6 max-w-xl text-base leading-8 text-white/70">
-              Explore how Oriana inverters perform in the field as our case library grows across
-              on-grid, hybrid, utility, and storage installations.
-            </p>
+            {intro.description ? (
+              <p className="mt-6 max-w-xl text-base leading-8 text-white/70">{intro.description}</p>
+            ) : null}
           </div>
           <Link
-            href="/case-studies"
+            href={cta.href}
             className="group inline-flex min-h-12 w-fit items-center gap-2 rounded-full border border-white/30 px-7 text-sm font-semibold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-oriana-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
           >
-            View all case studies
+            {cta.label}
             <ArrowUpRight
               className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               aria-hidden
@@ -78,10 +53,13 @@ export function SuccessStories() {
         </FadeIn>
 
         <Stagger className="mt-14 grid gap-5 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4 lg:pb-10">
-          {categories.map((category) => (
-            <StaggerItem key={category.title} className={`h-full ${category.offset}`}>
+          {categories.map((category, index) => (
+            <StaggerItem
+              key={category.title}
+              className={`h-full ${index % 2 === 1 ? 'lg:translate-y-10' : ''}`}
+            >
               <Link
-                href="/case-studies"
+                href={category.href || cta.href}
                 className="group relative flex h-full min-h-[24rem] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-oriana-navy/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white lg:min-h-[28rem]"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -113,7 +91,9 @@ export function SuccessStories() {
                       aria-hidden
                     />
                   </div>
-                  <p className="mt-3 text-sm leading-6 text-white/70">{category.description}</p>
+                  {category.body ? (
+                    <p className="mt-3 text-sm leading-6 text-white/70">{category.body}</p>
+                  ) : null}
                 </div>
               </Link>
             </StaggerItem>

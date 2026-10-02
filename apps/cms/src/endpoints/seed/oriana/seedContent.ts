@@ -455,56 +455,15 @@ export async function seedOrianaContent({
     context: { disableRevalidate: true },
   })
 
-  // Support
+  // Support — section tabs stay empty so the built-in page copy shows until an admin edits it.
   await payload.updateGlobal({
     slug: 'support',
     data: {
-      hero: {
-        eyebrow: 'Support',
-        title: 'Service & Support',
-        description:
-          'Our technical team supports installers, EPCs, and end customers across every stage — from commissioning to long-term O&M.',
+      seo: {
+        metaTitle: 'Support & Service',
+        metaDescription:
+          'Dependable service support throughout the product lifecycle for installers, homeowners, and businesses.',
       },
-      channels: [
-        {
-          iconKey: 'phone',
-          title: 'Customer Hotline',
-          detail: '+1 (800) ORIANA-1',
-          note: 'Mon–Fri, 8 AM – 6 PM local time',
-        },
-        {
-          iconKey: 'mail',
-          title: 'Technical Email',
-          detail: 'support@orianainverters.com',
-          note: 'Response within 1 business day',
-        },
-        {
-          iconKey: 'wrench',
-          title: 'Installer Support',
-          detail: 'installers@orianainverters.com',
-          note: 'Dedicated line for certified partners',
-        },
-        {
-          iconKey: 'mapPin',
-          title: 'Regional Offices',
-          detail: 'North America · Europe · APAC',
-          note: 'Find your local representative',
-        },
-      ],
-      selfServiceTitle: 'Self-Service Resources',
-      selfServiceLinks: [
-        { label: 'Download Center', href: '/resources/downloads' },
-        { label: 'Warranty', href: '/support/warranty' },
-        { label: 'FAQs', href: '/resources/faqs' },
-        { label: 'Installation Videos', href: '/resources/videos' },
-      ],
-      ticketCta: {
-        title: 'Submit a Support Ticket',
-        body: 'Describe your issue, include the inverter serial number and fault code if applicable.',
-        label: 'Open Contact Form',
-        href: '/contact',
-      },
-      seo: { metaTitle: 'Service & Support' },
       _status: 'published',
     } as never,
     overrideAccess: true,
@@ -516,18 +475,101 @@ export async function seedOrianaContent({
     slug: 'sustainability',
     data: {
       hero: {
-        eyebrow: 'Sustainability',
-        title: 'Powering a Sustainable Future',
+        eyebrow: 'Our Commitment',
+        title: 'Powering India’s Clean Energy Transition from the Ground Up.',
         description:
-          'Oriana integrates environmental responsibility into product design, manufacturing, and supply chain operations.',
+          'We engineer every unit for product longevity, responsible manufacturing, and circular lifecycles.',
       },
-      ...(mediaMap.sustainability ? { image: mediaMap.sustainability } : {}),
       highlights: [
-        { value: '45%', label: 'Renewable energy at manufacturing sites' },
-        { value: 'ISO 14001', label: 'Environmental management certified' },
-        { value: '2025', label: 'ESG report published' },
-        { value: '1M+', label: 'Clean energy units deployed' },
+        {
+          value: '97%+',
+          label: 'Peak efficiency',
+          description: 'Minimising conversion losses across the grid.',
+        },
+        {
+          value: '100%',
+          label: 'Recyclable packaging goal',
+          description: 'Phasing out single-use expanded plastics.',
+        },
+        {
+          value: 'Make in India',
+          label: 'Localised sourcing',
+          description: 'Fewer long-haul carbon miles in every unit.',
+        },
       ],
+      pillarsIntro: {
+        eyebrow: 'Core pillars',
+        title: 'Sustainability built in, from day one',
+        description:
+          'Four principles shape how we design, build, and support every Oriana product.',
+      },
+      pillars: [
+        {
+          title: 'Design for Longevity',
+          headline: 'Built to outlast, not to be replaced',
+          body: 'The greenest hardware is the one that stays out of landfills for decades. Our systems feature high-grade thermal engineering, industrial-grade silicon, and repairable component architecture that maximises uptime and energy yield across India’s harsh climate conditions.',
+          icon: 'shield-check',
+        },
+        {
+          title: 'Responsible Manufacturing',
+          headline: 'Cleaner practices on the shop floor',
+          body: 'Clean energy hardware should not be born from dirty manufacturing. We enforce lead-free soldering, RoHS-compliant electronics, water-conscious assembly, and corrugated honeycomb cushioning in place of single-use Styrofoam.',
+          icon: 'factory',
+        },
+        {
+          title: 'Local Communities',
+          headline: 'Made in India, building resilience',
+          body: 'Sourcing components locally strengthens domestic manufacturing and cuts international freight emissions. We invest in local engineering talent, transparent workplace safety standards, and regional technician upskilling.',
+          icon: 'users',
+        },
+        {
+          title: 'Circularity & E-Waste',
+          headline: 'Lifecycle responsibility beyond the sale',
+          body: 'Aligned with India’s E-Waste (Management) Rules, our enclosures and modular components are designed for straightforward disassembly, material recovery of aluminium, copper, and PCB silicon, and verified recycling partnerships.',
+          icon: 'recycle',
+        },
+      ],
+      calculator: {
+        title: 'Sustainability in numbers',
+        description: 'Move the slider to see what a solar installation can displace every year.',
+        kwhPerKw: 1450,
+        co2TonnesPerKw: 1.2,
+        treesPerKw: 15,
+        disclaimer:
+          'Estimates calculated using Central Electricity Authority (CEA) average grid emission factors. Actual results vary with location, orientation, and system design.',
+      },
+      commitmentsIntro: {
+        eyebrow: 'Roadmap',
+        title: 'Our day-one commitments',
+        description: 'A practical baseline we are delivering on now, and building towards next.',
+      },
+      commitments: [
+        {
+          phase: 'Phase 1',
+          timeframe: 'Current',
+          title: 'Plastic-minimised dispatch and RoHS lines',
+          body: '100% plastic-minimised dispatch boxes and RoHS-compliant manufacturing lines.',
+        },
+        {
+          phase: 'Phase 2',
+          timeframe: 'Next 12 months',
+          title: 'Solar-powered shop floor',
+          body: 'Moving testing and assembly power consumption to self-hosted rooftop solar.',
+        },
+        {
+          phase: 'Phase 3',
+          timeframe: 'Long-term',
+          title: 'Closed-loop takeback',
+          body: 'A certified takeback and refurbishment programme for field units across India.',
+        },
+      ],
+      cta: {
+        title: 'Join us in accelerating India’s solar decade.',
+        body: 'Partner with Oriana to deploy efficient, long-lived inverters built responsibly in India.',
+        primary: { label: 'Partner With Us', href: '/contact' },
+        secondary: { label: 'Download Product Spec Sheets', href: '/products' },
+        contactEmail: 'esg@orianainverters.com',
+      },
       approachTitle: 'Our Approach',
       approachBody:
         'Every Oriana inverter helps displace fossil generation over a 25+ year operational life.',
@@ -570,10 +612,23 @@ export async function seedOrianaContent({
       limit: 1,
       overrideAccess: true,
     })
-    if (existingForms.docs[0]) {
-      contactFormId = existingForms.docs[0].id
+    const { contactForm } = await import('../contact-form')
+    const existing = existingForms.docs[0]
+    if (existing) {
+      contactFormId = existing.id
+      const usesDemoEmail = existing.emails?.some((email) =>
+        email.emailFrom?.includes('demo@payloadcms.com'),
+      )
+      if (usesDemoEmail) {
+        await payload.update({
+          collection: 'forms',
+          id: existing.id,
+          data: { emails: contactForm.emails },
+          overrideAccess: true,
+          context: { disableRevalidate: true },
+        })
+      }
     } else {
-      const { contactForm } = await import('../contact-form')
       const created = await payload.create({
         collection: 'forms',
         data: contactForm,

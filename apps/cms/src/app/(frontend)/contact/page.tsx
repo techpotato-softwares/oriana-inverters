@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { getContactForm } from '@/utilities/getContactForm'
 import { getContact } from '@/utilities/getMarketing'
-import type { Form } from '@/payload-types'
 import { ContactForm, type ContactCard } from './ContactForm'
 
 const fallbackCards: ContactCard[] = [
@@ -10,12 +10,6 @@ const fallbackCards: ContactCard[] = [
   { iconKey: 'phone', title: 'Phone', detail: '+1 (800) ORIANA-1' },
   { iconKey: 'mapPin', title: 'Headquarters', detail: 'United States' },
 ]
-
-function formIdFromRelation(form: number | Form | null | undefined): number | null {
-  if (typeof form === 'number' && Number.isFinite(form)) return form
-  if (form && typeof form === 'object' && 'id' in form) return form.id
-  return null
-}
 
 export async function generateMetadata(): Promise<Metadata> {
   const contact = await getContact()
@@ -32,7 +26,11 @@ export default async function ContactPage({
 }: {
   searchParams: Promise<{ intent?: string }>
 }) {
-  const [{ intent }, contact] = await Promise.all([searchParams, getContact()])
+  const [{ intent }, contact, form] = await Promise.all([
+    searchParams,
+    getContact(),
+    getContactForm(),
+  ])
   const hero = contact?.hero
   const cards: ContactCard[] = contact?.cards?.length
     ? contact.cards.map((c) => ({
@@ -41,7 +39,6 @@ export default async function ContactPage({
         detail: c.detail,
       }))
     : fallbackCards
-  const formId = formIdFromRelation(contact?.form)
   const successMessage =
     contact?.successMessage ||
     'Thank you for reaching out. Our team will contact you within one business day.'
@@ -62,7 +59,7 @@ export default async function ContactPage({
         <div className="container">
           <ContactForm
             cards={cards}
-            formId={formId}
+            form={form}
             successMessage={successMessage}
             intent={intent}
           />

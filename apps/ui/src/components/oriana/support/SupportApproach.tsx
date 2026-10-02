@@ -4,39 +4,15 @@ import { useRef } from 'react'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useSpring } from 'framer-motion'
+import type { CardItem, Intro, LinkItem } from '../marketing/types'
 
-const steps = [
-  {
-    title: 'Identify',
-    description:
-      'Capture the operating condition, site context, and support requirement so nothing is assumed.',
-    image:
-      'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&q=80&w=1200',
-  },
-  {
-    title: 'Diagnose',
-    description:
-      'Review monitoring data, event logs, and system design to isolate the most likely root cause.',
-    image:
-      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=1200',
-  },
-  {
-    title: 'Resolve',
-    description:
-      'Deliver a clear remote fix or coordinate field assistance to bring the plant back to full output.',
-    image:
-      'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&q=80&w=1200',
-  },
-  {
-    title: 'Support',
-    description:
-      'Confirm the outcome, share preventive guidance, and stay engaged across the product lifecycle.',
-    image:
-      'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&q=80&w=1200',
-  },
-]
+type SupportApproachProps = {
+  intro: Intro
+  cta: LinkItem
+  steps: CardItem[]
+}
 
-export function SupportApproach() {
+export function SupportApproach({ intro, cta, steps }: SupportApproachProps) {
   const trackRef = useRef<HTMLOListElement>(null)
   const reduceMotion = useReducedMotion()
 
@@ -63,24 +39,22 @@ export function SupportApproach() {
         <div className="lg:sticky lg:top-[calc(var(--site-header-height,5rem)+6rem)] lg:self-start">
           <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-blue">
             <span className="h-px w-10 bg-oriana-blue/50" aria-hidden />
-            Our approach
+            {intro.eyebrow}
           </p>
           <h2
-            className="mt-6 font-display font-medium tracking-[-0.02em] text-oriana-navy"
+            className="mt-6 max-w-md text-balance font-display font-medium tracking-[-0.02em] text-oriana-navy"
             style={{ fontSize: 'clamp(2rem, 3.8vw, 3.5rem)', lineHeight: 1.08 }}
           >
-            One sequence,
-            <br className="hidden sm:block" /> every service case
+            {intro.title}
           </h2>
-          <p className="mt-6 max-w-md text-base leading-8 text-oriana-muted">
-            Identify, diagnose, resolve, support. A consistent method keeps communication clear from
-            the first observation through to long-term performance.
-          </p>
+          {intro.description ? (
+            <p className="mt-6 max-w-md text-base leading-8 text-oriana-muted">{intro.description}</p>
+          ) : null}
           <Link
-            href="/contact"
+            href={cta.href}
             className="group mt-9 inline-flex min-h-12 items-center gap-2 rounded-full bg-oriana-blue px-7 text-sm font-semibold text-white transition-colors duration-300 hover:bg-oriana-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-oriana-blue"
           >
-            Raise a service request
+            {cta.label}
             <ArrowUpRight
               className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               aria-hidden
@@ -140,7 +114,7 @@ export function SupportApproach() {
                   </h3>
                 </div>
                 <p className="px-6 py-6 text-sm leading-7 text-oriana-muted sm:text-base sm:leading-8">
-                  {step.description}
+                  {step.body}
                 </p>
               </div>
             </motion.li>

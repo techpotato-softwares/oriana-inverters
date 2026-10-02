@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 
 export type VideoHeroProps = {
   /** MP4 (or other browser-supported) video URL — local `/…` or absolute */
@@ -14,6 +14,8 @@ export type VideoHeroProps = {
   /** Accessible name for the section */
   ariaLabel?: string
   className?: string
+  /** Foreground content layered above the video and gradients */
+  children?: ReactNode
 }
 
 /**
@@ -27,6 +29,7 @@ export function VideoHero({
   captionIntervalMs = 4200,
   ariaLabel = 'Hero',
   className = '',
+  children,
 }: VideoHeroProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [ready, setReady] = useState(false)
@@ -116,6 +119,8 @@ export function VideoHero({
           </p>
         </div>
       ) : null}
+
+      {children ? <div className="absolute inset-0 z-10">{children}</div> : null}
     </section>
   )
 }

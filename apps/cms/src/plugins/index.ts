@@ -4,7 +4,7 @@ import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
 import { s3Storage } from '@payloadcms/storage-s3'
-import { Plugin } from 'payload'
+import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -13,6 +13,23 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+
+export const FORMS_GROUP = 'Forms & Leads'
+
+function revalidateFormsTag(context: Record<string, unknown> | undefined) {
+  if (context?.disableRevalidate) return
+  void import('next/cache').then(({ revalidateTag }) => revalidateTag('forms'))
+}
+
+const revalidateFormsAfterChange: CollectionAfterChangeHook = ({ doc, req }) => {
+  revalidateFormsTag(req.context)
+  return doc
+}
+
+const revalidateFormsAfterDelete: CollectionAfterDeleteHook = ({ doc, req }) => {
+  revalidateFormsTag(req.context)
+  return doc
+}
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Oriana Inverters` : 'Oriana Inverters'
@@ -66,6 +83,15 @@ export const plugins: Plugin[] = [
       payment: false,
     },
     formOverrides: {
+      admin: {
+        group: FORMS_GROUP,
+        description:
+          'Fields added here appear on the website form. The contact page uses the form chosen in Contact Page, or the form titled "Contact Form".',
+      },
+      hooks: {
+        afterChange: [revalidateFormsAfterChange],
+        afterDelete: [revalidateFormsAfterDelete],
+      },
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
           if ('name' in field && field.name === 'confirmationMessage') {
@@ -84,6 +110,14 @@ export const plugins: Plugin[] = [
           }
           return field
         })
+      },
+    },
+    formSubmissionOverrides: {
+      labels: { singular: 'Enquiry', plural: 'Website enquiries' },
+      admin: {
+        group: FORMS_GROUP,
+        description: 'Every contact and product enquiry submitted on the website.',
+        defaultColumns: ['form', 'createdAt'],
       },
     },
   }),

@@ -1,35 +1,53 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
-import { getWarrantyPlans } from '@/utilities/getMarketing'
+import { defaultWarrantyPage as defaults } from '@/components/oriana/support/supportData'
+import { getSupport, getWarrantyPlans } from '@/utilities/getMarketing'
+import {
+  mediaUrl,
+  resolveCards,
+  resolveLink,
+  resolveMeta,
+  resolveText,
+} from '@/utilities/cmsContent'
 import type { WarrantyPlan } from '@/payload-types'
 
-export const metadata = {
-  title: 'Warranty',
-  description: 'Oriana inverter warranty terms, registration, and claim process.',
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getSupport()
+  return resolveMeta(data?.warranty?.meta, defaults.meta)
 }
 
 export default async function WarrantyPage() {
-  const plans = (await getWarrantyPlans()) as WarrantyPlan[]
-  const warrantyTiers = plans.map((p) => ({
+  const [plans, data] = await Promise.all([getWarrantyPlans(), getSupport()])
+  const cms = data?.warranty
+  const warrantyTiers = (plans as WarrantyPlan[]).map((p) => ({
     product: p.productLine,
     standard: p.standard,
     extended: p.extended || '',
   }))
 
+  const hero = {
+    eyebrow: resolveText(cms?.hero?.eyebrow, defaults.hero.eyebrow),
+    title: resolveText(cms?.hero?.title, defaults.hero.title),
+    description: resolveText(cms?.hero?.description, defaults.hero.description),
+  }
+  const steps = resolveCards(cms?.steps, defaults.steps)
+  const primary = resolveLink(cms?.primary, defaults.primary)
+  const secondary = resolveLink(cms?.secondary, defaults.secondary)
+  const policyUrl = mediaUrl(cms?.policyFile)
+
   return (
     <main>
-      <PageHero
-        eyebrow="Support"
-        title="Warranty"
-        description="Industry-leading warranty coverage backed by global service infrastructure and spare parts availability."
-      />
-      <Breadcrumbs items={[{ label: 'Support', href: '/support' }, { label: 'Warranty' }]} />
+      <PageHero eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
+      <Breadcrumbs items={[{ label: 'Support', href: '/support' }, { label: hero.title }]} />
 
       <section className="py-12 lg:py-16">
         <div className="container max-w-4xl">
-          <h2 className="font-display text-2xl font-bold text-oriana-navy">Coverage by Product Line</h2>
+          <h2 className="font-display text-2xl font-bold text-oriana-navy">
+            {resolveText(cms?.matrixTitle, defaults.matrixTitle)}
+          </h2>
           {warrantyTiers.length === 0 ? (
             <div className="mt-6">
               <ComingSoon
@@ -66,34 +84,29 @@ export default async function WarrantyPage() {
           )}
 
           <div className="mt-12 space-y-8">
-            <div>
-              <h3 className="font-display text-xl font-bold text-oriana-navy">Register Your Product</h3>
-              <p className="mt-3 text-sm leading-relaxed text-oriana-muted">
-                Register within 60 days of installation to activate full warranty coverage. You will need the serial
-                number, installation date, and installer contact information.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-bold text-oriana-navy">Submit a Warranty Claim</h3>
-              <p className="mt-3 text-sm leading-relaxed text-oriana-muted">
-                Contact our support team with your serial number, fault description, and photos if applicable. RMA
-                processing typically completes within 5 business days for in-warranty units.
-              </p>
-            </div>
+            {steps.map((step) => (
+              <div key={step.title}>
+                <h3 className="font-display text-xl font-bold text-oriana-navy">{step.title}</h3>
+                {step.body ? (
+                  <p className="mt-3 text-sm leading-relaxed text-oriana-muted">{step.body}</p>
+                ) : null}
+              </div>
+            ))}
           </div>
 
           <div className="mt-12 flex flex-wrap gap-4">
             <Link
-              href="/contact"
+              href={primary.href}
               className="rounded bg-oriana-blue px-6 py-3 text-sm font-bold text-white hover:bg-oriana-deep"
             >
-              Register / Claim Warranty
+              {primary.label}
             </Link>
             <Link
-              href="/resources/downloads"
+              href={policyUrl || secondary.href}
+              {...(policyUrl ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               className="rounded border border-oriana-navy/15 px-6 py-3 text-sm font-semibold text-oriana-navy hover:border-oriana-blue"
             >
-              Download Warranty Policy (PDF)
+              {secondary.label}
             </Link>
           </div>
         </div>

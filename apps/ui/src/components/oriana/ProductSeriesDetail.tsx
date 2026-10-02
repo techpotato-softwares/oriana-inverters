@@ -219,7 +219,8 @@ function ProductInquiryForm({
     ].filter((row) => row.value)
 
     if (!formId) {
-      setStatus('sent')
+      setStatus('error')
+      setErrorMessage('Enquiries are unavailable right now. Please use the contact page to reach us.')
       return
     }
 
@@ -298,7 +299,9 @@ function ProductInquiryForm({
         </span>
       </label>
       {status === 'error' && errorMessage ? (
-        <p className="text-sm text-red-600 sm:col-span-2">{errorMessage}</p>
+        <p role="alert" className="text-sm text-red-600 sm:col-span-2">
+          {errorMessage}
+        </p>
       ) : null}
       <div className="sm:col-span-2">
         <button

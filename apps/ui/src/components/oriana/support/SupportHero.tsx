@@ -2,18 +2,13 @@
 
 import { useRef } from 'react'
 import Link from 'next/link'
-import { ArrowUpRight, FileText, LifeBuoy, ShieldCheck } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { MarketingIcon } from '../marketing/MarketingIcon'
+import type { SupportHeroContent } from './supportData'
 
-const headline = ['Professional support.', 'Reliable performance.']
-
-const quickLinks = [
-  { label: 'Technical support', href: '/contact', icon: LifeBuoy },
-  { label: 'Warranty claim', href: '/support/warranty', icon: ShieldCheck },
-  { label: 'Product documentation', href: '/resources/downloads', icon: FileText },
-]
-
-export function SupportHero() {
+export function SupportHero({ content }: { content: SupportHeroContent }) {
+  const headline = [content.title, content.highlight].filter(Boolean)
   const containerRef = useRef<HTMLDivElement>(null)
   const reduceMotion = useReducedMotion()
 
@@ -42,7 +37,7 @@ export function SupportHero() {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&q=88&w=2400"
+          src={content.image}
           alt="Oriana service engineers inspecting a solar installation"
           className="h-full w-full object-cover object-center"
           fetchPriority="high"
@@ -83,7 +78,7 @@ export function SupportHero() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
           <span className="h-px w-10 bg-oriana-sky/70" aria-hidden />
-          Service &amp; Support
+          {content.eyebrow}
         </motion.p>
 
         <h1
@@ -114,27 +109,25 @@ export function SupportHero() {
           transition={{ duration: 0.9, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
         >
           <p className="mt-8 max-w-2xl text-base leading-8 text-white/75 md:text-lg">
-            Dependable service across the product lifecycle — technical expertise, responsive
-            support, systematic troubleshooting, and field-level assistance that keeps customers,
-            installers, and EPC partners running with minimal downtime.
+            {content.description}
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <Link
-              href="/contact"
+              href={content.primary.href}
               className="group inline-flex min-h-12 items-center gap-2 rounded-full bg-oriana-blue px-7 text-sm font-semibold text-white transition-colors duration-300 hover:bg-oriana-sky hover:text-oriana-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
-              Contact support
+              {content.primary.label}
               <ArrowUpRight
                 className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 aria-hidden
               />
             </Link>
             <Link
-              href="#our-strengths"
+              href={content.secondary.href}
               className="inline-flex min-h-12 items-center rounded-full border border-white/30 px-7 text-sm font-semibold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-oriana-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
-              Explore our service
+              {content.secondary.label}
             </Link>
           </div>
         </motion.div>
@@ -146,17 +139,17 @@ export function SupportHero() {
           transition={{ duration: 0.9, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
         >
           <p className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-white/45">
-            Frequently needed
+            {content.quickLinksLabel}
           </p>
           <ul className="mt-4 flex flex-wrap gap-2.5">
-            {quickLinks.map(({ label, href, icon: Icon }) => (
-              <li key={label}>
+            {content.quickLinks.map((link) => (
+              <li key={link.title}>
                 <Link
-                  href={href}
+                  href={link.href || '/contact'}
                   className="inline-flex min-h-11 items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.1] px-5 text-sm text-white/85 transition-colors duration-300 hover:border-oriana-sky/60 hover:bg-white/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                 >
-                  <Icon className="h-4 w-4 text-oriana-sky" strokeWidth={1.6} aria-hidden />
-                  {label}
+                  <MarketingIcon name={link.icon} className="h-4 w-4 text-oriana-sky" strokeWidth={1.6} />
+                  {link.title}
                 </Link>
               </li>
             ))}

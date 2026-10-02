@@ -316,6 +316,67 @@ body,
   border: 1px solid rgba(7, 21, 37, 0.06);
 }
 
+.oriana-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 1.75rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.oriana-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    #4da3ff 0%,
+    #4da3ff var(--range-fill, 0%),
+    rgba(255, 255, 255, 0.14) var(--range-fill, 0%)
+  );
+}
+
+.oriana-range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.oriana-range::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: #4da3ff;
+}
+
+.oriana-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: -9px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 4px solid #4da3ff;
+  background: #fff;
+  box-shadow: 0 6px 18px -6px rgba(77, 163, 255, 0.8);
+  transition: transform 150ms ease;
+}
+
+.oriana-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 4px solid #4da3ff;
+  background: #fff;
+}
+
+.oriana-range:active::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+
+.oriana-range:focus-visible {
+  outline: 2px solid #4da3ff;
+  outline-offset: 6px;
+  border-radius: 999px;
+}
+
 .prose {
   --tw-prose-body: #606060;
   --tw-prose-headings: #606060;

@@ -1,13 +1,16 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
-import { getPartners } from '@/utilities/getMarketing'
+import { aboutPartners as defaults } from '@/components/oriana/about/aboutData'
+import { getAbout, getPartners } from '@/utilities/getMarketing'
+import { resolveLink, resolveMeta, resolveText } from '@/utilities/cmsContent'
 import type { Partner } from '@/payload-types'
 
-export const metadata = {
-  title: 'Partners',
-  description: 'Oriana strategic partners — distributors, EPCs, and technology alliances.',
+export async function generateMetadata(): Promise<Metadata> {
+  const about = await getAbout()
+  return resolveMeta(about?.partnersNetwork?.meta, defaults.meta)
 }
 
 function groupPartners(docs: Partner[]) {
@@ -28,33 +31,38 @@ function groupPartners(docs: Partner[]) {
 }
 
 export default async function PartnersPage() {
-  const docs = (await getPartners()) as Partner[]
+  const [docs, about] = await Promise.all([getPartners() as Promise<Partner[]>, getAbout()])
+  const cms = about?.partnersNetwork
+  const hero = {
+    eyebrow: resolveText(cms?.hero?.eyebrow, defaults.hero.eyebrow),
+    title: resolveText(cms?.hero?.title, defaults.hero.title),
+    description: resolveText(cms?.hero?.description, defaults.hero.description),
+  }
+  const breadcrumbs = [{ label: 'About', href: '/about' }, { label: 'Partners' }]
 
   if (docs.length === 0) {
+    const emptyCta = resolveLink(cms?.emptyCta, defaults.emptyCta)
     return (
       <main>
         <ComingSoon
-          eyebrow="About"
-          title="Partners"
-          description="Named partner listings will appear here once published. Explore distributor programmes meanwhile."
-          breadcrumbs={[{ label: 'About', href: '/about' }, { label: 'Partners' }]}
-          primaryHref="/partners/become-a-distributor"
-          primaryLabel="Become a distributor"
+          eyebrow={hero.eyebrow}
+          title={hero.title}
+          description={resolveText(cms?.emptyDescription, defaults.emptyDescription)}
+          breadcrumbs={breadcrumbs}
+          primaryHref={emptyCta.href}
+          primaryLabel={emptyCta.label}
         />
       </main>
     )
   }
 
   const partnerTypes = groupPartners(docs)
+  const programmeLink = resolveLink(cms?.programmeLink, defaults.programmeLink)
 
   return (
     <main>
-      <PageHero
-        eyebrow="About"
-        title="Partners"
-        description="We work with a global network of distributors, installers, and technology partners to deliver bankable solar solutions."
-      />
-      <Breadcrumbs items={[{ label: 'About', href: '/about' }, { label: 'Partners' }]} />
+      <PageHero eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
+      <Breadcrumbs items={breadcrumbs} />
 
       <section className="py-12 lg:py-16">
         <div className="container">
@@ -75,8 +83,11 @@ export default async function PartnersPage() {
           ))}
 
           <div className="mt-8">
-            <Link href="/partners" className="text-sm font-semibold text-oriana-blue hover:underline">
-              Explore partner programmes →
+            <Link
+              href={programmeLink.href}
+              className="text-sm font-semibold text-oriana-blue hover:underline"
+            >
+              {programmeLink.label} →
             </Link>
           </div>
         </div>
