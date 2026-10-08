@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 
 import { SustainabilityOverview } from '@/components/oriana/sustainability/SustainabilityOverview'
 import {
@@ -19,7 +17,6 @@ import {
 import { getAwards, getSustainability, getSustainabilityReports } from '@/utilities/getMarketing'
 import {
   isPlaceholderSustainabilityTitle,
-  PLACEHOLDER_POST_SLUGS,
   realSustainabilityHighlights,
 } from '@/utilities/placeholderContent'
 import type { Award, Media, SustainabilityReport } from '@/payload-types'
@@ -59,41 +56,11 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-async function getSustainabilityNews() {
-  try {
-    const payload = await getPayload({ config: configPromise })
-    const result = await payload.find({
-      collection: 'posts',
-      depth: 0,
-      limit: 3,
-      where: {
-        _status: { equals: 'published' },
-        slug: { not_in: [...PLACEHOLDER_POST_SLUGS] },
-      },
-      sort: '-publishedAt',
-    })
-    return result.docs.map((post) => ({
-      title: post.title,
-      href: `/posts/${post.slug}`,
-      date: post.publishedAt
-        ? new Date(post.publishedAt).toLocaleDateString('en-IN', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })
-        : undefined,
-    }))
-  } catch {
-    return []
-  }
-}
-
 export default async function SustainabilityPage() {
-  const [data, reportDocs, awardDocs, news] = await Promise.all([
+  const [data, reportDocs, awardDocs] = await Promise.all([
     getSustainability(),
     getSustainabilityReports(),
     getAwards(),
-    getSustainabilityNews(),
   ])
 
   const reports: ReportCard[] = (reportDocs as SustainabilityReport[]).map((doc) => ({
@@ -181,7 +148,6 @@ export default async function SustainabilityPage() {
       commitments={commitments}
       reports={reports}
       honors={honors}
-      news={news}
       cta={cta}
     />
   )

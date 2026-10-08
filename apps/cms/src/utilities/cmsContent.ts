@@ -8,7 +8,6 @@ import type {
   LinkItem,
   PageMeta,
 } from '@/components/oriana/marketing/types'
-import type { SupportAudiencePageContent } from '@/components/oriana/support/supportData'
 import type { Media } from '@/payload-types'
 
 type Maybe<T> = T | null | undefined
@@ -99,32 +98,6 @@ export function resolveCards(cms: Maybe<CmsCard[]>, fallback: CardItem[]): CardI
       highlights: highlights && highlights.length > 0 ? highlights : undefined,
     }
   })
-}
-
-export function resolveAudiencePage(
-  cms: Maybe<{
-    hero?: CmsHero
-    cards?: Maybe<CmsCard[]>
-    faqTitle?: CmsText
-    faqs?: Maybe<{ question: string; answer: string }[]>
-    faqLink?: CmsLink
-  }>,
-  fallback: SupportAudiencePageContent,
-): SupportAudiencePageContent {
-  return {
-    meta: fallback.meta,
-    hero: {
-      eyebrow: cms?.hero?.eyebrow || fallback.hero.eyebrow,
-      title: cms?.hero?.title || fallback.hero.title,
-      description: cms?.hero?.description || fallback.hero.description,
-    },
-    cards: resolveCards(cms?.cards, fallback.cards),
-    faqTitle: resolveText(cms?.faqTitle, fallback.faqTitle),
-    faqs: cms?.faqs?.length
-      ? cms.faqs.map(({ question, answer }) => ({ question, answer }))
-      : fallback.faqs,
-    faqLink: resolveLink(cms?.faqLink, fallback.faqLink),
-  }
 }
 
 export function resolveMeta(cms: Maybe<{ title?: CmsText; description?: CmsText }>, fallback: PageMeta): Metadata {

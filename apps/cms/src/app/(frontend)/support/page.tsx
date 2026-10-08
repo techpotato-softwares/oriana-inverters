@@ -5,15 +5,12 @@ import { SupportStrengths } from '@/components/oriana/support/SupportStrengths'
 import { SupportApproach } from '@/components/oriana/support/SupportApproach'
 import { GlobalPresence } from '@/components/oriana/support/GlobalPresence'
 import { ServiceStories } from '@/components/oriana/support/ServiceStories'
-import { SupportForYou } from '@/components/oriana/support/SupportForYou'
 import { SupportResources } from '@/components/oriana/support/SupportResources'
 import { SuccessStories } from '@/components/oriana/support/SuccessStories'
 import {
   defaultApproachCta,
   defaultApproachIntro,
   defaultApproachSteps,
-  defaultAudiences,
-  defaultAudiencesIntro,
   defaultCases,
   defaultCasesCta,
   defaultCasesIntro,
@@ -100,15 +97,12 @@ export default async function SupportPage() {
   const strengthsIntro = resolveIntro(data?.strengths?.intro, defaultStrengthsIntro)
   const approachIntro = resolveIntro(data?.approach?.intro, defaultApproachIntro)
   const storiesIntro = resolveIntro(data?.stories?.intro, defaultStoriesIntro)
-  const audiencesIntro = resolveIntro(data?.audiences?.intro, defaultAudiencesIntro)
-
   const sections = [
     { label: 'Service brand', id: 'service-brand' },
     { label: strengthsIntro.eyebrow || 'Our strength', id: 'our-strengths' },
     { label: approachIntro.eyebrow || 'Our approach', id: 'our-approach' },
     { label: presence.intro.eyebrow || 'Global presence', id: 'global-presence' },
     { label: storiesIntro.eyebrow || 'Service stories', id: 'service-stories' },
-    { label: audiencesIntro.eyebrow || 'Support for you', id: 'support-for-you' },
     { label: resources.intro.eyebrow || 'Resources', id: 'resources' },
   ]
 
@@ -129,13 +123,6 @@ export default async function SupportPage() {
       <ServiceStories
         intro={storiesIntro}
         stories={resolveCards(data?.stories?.items, defaultStories)}
-      />
-      <SupportForYou
-        intro={audiencesIntro}
-        audiences={resolveCards(data?.audiences?.items, defaultAudiences).map((item, index) => ({
-          ...item,
-          href: item.href || defaultAudiences[index]?.href,
-        }))}
       />
       <SupportResources content={resources} />
       <SuccessStories

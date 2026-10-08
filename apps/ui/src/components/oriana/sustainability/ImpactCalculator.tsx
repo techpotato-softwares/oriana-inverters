@@ -8,7 +8,7 @@ import { SectionHeading } from '@/components/oriana/sustainability/SectionHeadin
 import type { CalculatorConfig } from '@/components/oriana/sustainability/sustainabilityData'
 
 const MIN_KW = 1
-const MAX_KW = 100
+const MAX_KW = 150
 const DEFAULT_KW = 5
 
 const integer = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 })
@@ -44,7 +44,7 @@ export function ImpactCalculator({ config }: { config: CalculatorConfig }) {
     },
     {
       icon: TreePine,
-      label: 'Equivalent trees planted',
+      label: 'Equivalent trees saved',
       value: integer.format(kw * config.treesPerKw),
       unit: 'trees',
     },

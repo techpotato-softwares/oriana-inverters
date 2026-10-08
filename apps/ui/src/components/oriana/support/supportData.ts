@@ -37,15 +37,6 @@ export type SupportResourcesContent = {
   items: CardItem[]
 }
 
-export type SupportAudiencePageContent = {
-  meta: PageMeta
-  hero: { eyebrow: string; title: string; description: string }
-  cards: CardItem[]
-  faqTitle: string
-  faqs: { question: string; answer: string }[]
-  faqLink: LinkItem
-}
-
 export const supportMeta: PageMeta = {
   title: 'Support & Service',
   description:
@@ -149,21 +140,21 @@ export const defaultPresence: GlobalPresenceContent = {
       'Oriana pairs remote response with field-level assistance across India and beyond, so the right expertise reaches every system — residential rooftop to utility plant.',
   },
   stats: [
-    { value: '500+', label: 'Channel & service partners' },
-    { value: '24/7', label: 'Remote monitoring & response' },
     { value: '10+', label: 'Years of field experience' },
+    { value: '24/7', label: 'Remote monitoring & response' },
+    { value: '50+', label: 'Service engineers' },
     { value: '48h', label: 'Typical on-site mobilisation' },
   ],
   cta: { label: 'Find the right support contact', href: '/contact' },
   coverageLabel: 'Coverage',
   coverageBody: 'PAN India service reach supported by regional partners and a central technical desk.',
   locations: [
-    { label: 'Delhi NCR', top: '22%', left: '38%' },
-    { label: 'Ahmedabad', top: '43%', left: '24%' },
-    { label: 'Kolkata', top: '46%', left: '72%' },
-    { label: 'Pune', top: '60%', left: '30%' },
-    { label: 'Hyderabad', top: '66%', left: '46%' },
-    { label: 'Bengaluru', top: '80%', left: '38%' },
+    { label: 'Delhi NCR', top: '29.2%', left: '30.2%' },
+    { label: 'Ahmedabad', top: '48.5%', left: '14.1%' },
+    { label: 'Kolkata', top: '50%', left: '68.7%' },
+    { label: 'Pune', top: '64%', left: '18.6%' },
+    { label: 'Hyderabad', top: '67.9%', left: '34.6%' },
+    { label: 'Bengaluru', top: '83.1%', left: '31.5%' },
   ],
   pillars: [
     {
@@ -200,7 +191,7 @@ export const defaultStories: CardItem[] = [
     image: img('1559302504-64aae6ca6b6d', 1000),
     tag: 'Commercial',
     title: 'Rooftop project coordination',
-    body: 'Technical coordination across EPC, electrical, and monitoring stakeholders.',
+    body: 'Technical coordination across EPC, electrical, and monitoring teams.',
   },
   {
     image: img('1613665813446-82a78c468a1d', 1000),
@@ -219,37 +210,6 @@ export const defaultStories: CardItem[] = [
     tag: 'Utility',
     title: 'Large plant performance reviews',
     body: 'Periodic health checks that protect generation across the asset lifetime.',
-  },
-]
-
-export const defaultAudiencesIntro: Intro = {
-  eyebrow: 'Support for you',
-  title: 'Start where you stand',
-  description:
-    'Each pathway brings the documents, tools, and service options most relevant to your role — no hunting through everything else.',
-}
-
-export const defaultAudiences: CardItem[] = [
-  {
-    title: 'Installers',
-    body: 'Installation manuals, commissioning guidance, troubleshooting support, and warranty handling for solar professionals.',
-    highlights: ['Installation videos', 'Technical desk', 'Warranty claims'],
-    image: img('1581092580497-e0d23cbdf1dc', 1000),
-    href: '/support/installers',
-  },
-  {
-    title: 'Homeowners',
-    body: 'Simple product guidance, monitoring help, warranty information, and the fastest route to local support.',
-    highlights: ['App & monitoring', 'Product guides', 'Find a partner'],
-    image: img('1513694203232-719a280e022f', 1000),
-    href: '/support/homeowners',
-  },
-  {
-    title: 'Business owners',
-    body: 'Lifecycle support for commercial and industrial assets — diagnostics, maintenance planning, and service coordination.',
-    highlights: ['Plant health checks', 'Maintenance planning', 'Priority response'],
-    image: img('1600880292203-757bb62b4baf', 1000),
-    href: '/support/business',
   },
 ]
 
@@ -322,140 +282,6 @@ export const defaultCases: CardItem[] = [
     href: '/case-studies',
   },
 ]
-
-const faqLink: LinkItem = { label: 'View All FAQs', href: '/resources/faqs' }
-
-export const defaultHomeownersPage: SupportAudiencePageContent = {
-  meta: {
-    title: 'Homeowners Support',
-    description: 'Everything you need to monitor, manage, and maintain your home solar system.',
-  },
-  hero: {
-    eyebrow: 'Support For You',
-    title: 'Homeowners Support',
-    description:
-      'Welcome to your solar journey. Find quick guides, setup instructions for monitoring apps, and direct contact options for any questions about your home system.',
-  },
-  cards: [
-    {
-      title: 'Quick Start Guides',
-      body: 'Learn how to read your inverter display, connect to Wi-Fi, and understand basic operations.',
-      href: '/resources/downloads',
-      linkLabel: 'View Guides',
-    },
-    {
-      title: 'App Setup',
-      body: 'Step-by-step instructions for downloading and configuring the iSolarCloud app on your phone.',
-      href: '/resources/downloads',
-      linkLabel: 'Get the App',
-    },
-    {
-      title: 'Find an Installer',
-      body: 'Need an upgrade or physical maintenance? Locate a certified Oriana professional near you.',
-      href: '/where-to-buy',
-      linkLabel: 'Find Local Pros',
-    },
-  ],
-  faqTitle: 'Popular FAQs for Homeowners',
-  faqs: [
-    'How to set inverter parameters with iSolarCloud App?',
-    'How to log in Logger1000 Web interface?',
-    'What do the LED indicators on my residential inverter mean?',
-  ].map((question) => ({
-    question,
-    answer:
-      'Check the user manual provided with your system, or follow the step-by-step guide in our download center.',
-  })),
-  faqLink,
-}
-
-export const defaultInstallersPage: SupportAudiencePageContent = {
-  meta: {
-    title: 'Installers Support',
-    description: 'Dedicated support, tools, and resources for our certified installer partners.',
-  },
-  hero: {
-    eyebrow: 'Support For You',
-    title: 'Installers Support',
-    description:
-      'Access technical documentation, remote diagnostic tools, and priority support channels designed specifically for solar professionals.',
-  },
-  cards: [
-    {
-      title: 'Technical Documents',
-      body: 'Download manuals, quick installation guides, and compliance certificates.',
-      href: '/resources/downloads',
-      linkLabel: 'Browse Library',
-    },
-    {
-      title: 'Smart O&M Tools',
-      body: 'Manage all your renewable plants in one place with the iSolarCloud platform.',
-      href: '/support',
-      linkLabel: 'Learn More',
-    },
-    {
-      title: 'Warranty Claims',
-      body: 'Quickly file and track warranty claims for customer installations.',
-      href: '/support/warranty',
-      linkLabel: 'File a Claim',
-    },
-  ],
-  faqTitle: 'Popular FAQs for Installers',
-  faqs: [
-    'What to do when the inverter reports PV string abnormal alarm or fault?',
-    'How to solve the inverter overtemperature derating?',
-    'SHRS/SHRT models report EC51 back-up overload fault shutdown, what is the cause?',
-  ].map((question) => ({
-    question,
-    answer:
-      'Please refer to the technical manual or contact our priority support line for advanced troubleshooting steps.',
-  })),
-  faqLink,
-}
-
-export const defaultBusinessPage: SupportAudiencePageContent = {
-  meta: {
-    title: 'Business Owners Support',
-    description: 'Enterprise-grade support and tools for Commercial and Industrial solar installations.',
-  },
-  hero: {
-    eyebrow: 'Support For You',
-    title: 'Business Owners Support',
-    description:
-      'Maximize the ROI of your commercial solar investment with priority service, comprehensive O&M resources, and advanced fleet management tools.',
-  },
-  cards: [
-    {
-      title: 'O&M Services',
-      body: 'Learn about our preventative maintenance, field services, and SLA-backed support contracts.',
-      href: '/support',
-      linkLabel: 'View Service Plans',
-    },
-    {
-      title: 'Fleet Management',
-      body: 'Utilize our enterprise cloud platform for multi-site monitoring and yield analysis.',
-      href: '/support',
-      linkLabel: 'Explore Platform',
-    },
-    {
-      title: 'Commercial Warranty',
-      body: 'Review terms for C&I installations and access expedited replacement processes.',
-      href: '/support/warranty',
-      linkLabel: 'Warranty Details',
-    },
-  ],
-  faqTitle: 'Popular FAQs for Businesses',
-  faqs: [
-    'How does the accident ventilation system start up and work?',
-    'How should battery containers be handled after their first operation or long-term storage?',
-    'How to identify and set the switch codes for the master and slave units of the UD series?',
-  ].map((question) => ({
-    question,
-    answer:
-      'Refer to the C&I technical guidelines or contact your dedicated account manager for specialized assistance.',
-  })),
-  faqLink,
-}
 
 export const defaultWarrantyPage = {
   meta: {

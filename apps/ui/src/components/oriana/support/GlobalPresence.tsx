@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { AnimatedCounter } from '../AnimatedCounter'
 import { FadeIn, Stagger, StaggerItem } from '../FadeIn'
 import { MarketingIcon } from '../marketing/MarketingIcon'
+import { IndiaMapOutline, INDIA_MAP_VIEWBOX } from './IndiaMapOutline'
 import type { GlobalPresenceContent } from './supportData'
 
 export function GlobalPresence({ content }: { content: GlobalPresenceContent }) {
@@ -93,33 +94,48 @@ export function GlobalPresence({ content }: { content: GlobalPresenceContent }) 
               }}
             />
 
-            {nodes.map((node, index) => (
+            <div
+              className="absolute flex items-center justify-center"
+              style={{ inset: '1.5rem 1.5rem 9.5rem', containerType: 'size' }}
+            >
               <div
-                key={node.label}
-                className="absolute flex items-center gap-2"
-                style={{ top: node.top, left: node.left }}
+                className="relative"
+                style={{
+                  width: `min(100cqw, calc(100cqh * ${INDIA_MAP_VIEWBOX.width / INDIA_MAP_VIEWBOX.height}))`,
+                  aspectRatio: `${INDIA_MAP_VIEWBOX.width} / ${INDIA_MAP_VIEWBOX.height}`,
+                }}
               >
-                <span className="relative flex h-2.5 w-2.5">
-                  {reduceMotion ? null : (
-                    <motion.span
-                      className="absolute inline-flex h-full w-full rounded-full bg-oriana-sky"
-                      animate={{ scale: [1, 3.2, 1], opacity: [0.55, 0, 0.55] }}
-                      transition={{
-                        duration: 3.2,
-                        repeat: Infinity,
-                        delay: index * 0.45,
-                        ease: 'easeOut',
-                      }}
-                      aria-hidden
-                    />
-                  )}
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-oriana-sky shadow-[0_0_16px_rgba(77,163,255,0.9)]" />
-                </span>
-                <span className="whitespace-nowrap text-[0.7rem] font-medium tracking-wide text-white/70">
-                  {node.label}
-                </span>
+                <IndiaMapOutline className="absolute inset-0 h-full w-full text-oriana-sky/70" />
+
+                {nodes.map((node, index) => (
+                  <div
+                    key={node.label}
+                    className="absolute flex -translate-x-[5px] -translate-y-1/2 items-center gap-2"
+                    style={{ top: node.top, left: node.left }}
+                  >
+                    <span className="relative flex h-2.5 w-2.5">
+                      {reduceMotion ? null : (
+                        <motion.span
+                          className="absolute inline-flex h-full w-full rounded-full bg-oriana-sky"
+                          animate={{ scale: [1, 3.2, 1], opacity: [0.55, 0, 0.55] }}
+                          transition={{
+                            duration: 3.2,
+                            repeat: Infinity,
+                            delay: index * 0.45,
+                            ease: 'easeOut',
+                          }}
+                          aria-hidden
+                        />
+                      )}
+                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-oriana-sky shadow-[0_0_16px_rgba(77,163,255,0.9)]" />
+                    </span>
+                    <span className="whitespace-nowrap text-[0.7rem] font-medium tracking-wide text-white/70">
+                      {node.label}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
 
             <div className="absolute inset-x-6 bottom-6 rounded-2xl border border-white/10 bg-oriana-deep/85 p-5">
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-oriana-sky">

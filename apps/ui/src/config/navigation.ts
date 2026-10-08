@@ -50,14 +50,6 @@ export const supportMegaMenuCategories: NavMegaCategory[] = [
         ],
       },
       {
-        title: 'Support for You',
-        links: [
-          { label: 'Installers Support', href: '/support/installers' },
-          { label: 'Homeowners Support', href: '/support/homeowners' },
-          { label: 'Business Owners Support', href: '/support/business' },
-        ],
-      },
-      {
         title: 'Resources',
         links: [
           { label: 'Product Documentation', href: '/resources/downloads' },

@@ -5,8 +5,6 @@ import { PillarsShowcase } from '@/components/oriana/sustainability/PillarsShowc
 import {
   SustainabilityHonors,
   type SustainabilityHonor,
-  SustainabilityNews,
-  type SustainabilityNewsItem,
   SustainabilityReports,
 } from '@/components/oriana/sustainability/SustainabilityDocs'
 import { SustainabilityCta } from '@/components/oriana/sustainability/SustainabilityCta'
@@ -21,7 +19,7 @@ import type {
   SustainabilityPillar,
 } from '@/components/oriana/sustainability/sustainabilityData'
 
-export type { SustainabilityHonor, SustainabilityNewsItem }
+export type { SustainabilityHonor }
 
 export type SustainabilityOverviewProps = {
   hero: {
@@ -40,7 +38,6 @@ export type SustainabilityOverviewProps = {
   reports?: ReportCard[]
   policies?: ReportCard[]
   honors?: SustainabilityHonor[]
-  news?: SustainabilityNewsItem[]
   cta: SustainabilityCtaContent
 }
 
@@ -55,7 +52,6 @@ export function SustainabilityOverview({
   reports = [],
   policies = [],
   honors = [],
-  news = [],
   cta,
 }: SustainabilityOverviewProps) {
   return (
@@ -67,7 +63,6 @@ export function SustainabilityOverview({
       <CommitmentsTimeline intro={commitmentsIntro} commitments={commitments} />
       <SustainabilityReports reports={reports} policies={policies} />
       <SustainabilityHonors honors={honors} />
-      <SustainabilityNews news={news} />
       <SustainabilityCta content={cta} />
     </main>
   )

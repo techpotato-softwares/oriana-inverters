@@ -4236,7 +4236,7 @@ export interface Support {
     coverageLabel?: string | null;
     coverageBody?: string | null;
     /**
-     * Map pins. Position is a percentage from the top and left of the map panel, e.g. 22% / 38%.
+     * Map pins. Position is a percentage from the top and left of the India outline, e.g. Delhi 29.2% / 30.2%, Bengaluru 83.1% / 31.5%.
      */
     locations?:
       | {
@@ -4297,35 +4297,6 @@ export interface Support {
           title: string;
           body?: string | null;
           image?: (number | null) | Media;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  audiences?: {
-    /**
-     * Leave blank to keep the default copy.
-     */
-    intro?: {
-      eyebrow?: string | null;
-      title?: string | null;
-      description?: string | null;
-    };
-    /**
-     * Leave empty to keep the default cards.
-     */
-    items?:
-      | {
-          title: string;
-          body?: string | null;
-          image?: (number | null) | Media;
-          href?: string | null;
-          linkLabel?: string | null;
-          highlights?:
-            | {
-                text: string;
-                id?: string | null;
-              }[]
-            | null;
           id?: string | null;
         }[]
       | null;
@@ -4416,138 +4387,6 @@ export interface Support {
           id?: string | null;
         }[]
       | null;
-  };
-  homeowners?: {
-    /**
-     * Leave blank to keep the default copy.
-     */
-    hero?: {
-      eyebrow?: string | null;
-      title?: string | null;
-      description?: string | null;
-    };
-    /**
-     * Leave empty to keep the default cards.
-     */
-    cards?:
-      | {
-          title: string;
-          body?: string | null;
-          href?: string | null;
-          linkLabel?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-    faqTitle?: string | null;
-    /**
-     * Leave empty to keep the default questions.
-     */
-    faqs?:
-      | {
-          question: string;
-          answer: string;
-          id?: string | null;
-        }[]
-      | null;
-    faqLink?: {
-      label?: string | null;
-      /**
-       * Internal path (/contact) or full URL.
-       */
-      href?: string | null;
-    };
-    meta?: {
-      title?: string | null;
-      description?: string | null;
-    };
-  };
-  installers?: {
-    /**
-     * Leave blank to keep the default copy.
-     */
-    hero?: {
-      eyebrow?: string | null;
-      title?: string | null;
-      description?: string | null;
-    };
-    /**
-     * Leave empty to keep the default cards.
-     */
-    cards?:
-      | {
-          title: string;
-          body?: string | null;
-          href?: string | null;
-          linkLabel?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-    faqTitle?: string | null;
-    /**
-     * Leave empty to keep the default questions.
-     */
-    faqs?:
-      | {
-          question: string;
-          answer: string;
-          id?: string | null;
-        }[]
-      | null;
-    faqLink?: {
-      label?: string | null;
-      /**
-       * Internal path (/contact) or full URL.
-       */
-      href?: string | null;
-    };
-    meta?: {
-      title?: string | null;
-      description?: string | null;
-    };
-  };
-  business?: {
-    /**
-     * Leave blank to keep the default copy.
-     */
-    hero?: {
-      eyebrow?: string | null;
-      title?: string | null;
-      description?: string | null;
-    };
-    /**
-     * Leave empty to keep the default cards.
-     */
-    cards?:
-      | {
-          title: string;
-          body?: string | null;
-          href?: string | null;
-          linkLabel?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-    faqTitle?: string | null;
-    /**
-     * Leave empty to keep the default questions.
-     */
-    faqs?:
-      | {
-          question: string;
-          answer: string;
-          id?: string | null;
-        }[]
-      | null;
-    faqLink?: {
-      label?: string | null;
-      /**
-       * Internal path (/contact) or full URL.
-       */
-      href?: string | null;
-    };
-    meta?: {
-      title?: string | null;
-      description?: string | null;
-    };
   };
   warranty?: {
     /**
@@ -5846,33 +5685,6 @@ export interface SupportSelect<T extends boolean = true> {
               id?: T;
             };
       };
-  audiences?:
-    | T
-    | {
-        intro?:
-          | T
-          | {
-              eyebrow?: T;
-              title?: T;
-              description?: T;
-            };
-        items?:
-          | T
-          | {
-              title?: T;
-              body?: T;
-              image?: T;
-              href?: T;
-              linkLabel?: T;
-              highlights?:
-                | T
-                | {
-                    text?: T;
-                    id?: T;
-                  };
-              id?: T;
-            };
-      };
   resources?:
     | T
     | {
@@ -5933,126 +5745,6 @@ export interface SupportSelect<T extends boolean = true> {
               href?: T;
               linkLabel?: T;
               id?: T;
-            };
-      };
-  homeowners?:
-    | T
-    | {
-        hero?:
-          | T
-          | {
-              eyebrow?: T;
-              title?: T;
-              description?: T;
-            };
-        cards?:
-          | T
-          | {
-              title?: T;
-              body?: T;
-              href?: T;
-              linkLabel?: T;
-              id?: T;
-            };
-        faqTitle?: T;
-        faqs?:
-          | T
-          | {
-              question?: T;
-              answer?: T;
-              id?: T;
-            };
-        faqLink?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        meta?:
-          | T
-          | {
-              title?: T;
-              description?: T;
-            };
-      };
-  installers?:
-    | T
-    | {
-        hero?:
-          | T
-          | {
-              eyebrow?: T;
-              title?: T;
-              description?: T;
-            };
-        cards?:
-          | T
-          | {
-              title?: T;
-              body?: T;
-              href?: T;
-              linkLabel?: T;
-              id?: T;
-            };
-        faqTitle?: T;
-        faqs?:
-          | T
-          | {
-              question?: T;
-              answer?: T;
-              id?: T;
-            };
-        faqLink?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        meta?:
-          | T
-          | {
-              title?: T;
-              description?: T;
-            };
-      };
-  business?:
-    | T
-    | {
-        hero?:
-          | T
-          | {
-              eyebrow?: T;
-              title?: T;
-              description?: T;
-            };
-        cards?:
-          | T
-          | {
-              title?: T;
-              body?: T;
-              href?: T;
-              linkLabel?: T;
-              id?: T;
-            };
-        faqTitle?: T;
-        faqs?:
-          | T
-          | {
-              question?: T;
-              answer?: T;
-              id?: T;
-            };
-        faqLink?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        meta?:
-          | T
-          | {
-              title?: T;
-              description?: T;
             };
       };
   warranty?:

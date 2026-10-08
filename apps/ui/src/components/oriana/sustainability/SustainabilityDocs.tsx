@@ -9,12 +9,6 @@ import { SectionHeading } from '@/components/oriana/sustainability/SectionHeadin
 import type { ReportCard } from '@/components/oriana/sustainability/sustainabilityData'
 import { cn } from '@/utilities/ui'
 
-export type SustainabilityNewsItem = {
-  title: string
-  href: string
-  date?: string
-}
-
 export type SustainabilityHonor = {
   title: string
   image?: string | null
@@ -142,38 +136,6 @@ export function SustainabilityHonors({ honors }: { honors: SustainabilityHonor[]
                   {honor.title}
                 </p>
               </article>
-            </FadeIn>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-export function SustainabilityNews({ news }: { news: SustainabilityNewsItem[] }) {
-  if (news.length === 0) return null
-
-  return (
-    <section id="news" className="scroll-mt-24 bg-oriana-surface py-20 lg:py-28">
-      <div className="container">
-        <FadeIn>
-          <SectionHeading eyebrow="Updates" title="Latest news" />
-        </FadeIn>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {news.slice(0, 3).map((item, i) => (
-            <FadeIn key={item.href} delay={i * 0.05}>
-              <Link
-                href={item.href}
-                className="group block h-full rounded-2xl border border-oriana-deep/8 bg-white p-6 transition-shadow duration-300 hover:shadow-[0_24px_60px_-40px_rgba(7,21,37,0.55)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-oriana-blue"
-              >
-                <p className="text-xs font-semibold uppercase tracking-wider text-oriana-blue">
-                  Sustainability
-                </p>
-                <p className="mt-3 font-display text-lg font-semibold leading-snug text-oriana-navy group-hover:text-oriana-blue">
-                  {item.title}
-                </p>
-                {item.date ? <p className="mt-3 text-sm text-oriana-muted">{item.date}</p> : null}
-              </Link>
             </FadeIn>
           ))}
         </div>

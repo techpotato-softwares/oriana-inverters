@@ -13,7 +13,6 @@ const defaultSections: SupportSection[] = [
   { label: 'Our approach', id: 'our-approach' },
   { label: 'Global presence', id: 'global-presence' },
   { label: 'Service stories', id: 'service-stories' },
-  { label: 'Support for you', id: 'support-for-you' },
   { label: 'Resources', id: 'resources' },
 ]
 

@@ -1,4 +1,4 @@
-import type { Field, GlobalConfig, Tab } from 'payload'
+import type { Field, GlobalConfig } from 'payload'
 
 import { authenticated } from '@/access/authenticated'
 import {
@@ -11,29 +11,6 @@ import {
   subpageHero,
 } from '@/fields/marketing'
 import { seoFields } from '@/fields/seo'
-
-const audienceTab = (name: string, label: string, path: string): Tab => ({
-  name,
-  label,
-  description: path,
-  fields: [
-    subpageHero(),
-    cardList('cards', { label: 'Resource cards', link: true }),
-    { name: 'faqTitle', type: 'text' },
-    {
-      name: 'faqs',
-      type: 'array',
-      label: 'FAQs',
-      admin: { description: 'Leave empty to keep the default questions.' },
-      fields: [
-        { name: 'question', type: 'text', required: true },
-        { name: 'answer', type: 'textarea', required: true },
-      ],
-    },
-    optionalLink('faqLink', 'All FAQs button'),
-    pageMeta(),
-  ],
-})
 
 const statFields: Field[] = [
   {
@@ -143,7 +120,7 @@ export const Support: GlobalConfig = {
               type: 'array',
               admin: {
                 description:
-                  'Map pins. Position is a percentage from the top and left of the map panel, e.g. 22% / 38%.',
+                  'Map pins. Position is a percentage from the top and left of the India outline, e.g. Delhi 29.2% / 30.2%, Bengaluru 83.1% / 31.5%.',
               },
               fields: [
                 {
@@ -164,15 +141,6 @@ export const Support: GlobalConfig = {
           label: 'Service stories',
           description: '/support — horizontal story rail',
           fields: [sectionIntro('intro'), cardList('items', { label: 'Stories', image: true, tag: true })],
-        },
-        {
-          name: 'audiences',
-          label: 'Support for you',
-          description: '/support — audience pathways',
-          fields: [
-            sectionIntro('intro'),
-            cardList('items', { label: 'Audiences', image: true, link: true, highlights: true }),
-          ],
         },
         {
           name: 'resources',
@@ -205,9 +173,6 @@ export const Support: GlobalConfig = {
             cardList('items', { label: 'Categories', image: true, link: true }),
           ],
         },
-        audienceTab('homeowners', 'Homeowners', '/support/homeowners'),
-        audienceTab('installers', 'Installers', '/support/installers'),
-        audienceTab('business', 'Business owners', '/support/business'),
         {
           name: 'warranty',
           label: 'Warranty',
