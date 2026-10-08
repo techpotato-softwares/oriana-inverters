@@ -94,7 +94,7 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
         title: 'Company',
         links: [
           { label: 'Company Profile', href: '/about' },
-          { label: 'Brand Story', href: '/about' },
+          { label: 'Brand Story', href: '/about/brand-story' },
           { label: 'Certifications & Awards', href: '/about/certifications' },
           { label: 'Case Studies', href: '/case-studies' },
         ],
