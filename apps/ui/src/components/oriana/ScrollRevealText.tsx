@@ -27,6 +27,9 @@ type ScrollRevealTextProps = {
    * Blended with viewport progress via Math.max so sticky sections can finish the reveal.
    */
   progressRef?: RefObject<number>
+  /** Revealed character colour (defaults to the Sungrow gray). */
+  activeColor?: string
+  faintColor?: string
 }
 
 /**
@@ -41,6 +44,8 @@ export function ScrollRevealText({
   startVh = 0.82,
   endVh = 0.28,
   progressRef,
+  activeColor = ACTIVE,
+  faintColor = FAINT,
 }: ScrollRevealTextProps) {
   const textRef = useRef<HTMLParagraphElement>(null)
   const spansRef = useRef<HTMLSpanElement[]>([])
@@ -53,7 +58,7 @@ export function ScrollRevealText({
 
     if (reduceMotion) {
       spansRef.current.forEach((span) => {
-        if (span) span.style.color = ACTIVE
+        if (span) span.style.color = activeColor
       })
       return
     }
@@ -88,7 +93,7 @@ export function ScrollRevealText({
       for (let i = 0; i < spans.length; i++) {
         const span = spans[i]
         if (!span) continue
-        span.style.color = i < active ? ACTIVE : FAINT
+        span.style.color = i < active ? activeColor : faintColor
       }
       raf = window.requestAnimationFrame(tick)
     }
@@ -98,7 +103,7 @@ export function ScrollRevealText({
       running = false
       window.cancelAnimationFrame(raf)
     }
-  }, [chars.length, reduceMotion, startVh, endVh, progressRef])
+  }, [chars.length, reduceMotion, startVh, endVh, progressRef, activeColor, faintColor])
 
   return (
     <p ref={textRef} className={className} style={style} aria-label={text}>
@@ -109,7 +114,7 @@ export function ScrollRevealText({
             if (node) spansRef.current[i] = node
           }}
           aria-hidden
-          style={{ color: reduceMotion ? ACTIVE : FAINT }}
+          style={{ color: reduceMotion ? activeColor : faintColor }}
         >
           {ch}
         </span>

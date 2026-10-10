@@ -95,6 +95,14 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
         links: [
           { label: 'Company Profile', href: '/about' },
           { label: 'Brand Story', href: '/about/brand-story' },
+          { label: 'Vision & Mission', href: '/about/vision-mission' },
+          { label: 'Leadership', href: '/about#leadership' },
+        ],
+      },
+      {
+        title: 'Proof',
+        links: [
+          { label: 'Our Achievements', href: '/about/achievements' },
           { label: 'Certifications & Awards', href: '/about/certifications' },
           { label: 'Case Studies', href: '/case-studies' },
         ],
@@ -129,10 +137,7 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
     columns: [
       {
         title: 'Foundation',
-        links: [
-          { label: 'Our Mission', href: '/about/foundation' },
-          { label: 'Our Achievements', href: '/about/foundation' },
-        ],
+        links: [{ label: 'About the Foundation', href: '/about/foundation' }],
       },
       {
         title: 'Get Involved',
@@ -148,7 +153,7 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
         title: 'Careers',
         links: [
           { label: 'Open Positions', href: '/careers#openings' },
-          { label: 'Life at Oriana', href: '/careers#life' },
+          { label: 'Life at ORIANA', href: '/careers#life' },
           { label: 'Apply Now', href: '/careers#apply' },
         ],
       },
@@ -234,8 +239,10 @@ export const megaMenus: Record<
         title: 'About Oriana',
         links: [
           { label: 'Company Profile', href: '/about' },
+          { label: 'Brand Story', href: '/about/brand-story' },
+          { label: 'Vision & Mission', href: '/about/vision-mission' },
+          { label: 'Our Achievements', href: '/about/achievements' },
           { label: 'Certifications & Awards', href: '/about/certifications' },
-          { label: 'Case Studies', href: '/case-studies' },
         ],
       },
       {

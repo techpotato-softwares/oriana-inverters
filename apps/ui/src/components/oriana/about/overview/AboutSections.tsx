@@ -19,6 +19,7 @@ import {
 
 import { FadeIn } from '@/components/oriana/FadeIn'
 import type { AboutOverviewContent } from '@/components/oriana/about/overview/aboutOverviewData'
+import { RevealStatement } from '@/components/oriana/about/shared/RevealStatement'
 import { SectionHeading } from '@/components/oriana/sustainability/SectionHeading'
 import { cn } from '@/utilities/ui'
 
@@ -26,17 +27,11 @@ const chapterEyebrow = (number: string, eyebrow: string) => `${number} — ${eye
 
 export function AboutIntroSection({ content }: { content: AboutOverviewContent['intro'] }) {
   return (
-    <section aria-labelledby="about-intro-title" className="bg-white pb-20 pt-16 lg:pb-28 lg:pt-24">
+    <section aria-label="Our ambition" className="bg-white pb-20 pt-16 lg:pb-28 lg:pt-24">
       <div className="container grid gap-10 lg:grid-cols-12 lg:gap-16">
         <FadeIn className="lg:col-span-7">
           <p className="text-sm font-medium text-oriana-muted">{content.ambitionLead}</p>
-          <h2
-            id="about-intro-title"
-            className="mt-4 font-display font-medium tracking-[-0.02em] text-balance text-oriana-deep"
-            style={{ fontSize: 'clamp(1.9rem, 3.6vw, 3.25rem)', lineHeight: 1.1 }}
-          >
-            {content.ambition}
-          </h2>
+          <RevealStatement text={content.ambition} className="mt-4 font-display font-medium text-balance" />
         </FadeIn>
         <FadeIn delay={0.08} className="lg:col-span-5 lg:self-end">
           <p className="text-base leading-8 text-oriana-muted">{content.description}</p>

@@ -69,6 +69,76 @@ export const About: GlobalConfig = {
           ],
         },
         {
+          name: 'leadership',
+          label: 'Leadership',
+          description:
+            'Directors shown on /about (Leadership section) and /about/brand-story (Founded by). Leave the list empty to show the built-in directors.',
+          fields: [
+            sectionIntro('intro', 'Section heading'),
+            {
+              name: 'members',
+              type: 'array',
+              label: 'Directors',
+              labels: { singular: 'Director', plural: 'Directors' },
+              admin: {
+                description:
+                  'Shown in this order. Once a director is added here, this list replaces the built-in one.',
+                initCollapsed: false,
+              },
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'name', type: 'text', required: true, admin: { width: '50%' } },
+                    {
+                      name: 'title',
+                      type: 'text',
+                      defaultValue: 'Co-Founder & Director',
+                      admin: { width: '50%' },
+                    },
+                  ],
+                },
+                {
+                  name: 'bio',
+                  type: 'textarea',
+                  label: 'One-line description',
+                  maxLength: 160,
+                  admin: { description: 'One sentence, up to 160 characters.' },
+                },
+                {
+                  name: 'linkedinUrl',
+                  type: 'text',
+                  label: 'LinkedIn URL',
+                  admin: {
+                    description: 'Full profile link, e.g. https://www.linkedin.com/in/name. Leave blank to hide the icon.',
+                  },
+                  validate: (value: string | null | undefined) => {
+                    if (!value) return true
+                    try {
+                      const url = new URL(value)
+                      if (url.protocol !== 'https:' || !url.hostname.endsWith('linkedin.com')) {
+                        return 'Use a https://www.linkedin.com/… link.'
+                      }
+                      return true
+                    } catch {
+                      return 'Enter a full URL starting with https://'
+                    }
+                  },
+                },
+                {
+                  name: 'photo',
+                  type: 'upload',
+                  relationTo: 'media',
+                  admin: {
+                    description:
+                      'Portrait, about 4:5, on a plain white or light background. Without a photo the built-in portrait (matched by name) or the initials are shown.',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        {
           name: 'certifications',
           label: 'Certifications',
           description:
@@ -117,7 +187,7 @@ export const About: GlobalConfig = {
     },
   ],
   hooks: {
-    afterChange: [revalidateGlobal('about', ['/about'])],
+    afterChange: [revalidateGlobal('about', ['/about', '/about/brand-story'])],
   },
   versions: { drafts: true },
 }

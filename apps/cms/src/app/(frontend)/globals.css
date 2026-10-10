@@ -234,6 +234,10 @@
   body {
     @apply bg-white text-oriana-ink min-h-screen flex flex-col;
   }
+  /* Side-entering FadeIns start off-canvas; clip (not hidden) keeps position: sticky working. */
+  main {
+    overflow-x: clip;
+  }
   .font-sans,
   .font-display {
     font-family: var(--font-montserrat), 'Montserrat', ui-sans-serif, system-ui, sans-serif;

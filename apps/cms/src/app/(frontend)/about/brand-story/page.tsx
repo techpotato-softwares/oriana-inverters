@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { BrandStory } from '@/components/oriana/about/brand-story/BrandStory'
 import { brandStory } from '@/components/oriana/about/brand-story/brandStoryData'
+import { getLeadership } from '@/utilities/getLeadership'
 
 export const metadata: Metadata = {
   title: 'Our Brand Story',
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
     'From solar experience to energy innovation — how ORIANA grew from a team of engineers in 2015 into an energy-technology brand engineered at Chakan, Pune.',
 }
 
-export default function BrandStoryPage() {
-  return <BrandStory content={brandStory} />
+export default async function BrandStoryPage() {
+  const { leaders } = await getLeadership()
+  return <BrandStory content={brandStory} founders={leaders} />
 }

@@ -34,7 +34,6 @@ export const brandStory = {
       'For ORIANA, that journey began in 2015, driven by a team of engineers who shared a deep passion for energy and a vision for a cleaner, smarter future.',
       'Before building ORIANA, our team spent over a decade working across solar project development and the distribution of inverters for residential, commercial & industrial (C&I), and utility-scale applications.',
     ],
-    founders: ['Mr. Gaurav Mahajan', 'Mr. Rushikesh Gulve', 'Mr. Rohan Shelar'],
     insightLead: 'That experience gave us something invaluable:',
     insight: 'A first-hand understanding of what the energy industry truly needs.',
     understanding:

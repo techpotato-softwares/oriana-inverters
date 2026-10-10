@@ -3461,6 +3461,38 @@ export interface About {
         id?: string | null;
       }[]
     | null;
+  leadership?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    intro?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    /**
+     * Shown in this order. Once a director is added here, this list replaces the built-in one.
+     */
+    members?:
+      | {
+          name: string;
+          title?: string | null;
+          /**
+           * One sentence, up to 160 characters.
+           */
+          bio?: string | null;
+          /**
+           * Full profile link, e.g. https://www.linkedin.com/in/name. Leave blank to hide the icon.
+           */
+          linkedinUrl?: string | null;
+          /**
+           * Portrait, about 4:5, on a plain white or light background. Without a photo the built-in portrait (matched by name) or the initials are shown.
+           */
+          photo?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
   certifications?: {
     /**
      * Leave blank to keep the default copy.
@@ -4994,6 +5026,27 @@ export interface AboutSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         id?: T;
+      };
+  leadership?:
+    | T
+    | {
+        intro?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+            };
+        members?:
+          | T
+          | {
+              name?: T;
+              title?: T;
+              bio?: T;
+              linkedinUrl?: T;
+              photo?: T;
+              id?: T;
+            };
       };
   certifications?:
     | T

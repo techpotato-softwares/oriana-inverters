@@ -19,9 +19,9 @@ export const aboutOverview = {
     title: 'Powering the Intelligence Behind Tomorrow’s Energy',
     description:
       'ORIANA is a clean-energy technology company building advanced power-conversion and energy-management solutions for a rapidly evolving world.',
-    image: {
-      src: unsplash('1508514177221-188b1cf16e9d', 2400),
-      alt: 'Solar array under a wide blue sky',
+    video: {
+      src: '/assets/about/overview-hero.mp4',
+      poster: '/assets/about/overview-hero-poster.jpg',
     },
   },
 
@@ -193,6 +193,36 @@ export const aboutOverview = {
         description: 'Building technology for the energy requirements of tomorrow — not just today.',
       },
     ] satisfies AboutFeature[],
+  },
+
+  explore: {
+    title: 'More of the ORIANA story',
+    links: [
+      {
+        label: 'Brand Story',
+        description: 'From solar experience to energy innovation.',
+        href: '/about/brand-story',
+        image: unsplash('1509391366360-2e959784a276', 900),
+      },
+      {
+        label: 'Vision & Mission',
+        description: 'Where we are going — and how we get there.',
+        href: '/about/vision-mission',
+        image: unsplash('1466611653911-95081537e5b7', 900),
+      },
+      {
+        label: 'Achievements',
+        description: '5 GW+ supplied across every scale of solar.',
+        href: '/about/achievements',
+        image: unsplash('1509390144018-eeaf65052242', 900),
+      },
+      {
+        label: 'Life at ORIANA',
+        description: 'Build the future. Grow with us.',
+        href: '/careers',
+        image: unsplash('1531545514256-b1400bc00f31', 900),
+      },
+    ],
   },
 
   commitment: {

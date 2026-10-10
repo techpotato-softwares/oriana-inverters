@@ -13,12 +13,20 @@ import {
 
 import { FadeIn } from '@/components/oriana/FadeIn'
 import type { BrandStoryContent } from '@/components/oriana/about/brand-story/brandStoryData'
+import { FoundersStrip } from '@/components/oriana/about/leadership/FoundersStrip'
+import type { Leader } from '@/components/oriana/about/leadership/leadershipData'
 import { SectionHeading } from '@/components/oriana/sustainability/SectionHeading'
 
 const eyebrowClass =
   'flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em]'
 
-export function OriginSection({ content }: { content: BrandStoryContent['origin'] }) {
+export function OriginSection({
+  content,
+  founders,
+}: {
+  content: BrandStoryContent['origin']
+  founders: Leader[]
+}) {
   return (
     <section id="origin" aria-labelledby="origin-title" className="scroll-mt-24 bg-white py-20 lg:py-28">
       <div className="container grid gap-14 lg:grid-cols-12 lg:gap-16">
@@ -31,18 +39,7 @@ export function OriginSection({ content }: { content: BrandStoryContent['origin'
               {content.paragraphs.slice(0, 1).map((p) => (
                 <p key={p}>{p}</p>
               ))}
-              <div className="rounded-2xl border border-oriana-navy/8 bg-oriana-surface p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-oriana-blue">
-                  Founded by
-                </p>
-                <ul className="mt-4 grid gap-3 sm:grid-cols-3">
-                  {content.founders.map((name) => (
-                    <li key={name} className="font-display text-base font-semibold text-oriana-deep">
-                      {name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <FoundersStrip leaders={founders} />
               {content.paragraphs.slice(1).map((p) => (
                 <p key={p}>{p}</p>
               ))}
