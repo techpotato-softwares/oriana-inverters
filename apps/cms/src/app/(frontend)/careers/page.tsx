@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { CareerApplicationForm } from '@/components/oriana/CareerApplicationForm'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { FadeIn } from '@/components/oriana/FadeIn'
+import { OrriMascot } from '@/components/oriana/mascot/OrriMascot'
 import { lifeAtOriana } from '@/components/oriana/about/careers/careersData'
 import {
   CultureSection,
@@ -18,10 +19,13 @@ import { SustainabilityCta } from '@/components/oriana/sustainability/Sustainabi
 import { getCareers, getJobs } from '@/utilities/getMarketing'
 import type { Job, Media } from '@/payload-types'
 
-function mediaUrl(value: unknown): string | null {
-  return value && typeof value === 'object' && 'url' in value && (value as Media).url
-    ? (value as Media).url!
-    : null
+/** Full-bleed hero needs a photo; SVG illustrations render as a flat colour block. */
+function heroPhotoUrl(value: unknown): string | null {
+  if (!value || typeof value !== 'object' || !('url' in value)) return null
+  const { url, mimeType } = value as Media
+  if (!url) return null
+  if (mimeType === 'image/svg+xml' || /\.svg(\?|$)/i.test(url)) return null
+  return url
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -39,7 +43,7 @@ export default async function CareersPage() {
   const content = lifeAtOriana
 
   const hero = careers?.hero
-  const cmsImage = mediaUrl(careers?.image) || mediaUrl(hero?.image)
+  const cmsImage = heroPhotoUrl(hero?.image) || heroPhotoUrl(careers?.image)
   const heroMedia: AboutHeroMedia = cmsImage
     ? { kind: 'image', src: cmsImage, alt: 'Life at ORIANA' }
     : { kind: 'video', src: content.hero.video.src, poster: content.hero.video.poster }
@@ -156,6 +160,12 @@ export default async function CareersPage() {
               title="Come build the future of energy with us."
               description="Send your resume even if a listed role is not an exact match. Applications are saved for HR and emailed to the team."
             />
+            <div className="mt-10 hidden items-end gap-4 lg:flex">
+              <OrriMascot pose="wave" className="w-36 shrink-0 xl:w-44" sizes="176px" />
+              <p className="mb-6 rounded-2xl rounded-bl-sm bg-white px-4 py-3 text-sm font-medium text-oriana-deep shadow-[0_10px_30px_-14px_rgba(7,21,37,0.35)] ring-1 ring-oriana-navy/8">
+                Hi, I’m Orri! I can’t wait to meet you.
+              </p>
+            </div>
           </FadeIn>
           <FadeIn delay={0.08} className="lg:col-span-3">
             <CareerApplicationForm />

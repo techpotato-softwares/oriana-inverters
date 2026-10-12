@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Facebook, Instagram, Linkedin, Youtube } from 'lucide-react'
 import { Logo } from '@/components/Logo/Logo'
 import { ScrollToTop } from '@/components/oriana/ScrollToTop'
+import { OrriFooterPeek } from '@/components/oriana/mascot/OrriFooterPeek'
 import type { SiteSettingsView } from '@/types/siteSettings'
 
 function XIcon({ className }: { className?: string }) {
@@ -35,7 +36,8 @@ export function SiteFooter({ settings }: { settings: SiteSettingsView }) {
 
   return (
     <>
-      <footer className="mt-auto border-t border-oriana-navy/8 bg-oriana-surface">
+      <footer className="relative mt-auto border-t border-oriana-navy/8 bg-oriana-surface">
+        <OrriFooterPeek />
         <div className="container py-14 lg:py-16">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
             {settings.footerColumns.map((col) => (

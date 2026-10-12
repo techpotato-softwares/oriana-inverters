@@ -5,10 +5,12 @@ import {
   Check,
   DraftingCompass,
   Factory,
+  FlaskConical,
   Headset,
   Layers,
   Lightbulb,
   type LucideIcon,
+  RefreshCw,
   Rocket,
   ShieldCheck,
   SlidersHorizontal,
@@ -236,6 +238,13 @@ export function ManufacturingSection({ content }: { content: AboutOverviewConten
   )
 }
 
+const principleIcons: Record<string, LucideIcon> = {
+  design: DraftingCompass,
+  test: FlaskConical,
+  validate: ShieldCheck,
+  improve: RefreshCw,
+}
+
 export function QualitySection({ content }: { content: AboutOverviewContent['quality'] }) {
   return (
     <section
@@ -275,45 +284,58 @@ export function QualitySection({ content }: { content: AboutOverviewContent['qua
 
       <div className="container mt-16 lg:mt-20">
         <FadeIn>
-          <p className="text-sm font-medium text-oriana-muted">{content.principlesLead}</p>
-        </FadeIn>
-        <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0">
-          {content.principles.map((step, index) => {
-            const last = index === content.principles.length - 1
-            return (
-              <li key={step}>
-                <FadeIn delay={index * 0.1} className="h-full">
-                  <div
-                    className={cn(
-                      'flex h-full items-center justify-between gap-4 rounded-2xl px-6 py-7',
-                      last
-                        ? 'bg-oriana-blue text-white lg:rounded-l-none'
-                        : 'border border-oriana-navy/8 bg-white text-oriana-deep lg:border-r-0',
-                      index === 0 ? 'lg:rounded-r-none' : !last && 'lg:rounded-none',
-                    )}
-                  >
-                    <span className="flex items-center gap-3">
-                      <span
-                        aria-hidden
-                        className={cn('h-2 w-2 shrink-0 rounded-full', last ? 'bg-oriana-sun' : 'bg-oriana-sky')}
-                      />
-                      <span className="block font-display text-xl font-semibold uppercase tracking-[0.12em] lg:text-2xl">
-                        {step}
-                      </span>
-                    </span>
-                    {last ? null : (
-                      <ArrowRight className="hidden h-5 w-5 shrink-0 text-oriana-blue/50 lg:block" aria-hidden />
-                    )}
-                  </div>
-                </FadeIn>
-              </li>
-            )
-          })}
-        </ol>
-        <FadeIn>
-          <p className="mt-12 max-w-3xl font-display text-xl font-semibold text-balance text-oriana-deep lg:text-2xl">
-            {content.closing}
-          </p>
+          <div className="relative isolate overflow-hidden rounded-[2rem] bg-oriana-deep px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
+            <div
+              aria-hidden
+              className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_80%_at_100%_0%,rgba(77,163,255,0.18),transparent)]"
+            />
+            <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-10">
+              <div className="lg:col-span-4">
+                <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-sky">
+                  <span className="h-px w-8 bg-oriana-sky/60" aria-hidden />
+                  {content.principlesLead.replace(/:$/, '')}
+                </p>
+                <p className="mt-5 font-display text-2xl font-medium leading-snug text-balance text-white lg:text-[1.75rem]">
+                  {content.closing}
+                </p>
+              </div>
+
+              <ol className="relative grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:col-span-8">
+                <span
+                  aria-hidden
+                  className="absolute left-[12.5%] right-[12.5%] top-8 hidden h-px bg-gradient-to-r from-oriana-sky/50 via-oriana-sky/30 to-oriana-sun/60 sm:block"
+                />
+                {content.principles.map((step, index) => {
+                  const last = index === content.principles.length - 1
+                  const Icon = principleIcons[step.trim().toLowerCase()] ?? Check
+                  return (
+                    <li key={step} className="relative flex flex-col items-center text-center">
+                      <FadeIn delay={0.1 + index * 0.1} className="flex flex-col items-center">
+                        <span
+                          className={cn(
+                            'flex h-16 w-16 items-center justify-center rounded-full',
+                            last
+                              ? 'bg-oriana-sun text-oriana-deep'
+                              : 'border border-white/15 bg-[#0d2440] text-oriana-sky',
+                          )}
+                        >
+                          <Icon className="h-6 w-6" aria-hidden />
+                        </span>
+                        <span
+                          className={cn(
+                            'mt-5 font-display text-base font-semibold uppercase tracking-[0.18em] lg:text-lg',
+                            last ? 'text-oriana-sun' : 'text-white',
+                          )}
+                        >
+                          {step}
+                        </span>
+                      </FadeIn>
+                    </li>
+                  )
+                })}
+              </ol>
+            </div>
+          </div>
         </FadeIn>
       </div>
     </section>

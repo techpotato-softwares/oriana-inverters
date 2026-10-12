@@ -442,7 +442,6 @@ export async function seedOrianaContent({
         description:
           'Build the future of clean power conversion with a global team of engineers, makers, and problem-solvers.',
       },
-      ...(mediaMap.careers ? { image: mediaMap.careers } : {}),
       whyTitle: 'Life at Oriana',
       whyBody:
         'We offer competitive benefits, hybrid work options for eligible roles, and the opportunity to work on products deployed across 25 countries.',

@@ -3,6 +3,8 @@
 import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
+import { OrriSuccess } from '@/components/oriana/mascot/OrriSuccess'
+
 const fieldClass =
   'w-full rounded-xl border border-oriana-navy/12 bg-oriana-surface px-4 py-3 text-sm text-oriana-navy focus:border-oriana-blue focus:outline-none focus:ring-2 focus:ring-oriana-blue/15'
 
@@ -73,12 +75,9 @@ function CareerApplicationFormInner() {
 
   if (status === 'sent') {
     return (
-      <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center" role="status">
-        <p className="font-display text-xl font-bold text-green-800">Application received</p>
-        <p className="mt-2 text-green-700">
-          Thank you. Our HR team will review your resume and reply if there is a match.
-        </p>
-      </div>
+      <OrriSuccess title="Application received">
+        <p>Thank you. Our HR team will review your resume and reply if there is a match.</p>
+      </OrriSuccess>
     )
   }
 

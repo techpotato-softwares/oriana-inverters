@@ -6,6 +6,7 @@ import { Building2, Headphones, Mail, MapPin, Phone, Wrench, type LucideIcon } f
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 
+import { OrriSuccess } from '@/components/oriana/mascot/OrriSuccess'
 import type { WebsiteForm, WebsiteFormField } from '@/utilities/getContactForm'
 
 export type ContactCard = {
@@ -214,13 +215,9 @@ export function ContactForm({ cards, form, successMessage, intent }: ContactForm
 
       <div id="contact-form" className="scroll-mt-32 lg:col-span-3">
         {status === 'sent' ? (
-          <div
-            role="status"
-            className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center"
-          >
-            <p className="font-display text-xl font-bold text-green-800">Message Received</p>
-            <p className="mt-2 text-green-700">{successMessage}</p>
-          </div>
+          <OrriSuccess title="Message received">
+            <p>{successMessage}</p>
+          </OrriSuccess>
         ) : (
           <form
             ref={formRef}

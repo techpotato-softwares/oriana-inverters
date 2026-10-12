@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { OrriSuccess } from '@/components/oriana/mascot/OrriSuccess'
+
 const fieldClass =
   'w-full rounded-xl border border-oriana-navy/12 bg-oriana-surface px-4 py-3 text-sm text-oriana-navy focus:border-oriana-blue focus:outline-none focus:ring-2 focus:ring-oriana-blue/15'
 
@@ -57,10 +59,9 @@ export function DistributorApplicationForm({
 
   if (status === 'sent') {
     return (
-      <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center" role="status">
-        <p className="font-display text-xl font-bold text-green-800">{successTitle}</p>
-        <p className="mt-2 text-green-700">{successMessage}</p>
-      </div>
+      <OrriSuccess title={successTitle}>
+        <p>{successMessage}</p>
+      </OrriSuccess>
     )
   }
 
