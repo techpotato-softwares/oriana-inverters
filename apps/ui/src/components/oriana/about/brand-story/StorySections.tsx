@@ -149,12 +149,7 @@ export function JourneySection({ content }: { content: BrandStoryContent['journe
                     className="absolute inset-0 bg-gradient-to-t from-oriana-deep/90 via-oriana-deep/20 to-transparent"
                   />
                   <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6">
-                    <div>
-                      <p className="text-xs font-semibold tracking-[0.2em] text-oriana-sky">
-                        {`0${index + 1}`}
-                      </p>
-                      <p className="mt-1 font-display text-xl font-semibold text-white">{segment.label}</p>
-                    </div>
+                    <p className="font-display text-xl font-semibold text-white">{segment.label}</p>
                     {index < content.segments.length - 1 ? (
                       <ArrowRight className="mb-1 hidden h-5 w-5 text-white/60 md:block" aria-hidden />
                     ) : null}
@@ -240,11 +235,9 @@ export function UnitsSection({ content }: { content: BrandStoryContent['units'] 
           <FadeIn>
             <p className="text-base font-medium text-white">{content.lead}</p>
             <ul className="mt-6 space-y-5">
-              {content.represents.map((item, index) => (
+              {content.represents.map((item) => (
                 <li key={item} className="flex gap-4">
-                  <span className="mt-0.5 font-display text-sm font-semibold text-oriana-sky">
-                    {`0${index + 1}`}
-                  </span>
+                  <span aria-hidden className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-oriana-sky" />
                   <span className="text-base leading-7 text-white/75">{item}</span>
                 </li>
               ))}
@@ -300,14 +293,14 @@ export function IndiaSection({ content }: { content: BrandStoryContent['india'] 
           </FadeIn>
           <FadeIn delay={0.08}>
             <p className="mt-8 text-sm font-medium text-oriana-muted">{content.focusLead}</p>
-            <ol className="mt-5 grid gap-px overflow-hidden rounded-2xl border border-oriana-navy/8 bg-oriana-navy/8 sm:grid-cols-2">
-              {content.focus.map((item, index) => (
-                <li key={item} className="flex items-baseline gap-3 bg-white p-5">
-                  <span className="font-display text-sm font-semibold text-oriana-sky">{`0${index + 1}`}</span>
+            <ul className="mt-5 grid gap-px overflow-hidden rounded-2xl border border-oriana-navy/8 bg-oriana-navy/8 sm:grid-cols-2">
+              {content.focus.map((item) => (
+                <li key={item} className="flex items-center gap-3 bg-white p-5">
+                  <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-oriana-sky" />
                   <span className="font-display text-base font-semibold text-oriana-deep">{item}</span>
                 </li>
               ))}
-            </ol>
+            </ul>
             <div className="mt-10 space-y-3">
               <p className="text-base leading-7 text-oriana-muted">{content.belief}</p>
               <p className="font-display text-xl font-semibold text-oriana-blue">{content.beliefEmphasis}</p>
@@ -399,8 +392,8 @@ export function PurposeSection({ content }: { content: BrandStoryContent['purpos
             {content.musts.map((item, index) => (
               <li key={item}>
                 <FadeIn delay={index * 0.06}>
-                  <p className="flex items-baseline gap-5 py-6">
-                    <span className="font-display text-sm font-semibold text-oriana-sky">{`0${index + 1}`}</span>
+                  <p className="flex items-center gap-5 py-6">
+                    <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-oriana-sky" />
                     <span className="font-display text-xl font-medium text-oriana-deep lg:text-2xl">{item}</span>
                   </p>
                 </FadeIn>

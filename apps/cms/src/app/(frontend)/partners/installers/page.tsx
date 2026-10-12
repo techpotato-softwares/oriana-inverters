@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 import { CtaBand } from '@/components/oriana/marketing/CtaBand'
 import { LinkTiles } from '@/components/oriana/marketing/LinkTiles'
 import { MarketingIcon } from '@/components/oriana/marketing/MarketingIcon'
@@ -28,7 +29,8 @@ export default async function InstallersPage() {
 
   return (
     <main>
-      <PageHero eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
+      <PageHero
+        image={hero.image ? { src: hero.image, alt: hero.title } : heroImages.installers} eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
       <Breadcrumbs items={[{ label: 'Partners', href: '/partners' }, { label: 'Installers' }]} />
 
       <section className="py-12 lg:py-16">

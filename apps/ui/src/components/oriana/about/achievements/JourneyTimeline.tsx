@@ -57,10 +57,9 @@ export function JourneyTimeline({ steps }: { steps: JourneyStep[] }) {
               viewport={{ once: true, margin: '-15%' }}
               transition={{ duration: 0.8, ease }}
             >
-              <p className="font-display text-xs font-semibold tracking-[0.2em] text-white/45">{`0${index + 1}`}</p>
               <p
                 className={cn(
-                  'mt-2 font-display font-medium tracking-[-0.02em] text-balance',
+                  'font-display font-medium tracking-[-0.02em] text-balance',
                   final ? 'text-oriana-sun' : 'text-white',
                 )}
                 style={{ fontSize: 'clamp(1.5rem, 2.8vw, 2.5rem)', lineHeight: 1.1 }}

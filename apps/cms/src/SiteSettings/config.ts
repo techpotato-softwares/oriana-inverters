@@ -50,7 +50,7 @@ export const SiteSettings: GlobalConfig = {
             {
               name: 'hotline',
               type: 'text',
-              defaultValue: '+1 (800) ORIANA-1',
+              defaultValue: '+91 91452 28222',
               admin: { description: 'Shown in the header utility bar.' },
             },
             {

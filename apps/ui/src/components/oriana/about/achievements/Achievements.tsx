@@ -136,14 +136,7 @@ function ScaleSection({ content }: { content: AchievementsContent['scale'] }) {
                     className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-t from-oriana-deep/85 via-transparent to-transparent"
                   />
                   <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6">
-                    <span>
-                      <span className="block font-display text-xs font-semibold tracking-[0.2em] text-oriana-sky">
-                        {`0${index + 1}`}
-                      </span>
-                      <span className="mt-1 block font-display text-2xl font-semibold text-white">
-                        {segment.label}
-                      </span>
-                    </span>
+                    <span className="block font-display text-2xl font-semibold text-white">{segment.label}</span>
                     {index < content.segments.length - 1 ? (
                       <ArrowRight className="mb-1 hidden h-5 w-5 text-white/60 md:block" aria-hidden />
                     ) : null}

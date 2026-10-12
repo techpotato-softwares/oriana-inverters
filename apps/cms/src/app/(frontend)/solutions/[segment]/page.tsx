@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 import { FadeIn } from '@/components/oriana/FadeIn'
 import { getCatalogueProducts } from '@/utilities/getCatalogue'
 import { getSolutionBySlug } from '@/utilities/getMarketing'
@@ -44,7 +45,8 @@ export default async function SolutionPage({ params }: Props) {
 
   return (
     <main>
-      <PageHero eyebrow="Solutions" title={data.title} description={data.description} />
+      <PageHero
+        image={heroImages.solutions} eyebrow="Solutions" title={data.title} description={data.description} />
       <Breadcrumbs
         items={[{ label: 'Solutions', href: '/solutions/residential' }, { label: data.title }]}
       />

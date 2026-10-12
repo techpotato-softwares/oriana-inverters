@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 import { aboutPartners as defaults } from '@/components/oriana/about/aboutData'
 import { getAbout, getPartners } from '@/utilities/getMarketing'
 import { resolveLink, resolveMeta, resolveText } from '@/utilities/cmsContent'
@@ -61,7 +62,8 @@ export default async function PartnersPage() {
 
   return (
     <main>
-      <PageHero eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
+      <PageHero
+        image={heroImages.aboutPartners} eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
       <Breadcrumbs items={breadcrumbs} />
 
       <section className="py-12 lg:py-16">

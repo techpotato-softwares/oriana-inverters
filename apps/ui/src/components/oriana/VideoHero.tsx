@@ -76,7 +76,7 @@ export function VideoHero({
   return (
     <section
       className={`relative min-h-[100svh] w-full overflow-hidden bg-oriana-deep ${className}`.trim()}
-      style={{ height: '100svh' }}
+      style={children ? undefined : { height: '100svh' }}
       aria-label={ariaLabel}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -120,7 +120,9 @@ export function VideoHero({
         </div>
       ) : null}
 
-      {children ? <div className="absolute inset-0 z-10">{children}</div> : null}
+      {children ? (
+        <div className="relative z-10 flex min-h-[100svh] flex-col">{children}</div>
+      ) : null}
     </section>
   )
 }

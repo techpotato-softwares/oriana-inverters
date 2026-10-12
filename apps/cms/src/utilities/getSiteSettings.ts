@@ -19,7 +19,7 @@ const defaultLegalLinks: SiteNavLink[] = [
 
 const defaultSettings: SiteSettingsView = {
   siteName: 'Oriana Inverters',
-  hotline: '+1 (800) ORIANA-1',
+  hotline: '+91 91452 28222',
   copyrightText: '',
   seoTitle: 'Oriana Inverters | Advanced Solar Inverter Solutions',
   seoTitleTemplate: '%s | Oriana Inverters',

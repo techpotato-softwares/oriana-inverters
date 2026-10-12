@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 import { defaultWarrantyPage as defaults } from '@/components/oriana/support/supportData'
 import { getSupport, getWarrantyPlans } from '@/utilities/getMarketing'
 import {
@@ -40,7 +41,8 @@ export default async function WarrantyPage() {
 
   return (
     <main>
-      <PageHero eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
+      <PageHero
+        image={heroImages.warranty} eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
       <Breadcrumbs items={[{ label: 'Support', href: '/support' }, { label: hero.title }]} />
 
       <section className="py-12 lg:py-16">

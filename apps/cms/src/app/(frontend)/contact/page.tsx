@@ -1,15 +1,12 @@
 import type { Metadata } from 'next'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
+import { mediaUrl } from '@/utilities/cmsContent'
 import { getContactForm } from '@/utilities/getContactForm'
+import { defaultContactCards, isPlaceholderContactCards } from '@/utilities/contactDetails'
 import { getContact } from '@/utilities/getMarketing'
 import { ContactForm, type ContactCard } from './ContactForm'
-
-const fallbackCards: ContactCard[] = [
-  { iconKey: 'mail', title: 'Email', detail: 'info@orianainverters.com' },
-  { iconKey: 'phone', title: 'Phone', detail: '+1 (800) ORIANA-1' },
-  { iconKey: 'mapPin', title: 'Headquarters', detail: 'United States' },
-]
 
 export async function generateMetadata(): Promise<Metadata> {
   const contact = await getContact()
@@ -32,13 +29,19 @@ export default async function ContactPage({
     getContactForm(),
   ])
   const hero = contact?.hero
-  const cards: ContactCard[] = contact?.cards?.length
-    ? contact.cards.map((c) => ({
-        iconKey: c.iconKey,
-        title: c.title,
-        detail: c.detail,
-      }))
-    : fallbackCards
+  const cmsHeroImage = mediaUrl(hero?.image)
+  const heroImage = cmsHeroImage
+    ? { src: cmsHeroImage, alt: heroImages.contact.alt }
+    : heroImages.contact
+  const cmsCards = contact?.cards ?? []
+  const cards: ContactCard[] =
+    cmsCards.length && !isPlaceholderContactCards(cmsCards)
+      ? cmsCards.map((c) => ({
+          iconKey: c.iconKey,
+          title: c.title,
+          detail: c.detail,
+        }))
+      : defaultContactCards
   const successMessage =
     contact?.successMessage ||
     'Thank you for reaching out. Our team will contact you within one business day.'
@@ -46,6 +49,7 @@ export default async function ContactPage({
   return (
     <main>
       <PageHero
+        image={heroImage}
         eyebrow={hero?.eyebrow || 'Contact'}
         title={hero?.title || "Let's Build Together"}
         description={

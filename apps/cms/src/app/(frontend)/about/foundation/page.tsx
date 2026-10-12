@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 import { FoundationProgrammes } from '@/components/oriana/about/FoundationProgrammes'
 import { aboutFoundation as defaults } from '@/components/oriana/about/aboutData'
 import { getAbout } from '@/utilities/getMarketing'
@@ -48,7 +49,8 @@ export default async function OrianaFoundationPage() {
 
   return (
     <main>
-      <PageHero eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
+      <PageHero
+        image={heroImages.foundation} eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
       <Breadcrumbs items={breadcrumbs} />
       <FoundationProgrammes
         intro={resolveIntro(cms?.intro, defaults.intro)}

@@ -23,8 +23,6 @@ import { RevealStatement } from '@/components/oriana/about/shared/RevealStatemen
 import { SectionHeading } from '@/components/oriana/sustainability/SectionHeading'
 import { cn } from '@/utilities/ui'
 
-const chapterEyebrow = (number: string, eyebrow: string) => `${number} — ${eyebrow}`
-
 export function AboutIntroSection({ content }: { content: AboutOverviewContent['intro'] }) {
   return (
     <section aria-label="Our ambition" className="bg-white pb-20 pt-16 lg:pb-28 lg:pt-24">
@@ -53,7 +51,7 @@ export function WhoWeAreSection({ content }: { content: AboutOverviewContent['wh
           <FadeIn>
             <SectionHeading
               id="who-we-are-title"
-              eyebrow={chapterEyebrow(content.number, content.eyebrow)}
+              eyebrow={content.eyebrow}
               title={content.title}
             />
           </FadeIn>
@@ -125,7 +123,7 @@ export function TechnologySection({ content }: { content: AboutOverviewContent['
             <SectionHeading
               id="technology-title"
               tone="dark"
-              eyebrow={chapterEyebrow(content.number, content.eyebrow)}
+              eyebrow={content.eyebrow}
               title={content.title}
               description={content.description}
             />
@@ -209,7 +207,7 @@ export function ManufacturingSection({ content }: { content: AboutOverviewConten
           <FadeIn>
             <SectionHeading
               id="manufacturing-title"
-              eyebrow={chapterEyebrow(content.number, content.eyebrow)}
+              eyebrow={content.eyebrow}
               title={content.title}
             />
           </FadeIn>
@@ -250,7 +248,7 @@ export function QualitySection({ content }: { content: AboutOverviewContent['qua
           <FadeIn>
             <SectionHeading
               id="quality-title"
-              eyebrow={chapterEyebrow(content.number, content.eyebrow)}
+              eyebrow={content.eyebrow}
               title={content.title}
             />
           </FadeIn>
@@ -294,17 +292,12 @@ export function QualitySection({ content }: { content: AboutOverviewContent['qua
                       index === 0 ? 'lg:rounded-r-none' : !last && 'lg:rounded-none',
                     )}
                   >
-                    <span>
+                    <span className="flex items-center gap-3">
                       <span
-                        className={
-                          last
-                            ? 'block font-display text-sm font-semibold text-oriana-sun'
-                            : 'block font-display text-sm font-semibold text-oriana-sky'
-                        }
-                      >
-                        {`0${index + 1}`}
-                      </span>
-                      <span className="mt-1 block font-display text-xl font-semibold uppercase tracking-[0.12em] lg:text-2xl">
+                        aria-hidden
+                        className={cn('h-2 w-2 shrink-0 rounded-full', last ? 'bg-oriana-sun' : 'bg-oriana-sky')}
+                      />
+                      <span className="block font-display text-xl font-semibold uppercase tracking-[0.12em] lg:text-2xl">
                         {step}
                       </span>
                     </span>
@@ -349,7 +342,7 @@ export function AboutVisionSection({ content }: { content: AboutOverviewContent[
             <SectionHeading
               id="about-vision-title"
               tone="dark"
-              eyebrow={chapterEyebrow(content.number, content.eyebrow)}
+              eyebrow={content.eyebrow}
               title={content.title}
             />
           </FadeIn>
@@ -403,7 +396,7 @@ export function WhyOrianaSection({ content }: { content: AboutOverviewContent['w
         <FadeIn>
           <SectionHeading
             id="why-title"
-            eyebrow={chapterEyebrow(content.number, content.eyebrow)}
+            eyebrow={content.eyebrow}
             title={content.title}
             description={content.description}
           />
@@ -415,12 +408,9 @@ export function WhyOrianaSection({ content }: { content: AboutOverviewContent['w
               <li key={reason.key} className="bg-white">
                 <FadeIn delay={(index % 3) * 0.08} className="h-full">
                   <div className="flex h-full flex-col gap-6 p-8 lg:p-10">
-                    <div className="flex items-center justify-between">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-oriana-blue/8 text-oriana-blue">
-                        <Icon className="h-5 w-5" aria-hidden />
-                      </span>
-                      <span className="font-display text-sm font-semibold text-oriana-sky">{`0${index + 1}`}</span>
-                    </div>
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-oriana-blue/8 text-oriana-blue">
+                      <Icon className="h-5 w-5" aria-hidden />
+                    </span>
                     <div>
                       <h3 className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-oriana-deep">
                         {reason.title}

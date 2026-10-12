@@ -73,7 +73,7 @@ async function ensure(connectionString: string) {
 
     await pool.query(`
       INSERT INTO ${schema}.site_settings (id, site_name, hotline, seo_title, seo_title_template, twitter_handle)
-      SELECT 1, 'Oriana Inverters', '+1 (800) ORIANA-1',
+      SELECT 1, 'Oriana Inverters', '+91 91452 28222',
         'Oriana Inverters | Advanced Solar Inverter Solutions',
         '%s | Oriana Inverters',
         '@OrianaInverters'

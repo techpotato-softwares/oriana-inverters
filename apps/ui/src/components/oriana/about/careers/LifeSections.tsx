@@ -143,10 +143,10 @@ export function CultureSection({ content }: { content: LifeAtOrianaContent['cult
           className="mx-auto mt-12 grid max-w-5xl grid-cols-2 gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 sm:grid-cols-3 lg:mt-16"
           stagger={0.08}
         >
-          {content.values.map((value, index) => (
+          {content.values.map((value) => (
             <StaggerItem key={value} className="bg-oriana-deep/70 backdrop-blur-sm">
-              <div className="flex h-full flex-col gap-3 p-6 lg:p-8">
-                <span className="font-display text-xs font-semibold tracking-[0.2em] text-oriana-sun">{`0${index + 1}`}</span>
+              <div className="flex h-full flex-col gap-4 p-6 lg:p-8">
+                <span aria-hidden className="h-1.5 w-6 rounded-full bg-oriana-sun" />
                 <span className="font-display text-lg font-semibold text-white lg:text-2xl">{value}</span>
               </div>
             </StaggerItem>

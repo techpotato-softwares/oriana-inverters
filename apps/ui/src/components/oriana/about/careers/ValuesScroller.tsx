@@ -31,7 +31,7 @@ const icons: Record<CareerValueIcon, LucideIcon> = {
 /** Pin only where the cards fit comfortably beside a full-height viewport. */
 const PIN_QUERY = '(min-width: 1024px) and (min-height: 700px)'
 
-function ValueCard({ value, index }: { value: CareerValue; index: number }) {
+function ValueCard({ value }: { value: CareerValue }) {
   const Icon = icons[value.icon] ?? Rocket
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-oriana-navy/8 bg-white shadow-[0_24px_60px_-40px_rgba(7,21,37,0.35)]">
@@ -45,9 +45,6 @@ function ValueCard({ value, index }: { value: CareerValue; index: number }) {
         />
         <span className="absolute left-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/95 text-oriana-blue shadow-sm">
           <Icon className="h-5 w-5" aria-hidden />
-        </span>
-        <span className="absolute right-5 top-5 font-display text-sm font-semibold text-white drop-shadow">
-          {`0${index + 1}`}
         </span>
       </div>
       <div className="flex flex-1 flex-col p-6 lg:p-7">
@@ -154,9 +151,9 @@ export function ValuesScroller({
                 : '-mx-4 snap-x snap-mandatory overflow-x-auto px-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
             )}
           >
-            {values.map((value, index) => (
+            {values.map((value) => (
               <li key={value.key} className="w-[85vw] max-w-[26rem] shrink-0 snap-start sm:w-[24rem] lg:w-[26rem]">
-                <ValueCard value={value} index={index} />
+                <ValueCard value={value} />
               </li>
             ))}
           </motion.ul>

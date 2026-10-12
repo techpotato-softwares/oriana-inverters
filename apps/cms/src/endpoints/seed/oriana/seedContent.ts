@@ -18,6 +18,7 @@ import {
   HOME_WHY_CHOOSE,
 } from '@/data/homeFallback'
 import { megaMenus } from '@/config/navigation'
+import { defaultContactCards } from '@/utilities/contactDetails'
 import { footerNav, socialLinks as defaultSocialLinks } from '@/config/footer'
 
 const filename = fileURLToPath(import.meta.url)
@@ -285,7 +286,7 @@ export async function seedOrianaContent({
     slug: 'site-settings',
     data: {
       siteName: 'Oriana Inverters',
-      hotline: '+1 (800) ORIANA-1',
+      hotline: '+91 91452 28222',
       seoTitle: 'Oriana Inverters | Advanced Solar Inverter Solutions',
       seoTitleTemplate: '%s | Oriana Inverters',
       seoDescription:
@@ -651,11 +652,7 @@ export async function seedOrianaContent({
         description:
           'Tell us about your project. Our engineering and sales teams respond within one business day.',
       },
-      cards: [
-        { iconKey: 'mail', title: 'Email', detail: 'info@orianainverters.com' },
-        { iconKey: 'phone', title: 'Phone', detail: '+1 (800) ORIANA-1' },
-        { iconKey: 'mapPin', title: 'Headquarters', detail: 'United States' },
-      ],
+      cards: defaultContactCards,
       ...(contactFormId ? { form: contactFormId } : {}),
       successMessage:
         'Thank you for reaching out. Our team will contact you within one business day.',

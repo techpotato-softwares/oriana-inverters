@@ -49,9 +49,7 @@ function VisionStatementSection({ content }: { content: VisionMissionContent['vi
                       style={{ fontSize: 'clamp(1.6rem, 2.6vw, 2.4rem)', lineHeight: 1 }}
                     >
                       {panel.label}
-                    </span>
-                    <span className="font-display text-sm font-semibold text-oriana-sun">{`0${index + 1}`}</span>
-                  </figcaption>
+                    </span>                  </figcaption>
                 </figure>
               </FadeIn>
             </li>
@@ -101,7 +99,7 @@ function MissionSection({ content }: { content: VisionMissionContent['mission'] 
         </div>
 
         <ul className="space-y-6 lg:col-span-6 lg:space-y-10">
-          {content.values.map((value, index) => (
+          {content.values.map((value) => (
             <li key={value.key}>
               <FadeIn delay={0.05} direction="left">
                 <article className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04]">
@@ -112,11 +110,7 @@ function MissionSection({ content }: { content: VisionMissionContent['mission'] 
                       fill
                       sizes="(min-width: 1024px) 45vw, 100vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                    />
-                    <span className="absolute left-5 top-5 rounded-full bg-oriana-deep/70 px-3 py-1 font-display text-xs font-semibold text-oriana-sky backdrop-blur-sm">
-                      {`0${index + 1}`}
-                    </span>
-                  </div>
+                    />                  </div>
                   <div className="p-6 lg:p-8">
                     <h3 className="font-display text-2xl font-semibold text-white">{value.label}</h3>
                     <p className="mt-2 text-base leading-7 text-white/70">{value.description}</p>

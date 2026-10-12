@@ -7,7 +7,7 @@ import { useRef } from 'react'
 
 import type { LongTermItem } from '@/components/oriana/about/vision-mission/visionMissionData'
 
-function LongTermRow({ item, index }: { item: LongTermItem; index: number }) {
+function LongTermRow({ item }: { item: LongTermItem }) {
   const ref = useRef<HTMLLIElement>(null)
   const reduceMotion = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 85%', 'end 35%'] })
@@ -20,7 +20,7 @@ function LongTermRow({ item, index }: { item: LongTermItem; index: number }) {
         style={reduceMotion ? undefined : { opacity, x }}
         className="grid gap-4 py-8 sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:items-center sm:gap-8 lg:py-10"
       >
-        <span className="font-display text-sm font-semibold text-oriana-sky">{`0${index + 1}`}</span>
+        <span aria-hidden className="h-2 w-2 rounded-full bg-oriana-sky" />
         <p
           className="font-display font-medium tracking-[-0.02em] text-balance text-oriana-deep"
           style={{ fontSize: 'clamp(1.5rem, 3.2vw, 2.75rem)', lineHeight: 1.12 }}
@@ -43,8 +43,8 @@ function LongTermRow({ item, index }: { item: LongTermItem; index: number }) {
 export function LongTermList({ items }: { items: LongTermItem[] }) {
   return (
     <ol className="mt-12 border-t border-oriana-navy/10 lg:mt-16">
-      {items.map((item, index) => (
-        <LongTermRow key={item.label} item={item} index={index} />
+      {items.map((item) => (
+        <LongTermRow key={item.label} item={item} />
       ))}
     </ol>
   )

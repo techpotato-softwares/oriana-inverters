@@ -119,12 +119,6 @@ function LeaderCard({
             </span>
           )}
         </motion.div>
-        <span
-          aria-hidden
-          className="absolute left-6 top-6 font-display text-sm font-semibold text-oriana-blue/70"
-        >
-          {String(index + 1).padStart(2, '0')}
-        </span>
       </div>
 
       <div className="mt-6 flex flex-1 flex-col border-t border-oriana-navy/10 pt-5">

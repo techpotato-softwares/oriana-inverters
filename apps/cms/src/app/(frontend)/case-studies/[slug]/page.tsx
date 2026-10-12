@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { FadeIn } from '@/components/oriana/FadeIn'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 import { getCaseStudies, getCaseStudyBySlug } from '@/utilities/getMarketing'
 import type { CaseStudy as CmsCaseStudy, Media, Product } from '@/payload-types'
 
@@ -79,7 +80,8 @@ export default async function CaseStudyDetailPage({ params }: Props) {
 
   return (
     <main>
-      <PageHero eyebrow={study.segment} title={study.title} description={study.summary} />
+      <PageHero
+        image={heroImages.caseStudies} eyebrow={study.segment} title={study.title} description={study.summary} />
       <Breadcrumbs
         items={[
           { label: 'Case Studies', href: '/case-studies' },

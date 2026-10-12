@@ -4,6 +4,7 @@ import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { DistributorLocator } from '@/components/oriana/DistributorLocator'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 import { getDistributors } from '@/utilities/getDistributors'
 
 export const metadata = {
@@ -34,6 +35,7 @@ export default async function WhereToBuyPage() {
   return (
     <main>
       <PageHero
+        image={heroImages.whereToBuy}
         eyebrow="Sales"
         title="Where to Buy"
         description="Purchase Oriana inverters through our authorized distributor network or certified installer partners."

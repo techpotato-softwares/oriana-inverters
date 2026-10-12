@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 import { getCaseStudies } from '@/utilities/getMarketing'
 import type { CaseStudy as CmsCaseStudy, Media } from '@/payload-types'
 
@@ -48,6 +49,7 @@ export default async function CaseStudiesPage() {
   return (
     <main>
       <PageHero
+        image={heroImages.caseStudies}
         eyebrow="Solutions"
         title="Case Studies"
         description="Real-world deployments demonstrating Oriana reliability across residential, commercial, and utility applications."

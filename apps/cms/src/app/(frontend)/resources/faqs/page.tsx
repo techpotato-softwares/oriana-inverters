@@ -1,6 +1,7 @@
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 import { getFaqs } from '@/utilities/getMarketing'
 import type { Faq } from '@/payload-types'
 
@@ -53,6 +54,7 @@ export default async function FaqsPage() {
   return (
     <main>
       <PageHero
+        image={heroImages.faqs}
         eyebrow="Resources"
         title="Frequently Asked Questions"
         description="Answers to common questions about product selection, installation, warranty, and monitoring."

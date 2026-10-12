@@ -25,7 +25,7 @@ export function AboutOverview({
 }) {
   const { hero, whoWeAre, technology, manufacturing, quality, vision, why } = content
   const chapters = [whoWeAre, technology, manufacturing, quality, vision, why].map(
-    ({ id, number, eyebrow }) => ({ id, number, label: eyebrow }),
+    ({ id, eyebrow }) => ({ id, label: eyebrow }),
   )
   const sections = [
     chapters[0],

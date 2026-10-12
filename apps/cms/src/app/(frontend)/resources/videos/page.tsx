@@ -3,6 +3,7 @@ import { Play } from 'lucide-react'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 import { getVideos } from '@/utilities/getMarketing'
 import type { Video } from '@/payload-types'
 
@@ -42,6 +43,7 @@ export default async function VideosPage() {
   return (
     <main>
       <PageHero
+        image={heroImages.videos}
         eyebrow="Resources"
         title="Video Center"
         description="Step-by-step installation guides, commissioning walkthroughs, and product overviews."

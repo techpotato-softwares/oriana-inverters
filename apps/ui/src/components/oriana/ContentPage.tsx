@@ -1,5 +1,6 @@
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 
 type ContentSection = {
   heading?: string
@@ -14,10 +15,21 @@ type ContentPageProps = {
   sections: ContentSection[]
 }
 
-export function ContentPage({ eyebrow, title, description, breadcrumb, sections }: ContentPageProps) {
+export function ContentPage({
+  eyebrow,
+  title,
+  description,
+  breadcrumb,
+  sections,
+}: ContentPageProps) {
   return (
     <main>
-      <PageHero eyebrow={eyebrow} title={title} description={description} />
+      <PageHero
+        image={heroImages.content}
+        eyebrow={eyebrow}
+        title={title}
+        description={description}
+      />
       <Breadcrumbs items={breadcrumb} />
 
       <section className="py-12 lg:py-16">
@@ -25,7 +37,9 @@ export function ContentPage({ eyebrow, title, description, breadcrumb, sections 
           {sections.map((section) => (
             <div key={section.heading ?? section.paragraphs[0]} className="mb-10 last:mb-0">
               {section.heading && (
-                <h2 className="font-display text-xl font-bold text-oriana-navy">{section.heading}</h2>
+                <h2 className="font-display text-xl font-bold text-oriana-navy">
+                  {section.heading}
+                </h2>
               )}
               {section.paragraphs.map((p) => (
                 <p

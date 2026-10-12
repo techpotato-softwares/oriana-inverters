@@ -34,7 +34,6 @@ export const aboutOverview = {
 
   whoWeAre: {
     id: 'who-we-are',
-    number: '01',
     eyebrow: 'Who We Are',
     title: 'Built on Engineering. Driven by Energy.',
     paragraphs: [
@@ -51,7 +50,6 @@ export const aboutOverview = {
 
   technology: {
     id: 'technology',
-    number: '02',
     eyebrow: 'Our Technology',
     title: 'Intelligence Meets Power',
     description:
@@ -94,7 +92,6 @@ export const aboutOverview = {
 
   manufacturing: {
     id: 'manufacturing',
-    number: '03',
     eyebrow: 'Manufacturing',
     title: 'Precision Engineered. Made in India.',
     paragraphs: [
@@ -120,7 +117,6 @@ export const aboutOverview = {
 
   quality: {
     id: 'quality',
-    number: '04',
     eyebrow: 'Quality',
     title: 'Reliability Is Designed In.',
     paragraphs: [
@@ -138,7 +134,6 @@ export const aboutOverview = {
 
   vision: {
     id: 'vision',
-    number: '05',
     eyebrow: 'Our Vision',
     title: 'A Smarter Energy Future',
     paragraphs: [
@@ -157,7 +152,6 @@ export const aboutOverview = {
 
   why: {
     id: 'why-oriana',
-    number: '06',
     eyebrow: 'Why ORIANA',
     title: 'More Than an Inverter Company.',
     description: 'ORIANA is building an integrated clean-energy technology ecosystem.',

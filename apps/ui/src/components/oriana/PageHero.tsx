@@ -1,8 +1,10 @@
 'use client'
 
+import Image from 'next/image'
 import { cn } from '@/utilities/ui'
 import { EnergyMesh } from './EnergyMesh'
 import { FadeIn } from './FadeIn'
+import type { HeroImage } from './heroImages'
 
 type PageHeroProps = {
   eyebrow?: string
@@ -11,6 +13,8 @@ type PageHeroProps = {
   children?: React.ReactNode
   /** Dark navy (default) or a light airy hero for catalogue-style pages. */
   variant?: 'dark' | 'light'
+  /** Background photo for the dark variant. */
+  image?: HeroImage | null
 }
 
 export function PageHero({
@@ -19,8 +23,10 @@ export function PageHero({
   description,
   children,
   variant = 'dark',
+  image,
 }: PageHeroProps) {
   const light = variant === 'light'
+  const photo = light ? null : image
 
   return (
     <section
@@ -36,6 +42,25 @@ export function PageHero({
           <div className="absolute inset-0 bg-gradient-to-b from-white via-oriana-surface to-oriana-silver/80" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_90%_0%,rgba(26,66,138,0.08),transparent)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_35%_at_8%_85%,rgba(245,185,66,0.08),transparent)]" />
+        </>
+      ) : photo ? (
+        <>
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(100deg, rgba(7,21,37,0.92) 0%, rgba(7,21,37,0.74) 45%, rgba(7,21,37,0.35) 100%)',
+            }}
+          />
         </>
       ) : (
         <>
@@ -73,7 +98,11 @@ export function PageHero({
             <p
               className={cn(
                 'mt-5 max-w-3xl leading-relaxed',
-                light ? 'text-lg text-oriana-muted md:text-xl' : 'text-lg text-white/65',
+                light
+                  ? 'text-lg text-oriana-muted md:text-xl'
+                  : photo
+                    ? 'text-lg text-white/80'
+                    : 'text-lg text-white/65',
               )}
             >
               {description}

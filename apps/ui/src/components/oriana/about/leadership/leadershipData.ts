@@ -39,7 +39,7 @@ export const defaultLeaders: Leader[] = [
     role: 'Co-Founder & Director',
     bio: 'Growing ORIANA’s engineering and manufacturing ecosystem at Chakan, Pune.',
     linkedin: '',
-    image: '/assets/about/leadership/rohan-shelar.jpg',
+    image: '/assets/about/leadership/rohan-shelar-2026.jpg',
   },
 ]
 

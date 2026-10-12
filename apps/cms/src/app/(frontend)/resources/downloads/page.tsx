@@ -4,6 +4,7 @@ import { ArrowUpRight, FileText } from 'lucide-react'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { PageHero } from '@/components/oriana/PageHero'
+import { heroImages } from '@/components/oriana/heroImages'
 import { inverterMegaMenu } from '@/config/navigation'
 import { getCatalogueDownloads } from '@/utilities/getCatalogue'
 
@@ -56,6 +57,7 @@ export default async function DownloadsPage() {
   return (
     <main>
       <PageHero
+        image={heroImages.downloads}
         eyebrow="Resources"
         title="Download Center"
         description="Technical documentation, datasheets, installation guides, and compliance certificates for all Oriana products."

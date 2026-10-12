@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Mail, MapPin, Phone, type LucideIcon } from 'lucide-react'
+import { Building2, Headphones, Mail, MapPin, Phone, Wrench, type LucideIcon } from 'lucide-react'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 
@@ -72,6 +72,32 @@ const iconByKey: Record<string, LucideIcon> = {
   mail: Mail,
   phone: Phone,
   mapPin: MapPin,
+  wrench: Wrench,
+  headphones: Headphones,
+  building: Building2,
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const PHONE_PATTERN = /^\+?[\d\s()-]{7,}$/
+
+function ContactDetailLine({ line }: { line: string }) {
+  const linkClass =
+    'rounded-sm underline-offset-4 transition-colors hover:text-oriana-blue hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oriana-blue/40'
+  if (EMAIL_PATTERN.test(line)) {
+    return (
+      <a href={`mailto:${line}`} className={`${linkClass} break-all`}>
+        {line}
+      </a>
+    )
+  }
+  if (PHONE_PATTERN.test(line)) {
+    return (
+      <a href={`tel:${line.replace(/[^\d+]/g, '')}`} className={`${linkClass} tabular-nums`}>
+        {line}
+      </a>
+    )
+  }
+  return <>{line}</>
 }
 
 type NamedField = Exclude<WebsiteFormField, { blockType: 'message' }>
@@ -168,7 +194,17 @@ export function ContactForm({ cards, form, successMessage, intent }: ContactForm
                   <p className="text-xs font-bold uppercase tracking-widest text-oriana-muted">
                     {item.title}
                   </p>
-                  <p className="mt-1 font-medium text-oriana-navy">{item.detail}</p>
+                  <ul className="mt-1 space-y-0.5 font-medium text-oriana-navy">
+                    {item.detail
+                      .split('\n')
+                      .map((line) => line.trim())
+                      .filter(Boolean)
+                      .map((line) => (
+                        <li key={line}>
+                          <ContactDetailLine line={line} />
+                        </li>
+                      ))}
+                  </ul>
                 </div>
               </div>
             )

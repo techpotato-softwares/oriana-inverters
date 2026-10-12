@@ -32,7 +32,7 @@ export function SustainabilityHero({
         }}
         aria-hidden
       />
-      <div className="container relative flex h-full flex-col justify-end pb-8 lg:pb-10">
+      <div className="container hero-safe-top relative flex flex-1 flex-col justify-end pb-8 lg:pb-10">
         <FadeIn>
           {eyebrow ? (
             <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-sky">
@@ -42,7 +42,7 @@ export function SustainabilityHero({
           ) : null}
           <h1
             className="mt-5 max-w-4xl font-display font-medium tracking-[-0.02em] text-balance text-white"
-            style={{ fontSize: 'clamp(2.25rem, 5.2vw, 4.75rem)', lineHeight: 1.04 }}
+            style={{ fontSize: 'clamp(2.25rem, min(5.2vw, 8.5svh), 4.75rem)', lineHeight: 1.04 }}
           >
             {title}
           </h1>
@@ -65,7 +65,7 @@ export function SustainabilityHero({
           </Link>
         </FadeIn>
         <FadeIn delay={0.18} direction="none">
-          <SustainabilitySubNav className="mt-12 lg:mt-16" variant="dark" />
+          <SustainabilitySubNav className="mt-10 lg:mt-12" variant="dark" />
         </FadeIn>
       </div>
     </VideoHero>

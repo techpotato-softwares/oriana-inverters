@@ -47,7 +47,7 @@ function HeroCopy({ eyebrow, title, description, primary, secondary }: Omit<Abou
             'linear-gradient(90deg, rgba(7,21,37,0.82) 0%, rgba(7,21,37,0.45) 55%, rgba(7,21,37,0.1) 100%)',
         }}
       />
-      <div className="container relative flex h-full flex-col justify-end pb-8 pt-32 lg:pb-10">
+      <div className="container hero-safe-top relative flex flex-1 flex-col justify-end pb-8 lg:pb-10">
         <motion.p
           {...reveal(0.1)}
           className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-sky"
@@ -58,7 +58,7 @@ function HeroCopy({ eyebrow, title, description, primary, secondary }: Omit<Abou
         <motion.h1
           {...reveal(0.18)}
           className="mt-5 max-w-4xl font-display font-medium tracking-[-0.02em] text-balance text-white"
-          style={{ fontSize: 'clamp(2.25rem, 5.2vw, 4.75rem)', lineHeight: 1.04 }}
+          style={{ fontSize: 'clamp(2.25rem, min(5.2vw, 8.5svh), 4.75rem)', lineHeight: 1.04 }}
         >
           {title}
         </motion.h1>
@@ -95,7 +95,7 @@ function HeroCopy({ eyebrow, title, description, primary, secondary }: Omit<Abou
           </motion.div>
         ) : null}
         <motion.div {...reveal(0.46)}>
-          <AboutPageNav className="mt-12 lg:mt-16" />
+          <AboutPageNav className="mt-10 lg:mt-12" />
         </motion.div>
       </div>
     </>
@@ -113,7 +113,6 @@ function ImageHero({ media, ...copy }: AboutHeroProps & { media: { kind: 'image'
       ref={ref}
       aria-label={copy.eyebrow}
       className="relative isolate min-h-[100svh] w-full overflow-hidden bg-oriana-deep"
-      style={{ height: '100svh' }}
     >
       <motion.div
         className="absolute inset-0 -z-10"
@@ -125,7 +124,7 @@ function ImageHero({ media, ...copy }: AboutHeroProps & { media: { kind: 'image'
         <Image src={media.src} alt={media.alt} fill priority sizes="100vw" className="object-cover" />
       </motion.div>
       <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-oriana-deep/85 via-transparent to-oriana-deep/25" />
-      <div className="absolute inset-0">
+      <div className="relative flex min-h-[100svh] flex-col">
         <HeroCopy {...copy} />
       </div>
     </section>
