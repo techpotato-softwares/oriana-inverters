@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, type ReactNode } from 'react'
 
 import { VideoHero } from '@/components/oriana/VideoHero'
 import { AboutPageNav } from '@/components/oriana/about/shared/AboutPageNav'
@@ -24,9 +24,18 @@ type AboutHeroProps = {
   media: AboutHeroMedia
   primary?: AboutHeroAction
   secondary?: AboutHeroAction
+  /** Sibling-page nav under the copy; defaults to the About section links. */
+  nav?: ReactNode
 }
 
-function HeroCopy({ eyebrow, title, description, primary, secondary }: Omit<AboutHeroProps, 'media'>) {
+function HeroCopy({
+  eyebrow,
+  title,
+  description,
+  primary,
+  secondary,
+  nav = <AboutPageNav />,
+}: Omit<AboutHeroProps, 'media'>) {
   const reduceMotion = useReducedMotion()
   const reveal = (delay: number) =>
     reduceMotion
@@ -94,9 +103,11 @@ function HeroCopy({ eyebrow, title, description, primary, secondary }: Omit<Abou
             ) : null}
           </motion.div>
         ) : null}
-        <motion.div {...reveal(0.46)}>
-          <AboutPageNav className="mt-10 lg:mt-12" />
-        </motion.div>
+        {nav ? (
+          <motion.div {...reveal(0.46)} className="mt-10 lg:mt-12">
+            {nav}
+          </motion.div>
+        ) : null}
       </div>
     </>
   )

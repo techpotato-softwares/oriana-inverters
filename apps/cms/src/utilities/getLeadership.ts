@@ -26,6 +26,7 @@ function toLeader(member: CmsMember): Leader {
     bio: member.bio?.trim() || builtIn?.bio || '',
     linkedin: member.linkedinUrl?.trim() || '',
     image: photoUrl(member.photo) || builtIn?.image || null,
+    fallbackImage: builtIn?.image ?? null,
   }
 }
 

@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
-import { PageHero } from '@/components/oriana/PageHero'
+import { AboutHero } from '@/components/oriana/about/shared/AboutHero'
+import { PartnersPageNav } from '@/components/oriana/partners/PartnersPageNav'
 import { heroImages } from '@/components/oriana/heroImages'
 import { CtaBand } from '@/components/oriana/marketing/CtaBand'
 import { partnersPartnership as defaults } from '@/components/oriana/partners/partnersData'
@@ -28,8 +29,14 @@ export default async function PartnershipPage() {
 
   return (
     <main>
-      <PageHero
-        image={hero.image ? { src: hero.image, alt: hero.title } : heroImages.partnership} eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
+      <AboutHero
+        eyebrow={hero.eyebrow || 'Partners'}
+        title={hero.title}
+        description={hero.description}
+        media={{ kind: 'image', ...(hero.image ? { src: hero.image, alt: hero.title } : heroImages.partnership) }}
+        primary={{ label: 'Talk to our team', href: '/contact' }}
+        nav={<PartnersPageNav />}
+      />
       <Breadcrumbs items={[{ label: 'Partners', href: '/partners' }, { label: 'Partnership' }]} />
 
       <section className="py-12 lg:py-16">

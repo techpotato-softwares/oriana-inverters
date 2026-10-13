@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { DistributorApplicationForm } from '@/components/oriana/DistributorApplicationForm'
 import { FadeIn } from '@/components/oriana/FadeIn'
-import { MediaHero } from '@/components/oriana/MediaHero'
+import { AboutHero } from '@/components/oriana/about/shared/AboutHero'
+import { PartnersPageNav } from '@/components/oriana/partners/PartnersPageNav'
 import { partnersApplyDistributor as defaults } from '@/components/oriana/partners/partnersData'
 import { getPartnersPage } from '@/utilities/getMarketing'
 import {
@@ -35,14 +36,14 @@ export default async function BecomeADistributorPage() {
 
   return (
     <main>
-      <MediaHero
+      <AboutHero
         eyebrow={hero.eyebrow || defaults.hero.eyebrow}
         title={hero.title}
         description={hero.description || defaults.hero.description}
-        imageSrc={hero.image || defaults.hero.image}
-        imageAlt="Solar array under a clear sky"
+        media={{ kind: 'image', src: hero.image || defaults.hero.image, alt: 'Solar array under a clear sky' }}
         primary={resolveLink(cms?.heroPrimary, defaults.heroPrimary)}
         secondary={resolveLink(cms?.heroSecondary, defaults.heroSecondary)}
+        nav={<PartnersPageNav />}
       />
       <Breadcrumbs
         items={[

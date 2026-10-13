@@ -1,16 +1,12 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Linkedin } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import { FadeIn } from '@/components/oriana/FadeIn'
-import {
-  leaderInitials,
-  type Leader,
-  type LeadershipContent,
-} from '@/components/oriana/about/leadership/leadershipData'
+import { LeaderPortrait } from '@/components/oriana/about/leadership/LeaderPortrait'
+import type { Leader, LeadershipContent } from '@/components/oriana/about/leadership/leadershipData'
 import { SectionHeading } from '@/components/oriana/sustainability/SectionHeading'
 import { cn } from '@/utilities/ui'
 
@@ -95,30 +91,25 @@ function LeaderCard({
               'radial-gradient(70% 90% at 50% 100%, rgba(77,163,255,0.22) 0%, rgba(247,249,252,0) 70%)',
           }}
         />
-        <motion.div
-          className="absolute inset-0"
-          initial={reduceMotion ? undefined : { clipPath: 'inset(100% 0% 0% 0%)' }}
-          whileInView={reduceMotion ? undefined : { clipPath: 'inset(0% 0% 0% 0%)' }}
-          viewport={{ once: true, margin: '-10%' }}
-          transition={{ duration: 1.1, delay: 0.1 + (index % 3) * 0.12, ease }}
-        >
-          {leader.image ? (
-            <Image
-              src={leader.image}
-              alt={`Portrait of ${leader.name}`}
-              fill
-              sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-              className="object-cover object-top mix-blend-multiply transition-transform duration-700 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-            />
-          ) : (
-            <span
-              aria-hidden
-              className="absolute inset-0 flex items-center justify-center font-display text-6xl font-semibold text-oriana-blue/25"
-            >
-              {leaderInitials(leader.name)}
-            </span>
-          )}
-        </motion.div>
+        <div className="absolute inset-0">
+          <LeaderPortrait
+            leader={leader}
+            sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+            className="object-cover object-top mix-blend-multiply transition-transform duration-700 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            initialsClassName="text-6xl"
+          />
+        </div>
+        {/* Curtain instead of clip-path: Chrome won't lazy-load images inside a fully clipped box. */}
+        {reduceMotion ? null : (
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 origin-top bg-oriana-surface"
+            initial={{ scaleY: 1 }}
+            whileInView={{ scaleY: 0 }}
+            viewport={{ once: true, margin: '-10%' }}
+            transition={{ duration: 1.1, delay: 0.1 + (index % 3) * 0.12, ease }}
+          />
+        )}
       </div>
 
       <div className="mt-6 flex flex-1 flex-col border-t border-oriana-navy/10 pt-5">

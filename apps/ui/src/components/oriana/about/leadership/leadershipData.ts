@@ -7,6 +7,8 @@ export type Leader = {
   linkedin: string
   /** Null renders an initials placeholder. */
   image: string | null
+  /** Built-in portrait shown when the CMS photo fails to load. */
+  fallbackImage?: string | null
 }
 
 export type LeadershipContent = {

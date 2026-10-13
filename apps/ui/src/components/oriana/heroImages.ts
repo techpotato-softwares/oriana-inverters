@@ -50,4 +50,5 @@ export const heroImages = {
     alt: 'Engineer reviewing technical drawings with tools',
   },
   content: { src: '/assets/heroes/content.jpg', alt: 'Bright modern office interior' },
-} satisfies Record<string, HeroImage>
+  products: { src: '/assets/heroes/products.jpg', alt: 'Rows of solar panels under a blue sky' },
+ } satisfies Record<string, HeroImage>

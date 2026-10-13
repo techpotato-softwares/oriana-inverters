@@ -1,6 +1,9 @@
 import { redirect } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
-import { PageHero } from '@/components/oriana/PageHero'
+import { HeroPageNav } from '@/components/oriana/HeroPageNav'
+import { heroImages } from '@/components/oriana/heroImages'
+import { AboutHero } from '@/components/oriana/about/shared/AboutHero'
+import { productCategoryNav } from '@/utilities/productCategoryNav'
 import { AllProductsCatalogue } from '@/components/oriana/AllProductsCatalogue'
 import { staticCategories } from '@/data/products'
 import {
@@ -67,13 +70,19 @@ export default async function ProductsPage({ searchParams }: Props) {
 
   return (
     <main>
-      <PageHero
-        variant="light"
+      <AboutHero
+        eyebrow="Products"
         title="All Products"
         description="Raise energy yield and project returns with Oriana inverters, hybrid systems, and storage — engineered for homes, businesses, and utility plants."
+        media={{ kind: 'image', ...heroImages.products }}
+        primary={{ label: 'Browse the range', href: '#catalogue' }}
+        secondary={{ label: 'Find a distributor', href: '/where-to-buy' }}
+        nav={<HeroPageNav label="Product categories" items={productCategoryNav(tabs)} />}
       />
       <Breadcrumbs items={[{ label: 'All Products' }]} />
-      <AllProductsCatalogue tabs={tabs} catalogues={catalogues} />
+      <div id="catalogue" className="scroll-mt-24">
+        <AllProductsCatalogue tabs={tabs} catalogues={catalogues} />
+      </div>
     </main>
   )
 }

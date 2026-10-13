@@ -1,8 +1,8 @@
-import Image from 'next/image'
 import { Linkedin } from 'lucide-react'
 
 import { Stagger, StaggerItem } from '@/components/oriana/FadeIn'
-import { leaderInitials, type Leader } from '@/components/oriana/about/leadership/leadershipData'
+import { LeaderPortrait } from '@/components/oriana/about/leadership/LeaderPortrait'
+import type { Leader } from '@/components/oriana/about/leadership/leadershipData'
 
 /** Compact founder portraits for story sections. */
 export function FoundersStrip({ leaders, label = 'Founded by' }: { leaders: Leader[]; label?: string }) {
@@ -15,22 +15,12 @@ export function FoundersStrip({ leaders, label = 'Founded by' }: { leaders: Lead
           <StaggerItem key={`${leader.name}-${index}`}>
             <figure>
               <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white">
-                {leader.image ? (
-                  <Image
-                    src={leader.image}
-                    alt={`Portrait of ${leader.name}`}
-                    fill
-                    sizes="(min-width: 1024px) 14vw, 30vw"
-                    className="object-cover object-top"
-                  />
-                ) : (
-                  <span
-                    aria-hidden
-                    className="absolute inset-0 flex items-center justify-center font-display text-2xl font-semibold text-oriana-blue/30"
-                  >
-                    {leaderInitials(leader.name)}
-                  </span>
-                )}
+                <LeaderPortrait
+                  leader={leader}
+                  sizes="(min-width: 1024px) 14vw, 30vw"
+                  className="object-cover object-top"
+                  initialsClassName="text-2xl text-oriana-blue/30"
+                />
               </div>
               <figcaption className="mt-3">
                 <span className="flex items-center gap-1.5 font-display text-sm font-semibold leading-5 text-oriana-deep sm:text-base">
