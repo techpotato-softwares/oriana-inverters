@@ -124,6 +124,7 @@ export function ValuesScroller({
       style={pinned ? { height: `calc(${distance}px + 100svh)` } : undefined}
     >
       <div
+        data-sticky-pin={pinned ? '' : undefined}
         className={cn(pinned ? 'sticky flex flex-col justify-center overflow-hidden' : 'py-20')}
         style={pinned ? { top: STICKY_BELOW_NAV_TOP, height: STICKY_BELOW_NAV_HEIGHT } : undefined}
       >

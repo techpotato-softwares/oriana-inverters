@@ -91,7 +91,8 @@ export function GrowingAccentLine({
       if (external) return clamp01(progressRef.current)
       const el = boxRef.current
       if (!el) return 0
-      const vh = window.innerHeight
+      // Align with CSS svh clamps — clientHeight matches Windows scrollbar layout
+      const vh = document.documentElement.clientHeight || window.innerHeight
       const rect = el.getBoundingClientRect()
       // Grow while the line travels through the upper/mid viewport (Sungrow feel)
       const start = vh * 0.92

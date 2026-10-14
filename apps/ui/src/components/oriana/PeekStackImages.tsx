@@ -50,11 +50,17 @@ export function PeekStackImages({
 
   useLayoutEffect(() => {
     const sync = () => {
-      const vh = Math.max(window.innerHeight, 1)
-      // Align the rounded mask to the fixed header bottom so top corners
-      // appear where the image meets the nav (Sungrow behavior).
+      // Prefer measured --site-header-height + layout viewport so Windows DPI /
+      // classic scrollbars do not drift from Mac overlay-scrollbar math.
+      const cssHeader = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--site-header-height'),
+      )
       const headerEl = document.querySelector('header')
-      const headerH = headerEl?.getBoundingClientRect().height ?? 0
+      const headerH =
+        (Number.isFinite(cssHeader) && cssHeader > 0
+          ? cssHeader
+          : headerEl?.getBoundingClientRect().height) ?? 0
+      const vh = Math.max(document.documentElement.clientHeight || window.innerHeight, 1)
       const topPx = Math.max(75, Math.ceil(headerH || 80))
       setInsetTopPx(topPx)
       setInsetTopPct((topPx / vh) * 100)
@@ -139,7 +145,9 @@ export function PeekStackImages({
               className="absolute left-1/2 -translate-x-1/2 overflow-hidden"
               style={{
                 top: insetTopPx,
-                height: '100vh',
+                // Same unit as PANEL_STYLE — mixing vh/dvh misaligns the ring on Windows
+                height: '100dvh',
+                minHeight: '100dvh',
                 borderRadius: '2.083vw',
                 boxShadow: '0 0 0 6.25vw #fff',
               }}

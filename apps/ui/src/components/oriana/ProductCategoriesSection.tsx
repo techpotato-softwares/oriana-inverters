@@ -96,7 +96,8 @@ export function ProductCategoriesSection({
         <div
           className="container flex flex-1 flex-col justify-center text-center lg:text-left"
           style={{
-            paddingTop: 'max(calc(var(--header-offset) + 1.5rem), calc(env(safe-area-inset-top, 0px) + 5rem))',
+            paddingTop:
+              'max(calc(var(--site-header-height, var(--header-offset)) + 1.5rem), calc(env(safe-area-inset-top, 0px) + 5rem))',
             paddingBottom: compactTabs ? '9rem' : '14rem',
           }}
         >
