@@ -139,6 +139,7 @@ async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
 
         const heroId = relationId(doc.heroImage)
         const datasheetId = relationId(doc.datasheetPdf)
+        const manualId = relationId(doc.manualPdf)
 
         return mapProductDoc({
           ...doc,
@@ -154,6 +155,7 @@ async function fetchPublishedProducts(): Promise<CatalogueProduct[]> {
           }),
           datasheetPdf:
             (datasheetId !== null ? mediaById.get(datasheetId) : null) ?? doc.datasheetPdf,
+          manualPdf: (manualId !== null ? mediaById.get(manualId) : null) ?? doc.manualPdf,
         })
       })
       .filter((product) => isCanonicalCategorySlug(product.categorySlug))
@@ -261,7 +263,7 @@ async function fetchDownloads(): Promise<CatalogueDownload[]> {
 
 export const getCatalogueProducts = unstable_cache(
   fetchPublishedProducts,
-  ['catalogue-products', 'canonical-v3-family-products'],
+  ['catalogue-products', 'canonical-v3-family-products', 'manual-pdf-v1'],
   {
     tags: ['products'],
   },

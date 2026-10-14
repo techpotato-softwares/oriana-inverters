@@ -2,57 +2,64 @@ import Link from 'next/link'
 import { ArrowUpRight, FileText } from 'lucide-react'
 
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
-import { ComingSoon } from '@/components/oriana/ComingSoon'
+import { FadeIn } from '@/components/oriana/FadeIn'
 import { PageHero } from '@/components/oriana/PageHero'
+import {
+  ProductDownloadsByCategory,
+  type ProductDownloadCategory,
+} from '@/components/oriana/ProductDownloadsByCategory'
 import { heroImages } from '@/components/oriana/heroImages'
-import { inverterMegaMenu } from '@/config/navigation'
-import { getCatalogueDownloads } from '@/utilities/getCatalogue'
+import {
+  getCatalogueCategories,
+  getCatalogueDownloads,
+  getCatalogueSeries,
+} from '@/utilities/getCatalogue'
 
 export const metadata = {
   title: 'Download Center',
   description: 'Datasheets, installation manuals, certificates, and software for Oriana solar inverters.',
 }
 
-const typeOrder = ['datasheet', 'manual', 'certificate', 'warranty', 'brochure', 'software']
-
-const typeLabels: Record<string, string> = {
-  datasheet: 'Datasheets',
-  manual: 'Installation Manuals',
-  certificate: 'Certificates & Compliance',
-  warranty: 'Warranty Documents',
-  brochure: 'Brochures',
-  software: 'Software & Tools',
+function firstDocUrl(urls: Array<string | null | undefined>): string | null {
+  for (const url of urls) {
+    if (url?.trim()) return url.trim()
+  }
+  return null
 }
 
 export default async function DownloadsPage() {
-  const downloads = await getCatalogueDownloads()
+  const [categories, seriesList, downloads] = await Promise.all([
+    getCatalogueCategories(),
+    getCatalogueSeries(),
+    getCatalogueDownloads(),
+  ])
 
-  const grouped = typeOrder
-    .map((type) => ({
-      title: typeLabels[type] ?? type,
-      items: downloads.filter((d) => d.documentType === type),
-    }))
-    .filter((g) => g.items.length > 0)
+  // All categories stay as tabs; rows only include series with a datasheet and/or manual.
+  const productCategories: ProductDownloadCategory[] = categories.map((category) => {
+    const products = seriesList
+      .filter((series) => series.categorySlug === category.slug)
+      .map((series) => {
+        const datasheetUrl = firstDocUrl(series.variants.map((variant) => variant.datasheetUrl))
+        const manualUrl = firstDocUrl(series.variants.map((variant) => variant.manualUrl))
+        return {
+          id: series.slug,
+          name: series.series,
+          href: `/products/${series.slug}`,
+          powerRange: series.powerRange !== '—' ? series.powerRange : undefined,
+          datasheetUrl,
+          manualUrl,
+        }
+      })
+      .filter((product) => Boolean(product.datasheetUrl || product.manualUrl))
 
-  if (grouped.length === 0) {
-    return (
-      <main>
-        <ComingSoon
-          eyebrow="Resources"
-          title="Download Center"
-          description="Datasheets, manuals, and certificates will appear here once product documents are published in the CMS."
-          breadcrumbs={[
-            { label: 'Resources', href: '/resources/downloads' },
-            { label: 'Downloads' },
-          ]}
-          primaryHref="/support"
-          primaryLabel="Contact support"
-          secondaryHref="/products"
-          secondaryLabel="Browse products"
-        />
-      </main>
-    )
-  }
+    return {
+      slug: category.slug,
+      title: category.title,
+      products,
+    }
+  })
+
+  const certificates = downloads.filter((item) => item.documentType === 'certificate')
 
   return (
     <main>
@@ -64,58 +71,75 @@ export default async function DownloadsPage() {
       />
       <Breadcrumbs items={[{ label: 'Resources', href: '/resources/downloads' }, { label: 'Downloads' }]} />
 
-      <section className="py-12 lg:py-16">
+      {productCategories.length > 0 ? (
+        <ProductDownloadsByCategory categories={productCategories} />
+      ) : null}
+
+      <section
+        className={`pb-12 lg:pb-16 ${productCategories.length > 0 ? 'pt-0' : 'pt-12 lg:pt-16'}`}
+        aria-labelledby="certificates-heading"
+      >
         <div className="container">
-          <div className="mb-10 flex flex-wrap gap-3">
-            {inverterMegaMenu.map((cat) => (
-              <Link
-                key={cat.href}
-                href={cat.href}
-                className="rounded border border-oriana-navy/10 px-4 py-2 text-sm font-medium text-oriana-navy hover:border-oriana-blue hover:text-oriana-blue"
+          <FadeIn>
+            <div className="max-w-2xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-oriana-blue">
+                Compliance
+              </p>
+              <h2
+                id="certificates-heading"
+                className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl"
               >
-                {cat.title}
-              </Link>
-            ))}
-          </div>
+                Certificates &amp; Compliance
+              </h2>
+              <p className="mt-3 text-base leading-relaxed text-oriana-muted">
+                Shared certification and compliance documents for Oriana products.
+              </p>
+            </div>
+          </FadeIn>
 
-          <div className="grid gap-10 lg:grid-cols-2">
-            {grouped.map((cat) => (
-              <div key={cat.title} className="rounded border border-oriana-navy/8 bg-white">
-                <h2 className="border-b border-oriana-navy/8 bg-oriana-silver/40 px-6 py-4 font-display text-lg font-bold text-oriana-navy">
-                  {cat.title}
-                </h2>
-                <ul className="divide-y divide-oriana-navy/8">
-                  {cat.items.map((item) => (
-                    <li key={item.id}>
-                      {item.fileUrl ? (
-                        <a
-                          href={item.fileUrl}
-                          className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left transition hover:bg-oriana-silver/30"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <div className="flex items-start gap-3">
-                            <FileText className="mt-0.5 h-5 w-5 shrink-0 text-oriana-blue" />
-                            <div>
-                              <p className="text-sm font-medium text-oriana-navy">{item.title}</p>
-                              {item.relatedProductName && (
-                                <p className="mt-0.5 text-xs text-oriana-muted">{item.relatedProductName}</p>
-                              )}
-                            </div>
+          <div className="mt-8 overflow-hidden rounded-2xl border border-oriana-navy/10 bg-white">
+            {certificates.length > 0 ? (
+              <ul className="divide-y divide-oriana-navy/8">
+                {certificates.map((item) => (
+                  <li key={item.id}>
+                    {item.fileUrl ? (
+                      <a
+                        href={item.fileUrl}
+                        className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left transition hover:bg-oriana-silver/30 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-oriana-blue"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <div className="flex items-start gap-3">
+                          <FileText className="mt-0.5 h-5 w-5 shrink-0 text-oriana-blue" aria-hidden />
+                          <div>
+                            <p className="text-sm font-medium text-oriana-navy">{item.title}</p>
+                            {item.relatedProductName ? (
+                              <p className="mt-0.5 text-xs text-oriana-muted">
+                                {item.relatedProductName}
+                              </p>
+                            ) : null}
                           </div>
-                          <ArrowUpRight className="h-4 w-4 shrink-0 text-oriana-blue" />
-                        </a>
-                      ) : (
-                        <span className="flex px-6 py-4 text-sm text-oriana-muted">{item.title}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+                        </div>
+                        <ArrowUpRight className="h-4 w-4 shrink-0 text-oriana-blue" aria-hidden />
+                      </a>
+                    ) : (
+                      <span className="flex px-6 py-4 text-sm text-oriana-muted">{item.title}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="px-6 py-10 text-center text-sm text-oriana-muted">
+                Not available — certificates will appear here when published.
+              </p>
+            )}
           </div>
+        </div>
+      </section>
 
-          <p className="mt-10 text-center text-sm text-oriana-muted">
+      <section className="pb-16">
+        <div className="container">
+          <p className="text-center text-sm text-oriana-muted">
             Can&apos;t find what you need?{' '}
             <Link href="/support" className="font-semibold text-oriana-blue hover:underline">
               Contact technical support
