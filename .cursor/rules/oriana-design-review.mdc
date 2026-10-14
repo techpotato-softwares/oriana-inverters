@@ -17,3 +17,4 @@ When finishing a UI change, run this pass (use `web-design-guidelines` + `access
 - [ ] Reduced motion path works
 - [ ] No layout shift from images/fonts (sizes reserved)
 - [ ] Payload-driven content still renders; empty/error states are intentional
+- [ ] Mac/Windows parity: no `100vw` shells; sticky scrub uses `useStickyScrub` helpers (not bare `innerHeight`); `fill` images have a sized relative parent; same `vh`/`svh`/`dvh` unit within a section

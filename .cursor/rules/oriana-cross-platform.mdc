@@ -1,0 +1,31 @@
+---
+description: Mac/Windows UI parity — viewport, scrollbars, sticky scrub, images
+alwaysApply: true
+---
+
+# Cross-platform UI parity (Mac = Windows)
+
+Public UI must render and behave the same on Mac and Windows (Chrome/Edge). Prefer geometry that does not depend on overlay vs classic scrollbars or DPI quirks.
+
+## Hard rules
+
+1. **No `100vw` for full-bleed width** — use `width: 100%` / `w-full`. Classic Windows scrollbars make `100vw` overflow or crop.
+2. **One viewport unit family per component** — do not mix `vh` with `dvh`/`svh` for the same measured box (e.g. panel + mask). Prefer `svh`/`dvh` for sticky pins and full-viewport sections.
+3. **JS scrub must match CSS pin** — never drive sticky/parallax progress with bare `window.innerHeight` when CSS uses `100svh`. Use `measureStickyPinHeightPx` / `readStickyPinHeightPx` from `useStickyScrub.ts`, or measure the live `[data-sticky-pin]` element.
+4. **One header offset token** — prefer `--site-header-height` (set by `SiteHeader`). Fall back to `--header-offset` only when needed; do not invent a third offset.
+5. **`fill` images need a sized relative parent** — Next/Image `fill` and CMS `Media fill` must sit in `relative` + explicit height/`aspect-*`/`inset-0` frame. Pass explicit `sizes` (e.g. `100vw` for heroes).
+6. **Avoid webkit-only layout** — scrollbar hiding needs both `scrollbar-width: none` and `::-webkit-scrollbar`. Do not rely on `-webkit-font-smoothing` for visual weight.
+
+## When building sticky / scroll sections
+
+- Mark the sticky pin with `data-sticky-pin`.
+- Runway height and pin height must use the same unit (`svh`).
+- Re-check after resize; assume Windows 125%/150% scaling exists.
+
+## Pre-merge check (UI changes)
+
+- [ ] No new `100vw` widths for layout shells
+- [ ] No `innerHeight` vs `svh` mismatch in scroll math
+- [ ] Images have aspect/min-height + `object-cover`/`contain` intentional
+- [ ] Sticky sections use shared helpers from `useStickyScrub.ts`
+---

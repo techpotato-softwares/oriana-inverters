@@ -23,3 +23,4 @@ Before designing or changing any public UI, read and apply these project skills 
 - Motion: use existing `FadeIn` / Framer Motion patterns; respect `prefers-reduced-motion`.
 - Content comes from Payload when available; never hardcode fake CMS copy that fights production content.
 - Desktop + mobile both required; no hover-only critical actions.
+- Mac and Windows must match: follow `oriana-cross-platform` (no `100vw` shells, sticky scrub via `useStickyScrub`, one viewport unit family per section, sized parents for `fill` images).
