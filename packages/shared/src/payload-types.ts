@@ -825,6 +825,10 @@ export interface User {
  * via the `definition` "CallToActionBlock".
  */
 export interface CallToActionBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   richText?: {
     root: {
       type: string;
@@ -873,8 +877,16 @@ export interface CallToActionBlock {
  * via the `definition` "ContentBlock".
  */
 export interface ContentBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   columns?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
         richText?: {
           root: {
@@ -923,6 +935,10 @@ export interface ContentBlock {
  * via the `definition` "MediaBlock".
  */
 export interface MediaBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   media: number | Media;
   id?: string | null;
   blockName?: string | null;
@@ -933,6 +949,10 @@ export interface MediaBlock {
  * via the `definition` "ArchiveBlock".
  */
 export interface ArchiveBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   introContent?: {
     root: {
       type: string;
@@ -967,6 +987,10 @@ export interface ArchiveBlock {
  * via the `definition` "FormBlock".
  */
 export interface FormBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   form: number | Form;
   enableIntro?: boolean | null;
   introContent?: {
@@ -1169,9 +1193,17 @@ export interface Form {
  * via the `definition` "StatsGridBlock".
  */
 export interface StatsGridBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   eyebrow?: string | null;
   title?: string | null;
   stats: {
+    /**
+     * Hide this item from visitors without deleting it.
+     */
+    hidden?: boolean | null;
     /**
      * Preferred: upload an SVG/PNG icon.
      */
@@ -1212,9 +1244,17 @@ export interface StatsGridBlock {
  * via the `definition` "CardGridBlock".
  */
 export interface CardGridBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   eyebrow?: string | null;
   title?: string | null;
   cards: {
+    /**
+     * Hide this item from visitors without deleting it.
+     */
+    hidden?: boolean | null;
     /**
      * Preferred: upload an SVG/PNG icon.
      */
@@ -1256,6 +1296,10 @@ export interface CardGridBlock {
  * via the `definition` "CtaBandBlock".
  */
 export interface CtaBandBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   title: string;
   body?: string | null;
   primaryCta: {
@@ -1281,7 +1325,15 @@ export interface CtaBandBlock {
  * via the `definition` "ContentPageBlock".
  */
 export interface ContentPageBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   sections: {
+    /**
+     * Hide this item from visitors without deleting it.
+     */
+    hidden?: boolean | null;
     heading: string;
     body: string;
     id?: string | null;
@@ -1295,6 +1347,10 @@ export interface ContentPageBlock {
  * via the `definition` "IconFeatureBlock".
  */
 export interface IconFeatureBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   /**
    * Preferred: upload an SVG/PNG icon.
    */
@@ -2027,6 +2083,7 @@ export interface PagesSelect<T extends boolean = true> {
  * via the `definition` "CallToActionBlock_select".
  */
 export interface CallToActionBlockSelect<T extends boolean = true> {
+  hidden?: T;
   richText?: T;
   links?:
     | T
@@ -2051,9 +2108,11 @@ export interface CallToActionBlockSelect<T extends boolean = true> {
  * via the `definition` "ContentBlock_select".
  */
 export interface ContentBlockSelect<T extends boolean = true> {
+  hidden?: T;
   columns?:
     | T
     | {
+        hidden?: T;
         size?: T;
         richText?: T;
         enableLink?: T;
@@ -2077,6 +2136,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
  * via the `definition` "MediaBlock_select".
  */
 export interface MediaBlockSelect<T extends boolean = true> {
+  hidden?: T;
   media?: T;
   id?: T;
   blockName?: T;
@@ -2086,6 +2146,7 @@ export interface MediaBlockSelect<T extends boolean = true> {
  * via the `definition` "ArchiveBlock_select".
  */
 export interface ArchiveBlockSelect<T extends boolean = true> {
+  hidden?: T;
   introContent?: T;
   populateBy?: T;
   relationTo?: T;
@@ -2100,6 +2161,7 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
  * via the `definition` "FormBlock_select".
  */
 export interface FormBlockSelect<T extends boolean = true> {
+  hidden?: T;
   form?: T;
   enableIntro?: T;
   introContent?: T;
@@ -2111,11 +2173,13 @@ export interface FormBlockSelect<T extends boolean = true> {
  * via the `definition` "StatsGridBlock_select".
  */
 export interface StatsGridBlockSelect<T extends boolean = true> {
+  hidden?: T;
   eyebrow?: T;
   title?: T;
   stats?:
     | T
     | {
+        hidden?: T;
         icon?: T;
         iconKey?: T;
         value?: T;
@@ -2130,11 +2194,13 @@ export interface StatsGridBlockSelect<T extends boolean = true> {
  * via the `definition` "CardGridBlock_select".
  */
 export interface CardGridBlockSelect<T extends boolean = true> {
+  hidden?: T;
   eyebrow?: T;
   title?: T;
   cards?:
     | T
     | {
+        hidden?: T;
         icon?: T;
         iconKey?: T;
         title?: T;
@@ -2150,6 +2216,7 @@ export interface CardGridBlockSelect<T extends boolean = true> {
  * via the `definition` "CtaBandBlock_select".
  */
 export interface CtaBandBlockSelect<T extends boolean = true> {
+  hidden?: T;
   title?: T;
   body?: T;
   primaryCta?:
@@ -2172,9 +2239,11 @@ export interface CtaBandBlockSelect<T extends boolean = true> {
  * via the `definition` "ContentPageBlock_select".
  */
 export interface ContentPageBlockSelect<T extends boolean = true> {
+  hidden?: T;
   sections?:
     | T
     | {
+        hidden?: T;
         heading?: T;
         body?: T;
         id?: T;
@@ -2187,6 +2256,7 @@ export interface ContentPageBlockSelect<T extends boolean = true> {
  * via the `definition` "IconFeatureBlock_select".
  */
 export interface IconFeatureBlockSelect<T extends boolean = true> {
+  hidden?: T;
   icon?: T;
   iconKey?: T;
   title?: T;

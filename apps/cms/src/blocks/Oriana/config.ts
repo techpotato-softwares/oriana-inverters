@@ -2,6 +2,7 @@ import type { Block } from 'payload'
 
 import { iconOrMediaFields } from '@/fields/iconOrMedia'
 import { simpleLinkFields } from '@/fields/simpleLink'
+import { visibleArray } from '@/fields/visibility'
 
 export const StatsGrid: Block = {
   slug: 'statsGrid',
@@ -10,7 +11,7 @@ export const StatsGrid: Block = {
   fields: [
     { name: 'eyebrow', type: 'text' },
     { name: 'title', type: 'text' },
-    {
+    visibleArray({
       name: 'stats',
       type: 'array',
       required: true,
@@ -19,7 +20,7 @@ export const StatsGrid: Block = {
         { name: 'value', type: 'text', required: true },
         { name: 'label', type: 'text', required: true },
       ],
-    },
+    }),
   ],
 }
 
@@ -30,7 +31,7 @@ export const CardGrid: Block = {
   fields: [
     { name: 'eyebrow', type: 'text' },
     { name: 'title', type: 'text' },
-    {
+    visibleArray({
       name: 'cards',
       type: 'array',
       required: true,
@@ -40,7 +41,7 @@ export const CardGrid: Block = {
         { name: 'body', type: 'textarea', required: true },
         { name: 'href', type: 'text' },
       ],
-    },
+    }),
   ],
 }
 
@@ -71,7 +72,7 @@ export const ContentPageSections: Block = {
   interfaceName: 'ContentPageBlock',
   labels: { singular: 'Content sections', plural: 'Content sections' },
   fields: [
-    {
+    visibleArray({
       name: 'sections',
       type: 'array',
       required: true,
@@ -79,7 +80,7 @@ export const ContentPageSections: Block = {
         { name: 'heading', type: 'text', required: true },
         { name: 'body', type: 'textarea', required: true },
       ],
-    },
+    }),
   ],
 }
 

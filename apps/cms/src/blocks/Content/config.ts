@@ -8,6 +8,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 import { link } from '@/fields/link'
+import { visibleArray } from '@/fields/visibility'
 
 const columnFields: Field[] = [
   {
@@ -67,13 +68,13 @@ export const Content: Block = {
   slug: 'content',
   interfaceName: 'ContentBlock',
   fields: [
-    {
+    visibleArray({
       name: 'columns',
       type: 'array',
       admin: {
         initCollapsed: true,
       },
       fields: columnFields,
-    },
+    }),
   ],
 }

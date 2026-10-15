@@ -14,6 +14,7 @@ import {
   IconFeature,
   StatsGrid,
 } from '../../blocks/Oriana/config'
+import { visibleBlock } from '@/fields/visibility'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -98,7 +99,7 @@ export const Pages: CollectionConfig = {
                 CtaBand,
                 ContentPageSections,
                 IconFeature,
-              ],
+              ].map(visibleBlock),
               required: true,
               admin: {
                 initCollapsed: true,

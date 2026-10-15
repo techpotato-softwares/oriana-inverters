@@ -1,6 +1,8 @@
 import type { Block } from 'payload'
 
-export const MediaBlock: Block = {
+import { visibleBlock } from '@/fields/visibility'
+
+export const MediaBlock: Block = visibleBlock({
   slug: 'mediaBlock',
   interfaceName: 'MediaBlock',
   fields: [
@@ -11,4 +13,4 @@ export const MediaBlock: Block = {
       required: true,
     },
   ],
-}
+})

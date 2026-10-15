@@ -1,4 +1,4 @@
-import type { ArrayField, CheckboxField, Field } from 'payload'
+import type { ArrayField, Block, CheckboxField, Field } from 'payload'
 
 const HIDDEN_ROW_LABEL = '@/components/admin/VisibilityRowLabel#VisibilityRowLabel'
 
@@ -39,6 +39,18 @@ export function visibleArray<T extends Field>(field: T): T {
       },
     },
   } as T
+}
+
+/**
+ * Prepend a `hidden` checkbox to a layout block. Idempotent, so a block shared between
+ * collections keeps one field shape (one generated interface, one DB table).
+ */
+export function visibleBlock(block: Block): Block {
+  if (block.fields.some((child) => 'name' in child && child.name === 'hidden')) return block
+  return {
+    ...block,
+    fields: [hiddenField({ description: 'Hide this block from visitors without deleting it.' }), ...block.fields],
+  }
 }
 
 type SectionHiddenOptions = {
