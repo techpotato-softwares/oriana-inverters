@@ -41,6 +41,15 @@ export function visibleArray<T extends Field>(field: T): T {
   } as T
 }
 
+type SectionHiddenOptions = {
+  /** Override for tabs without a group, where `hidden` would clash between sections. */
+  name?: string
+  label?: string
+}
+
 /** Section toggle placed at the top of a section group or tab. */
-export const sectionHiddenField = (): CheckboxField =>
-  hiddenField({ description: 'Hide this whole section from visitors without deleting its content.' })
+export const sectionHiddenField = ({ name = 'hidden', label }: SectionHiddenOptions = {}): CheckboxField => ({
+  ...hiddenField({ description: 'Hide this whole section from visitors without deleting its content.' }),
+  name,
+  ...(label ? { label } : {}),
+})

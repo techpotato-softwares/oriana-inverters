@@ -4302,6 +4302,10 @@ export interface Support {
        */
       quickLinks?:
         | {
+            /**
+             * Hide this item from visitors without deleting it.
+             */
+            hidden?: boolean | null;
             label: string;
             href: string;
             icon?:
@@ -4333,6 +4337,10 @@ export interface Support {
   };
   strengths?: {
     /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
+    /**
      * Leave blank to keep the default copy.
      */
     intro?: {
@@ -4357,6 +4365,10 @@ export interface Support {
       | null;
   };
   approach?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     /**
      * Leave blank to keep the default copy.
      */
@@ -4390,6 +4402,10 @@ export interface Support {
   };
   presence?: {
     /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
+    /**
      * Leave blank to keep the default copy.
      */
     intro?: {
@@ -4402,6 +4418,10 @@ export interface Support {
      */
     stats?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           value: string;
           label: string;
           id?: string | null;
@@ -4421,6 +4441,10 @@ export interface Support {
      */
     locations?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           top: string;
           left: string;
@@ -4466,6 +4490,10 @@ export interface Support {
   };
   stories?: {
     /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
+    /**
      * Leave blank to keep the default copy.
      */
     intro?: {
@@ -4491,6 +4519,10 @@ export interface Support {
       | null;
   };
   resources?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     /**
      * Leave blank to keep the default copy.
      */
@@ -4552,6 +4584,10 @@ export interface Support {
       | null;
   };
   cases?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     /**
      * Leave blank to keep the default copy.
      */
@@ -4646,6 +4682,10 @@ export interface Support {
      */
     sections?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           heading: string;
           body: string;
           id?: string | null;
@@ -4701,10 +4741,18 @@ export interface Sustainability {
    */
   image?: (number | null) | Media;
   /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  highlightsHidden?: boolean | null;
+  /**
    * Big numbers shown directly below the hero (3 recommended).
    */
   highlights?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         value: string;
         label: string;
         description?: string | null;
@@ -4723,6 +4771,10 @@ export interface Sustainability {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  pillarsHidden?: boolean | null;
   pillarsIntro?: {
     eyebrow?: string | null;
     title?: string | null;
@@ -4730,6 +4782,10 @@ export interface Sustainability {
   };
   pillars?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         title: string;
         headline: string;
         body: string;
@@ -4752,6 +4808,10 @@ export interface Sustainability {
       }[]
     | null;
   calculator?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     description?: string | null;
     /**
@@ -4768,6 +4828,10 @@ export interface Sustainability {
     treesPerKw?: number | null;
     disclaimer?: string | null;
   };
+  /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  commitmentsHidden?: boolean | null;
   commitmentsIntro?: {
     eyebrow?: string | null;
     title?: string | null;
@@ -4775,6 +4839,10 @@ export interface Sustainability {
   };
   commitments?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         phase: string;
         timeframe: string;
         title: string;
@@ -4783,6 +4851,10 @@ export interface Sustainability {
       }[]
     | null;
   cta?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     body?: string | null;
     primary?: {
@@ -4806,6 +4878,10 @@ export interface Sustainability {
   };
   strategySections?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         heading: string;
         body: string;
         id?: string | null;
@@ -5828,6 +5904,7 @@ export interface SupportSelect<T extends boolean = true> {
               quickLinks?:
                 | T
                 | {
+                    hidden?: T;
                     label?: T;
                     href?: T;
                     icon?: T;
@@ -5838,6 +5915,7 @@ export interface SupportSelect<T extends boolean = true> {
   strengths?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5858,6 +5936,7 @@ export interface SupportSelect<T extends boolean = true> {
   approach?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5884,6 +5963,7 @@ export interface SupportSelect<T extends boolean = true> {
   presence?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5894,6 +5974,7 @@ export interface SupportSelect<T extends boolean = true> {
         stats?:
           | T
           | {
+              hidden?: T;
               value?: T;
               label?: T;
               id?: T;
@@ -5909,6 +5990,7 @@ export interface SupportSelect<T extends boolean = true> {
         locations?:
           | T
           | {
+              hidden?: T;
               label?: T;
               top?: T;
               left?: T;
@@ -5927,6 +6009,7 @@ export interface SupportSelect<T extends boolean = true> {
   stories?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5948,6 +6031,7 @@ export interface SupportSelect<T extends boolean = true> {
   resources?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5984,6 +6068,7 @@ export interface SupportSelect<T extends boolean = true> {
   cases?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -6061,6 +6146,7 @@ export interface SupportSelect<T extends boolean = true> {
         sections?:
           | T
           | {
+              hidden?: T;
               heading?: T;
               body?: T;
               id?: T;
@@ -6108,9 +6194,11 @@ export interface SustainabilitySelect<T extends boolean = true> {
       };
   heroVideo?: T;
   image?: T;
+  highlightsHidden?: T;
   highlights?:
     | T
     | {
+        hidden?: T;
         value?: T;
         label?: T;
         description?: T;
@@ -6125,6 +6213,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
         href?: T;
         id?: T;
       };
+  pillarsHidden?: T;
   pillarsIntro?:
     | T
     | {
@@ -6135,6 +6224,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
   pillars?:
     | T
     | {
+        hidden?: T;
         title?: T;
         headline?: T;
         body?: T;
@@ -6145,6 +6235,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
   calculator?:
     | T
     | {
+        hidden?: T;
         title?: T;
         description?: T;
         kwhPerKw?: T;
@@ -6152,6 +6243,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
         treesPerKw?: T;
         disclaimer?: T;
       };
+  commitmentsHidden?: T;
   commitmentsIntro?:
     | T
     | {
@@ -6162,6 +6254,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
   commitments?:
     | T
     | {
+        hidden?: T;
         phase?: T;
         timeframe?: T;
         title?: T;
@@ -6171,6 +6264,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
   cta?:
     | T
     | {
+        hidden?: T;
         title?: T;
         body?: T;
         primary?:
@@ -6198,6 +6292,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
   strategySections?:
     | T
     | {
+        hidden?: T;
         heading?: T;
         body?: T;
         id?: T;

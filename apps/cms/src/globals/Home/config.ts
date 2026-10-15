@@ -6,13 +6,6 @@ import { seoFields } from '@/fields/seo'
 import { sectionHiddenField, visibleArray } from '@/fields/visibility'
 import { revalidateHome } from './hooks/revalidateHome'
 
-/** Section toggle for tabs whose content is a bare array (no wrapping group). */
-const sectionToggle = (name: string) =>
-  ({
-    ...sectionHiddenField(),
-    name,
-  }) satisfies NonNullable<GlobalConfig['fields']>[number]
-
 const linkFields = (label: string, href: string) => [
   { name: 'label' as const, type: 'text' as const, defaultValue: label },
   {
@@ -142,7 +135,7 @@ export const Home: GlobalConfig = {
         {
           label: 'Scenarios',
           fields: [
-            sectionToggle('peekImagesHidden'),
+            sectionHiddenField({ name: 'peekImagesHidden', label: 'Hide scenarios section' }),
             visibleArray({
               name: 'peekImages',
               type: 'array',
@@ -176,7 +169,7 @@ export const Home: GlobalConfig = {
         {
           label: 'Vision & Mission',
           fields: [
-            sectionToggle('visionMissionHidden'),
+            sectionHiddenField({ name: 'visionMissionHidden', label: 'Hide vision & mission section' }),
             visibleArray({
               name: 'visionMission',
               type: 'array',
