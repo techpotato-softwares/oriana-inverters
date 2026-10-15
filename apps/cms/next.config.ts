@@ -54,8 +54,9 @@ const nextConfig: NextConfig = {
           }
         })(),
       ],
-      // Client uploads go to S3; metadata POSTs can still be large for rich text.
-      bodySizeLimit: '10mb',
+      // Client uploads go to S3 (bypass Lambda ≈6MB). Keep headroom for form-state /
+      // metadata Server Actions — this alone cannot raise the Lambda hard cap.
+      bodySizeLimit: '50mb',
     },
   },
   sassOptions: {

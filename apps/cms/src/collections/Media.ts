@@ -29,7 +29,8 @@ export const Media: CollectionConfig = {
   },
   admin: {
     group: 'Assets',
-    description: 'Images, videos, and documents. Organize with folders (Hero, Products, Icons, …).',
+    description:
+      'Images, videos, and documents. On AWS, large files (>~6MB) upload directly to S3 — if that fails, check media-bucket CORS for the admin origin. Organize with folders (Hero, Products, Icons, …).',
     defaultColumns: ['filename', 'alt', 'mediaType', 'updatedAt'],
   },
   fields: [
@@ -109,6 +110,10 @@ export const Media: CollectionConfig = {
     focalPoint: true,
     mimeTypes: ['image/*', 'video/mp4', 'video/webm', 'video/quicktime', 'application/pdf'],
     filesRequiredOnCreate: false,
+    // On AWS, browser→S3 clientUploads bypasses the Lambda ≈6MB body limit.
+    limits: {
+      fileSize: 100 * 1024 * 1024, // 100 MB
+    },
     imageSizes: [
       {
         name: 'thumbnail',

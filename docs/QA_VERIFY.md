@@ -19,5 +19,7 @@
 - [ ] `/admin` works (QA DB must use Supabase **transaction** pooler port `6543`, not session `5432`)
 - [ ] Media uploads -> `oriana-invertors-web-media-qa` (browser PUTs via presigned URL; objects under `media/`)
 - [ ] Upload a file >6MB (e.g. short video) to confirm clientUploads bypasses Lambda body limit
+  - In DevTools → Network: expect a **PUT** to `*.amazonaws.com` (S3), then a small create/save to the app
+  - If the large file only POSTs to CloudFront/Lambda (no S3 PUT), CORS/origins are wrong — redeploy CDK so media-bucket CORS includes the admin CloudFront URL (+ custom domain)
 
 Share CloudFront URL + admin link with the team.

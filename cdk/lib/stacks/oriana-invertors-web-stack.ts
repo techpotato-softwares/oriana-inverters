@@ -148,12 +148,12 @@ export class OrianaInvertorsWebStack extends Stack {
     // Must be an AwsCustomResource — putting the CF domain on the bucket CORS property
     // creates a CloudFormation cycle (bucket ↔ distribution).
     if (mediaBucket) {
-      const corsOrigins = [cf.distributionUrl];
+      // Admin origin must match AllowedOrigins or browser PUT to S3 fails and
+      // Payload falls back through Lambda (hard ≈6MB body limit).
+      const corsOrigins = [cf.distributionUrl, "http://localhost:3000"];
       if (config.customDomain) {
         corsOrigins.push(`https://${config.customDomain}`);
-      }
-      if (config.environment === "dev") {
-        corsOrigins.push("http://localhost:3000");
+        corsOrigins.push(`https://www.${config.customDomain}`);
       }
 
       const putCors = {
@@ -167,14 +167,20 @@ export class OrianaInvertorsWebStack extends Stack {
                 AllowedHeaders: ["*"],
                 AllowedMethods: ["GET", "PUT", "POST", "DELETE", "HEAD"],
                 AllowedOrigins: corsOrigins,
-                ExposeHeaders: ["ETag"],
+                // Payload clientUploads needs ETag; expose common S3 headers too.
+                ExposeHeaders: [
+                  "ETag",
+                  "x-amz-request-id",
+                  "x-amz-id-2",
+                  "x-amz-version-id",
+                ],
                 MaxAgeSeconds: 3600,
               },
             ],
           },
         },
         physicalResourceId: cr.PhysicalResourceId.of(
-          `${mediaBucket.bucketName}-client-upload-cors`,
+          `${mediaBucket.bucketName}-client-upload-cors-v2`,
         ),
       };
 

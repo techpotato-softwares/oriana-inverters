@@ -190,6 +190,16 @@ export default buildConfig({
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,
+  // Large videos/PDFs must use S3 clientUploads on Lambda (≈6MB invoke cap).
+  // These limits apply when the file is parsed by Payload (local / metadata path).
+  upload: {
+    abortOnLimit: true,
+    useTempFiles: true,
+    tempFileDir: '/tmp',
+    limits: {
+      fileSize: 100 * 1024 * 1024, // 100 MB
+    },
+  },
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
