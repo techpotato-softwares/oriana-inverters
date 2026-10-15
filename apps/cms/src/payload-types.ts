@@ -3246,15 +3246,27 @@ export interface Home {
      */
     captions?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           text: string;
           id?: string | null;
         }[]
       | null;
   };
   introduction?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     paragraphs?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           text: string;
           id?: string | null;
         }[]
@@ -3262,10 +3274,18 @@ export interface Home {
     tagline?: string | null;
   };
   /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  peekImagesHidden?: boolean | null;
+  /**
    * Stacked full-viewport scenario images (For Home, Business, Utility, Storage).
    */
   peekImages?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         /**
          * Stable id used by the UI (home, business, utility, storage).
          */
@@ -3280,8 +3300,16 @@ export interface Home {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  visionMissionHidden?: boolean | null;
   visionMission?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         /**
          * Stable id (vision, mission).
          */
@@ -3299,6 +3327,10 @@ export interface Home {
       }[]
     | null;
   impactSection?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     body?: string | null;
     link?: {
@@ -3310,6 +3342,10 @@ export interface Home {
     };
     stats?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           /**
            * Preferred: upload an SVG/PNG icon.
            */
@@ -3344,9 +3380,17 @@ export interface Home {
       | null;
   };
   productCategories?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     items?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           /**
            * Stable id (on-grid, hybrid, utility, bess).
            */
@@ -3363,10 +3407,18 @@ export interface Home {
       | null;
   };
   whySection?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     body?: string | null;
     cards?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           idKey: string;
           title: string;
           href?: string | null;
@@ -3380,6 +3432,10 @@ export interface Home {
       | null;
   };
   greenMission?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     /**
      * Background image. If empty, the page uses the built-in Unsplash fallback.
@@ -3390,10 +3446,18 @@ export interface Home {
     ctaLabel?: string | null;
   };
   newsSection?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     mode?: ('live' | 'manual') | null;
     manualItems?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           date?: string | null;
           href: string;
@@ -3415,6 +3479,10 @@ export interface Home {
    * Social URLs come from Site Settings → Footer → Social links. Only the heading is edited here.
    */
   followSection?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
   };
   seo?: {
@@ -4857,6 +4925,7 @@ export interface HomeSelect<T extends boolean = true> {
         captions?:
           | T
           | {
+              hidden?: T;
               text?: T;
               id?: T;
             };
@@ -4864,18 +4933,22 @@ export interface HomeSelect<T extends boolean = true> {
   introduction?:
     | T
     | {
+        hidden?: T;
         title?: T;
         paragraphs?:
           | T
           | {
+              hidden?: T;
               text?: T;
               id?: T;
             };
         tagline?: T;
       };
+  peekImagesHidden?: T;
   peekImages?:
     | T
     | {
+        hidden?: T;
         idKey?: T;
         title?: T;
         href?: T;
@@ -4883,9 +4956,11 @@ export interface HomeSelect<T extends boolean = true> {
         alt?: T;
         id?: T;
       };
+  visionMissionHidden?: T;
   visionMission?:
     | T
     | {
+        hidden?: T;
         idKey?: T;
         label?: T;
         body?: T;
@@ -4898,6 +4973,7 @@ export interface HomeSelect<T extends boolean = true> {
   impactSection?:
     | T
     | {
+        hidden?: T;
         title?: T;
         body?: T;
         link?:
@@ -4909,6 +4985,7 @@ export interface HomeSelect<T extends boolean = true> {
         stats?:
           | T
           | {
+              hidden?: T;
               icon?: T;
               iconKey?: T;
               value?: T;
@@ -4919,10 +4996,12 @@ export interface HomeSelect<T extends boolean = true> {
   productCategories?:
     | T
     | {
+        hidden?: T;
         title?: T;
         items?:
           | T
           | {
+              hidden?: T;
               idKey?: T;
               label?: T;
               href?: T;
@@ -4934,11 +5013,13 @@ export interface HomeSelect<T extends boolean = true> {
   whySection?:
     | T
     | {
+        hidden?: T;
         title?: T;
         body?: T;
         cards?:
           | T
           | {
+              hidden?: T;
               idKey?: T;
               title?: T;
               href?: T;
@@ -4950,6 +5031,7 @@ export interface HomeSelect<T extends boolean = true> {
   greenMission?:
     | T
     | {
+        hidden?: T;
         title?: T;
         image?: T;
         alt?: T;
@@ -4959,11 +5041,13 @@ export interface HomeSelect<T extends boolean = true> {
   newsSection?:
     | T
     | {
+        hidden?: T;
         title?: T;
         mode?: T;
         manualItems?:
           | T
           | {
+              hidden?: T;
               title?: T;
               date?: T;
               href?: T;
@@ -4982,6 +5066,7 @@ export interface HomeSelect<T extends boolean = true> {
   followSection?:
     | T
     | {
+        hidden?: T;
         title?: T;
       };
   seo?:

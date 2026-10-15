@@ -19,20 +19,16 @@ export function visibleItems<T>(rows: readonly T[] | null | undefined): T[] {
 }
 
 /**
- * Resolve a CMS list against its fallback.
+ * Pick the list to render after mapping visible CMS rows.
  * - CMS has no rows → fallback
- * - CMS has rows → mapped visible rows (possibly empty when all are hidden)
+ * - some rows mapped → those rows
+ * - nothing mapped but an editor hid rows → empty (never resurrect defaults)
+ * - nothing mapped and nothing hidden (invalid rows) → fallback
  */
-export function cmsListOrFallback<Row, Out>(
-  rows: unknown,
-  map: (rows: Row[]) => Out[],
-  fallback: Out[],
-): Out[] {
+export function resolveCmsList<Out>(rows: unknown, mapped: Out[], fallback: Out[]): Out[] {
   if (!Array.isArray(rows) || rows.length === 0) return fallback
-  const visible = visibleItems(rows as Row[])
-  if (visible.length === 0) return []
-  const mapped = map(visible)
-  return mapped.length ? mapped : fallback
+  if (mapped.length) return mapped
+  return rows.some(isHidden) ? [] : fallback
 }
 
 /** True when a section group (or tab group) is toggled off in the CMS. */

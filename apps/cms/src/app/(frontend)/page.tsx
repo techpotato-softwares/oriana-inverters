@@ -39,13 +39,14 @@ export default async function HomePage() {
     publishedAt?: string | null
     heroImage?: unknown
   }[] = []
-  if (view.news.mode !== 'manual') {
+  const { news } = view
+  if (news && news.mode !== 'manual') {
     try {
       const payload = await getPayload({ config: configPromise })
       const result = await payload.find({
         collection: 'posts',
         depth: 1,
-        limit: view.news.postsLimit || 5,
+        limit: news.postsLimit || 5,
         where: { _status: { equals: 'published' } },
         sort: '-publishedAt',
       })
@@ -63,8 +64,8 @@ export default async function HomePage() {
   }
 
   const newsItems =
-    view.news.mode === 'manual' && view.news.manualItems.length
-      ? view.news.manualItems
+    news?.mode === 'manual' && news.manualItems.length
+      ? news.manualItems
       : livePosts.map((post) => ({
           title: post.title,
           date: post.publishedAt
@@ -82,31 +83,33 @@ export default async function HomePage() {
   return (
     <main className="bg-white">
       <VideoHero {...view.videoHero} />
-      <IntroductionSection {...view.introduction} />
+      {view.introduction ? <IntroductionSection {...view.introduction} /> : null}
       <PeekStackImages images={view.peekImages} ariaLabel="Customer scenarios" />
       <VisionMissionSection cards={view.visionMission} />
-      <ImpactStats
-        title={view.impact.title}
-        body={view.impact.body}
-        link={view.impact.link}
-        stats={view.impact.stats}
-      />
-      <ProductCategoriesSection
-        title={view.productCategories.title}
-        categories={view.productCategories.categories}
-      />
-      <WhyChooseOrianaSection
-        title={view.whyChoose.title}
-        body={view.whyChoose.body}
-        cards={view.whyChoose.cards}
-      />
-      <GreenMissionSection {...view.greenMission} />
-      <NewsEventsSection
-        title={view.news.title}
-        link={view.news.link}
-        items={newsItems}
-      />
-      <FollowOrianaSection title={view.follow.title} links={view.follow.links} />
+      {view.impact ? (
+        <ImpactStats
+          title={view.impact.title}
+          body={view.impact.body}
+          link={view.impact.link}
+          stats={view.impact.stats}
+        />
+      ) : null}
+      {view.productCategories ? (
+        <ProductCategoriesSection
+          title={view.productCategories.title}
+          categories={view.productCategories.categories}
+        />
+      ) : null}
+      {view.whyChoose ? (
+        <WhyChooseOrianaSection
+          title={view.whyChoose.title}
+          body={view.whyChoose.body}
+          cards={view.whyChoose.cards}
+        />
+      ) : null}
+      {view.greenMission ? <GreenMissionSection {...view.greenMission} /> : null}
+      {news ? <NewsEventsSection title={news.title} link={news.link} items={newsItems} /> : null}
+      {view.follow ? <FollowOrianaSection title={view.follow.title} links={view.follow.links} /> : null}
     </main>
   )
 }

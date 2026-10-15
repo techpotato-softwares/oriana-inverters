@@ -3,7 +3,15 @@ import type { GlobalConfig } from 'payload'
 import { authenticated } from '@/access/authenticated'
 import { iconOrMediaFields } from '@/fields/iconOrMedia'
 import { seoFields } from '@/fields/seo'
+import { sectionHiddenField, visibleArray } from '@/fields/visibility'
 import { revalidateHome } from './hooks/revalidateHome'
+
+/** Section toggle for tabs whose content is a bare array (no wrapping group). */
+const sectionToggle = (name: string) =>
+  ({
+    ...sectionHiddenField(),
+    name,
+  }) satisfies NonNullable<GlobalConfig['fields']>[number]
 
 const linkFields = (label: string, href: string) => [
   { name: 'label' as const, type: 'text' as const, defaultValue: label },
@@ -81,7 +89,7 @@ export const Home: GlobalConfig = {
                     mimeType: { contains: 'image' },
                   },
                 },
-                {
+                visibleArray({
                   name: 'captions',
                   type: 'array',
                   labels: { singular: 'Caption', plural: 'Captions' },
@@ -94,7 +102,7 @@ export const Home: GlobalConfig = {
                     { text: 'To power that transforms businesses' },
                     { text: 'Energy platforms partners trust' },
                   ],
-                },
+                }),
               ],
             },
           ],
@@ -106,8 +114,9 @@ export const Home: GlobalConfig = {
               name: 'introduction',
               type: 'group',
               fields: [
+                sectionHiddenField(),
                 { name: 'title', type: 'text', defaultValue: 'Introduction' },
-                {
+                visibleArray({
                   name: 'paragraphs',
                   type: 'array',
                   labels: { singular: 'Paragraph', plural: 'Paragraphs' },
@@ -120,7 +129,7 @@ export const Home: GlobalConfig = {
                       text: "Backed by industry experience and a strong understanding of India's solar ecosystem, Oriana Inverters are designed to meet the evolving requirements of residential, commercial, industrial, and utility-scale solar applications.",
                     },
                   ],
-                },
+                }),
                 {
                   name: 'tagline',
                   type: 'text',
@@ -133,7 +142,8 @@ export const Home: GlobalConfig = {
         {
           label: 'Scenarios',
           fields: [
-            {
+            sectionToggle('peekImagesHidden'),
+            visibleArray({
               name: 'peekImages',
               type: 'array',
               labels: { singular: 'Scenario', plural: 'Scenarios' },
@@ -160,13 +170,14 @@ export const Home: GlobalConfig = {
                 { idKey: 'utility', title: 'For Utility', href: '/solutions/utility' },
                 { idKey: 'storage', title: 'For Storage', href: '/solutions/storage' },
               ],
-            },
+            }),
           ],
         },
         {
           label: 'Vision & Mission',
           fields: [
-            {
+            sectionToggle('visionMissionHidden'),
+            visibleArray({
               name: 'visionMission',
               type: 'array',
               labels: { singular: 'Card', plural: 'Cards' },
@@ -202,7 +213,7 @@ export const Home: GlobalConfig = {
                   ctaLabel: 'Explore more',
                 },
               ],
-            },
+            }),
           ],
         },
         {
@@ -212,6 +223,7 @@ export const Home: GlobalConfig = {
               name: 'impactSection',
               type: 'group',
               fields: [
+                sectionHiddenField(),
                 { name: 'title', type: 'text', defaultValue: 'Our Impact' },
                 {
                   name: 'body',
@@ -224,7 +236,7 @@ export const Home: GlobalConfig = {
                   type: 'group',
                   fields: linkFields('Discover who we are', '/about'),
                 },
-                {
+                visibleArray({
                   name: 'stats',
                   type: 'array',
                   labels: { singular: 'Stat', plural: 'Stats' },
@@ -240,7 +252,7 @@ export const Home: GlobalConfig = {
                     { iconKey: 'building', value: '50+', label: 'Channels and service' },
                     { iconKey: 'leaf', value: '99.6%', label: 'Peak conversion efficiency' },
                   ],
-                },
+                }),
               ],
             },
           ],
@@ -252,8 +264,9 @@ export const Home: GlobalConfig = {
               name: 'productCategories',
               type: 'group',
               fields: [
+                sectionHiddenField(),
                 { name: 'title', type: 'text', defaultValue: 'Product Categories' },
-                {
+                visibleArray({
                   name: 'items',
                   type: 'array',
                   labels: { singular: 'Category', plural: 'Categories' },
@@ -297,7 +310,7 @@ export const Home: GlobalConfig = {
                       alt: 'Battery energy storage system',
                     },
                   ],
-                },
+                }),
               ],
             },
           ],
@@ -309,6 +322,7 @@ export const Home: GlobalConfig = {
               name: 'whySection',
               type: 'group',
               fields: [
+                sectionHiddenField(),
                 {
                   name: 'title',
                   type: 'text',
@@ -320,7 +334,7 @@ export const Home: GlobalConfig = {
                   defaultValue:
                     'Oriana Inverters brings together advanced power electronics, intelligent technology, and precision engineering to deliver reliable solar power solutions for homes, businesses, and large-scale applications.',
                 },
-                {
+                visibleArray({
                   name: 'cards',
                   type: 'array',
                   labels: { singular: 'Card', plural: 'Cards' },
@@ -369,7 +383,7 @@ export const Home: GlobalConfig = {
                       alt: 'Professional customer service',
                     },
                   ],
-                },
+                }),
               ],
             },
           ],
@@ -381,6 +395,7 @@ export const Home: GlobalConfig = {
               name: 'greenMission',
               type: 'group',
               fields: [
+                sectionHiddenField(),
                 {
                   name: 'title',
                   type: 'text',
@@ -407,6 +422,7 @@ export const Home: GlobalConfig = {
               name: 'newsSection',
               type: 'group',
               fields: [
+                sectionHiddenField(),
                 { name: 'title', type: 'text', defaultValue: 'Trending News & Events' },
                 {
                   name: 'mode',
@@ -417,7 +433,7 @@ export const Home: GlobalConfig = {
                     { label: 'Manual items', value: 'manual' },
                   ],
                 },
-                {
+                visibleArray({
                   name: 'manualItems',
                   type: 'array',
                   admin: {
@@ -438,7 +454,7 @@ export const Home: GlobalConfig = {
                       },
                     },
                   ],
-                },
+                }),
                 {
                   name: 'postsLimit',
                   type: 'number',
@@ -466,7 +482,10 @@ export const Home: GlobalConfig = {
                 description:
                   'Social URLs come from Site Settings → Footer → Social links. Only the heading is edited here.',
               },
-              fields: [{ name: 'title', type: 'text', defaultValue: 'Follow Oriana' }],
+              fields: [
+                sectionHiddenField(),
+                { name: 'title', type: 'text', defaultValue: 'Follow Oriana' },
+              ],
             },
           ],
         },
