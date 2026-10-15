@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache'
 
 import { footerNav, socialLinks as defaultSocial } from '@/config/footer'
 import { getHiddenCategorySlugs } from '@/utilities/getCatalogue'
+import { isHidden, resolveCmsList } from '@/utilities/visibility'
 import type {
   SiteFooterColumn,
   SiteNavLink,
@@ -53,7 +54,7 @@ function optionalId(value: unknown): string | null {
 function mapLinks(value: unknown): SiteNavLink[] {
   if (!Array.isArray(value)) return []
   return value.flatMap((item) => {
-    if (!item || typeof item !== 'object') return []
+    if (!item || typeof item !== 'object' || isHidden(item)) return []
     const row = item as { label?: unknown; href?: unknown }
     if (typeof row.label !== 'string' || typeof row.href !== 'string') return []
     if (!row.label.trim() || !row.href.trim()) return []
@@ -71,6 +72,7 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
 
     const footerColumns = Array.isArray(doc.footerColumns)
       ? doc.footerColumns.flatMap((col) => {
+          if (isHidden(col)) return []
           const title = typeof col?.title === 'string' ? col.title.trim() : ''
           const links = mapLinks(col?.links)
           if (!title || !links.length) return []
@@ -81,6 +83,7 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
     const legalLinks = mapLinks(doc.legalLinks)
     const socialLinks = Array.isArray(doc.socialLinks)
       ? doc.socialLinks.flatMap((item) => {
+          if (isHidden(item)) return []
           const platform = item?.platform
           const href = typeof item?.href === 'string' ? item.href.trim() : ''
           if (
@@ -133,8 +136,11 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
       '/partners/installers',
     ])
 
-    const resolvedFooter =
-      footerColumns.length > 0 ? footerColumns : defaultSettings.footerColumns
+    const resolvedFooter = resolveCmsList(
+      doc.footerColumns,
+      footerColumns,
+      defaultSettings.footerColumns,
+    )
     const partnersFromConfig = defaultSettings.footerColumns.find((col) => col.title === 'Partners')
     const productsFromConfig = defaultSettings.footerColumns.find(
       (col) => col.title === 'Products & Solutions',
@@ -161,8 +167,8 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
       googleAnalyticsId: optionalId(doc.googleAnalyticsId),
       googleTagManagerId: optionalId(doc.googleTagManagerId),
       footerColumns: footerWithConfigColumns,
-      legalLinks: legalLinks.length ? legalLinks : defaultSettings.legalLinks,
-      socialLinks: socialLinks.length ? socialLinks : defaultSettings.socialLinks,
+      legalLinks: resolveCmsList(doc.legalLinks, legalLinks, defaultSettings.legalLinks),
+      socialLinks: resolveCmsList(doc.socialLinks, socialLinks, defaultSettings.socialLinks),
     }
   } catch (error) {
     console.error('[getSiteSettings] failed:', error)

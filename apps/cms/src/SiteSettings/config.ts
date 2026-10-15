@@ -1,5 +1,7 @@
 import type { GlobalConfig } from 'payload'
 
+import { visibleArray } from '@/fields/visibility'
+
 import { revalidateSiteSettings } from './hooks/revalidateSiteSettings'
 
 const navLinkFields = [
@@ -120,7 +122,7 @@ export const SiteSettings: GlobalConfig = {
         {
           label: 'Footer',
           fields: [
-            {
+            visibleArray({
               name: 'footerColumns',
               type: 'array',
               labels: { singular: 'Column', plural: 'Columns' },
@@ -129,15 +131,15 @@ export const SiteSettings: GlobalConfig = {
               },
               fields: [
                 { name: 'title', type: 'text', required: true },
-                {
+                visibleArray({
                   name: 'links',
                   type: 'array',
                   labels: { singular: 'Link', plural: 'Links' },
                   fields: navLinkFields,
-                },
+                }),
               ],
-            },
-            {
+            }),
+            visibleArray({
               name: 'legalLinks',
               type: 'array',
               labels: { singular: 'Legal link', plural: 'Legal links' },
@@ -145,8 +147,8 @@ export const SiteSettings: GlobalConfig = {
                 description: 'Privacy, terms, sitemap, etc. Empty keeps the current legal row.',
               },
               fields: navLinkFields,
-            },
-            {
+            }),
+            visibleArray({
               name: 'socialLinks',
               type: 'array',
               labels: { singular: 'Social link', plural: 'Social links' },
@@ -165,7 +167,7 @@ export const SiteSettings: GlobalConfig = {
                 },
                 { name: 'href', type: 'text', required: true },
               ],
-            },
+            }),
           ],
         },
       ],

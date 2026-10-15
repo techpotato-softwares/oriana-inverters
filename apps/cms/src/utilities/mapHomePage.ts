@@ -59,7 +59,8 @@ export function mapFollowLinks(socials: SiteSocialLink[]): FollowSocialLink[] {
       } satisfies FollowSocialLink,
     ]
   })
-  return links.length ? links : HOME_FOLLOW_ORIANA.links
+  // Site settings already falls back to the default socials; an empty list means all were hidden.
+  return links
 }
 
 type ImpactStat = (typeof HOME_IMPACT.stats)[number]

@@ -3187,9 +3187,17 @@ export interface SiteSetting {
    */
   footerColumns?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         title: string;
         links?:
           | {
+              /**
+               * Hide this item from visitors without deleting it.
+               */
+              hidden?: boolean | null;
               label: string;
               /**
                * Internal path (/about) or full URL (https://…).
@@ -3206,6 +3214,10 @@ export interface SiteSetting {
    */
   legalLinks?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         label: string;
         /**
          * Internal path (/about) or full URL (https://…).
@@ -3216,6 +3228,10 @@ export interface SiteSetting {
     | null;
   socialLinks?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         platform: 'linkedin' | 'facebook' | 'youtube' | 'instagram' | 'x';
         href: string;
         id?: string | null;
@@ -5096,10 +5112,12 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   footerColumns?:
     | T
     | {
+        hidden?: T;
         title?: T;
         links?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -5109,6 +5127,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   legalLinks?:
     | T
     | {
+        hidden?: T;
         label?: T;
         href?: T;
         id?: T;
@@ -5116,6 +5135,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   socialLinks?:
     | T
     | {
+        hidden?: T;
         platform?: T;
         href?: T;
         id?: T;
