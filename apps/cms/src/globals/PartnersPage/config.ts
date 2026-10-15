@@ -11,6 +11,7 @@ import {
   sectionIntro,
   subpageHero,
 } from '@/fields/marketing'
+import { visibleArray } from '@/fields/visibility'
 
 export const PartnersPage: GlobalConfig = {
   slug: 'partners-page',
@@ -106,12 +107,12 @@ export const PartnersPage: GlobalConfig = {
             { name: 'stepsTitle', type: 'text' },
             cardList('steps', { label: 'Steps' }),
             { name: 'benefitsTitle', type: 'text' },
-            {
+            visibleArray({
               name: 'benefits',
               type: 'array',
               admin: { description: 'Leave empty to keep the default list.' },
               fields: [{ name: 'text', type: 'text', required: true }],
-            },
+            }),
             linkList('links', 'Text links'),
             ctaBand(),
             pageMeta(),

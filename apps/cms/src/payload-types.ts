@@ -3757,6 +3757,10 @@ export interface PartnersPage {
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -3840,6 +3844,10 @@ export interface PartnersPage {
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -3997,6 +4005,10 @@ export interface PartnersPage {
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -4049,6 +4061,10 @@ export interface PartnersPage {
      */
     benefits?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           text: string;
           id?: string | null;
         }[]
@@ -4068,6 +4084,10 @@ export interface PartnersPage {
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -4138,6 +4158,10 @@ export interface PartnersPage {
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -4200,6 +4224,10 @@ export interface PartnersPage {
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -4242,8 +4270,16 @@ export interface Career {
     image?: (number | null) | Media;
   };
   image?: (number | null) | Media;
+  /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  lifeHidden?: boolean | null;
   whyTitle?: string | null;
   whyBody?: string | null;
+  /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  openingsHidden?: boolean | null;
   openingsTitle?: string | null;
   /**
    * Where Apply buttons send candidates. Prefer the contact form with intent=career.
@@ -4916,6 +4952,10 @@ export interface Contact {
   cards?:
     | {
         /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
+        /**
          * Preferred: upload an SVG/PNG icon.
          */
         icon?: (number | null) | Media;
@@ -5455,6 +5495,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5522,6 +5563,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5640,6 +5682,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5685,6 +5728,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         benefits?:
           | T
           | {
+              hidden?: T;
               text?: T;
               id?: T;
             };
@@ -5699,6 +5743,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5759,6 +5804,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5812,6 +5858,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5853,8 +5900,10 @@ export interface CareersSelect<T extends boolean = true> {
         image?: T;
       };
   image?: T;
+  lifeHidden?: T;
   whyTitle?: T;
   whyBody?: T;
+  openingsHidden?: T;
   openingsTitle?: T;
   applyHref?: T;
   applyLabel?: T;
@@ -6327,6 +6376,7 @@ export interface ContactSelect<T extends boolean = true> {
   cards?:
     | T
     | {
+        hidden?: T;
         icon?: T;
         iconKey?: T;
         title?: T;

@@ -1,6 +1,6 @@
 import type { Field } from 'payload'
 
-import { visibleArray } from '@/fields/visibility'
+import { sectionHiddenField, visibleArray } from '@/fields/visibility'
 
 /** Icon keys rendered by `MarketingIcon` in apps/ui. Keep both lists in sync. */
 export const marketingIconOptions = [
@@ -86,6 +86,7 @@ export const ctaBand = (name = 'cta', label = 'Call to action'): Field => ({
   type: 'group',
   label,
   fields: [
+    sectionHiddenField(),
     { name: 'title', type: 'text' },
     { name: 'body', type: 'textarea' },
     optionalLink('primary', 'Primary button'),
