@@ -150,8 +150,43 @@ function byKey<T extends { id: string }>(items: T[]): Map<string, T> {
   return new Map(items.map((item) => [item.id, item]))
 }
 
+const CATEGORY_HREF = /^\/products\/category\/([^/?#]+)/
+
+function linksToHiddenCategory(href: string | undefined, hidden: ReadonlySet<string>): boolean {
+  if (!href || !hidden.size) return false
+  const slug = CATEGORY_HREF.exec(href)?.[1]
+  return Boolean(slug && hidden.has(slug))
+}
+
+/** Drop home tiles that point at a category an editor has hidden. */
+function withoutHiddenCategoryTiles(view: HomePageView, hidden: ReadonlySet<string>): HomePageView {
+  if (!hidden.size) return view
+  return {
+    ...view,
+    peekImages: view.peekImages.filter((item) => !linksToHiddenCategory(item.href, hidden)),
+    productCategories: {
+      ...view.productCategories,
+      categories: view.productCategories.categories.filter(
+        (item) => !linksToHiddenCategory(item.href, hidden),
+      ),
+    },
+  }
+}
+
+type MapHomeOptions = {
+  hiddenCategorySlugs?: ReadonlySet<string>
+}
+
 /** Map Payload Home global → homepage view. `home === null` means the CMS fetch failed. */
-export function mapHomePage(home: unknown, socials: SiteSocialLink[]): HomePageView {
+export function mapHomePage(
+  home: unknown,
+  socials: SiteSocialLink[],
+  { hiddenCategorySlugs = new Set() }: MapHomeOptions = {},
+): HomePageView {
+  return withoutHiddenCategoryTiles(mapHomeDoc(home, socials), hiddenCategorySlugs)
+}
+
+function mapHomeDoc(home: unknown, socials: SiteSocialLink[]): HomePageView {
   const followLinks = mapFollowLinks(socials)
 
   if (!home || typeof home !== 'object') {

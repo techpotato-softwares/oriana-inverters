@@ -3,6 +3,7 @@ import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
 
 import { footerNav, socialLinks as defaultSocial } from '@/config/footer'
+import { getHiddenCategorySlugs } from '@/utilities/getCatalogue'
 import type {
   SiteFooterColumn,
   SiteNavLink,
@@ -169,6 +170,28 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
   }
 }
 
-export const getSiteSettings = unstable_cache(fetchSiteSettings, ['site-settings', 'footer-ia-2026-09'], {
+const getCachedSiteSettings = unstable_cache(fetchSiteSettings, ['site-settings', 'footer-ia-2026-09'], {
   tags: ['global_site-settings'],
 })
+
+const CATEGORY_HREF = /^\/products\/category\/([^/?#]+)/
+
+function withoutHiddenCategoryLinks(
+  columns: SiteFooterColumn[],
+  hidden: ReadonlySet<string>,
+): SiteFooterColumn[] {
+  if (!hidden.size) return columns
+  return columns.flatMap((col) => {
+    const links = col.links.filter((link) => {
+      const slug = CATEGORY_HREF.exec(link.href)?.[1]
+      return !slug || !hidden.has(slug)
+    })
+    return links.length ? [{ ...col, links }] : []
+  })
+}
+
+/** Site settings with footer links to hidden categories removed. */
+export async function getSiteSettings(): Promise<SiteSettingsView> {
+  const [settings, hidden] = await Promise.all([getCachedSiteSettings(), getHiddenCategorySlugs()])
+  return { ...settings, footerColumns: withoutHiddenCategoryLinks(settings.footerColumns, hidden) }
+}

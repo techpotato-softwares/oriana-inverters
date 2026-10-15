@@ -234,10 +234,16 @@ export function sortSeriesByProductMaster<T extends { slug: string; series: stri
 }
 
 /** Products mega-menu: horizontal category tiles → category pages. */
-export function buildProductsMegaMenu(cmsCategories?: CmsCategoryImages[]): MegaCategory[] {
+export function buildProductsMegaMenu(
+  cmsCategories?: CmsCategoryImages[],
+  hiddenSlugs?: ReadonlySet<string>,
+): MegaCategory[] {
   const cmsBySlug = new Map((cmsCategories ?? []).map((category) => [category.slug, category]))
+  const categories = hiddenSlugs?.size
+    ? productMaster.categories.filter((category) => !hiddenSlugs.has(categorySlug(category.name)))
+    : productMaster.categories
 
-  return productMaster.categories.map((category) => {
+  return categories.map((category) => {
     const cms = cmsBySlug.get(categorySlug(category.name))
     const href = categoryHref(category.name)
     const image = categoryImage(category.name, cms)

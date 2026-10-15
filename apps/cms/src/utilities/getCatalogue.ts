@@ -261,7 +261,41 @@ async function fetchDownloads(): Promise<CatalogueDownload[]> {
   }
 }
 
-export const getCatalogueProducts = unstable_cache(
+/** Slugs of categories an editor ticked "Hide on website". Empty on any error (fail-open). */
+async function fetchHiddenCategorySlugs(): Promise<string[]> {
+  const payload = await getPayloadSafe()
+  if (!payload) return []
+  try {
+    const result = await payload.find({
+      collection: 'categories',
+      depth: 0,
+      limit: 100,
+      pagination: false,
+      where: { hidden: { equals: true } },
+    })
+    return result.docs.flatMap((doc) => (doc.slug ? [doc.slug] : []))
+  } catch (error) {
+    console.error('[getCatalogue] hidden categories query failed — showing all:', error)
+    return []
+  }
+}
+
+const getCachedHiddenCategorySlugs = unstable_cache(
+  fetchHiddenCategorySlugs,
+  ['catalogue-hidden-category-slugs'],
+  { tags: ['categories'] },
+)
+
+export async function getHiddenCategorySlugs(): Promise<Set<string>> {
+  return new Set(await getCachedHiddenCategorySlugs())
+}
+
+export async function isCategoryHidden(slug: string | null | undefined): Promise<boolean> {
+  if (!slug) return false
+  return (await getHiddenCategorySlugs()).has(slug)
+}
+
+const getCachedCatalogueProducts = unstable_cache(
   fetchPublishedProducts,
   ['catalogue-products', 'canonical-v3-family-products', 'manual-pdf-v1'],
   {
@@ -269,7 +303,13 @@ export const getCatalogueProducts = unstable_cache(
   },
 )
 
-export const getCatalogueCategories = unstable_cache(
+/** Published products, excluding products in hidden categories. */
+export async function getCatalogueProducts(): Promise<CatalogueProduct[]> {
+  const [products, hidden] = await Promise.all([getCachedCatalogueProducts(), getHiddenCategorySlugs()])
+  return hidden.size ? products.filter((product) => !hidden.has(product.categorySlug)) : products
+}
+
+const getCachedCatalogueCategories = unstable_cache(
   fetchCategories,
   ['catalogue-categories', 'canonical-v3-category-hero'],
   {
@@ -277,12 +317,24 @@ export const getCatalogueCategories = unstable_cache(
   },
 )
 
+/** Visible categories (hidden ones removed). */
+export async function getCatalogueCategories(): Promise<CatalogueCategory[]> {
+  const [categories, hidden] = await Promise.all([
+    getCachedCatalogueCategories(),
+    getHiddenCategorySlugs(),
+  ])
+  return hidden.size ? categories.filter((category) => !hidden.has(category.slug)) : categories
+}
+
 export { uniqueProductsMegaMenuImageUrls }
 
 /** Products mega-menu with CMS segment photos when present; static PNGs otherwise. */
 export async function getProductsMegaMenu(): Promise<NavMegaCategory[]> {
-  const categories = await getCatalogueCategories()
-  return buildProductsMegaMenu(categories)
+  const [categories, hidden] = await Promise.all([
+    getCachedCatalogueCategories(),
+    getHiddenCategorySlugs(),
+  ])
+  return buildProductsMegaMenu(categories, hidden)
 }
 
 export const getCatalogueDownloads = unstable_cache(fetchDownloads, ['catalogue-downloads'], {
@@ -361,6 +413,12 @@ function productFromStaticCatalogue(slug: string): CatalogueProduct | null {
 }
 
 export async function getProductBySlug(slug: string): Promise<CatalogueProduct | null> {
+  const product = await resolveProductBySlug(slug)
+  if (!product || (await isCategoryHidden(product.categorySlug))) return null
+  return product
+}
+
+async function resolveProductBySlug(slug: string): Promise<CatalogueProduct | null> {
   const products = await getCatalogueProducts()
   const cached = products.find((p) => p.slug === slug)
   if (cached) return cached
@@ -374,6 +432,12 @@ export async function getProductBySlug(slug: string): Promise<CatalogueProduct |
 }
 
 export async function getSeriesBySlug(slug: string): Promise<CatalogueSeries | null> {
+  const series = await resolveSeriesBySlug(slug)
+  if (!series || (await isCategoryHidden(series.categorySlug))) return null
+  return series
+}
+
+async function resolveSeriesBySlug(slug: string): Promise<CatalogueSeries | null> {
   const seriesList = await getCatalogueSeries()
   const bySeriesSlug = findSeriesBySlug(seriesList, slug)
   if (bySeriesSlug) return overlayMasterPhotos(bySeriesSlug)
@@ -408,6 +472,7 @@ export async function getProductsByCategory(categorySlug: string): Promise<Catal
 }
 
 export async function getSeriesByCategory(categorySlug: string): Promise<CatalogueSeries[]> {
+  if (await isCategoryHidden(categorySlug)) return []
   const fromMaster = seriesFromProductMaster(categorySlug)
   const seriesList = isCanonicalCategorySlug(categorySlug) ? await getCatalogueSeries() : []
   const fromCms = seriesList.filter((series) => series.categorySlug === categorySlug)
@@ -431,6 +496,7 @@ export async function getSeriesByCategory(categorySlug: string): Promise<Catalog
 }
 
 export async function getCategoryMeta(slug: string): Promise<CatalogueCategory | null> {
+  if (await isCategoryHidden(slug)) return null
   const categories = await getCatalogueCategories()
   return (
     categories.find((c) => c.slug === slug) ??

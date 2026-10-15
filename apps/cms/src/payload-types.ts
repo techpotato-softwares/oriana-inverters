@@ -703,6 +703,10 @@ export interface Product {
 export interface Category {
   id: number;
   /**
+   * Hide this category, its products, menu/footer links and home tiles from visitors. Data is kept; untick to show again.
+   */
+  hidden?: boolean | null;
+  /**
    * Category / product-family name shown in nav and on /products.
    */
   title: string;
@@ -2445,6 +2449,7 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
+  hidden?: T;
   title?: T;
   generateSlug?: T;
   slug?: T;

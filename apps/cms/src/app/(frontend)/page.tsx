@@ -12,6 +12,7 @@ import { VideoHero } from '@/components/oriana/VideoHero'
 import { VisionMissionSection } from '@/components/oriana/VisionMissionSection'
 import { WhyChooseOrianaSection } from '@/components/oriana/WhyChooseOrianaSection'
 import { HOME_SEO } from '@/data/homeFallback'
+import { getHiddenCategorySlugs } from '@/utilities/getCatalogue'
 import { getHome } from '@/utilities/getMarketing'
 import { getSiteSettings } from '@/utilities/getSiteSettings'
 import { mapHomePage } from '@/utilities/mapHomePage'
@@ -25,8 +26,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [{ home }, settings] = await Promise.all([getHome(), getSiteSettings()])
-  const view = mapHomePage(home, settings.socialLinks)
+  const [{ home }, settings, hiddenCategorySlugs] = await Promise.all([
+    getHome(),
+    getSiteSettings(),
+    getHiddenCategorySlugs(),
+  ])
+  const view = mapHomePage(home, settings.socialLinks, { hiddenCategorySlugs })
 
   let livePosts: {
     title: string

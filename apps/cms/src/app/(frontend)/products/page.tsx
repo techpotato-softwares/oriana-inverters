@@ -12,7 +12,7 @@ import {
   type AllProductsTab,
   type CatalogueByCategory,
 } from '@/utilities/allProductsCatalogue'
-import { getSeriesByCategory } from '@/utilities/getCatalogue'
+import { getHiddenCategorySlugs, getSeriesByCategory } from '@/utilities/getCatalogue'
 
 export const metadata = {
   title: 'All Products',
@@ -44,14 +44,18 @@ export const dynamic = 'force-dynamic'
 
 export default async function ProductsPage({ searchParams }: Props) {
   const { cat, category: categoryParam } = await searchParams
-  if (cat && legacyCategoryRedirects[cat]) {
-    redirect(`/products/category/${legacyCategoryRedirects[cat]}`)
+  const hidden = await getHiddenCategorySlugs()
+  const legacyTarget = cat ? legacyCategoryRedirects[cat] : undefined
+  if (legacyTarget && !hidden.has(legacyTarget)) {
+    redirect(`/products/category/${legacyTarget}`)
   }
 
-  const tabs: AllProductsTab[] = staticCategories.map((item) => ({
-    slug: item.slug,
-    title: item.title,
-  }))
+  const tabs: AllProductsTab[] = staticCategories
+    .filter((item) => !hidden.has(item.slug))
+    .map((item) => ({
+      slug: item.slug,
+      title: item.title,
+    }))
 
   const requested = categoryParam || (cat && !legacyCategoryRedirects[cat] ? cat : undefined)
   if (requested && tabs.some((tab) => tab.slug === requested)) {
