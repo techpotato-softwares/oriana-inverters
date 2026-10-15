@@ -483,6 +483,10 @@ export interface FolderInterface {
  */
 export interface Download {
   id: number;
+  /**
+   * Hide this document from the downloads page without deleting it.
+   */
+  hidden?: boolean | null;
   title: string;
   file: number | Media;
   documentType: 'datasheet' | 'manual' | 'certificate' | 'warranty' | 'brochure' | 'software';
@@ -2322,6 +2326,7 @@ export interface ProductsSelect<T extends boolean = true> {
  * via the `definition` "downloads_select".
  */
 export interface DownloadsSelect<T extends boolean = true> {
+  hidden?: T;
   title?: T;
   file?: T;
   documentType?: T;

@@ -18,6 +18,7 @@ import {
 import type { NavMegaCategory } from '@/config/navigation'
 import { mapCategory, mapDownload, mapProductDoc } from '@/utilities/mapCatalogue'
 import { groupProductsIntoSeries, seriesNameOf, slugifySeries } from '@/utilities/series'
+import { visibleItems } from '@/utilities/visibility'
 import type {
   CatalogueCategory,
   CatalogueDownload,
@@ -254,7 +255,7 @@ async function fetchDownloads(): Promise<CatalogueDownload[]> {
       sort: 'title',
     })
 
-    return result.docs.map(mapDownload)
+    return visibleItems(result.docs).map(mapDownload)
   } catch (error) {
     console.error('[getCatalogue] downloads query failed:', error)
     return []

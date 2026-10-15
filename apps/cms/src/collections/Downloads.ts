@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import { hiddenField } from '../fields/visibility'
 
 export const Downloads: CollectionConfig = {
   slug: 'downloads',
@@ -26,14 +27,19 @@ export const Downloads: CollectionConfig = {
     afterChange: [
       async ({ doc, req: { payload, context } }) => {
         if (context.disableRevalidate) return doc
-        const { revalidatePath } = await import('next/cache')
+        const { revalidatePath, revalidateTag } = await import('next/cache')
         payload.logger.info('Revalidating downloads page')
+        revalidateTag('downloads')
         revalidatePath('/resources/downloads')
         return doc
       },
     ],
   },
   fields: [
+    hiddenField({
+      sidebar: true,
+      description: 'Hide this document from the downloads page without deleting it.',
+    }),
     {
       name: 'title',
       type: 'text',
