@@ -1,5 +1,7 @@
 import type { Field } from 'payload'
 
+import { visibleArray } from '@/fields/visibility'
+
 /** Icon keys rendered by `MarketingIcon` in apps/ui. Keep both lists in sync. */
 export const marketingIconOptions = [
   { label: 'Store', value: 'store' },
@@ -61,21 +63,22 @@ export const optionalLink = (name: string, label?: string): Field => ({
   ],
 })
 
-export const linkList = (name: string, label?: string): Field => ({
-  name,
-  type: 'array',
-  label,
-  admin: { description: 'Leave empty to keep the default links.' },
-  fields: [
-    {
-      type: 'row',
-      fields: [
-        { name: 'label', type: 'text', required: true, admin: { width: '50%' } },
-        { name: 'href', type: 'text', required: true, admin: { width: '50%' } },
-      ],
-    },
-  ],
-})
+export const linkList = (name: string, label?: string): Field =>
+  visibleArray({
+    name,
+    type: 'array',
+    label,
+    admin: { description: 'Leave empty to keep the default links.' },
+    fields: [
+      {
+        type: 'row',
+        fields: [
+          { name: 'label', type: 'text', required: true, admin: { width: '50%' } },
+          { name: 'href', type: 'text', required: true, admin: { width: '50%' } },
+        ],
+      },
+    ],
+  })
 
 /** Dark call-to-action band: heading, body, two buttons. */
 export const ctaBand = (name = 'cta', label = 'Call to action'): Field => ({
@@ -100,41 +103,40 @@ type CardOptions = {
 }
 
 /** Repeating card: title + body, plus optional icon, image, link, tag, and bullet list. */
-export const cardList = (name: string, options: CardOptions = {}): Field => ({
-  name,
-  type: 'array',
-  label: options.label,
-  admin: { description: 'Leave empty to keep the default cards.' },
-  fields: [
-    ...(options.tag ? [{ name: 'tag', type: 'text' } as Field] : []),
-    { name: 'title', type: 'text', required: true },
-    { name: 'body', type: 'textarea' },
-    ...(options.icon ? [iconSelect()] : []),
-    ...(options.image
-      ? [{ name: 'image', type: 'upload', relationTo: 'media' } as Field]
-      : []),
-    ...(options.link
-      ? [
-          {
-            type: 'row',
-            fields: [
-              { name: 'href', type: 'text', admin: { width: '50%' } },
-              { name: 'linkLabel', type: 'text', admin: { width: '50%' } },
-            ],
-          } as Field,
-        ]
-      : []),
-    ...(options.highlights
-      ? [
-          {
-            name: 'highlights',
-            type: 'array',
-            fields: [{ name: 'text', type: 'text', required: true }],
-          } as Field,
-        ]
-      : []),
-  ],
-})
+export const cardList = (name: string, options: CardOptions = {}): Field =>
+  visibleArray({
+    name,
+    type: 'array',
+    label: options.label,
+    admin: { description: 'Leave empty to keep the default cards.' },
+    fields: [
+      ...(options.tag ? [{ name: 'tag', type: 'text' } as Field] : []),
+      { name: 'title', type: 'text', required: true },
+      { name: 'body', type: 'textarea' },
+      ...(options.icon ? [iconSelect()] : []),
+      ...(options.image ? [{ name: 'image', type: 'upload', relationTo: 'media' } as Field] : []),
+      ...(options.link
+        ? [
+            {
+              type: 'row',
+              fields: [
+                { name: 'href', type: 'text', admin: { width: '50%' } },
+                { name: 'linkLabel', type: 'text', admin: { width: '50%' } },
+              ],
+            } as Field,
+          ]
+        : []),
+      ...(options.highlights
+        ? [
+            {
+              name: 'highlights',
+              type: 'array',
+              fields: [{ name: 'text', type: 'text', required: true }],
+            } as Field,
+          ]
+        : []),
+    ],
+  })
 
 /** Hero copy for a subpage: eyebrow, title, description, and a background image when the layout shows one. */
 export const subpageHero = (name = 'hero', { image = false }: { image?: boolean } = {}): Field => ({
@@ -164,7 +166,13 @@ export const pageMeta = (name = 'meta'): Field => ({
 /** Revalidate a route segment (and its subpages) plus a cache tag after a global save. */
 export const revalidateGlobal =
   (tag: string, paths: string[]) =>
-  ({ doc, req: { context } }: { doc: unknown; req: { context: { disableRevalidate?: boolean } } }) => {
+  ({
+    doc,
+    req: { context },
+  }: {
+    doc: unknown
+    req: { context: { disableRevalidate?: boolean } }
+  }) => {
     if (context.disableRevalidate) return doc
     void import('next/cache').then(({ revalidatePath, revalidateTag }) => {
       revalidateTag(tag)

@@ -3536,6 +3536,10 @@ export interface About {
     | null;
   leadership?: {
     /**
+     * Hide the Leadership section on /about and the “Founded by” strip on /about/brand-story.
+     */
+    hidden?: boolean | null;
+    /**
      * Leave blank to keep the default copy.
      */
     intro?: {
@@ -3548,6 +3552,10 @@ export interface About {
      */
     members?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           name: string;
           title?: string | null;
           /**
@@ -3640,6 +3648,10 @@ export interface About {
      */
     programmes?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           image?: (number | null) | Media;
@@ -3697,6 +3709,10 @@ export interface PartnersPage {
      */
     tracks?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           icon?:
@@ -3731,6 +3747,10 @@ export interface PartnersPage {
      */
     quickLinks?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           href: string;
           id?: string | null;
@@ -3781,6 +3801,10 @@ export interface PartnersPage {
      */
     coverage?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
@@ -3792,6 +3816,10 @@ export interface PartnersPage {
      */
     benefits?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
@@ -3802,6 +3830,10 @@ export interface PartnersPage {
      */
     links?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           href: string;
           id?: string | null;
@@ -3867,6 +3899,10 @@ export interface PartnersPage {
      */
     points?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
@@ -3915,6 +3951,10 @@ export interface PartnersPage {
      */
     pillars?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           icon?:
@@ -3947,6 +3987,10 @@ export interface PartnersPage {
      */
     quickLinks?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           href: string;
           id?: string | null;
@@ -3990,6 +4034,10 @@ export interface PartnersPage {
      */
     steps?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
@@ -4010,6 +4058,10 @@ export interface PartnersPage {
      */
     links?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           href: string;
           id?: string | null;
@@ -4060,6 +4112,10 @@ export interface PartnersPage {
      */
     paths?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           href?: string | null;
@@ -4072,6 +4128,10 @@ export interface PartnersPage {
      */
     enablement?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
@@ -4114,6 +4174,10 @@ export interface PartnersPage {
      */
     topics?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           href?: string | null;
@@ -4126,6 +4190,10 @@ export interface PartnersPage {
      */
     quickLinks?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           href: string;
           id?: string | null;
@@ -4277,6 +4345,10 @@ export interface Support {
      */
     items?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           image?: (number | null) | Media;
@@ -4305,6 +4377,10 @@ export interface Support {
      */
     steps?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           image?: (number | null) | Media;
@@ -4356,6 +4432,10 @@ export interface Support {
      */
     pillars?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           icon?:
@@ -4398,6 +4478,10 @@ export interface Support {
      */
     items?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           tag?: string | null;
           title: string;
           body?: string | null;
@@ -4433,6 +4517,10 @@ export interface Support {
      */
     items?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           icon?:
@@ -4484,6 +4572,10 @@ export interface Support {
      */
     items?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           image?: (number | null) | Media;
@@ -4508,6 +4600,10 @@ export interface Support {
      */
     steps?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
@@ -5120,6 +5216,7 @@ export interface AboutSelect<T extends boolean = true> {
   leadership?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5130,6 +5227,7 @@ export interface AboutSelect<T extends boolean = true> {
         members?:
           | T
           | {
+              hidden?: T;
               name?: T;
               title?: T;
               bio?: T;
@@ -5208,6 +5306,7 @@ export interface AboutSelect<T extends boolean = true> {
         programmes?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               image?: T;
@@ -5261,6 +5360,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         tracks?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               icon?: T;
@@ -5271,6 +5371,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         quickLinks?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -5320,6 +5421,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         coverage?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;
@@ -5328,6 +5430,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         benefits?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;
@@ -5335,6 +5438,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         links?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -5397,6 +5501,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         points?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;
@@ -5442,6 +5547,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         pillars?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               icon?: T;
@@ -5450,6 +5556,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         quickLinks?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -5493,6 +5600,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         steps?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;
@@ -5507,6 +5615,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         links?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -5556,6 +5665,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         paths?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               href?: T;
@@ -5565,6 +5675,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         enablement?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;
@@ -5607,6 +5718,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         topics?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               href?: T;
@@ -5616,6 +5728,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         quickLinks?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -5735,6 +5848,7 @@ export interface SupportSelect<T extends boolean = true> {
         items?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               image?: T;
@@ -5760,6 +5874,7 @@ export interface SupportSelect<T extends boolean = true> {
         steps?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               image?: T;
@@ -5802,6 +5917,7 @@ export interface SupportSelect<T extends boolean = true> {
         pillars?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               icon?: T;
@@ -5821,6 +5937,7 @@ export interface SupportSelect<T extends boolean = true> {
         items?:
           | T
           | {
+              hidden?: T;
               tag?: T;
               title?: T;
               body?: T;
@@ -5855,6 +5972,7 @@ export interface SupportSelect<T extends boolean = true> {
         items?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               icon?: T;
@@ -5882,6 +6000,7 @@ export interface SupportSelect<T extends boolean = true> {
         items?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               image?: T;
@@ -5904,6 +6023,7 @@ export interface SupportSelect<T extends boolean = true> {
         steps?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;

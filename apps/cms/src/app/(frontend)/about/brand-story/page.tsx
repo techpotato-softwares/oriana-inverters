@@ -11,6 +11,6 @@ export const metadata: Metadata = {
 }
 
 export default async function BrandStoryPage() {
-  const { leaders } = await getLeadership()
-  return <BrandStory content={brandStory} founders={leaders} />
+  const leadership = await getLeadership()
+  return <BrandStory content={brandStory} founders={leadership?.leaders ?? []} />
 }
