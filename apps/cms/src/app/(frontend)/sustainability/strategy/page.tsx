@@ -2,10 +2,15 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { ArrowRight } from 'lucide-react'
 
-import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { FadeIn } from '@/components/oriana/FadeIn'
 import { SustainabilityHero } from '@/components/oriana/sustainability/SustainabilityHero'
-import { defaultHero } from '@/components/oriana/sustainability/sustainabilityData'
+import {
+  defaultHero,
+  defaultStrategyHero,
+  defaultStrategyPillars,
+  defaultStrategySections,
+  type StrategySection,
+} from '@/components/oriana/sustainability/sustainabilityData'
 import { getSustainability } from '@/utilities/getMarketing'
 import { realStrategySections } from '@/utilities/placeholderContent'
 import { visibleItems } from '@/utilities/visibility'
@@ -18,18 +23,21 @@ function mediaUrl(v: unknown): string | null {
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getSustainability()
   return {
-    title: data?.strategyHero?.title || data?.seo?.metaTitle || 'Sustainability Strategy',
+    title: data?.strategyHero?.title || defaultStrategyHero.title,
     description:
       data?.strategyHero?.description ||
       data?.seo?.metaDescription ||
-      'Oriana Inverters environmental strategy and 2030 sustainability targets.',
+      defaultStrategyHero.description,
   }
 }
 
 export default async function SustainabilityStrategyPage() {
   const data = await getSustainability()
   const strategyHero = data?.strategyHero
-  const sections = visibleItems(realStrategySections(data?.strategySections)).map((section) => ({
+
+  const cmsSections: StrategySection[] = visibleItems(
+    realStrategySections(data?.strategySections),
+  ).map((section) => ({
     heading: section.heading || '',
     paragraphs: (section.body || '')
       .split(/\n+/)
@@ -37,45 +45,63 @@ export default async function SustainabilityStrategyPage() {
       .filter(Boolean),
   }))
 
-  if (sections.length === 0) {
-    return (
-      <main>
-        <ComingSoon
-          eyebrow="Sustainability"
-          title={strategyHero?.title || 'Sustainability Strategy'}
-          description={
-            strategyHero?.description ||
-            'Detailed strategy content will appear here once it is published in the CMS.'
-          }
-          breadcrumbs={[
-            { label: 'Sustainability', href: '/sustainability' },
-            { label: 'Strategy' },
-          ]}
-        />
-      </main>
-    )
-  }
+  const sections = cmsSections.length > 0 ? cmsSections : defaultStrategySections
 
   return (
     <main>
       <SustainabilityHero
-        eyebrow={strategyHero?.eyebrow || 'Sustainability'}
-        title={strategyHero?.title || 'Sustainability Strategy'}
-        description={strategyHero?.description || undefined}
+        eyebrow={strategyHero?.eyebrow || defaultStrategyHero.eyebrow}
+        title={strategyHero?.title || defaultStrategyHero.title}
+        description={strategyHero?.description || defaultStrategyHero.description}
         videoSrc={mediaUrl(data?.heroVideo) || defaultHero.videoSrc}
         posterSrc={mediaUrl(data?.image) || mediaUrl(data?.hero?.image) || defaultHero.posterSrc}
-        cta={null}
+        cta={{ label: 'View reports & policies', href: '/sustainability/reports' }}
       />
 
-      <section className="bg-white py-16 lg:py-24">
+      <section className="bg-oriana-surface section-safe-y">
+        <div className="container">
+          <FadeIn>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-oriana-blue">
+              Focus areas
+            </p>
+            <h2 className="fluid-heading mt-3 max-w-2xl font-display font-semibold text-oriana-navy">
+              How we organise the work
+            </h2>
+            <p className="mt-3 max-w-2xl text-base leading-relaxed text-oriana-muted">
+              Inspired by leading inverter makers’ ESG frameworks, adapted to Oriana’s manufacturing
+              footprint and partner network in India.
+            </p>
+          </FadeIn>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {defaultStrategyPillars.map((pillar, i) => (
+              <FadeIn key={pillar.title} delay={i * 0.05}>
+                <article className="flex h-full flex-col rounded-2xl border border-oriana-navy/8 bg-white p-6 lg:p-7">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-oriana-blue">
+                    {pillar.title}
+                  </p>
+                  <h3 className="mt-3 font-display text-lg font-semibold text-oriana-navy">
+                    {pillar.headline}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-oriana-muted">{pillar.body}</p>
+                </article>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white section-safe-y">
         <div className="container">
           <div className="max-w-3xl space-y-12">
             {sections.map((section, i) => (
               <FadeIn key={section.heading} delay={i * 0.05}>
-                <h2 className="font-display text-2xl font-semibold text-oriana-navy">{section.heading}</h2>
+                <h2 className="fluid-heading font-display font-semibold text-oriana-navy">
+                  {section.heading}
+                </h2>
                 <div className="mt-4 space-y-4">
                   {section.paragraphs.map((paragraph) => (
-                    <p key={paragraph.slice(0, 40)} className="text-sm leading-relaxed text-oriana-muted">
+                    <p key={paragraph.slice(0, 48)} className="text-sm leading-relaxed text-oriana-muted">
                       {paragraph}
                     </p>
                   ))}
@@ -84,13 +110,21 @@ export default async function SustainabilityStrategyPage() {
             ))}
           </div>
 
-          <Link
-            href="/sustainability"
-            className="mt-12 inline-flex items-center gap-2 text-sm font-semibold text-oriana-blue hover:underline"
-          >
-            Back to overview
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="mt-14 flex flex-wrap gap-4">
+            <Link
+              href="/sustainability/reports"
+              className="inline-flex items-center gap-2 rounded-full bg-oriana-blue px-6 py-3 text-sm font-semibold text-white transition hover:bg-oriana-deep"
+            >
+              Reports &amp; policies
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+            <Link
+              href="/sustainability"
+              className="inline-flex items-center gap-2 rounded-full border border-oriana-navy/15 px-6 py-3 text-sm font-semibold text-oriana-navy transition hover:border-oriana-blue hover:text-oriana-blue"
+            >
+              Back to overview
+            </Link>
+          </div>
         </div>
       </section>
     </main>

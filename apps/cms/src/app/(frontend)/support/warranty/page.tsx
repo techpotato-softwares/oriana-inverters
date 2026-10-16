@@ -2,9 +2,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { ComingSoon } from '@/components/oriana/ComingSoon'
-import { PageHero } from '@/components/oriana/PageHero'
+import { AboutHero } from '@/components/oriana/about/shared/AboutHero'
 import { heroImages } from '@/components/oriana/heroImages'
 import { defaultWarrantyPage as defaults } from '@/components/oriana/support/supportData'
+import { SupportResourcesNav } from '@/components/oriana/support/SupportResourcesNav'
 import { getSupport, getWarrantyPlans } from '@/utilities/getMarketing'
 import {
   mediaUrl,
@@ -41,11 +42,18 @@ export default async function WarrantyPage() {
 
   return (
     <main>
-      <PageHero
-        image={heroImages.warranty} eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
+      <AboutHero
+        eyebrow={hero.eyebrow}
+        title={hero.title}
+        description={hero.description}
+        media={{ kind: 'image', src: heroImages.warranty.src, alt: heroImages.warranty.alt }}
+        primary={primary}
+        secondary={{ label: 'Download Center', href: '/resources/downloads' }}
+        nav={<SupportResourcesNav />}
+      />
       <Breadcrumbs items={[{ label: 'Support', href: '/support' }, { label: hero.title }]} />
 
-      <section className="py-12 lg:py-16">
+      <section className="section-safe-y">
         <div className="container max-w-4xl">
           <h2 className="font-display text-2xl font-bold text-oriana-navy">
             {resolveText(cms?.matrixTitle, defaults.matrixTitle)}
@@ -56,7 +64,7 @@ export default async function WarrantyPage() {
                 compact
                 title="Warranty matrix coming soon"
                 description="Published coverage by product line will appear here. Contact support to register a product or start a claim."
-                primaryHref="/contact#contact-form"
+                primaryHref="/contact"
                 primaryLabel="Contact support"
                 secondaryHref="/resources/downloads"
                 secondaryLabel="Downloads"

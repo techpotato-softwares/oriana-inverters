@@ -126,12 +126,31 @@ export function ContactForm({ cards, form, successMessage, intent }: ContactForm
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
 
+  // Only scroll when the URL hash explicitly asks for the form — never on
+  // intent alone (that skipped the hero and fought Lenis / header height).
   useEffect(() => {
-    if (!topic && window.location.hash !== '#contact-form') return
-    const container = document.getElementById('contact-form')
+    if (window.location.hash !== '#contact-form') return
+
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    container?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
-    formRef.current?.querySelector<HTMLElement>('input, select, textarea')?.focus()
+    let cancelled = false
+    let innerFrame = 0
+    const outerFrame = window.requestAnimationFrame(() => {
+      // Wait a frame so --site-header-height / sticky offsets settle first.
+      innerFrame = window.requestAnimationFrame(() => {
+        if (cancelled) return
+        const container = document.getElementById('contact-form')
+        container?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+        formRef.current?.querySelector<HTMLElement>('input, select, textarea')?.focus({
+          preventScroll: true,
+        })
+      })
+    })
+
+    return () => {
+      cancelled = true
+      window.cancelAnimationFrame(outerFrame)
+      window.cancelAnimationFrame(innerFrame)
+    }
   }, [topic])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

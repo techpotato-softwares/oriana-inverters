@@ -3,12 +3,13 @@ import { ArrowUpRight, FileText } from 'lucide-react'
 
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
 import { FadeIn } from '@/components/oriana/FadeIn'
-import { PageHero } from '@/components/oriana/PageHero'
+import { AboutHero } from '@/components/oriana/about/shared/AboutHero'
 import {
   ProductDownloadsByCategory,
   type ProductDownloadCategory,
 } from '@/components/oriana/ProductDownloadsByCategory'
 import { heroImages } from '@/components/oriana/heroImages'
+import { SupportResourcesNav } from '@/components/oriana/support/SupportResourcesNav'
 import {
   getCatalogueCategories,
   getCatalogueDownloads,
@@ -71,11 +72,14 @@ export default async function DownloadsPage() {
 
   return (
     <main>
-      <PageHero
-        image={heroImages.downloads}
+      <AboutHero
         eyebrow="Resources"
         title="Download Center"
         description="Technical documentation, datasheets, installation guides, and compliance certificates for all Oriana products."
+        media={{ kind: 'image', src: heroImages.downloads.src, alt: heroImages.downloads.alt }}
+        primary={{ label: 'Browse products', href: '/products' }}
+        secondary={{ label: 'Contact support', href: '/support' }}
+        nav={<SupportResourcesNav />}
       />
       <Breadcrumbs items={[{ label: 'Resources', href: '/resources/downloads' }, { label: 'Downloads' }]} />
 

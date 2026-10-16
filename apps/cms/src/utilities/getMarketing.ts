@@ -63,7 +63,7 @@ function quoteHref(href: string | null | undefined): string {
   return value
 }
 
-export const getHeaderNav = unstable_cache(fetchHeaderNav, ['header-nav', 'nav-ia-2026-09'], {
+export const getHeaderNav = unstable_cache(fetchHeaderNav, ['header-nav', 'nav-ia-2026-10'], {
   tags: ['global_header'],
 })
 

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
-import { PageHero } from '@/components/oriana/PageHero'
+import { AboutHero } from '@/components/oriana/about/shared/AboutHero'
+import { ContactPageNav } from '@/components/oriana/contact/ContactPageNav'
 import { heroImages } from '@/components/oriana/heroImages'
 import { mediaUrl } from '@/utilities/cmsContent'
 import { getContactForm } from '@/utilities/getContactForm'
@@ -40,14 +41,17 @@ export default async function ContactPage({
 
   return (
     <main>
-      <PageHero
-        image={heroImage}
+      <AboutHero
         eyebrow={hero?.eyebrow || 'Contact'}
         title={hero?.title || "Let's Build Together"}
         description={
           hero?.description ||
           'Tell us about your project. Our engineering and sales teams respond within one business day.'
         }
+        media={{ kind: 'image', src: heroImage.src, alt: heroImage.alt }}
+        primary={{ label: 'Send a message', href: '#contact-form' }}
+        secondary={{ label: 'Sales enquiry', href: '/contact/sales' }}
+        nav={<ContactPageNav />}
       />
       <Breadcrumbs items={[{ label: 'Contact' }]} />
 

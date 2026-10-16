@@ -111,14 +111,14 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
   },
   {
     label: 'News & Media',
-    href: '/posts',
+    href: '/news',
     columns: [
       {
         title: 'News',
         links: [
-          { label: 'Newsroom', href: '/posts' },
-          { label: 'Press Releases', href: '/posts' },
-          { label: 'Events', href: '/posts' },
+          { label: 'Newsroom', href: '/news' },
+          { label: 'Press Releases', href: '/news/press-releases' },
+          { label: 'Events', href: '/news/events' },
         ],
       },
       {
@@ -141,7 +141,7 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
       },
       {
         title: 'Get Involved',
-        links: [{ label: 'Partner With Us', href: '/contact?intent=sales#contact-form' }],
+        links: [{ label: 'Partner With Us', href: '/contact/sales' }],
       },
     ],
   },
@@ -166,8 +166,8 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
       {
         title: 'Contact',
         links: [
-          { label: 'Contact Oriana', href: '/contact#contact-form' },
-          { label: 'Sales Enquiry', href: '/contact?intent=sales#contact-form' },
+          { label: 'Contact Oriana', href: '/contact' },
+          { label: 'Sales Enquiry', href: '/contact/sales' },
           { label: 'Support', href: '/support' },
         ],
       },
@@ -175,8 +175,8 @@ export const aboutMegaMenuCategories: NavMegaCategory[] = [
         title: 'Locations',
         links: [
           { label: 'Where to Buy', href: '/where-to-buy' },
-          { label: 'Find a Distributor', href: '/where-to-buy' },
-          { label: 'Request a Quote', href: '/contact?intent=quote#contact-form' },
+          { label: 'Become a Distributor', href: '/partners/become-a-distributor' },
+          { label: 'Request a Quote', href: '/contact/quote' },
         ],
       },
     ],
@@ -248,7 +248,7 @@ export const megaMenus: Record<
       {
         title: 'News & Media',
         links: [
-          { label: 'Newsroom', href: '/posts' },
+          { label: 'Newsroom', href: '/news' },
           { label: 'Case Studies', href: '/case-studies' },
           { label: 'Video Center', href: '/resources/videos' },
         ],
@@ -257,7 +257,7 @@ export const megaMenus: Record<
         title: 'Partners',
         links: [
           { label: 'Partners', href: '/about/partners' },
-          { label: 'Where to Buy', href: '/where-to-buy' },
+          { label: 'Become a Distributor', href: '/partners/become-a-distributor' },
           { label: 'Contact Us', href: '/contact' },
         ],
       },
@@ -389,8 +389,8 @@ export const megaMenus: Record<
         title: 'Sales',
         links: [
           { label: 'Where to Buy', href: '/where-to-buy' },
-          { label: 'Find a Distributor', href: '/where-to-buy' },
-          { label: 'Request a Quote', href: '/contact' },
+          { label: 'Become a Distributor', href: '/partners/become-a-distributor' },
+          { label: 'Request a Quote', href: '/contact/quote' },
         ],
       },
     ],

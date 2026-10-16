@@ -10,6 +10,7 @@ import {
   defaultHighlights,
   defaultPillars,
   defaultPillarsIntro,
+  defaultPolicies,
   type PillarIcon,
   type ReportCard,
   type SectionIntro,
@@ -167,6 +168,7 @@ export default async function SustainabilityPage() {
       commitmentsIntro={intro(data?.commitmentsIntro, defaultCommitmentsIntro)}
       commitments={commitments}
       reports={reports}
+      policies={defaultPolicies}
       honors={honors}
       cta={cta}
     />

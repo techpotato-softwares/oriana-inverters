@@ -176,3 +176,124 @@ export const defaultCta: SustainabilityCtaContent = {
   image: unsplash('1497440001374-f26997328c1b', 2000),
   contactEmail: 'esg@orianainverters.com',
 }
+
+export type StrategyPillar = {
+  title: string
+  headline: string
+  body: string
+}
+
+export type StrategySection = {
+  heading: string
+  paragraphs: string[]
+}
+
+/** Sungrow-inspired strategy pillars, adapted to Oriana’s Make-in-India context. */
+export const defaultStrategyPillars: StrategyPillar[] = [
+  {
+    title: 'Governance excellence',
+    headline: 'Clear ownership of ESG outcomes',
+    body: 'Board-level oversight of environmental and social commitments, supplier codes of conduct, and transparent reporting as we scale manufacturing in India.',
+  },
+  {
+    title: 'Net-zero transition',
+    headline: 'Cleaner operations, cleaner grids',
+    body: 'Raise renewable electricity share at production sites, cut energy intensity per unit shipped, and design inverters that displace fossil generation for decades.',
+  },
+  {
+    title: 'Eco-harmony',
+    headline: 'Responsible materials and sites',
+    body: 'RoHS-compliant electronics, plastic-minimised packaging, water-conscious assembly, and environmental management practices across our facilities.',
+  },
+  {
+    title: 'Mutual prosperity',
+    headline: 'Local jobs and partner capability',
+    body: 'Prefer domestic sourcing where quality allows, upskill regional technicians, and share safe installation practices with our distributor network.',
+  },
+  {
+    title: 'Circularity',
+    headline: 'Lifecycle beyond the sale',
+    body: 'Repairable architecture, modular serviceability, and takeback pathways aligned with India’s e-waste rules so aluminium, copper, and PCB materials can be recovered.',
+  },
+]
+
+export const defaultStrategySections: StrategySection[] = [
+  {
+    heading: 'Our climate ambition',
+    paragraphs: [
+      'Oriana builds inverters so solar plants run longer with fewer losses. Every percentage point of efficiency and every extra year of serviceable life reduces the carbon intensity of the energy we help deliver.',
+      'We are aligning operations with a staged path: lower Scope 1 and 2 intensity at our plants, grow on-site and contracted renewable electricity, and work with key suppliers on Scope 3 visibility.',
+    ],
+  },
+  {
+    heading: 'Product lifecycle',
+    paragraphs: [
+      'Design for longevity is our first sustainability lever — industrial-grade thermal paths, repairable boards, and extended warranty options that keep hardware in the field instead of in landfill.',
+      'We publish datasheets and service manuals so partners can maintain units correctly, and we plan certified takeback and refurbishment as volumes mature across India.',
+    ],
+  },
+  {
+    heading: 'Supply chain & manufacturing',
+    paragraphs: [
+      'Make-in-India localisation shortens freight miles and builds domestic capability. Strategic components are qualified against RoHS and our Supplier Code of Conduct.',
+      'Shop-floor programmes target plastic-minimised dispatch, corrugated cushioning in place of expanded foam, and progressive electrification of testing loads with rooftop solar.',
+    ],
+  },
+  {
+    heading: 'People & communities',
+    paragraphs: [
+      'Safe workplaces, technician training, and community programmes through the Oriana Foundation sit alongside product work — because a just energy transition needs skilled people as much as hardware.',
+    ],
+  },
+]
+
+export const defaultStrategyHero = {
+  eyebrow: 'Sustainability',
+  title: 'Sustainability Strategy',
+  description:
+    'Five focus areas guide how we design, manufacture, and support Oriana inverters — from net-zero operations to circular lifecycles.',
+}
+
+export const defaultReportsHero = {
+  eyebrow: 'Sustainability',
+  title: 'Reports & Policies',
+  description:
+    'ESG disclosures, environmental policies, and compliance documents that explain how Oriana manages sustainability risks and opportunities.',
+}
+
+/** Policy cards shown when CMS PDFs are not yet published (request via contact). */
+export const defaultPolicies: ReportCard[] = [
+  {
+    title: 'Environmental Management Policy',
+    year: 'Framework',
+    href: '/contact?intent=sales',
+    tag: 'Policy',
+  },
+  {
+    title: 'Supplier Code of Conduct',
+    year: 'Framework',
+    href: '/contact?intent=sales',
+    tag: 'Policy',
+  },
+  {
+    title: 'E-Waste & Takeback Guidelines',
+    year: 'Framework',
+    href: '/contact?intent=sales',
+    tag: 'Policy',
+  },
+  {
+    title: 'Equity, Inclusion & Workplace Safety',
+    year: 'Framework',
+    href: '/contact?intent=sales',
+    tag: 'Policy',
+  },
+]
+
+export const defaultReportPlaceholders: ReportCard[] = [
+  {
+    title: 'Oriana Sustainability Report',
+    year: 'Coming soon',
+    href: '/contact?intent=sales',
+    tag: 'Enterprise',
+  },
+]

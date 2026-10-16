@@ -23,7 +23,16 @@ export function HeroPageNav({
     <nav aria-label={label} className={cn('border-b border-white/15', className)}>
       <ul className="-mx-4 flex gap-x-8 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0 [&::-webkit-scrollbar]:hidden">
         {items.map((item) => {
-          const active = pathname === item.href
+          // Exact match, or parent path only when no deeper sibling owns this pathname.
+          const active =
+            pathname === item.href ||
+            (item.href !== '/' &&
+              pathname.startsWith(`${item.href}/`) &&
+              !items.some(
+                (other) =>
+                  other.href !== item.href &&
+                  (pathname === other.href || pathname.startsWith(`${other.href}/`)),
+              ))
           return (
             <li key={item.href} className="shrink-0">
               <Link
