@@ -11,7 +11,7 @@ type FoundationProgrammesProps = {
 
 export function FoundationProgrammes({ intro, programmes, cta }: FoundationProgrammesProps) {
   return (
-    <section className="bg-white py-20 lg:py-28">
+    <section className="section-safe-y bg-white">
       <div className="container">
         <FadeIn className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">

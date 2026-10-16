@@ -33,7 +33,7 @@ export function MediaHero({
   const reduceMotion = useReducedMotion()
 
   return (
-    <section className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-oriana-deep">
+    <section className="relative isolate flex min-h-[min(78svh,var(--viewport-height))] items-end overflow-hidden bg-oriana-deep">
       <motion.div
         className="absolute inset-0 -z-10"
         initial={reduceMotion ? undefined : { scale: 1.06, opacity: 0 }}

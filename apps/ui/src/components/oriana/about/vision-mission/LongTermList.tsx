@@ -23,7 +23,7 @@ function LongTermRow({ item }: { item: LongTermItem }) {
         <span aria-hidden className="h-2 w-2 rounded-full bg-oriana-sky" />
         <p
           className="font-display font-medium tracking-[-0.02em] text-balance text-oriana-deep"
-          style={{ fontSize: 'clamp(1.5rem, 3.2vw, 2.75rem)', lineHeight: 1.12 }}
+          style={{ fontSize: 'clamp(1.15rem, 2.1vw, 1.65rem)', lineHeight: 1.25 }}
         >
           {item.label}
         </p>

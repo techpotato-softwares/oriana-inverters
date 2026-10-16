@@ -9,6 +9,7 @@ import type {
   PageMeta,
 } from '@/components/oriana/marketing/types'
 import type { Media } from '@/payload-types'
+import { isHidden, resolveCmsList } from '@/utilities/visibility'
 
 type Maybe<T> = T | null | undefined
 
@@ -31,6 +32,7 @@ type CmsCard = {
   linkLabel?: CmsText
   tag?: CmsText
   highlights?: Maybe<{ text: string }[]>
+  hidden?: Maybe<boolean>
 }
 
 export function mediaUrl(value: unknown): string | undefined {
@@ -68,8 +70,12 @@ export function resolveLink(cms: CmsLink, fallback?: LinkItem): LinkItem | undef
   return cms?.label && cms?.href ? { label: cms.label, href: cms.href } : fallback
 }
 
-export function resolveLinks(cms: Maybe<{ label: string; href: string }[]>, fallback: LinkItem[]): LinkItem[] {
-  return cms && cms.length > 0 ? cms.map(({ label, href }) => ({ label, href })) : fallback
+export function resolveLinks(
+  cms: Maybe<{ label: string; href: string; hidden?: Maybe<boolean> }[]>,
+  fallback: LinkItem[],
+): LinkItem[] {
+  const links = (cms ?? []).flatMap((link) => (isHidden(link) ? [] : [{ label: link.label, href: link.href }]))
+  return resolveCmsList(cms, links, fallback)
 }
 
 export function resolveCta(cms: CmsCta, fallback: CtaBandContent): CtaBandContent {
@@ -81,23 +87,29 @@ export function resolveCta(cms: CmsCta, fallback: CtaBandContent): CtaBandConten
   }
 }
 
-/** CMS cards replace the defaults; missing images/icons/links borrow from the default at the same index. */
+/**
+ * CMS cards replace the defaults; missing images/icons/links borrow from the default at the same index.
+ * Hidden cards are skipped but keep their index so the borrowed defaults don't shift.
+ */
 export function resolveCards(cms: Maybe<CmsCard[]>, fallback: CardItem[]): CardItem[] {
-  if (!cms || cms.length === 0) return fallback
-  return cms.map((card, index) => {
+  const cards = (cms ?? []).flatMap((card, index): CardItem[] => {
+    if (isHidden(card)) return []
     const base = fallback.length > 0 ? fallback[index % fallback.length] : undefined
     const highlights = card.highlights?.map((item) => item.text).filter(Boolean)
-    return {
-      title: card.title,
-      body: card.body || undefined,
-      icon: card.icon || base?.icon,
-      image: mediaUrl(card.image) || base?.image,
-      href: card.href || undefined,
-      linkLabel: card.linkLabel || base?.linkLabel,
-      tag: card.tag || undefined,
-      highlights: highlights && highlights.length > 0 ? highlights : undefined,
-    }
+    return [
+      {
+        title: card.title,
+        body: card.body || undefined,
+        icon: card.icon || base?.icon,
+        image: mediaUrl(card.image) || base?.image,
+        href: card.href || undefined,
+        linkLabel: card.linkLabel || base?.linkLabel,
+        tag: card.tag || undefined,
+        highlights: highlights && highlights.length > 0 ? highlights : undefined,
+      },
+    ]
   })
+  return resolveCmsList(cms, cards, fallback)
 }
 
 export function resolveMeta(cms: Maybe<{ title?: CmsText; description?: CmsText }>, fallback: PageMeta): Metadata {

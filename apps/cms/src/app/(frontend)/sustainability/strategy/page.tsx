@@ -7,6 +7,7 @@ import { FadeIn } from '@/components/oriana/FadeIn'
 import { SustainabilitySubNav } from '@/components/oriana/sustainability/SustainabilitySubNav'
 import { getSustainability } from '@/utilities/getMarketing'
 import { realStrategySections } from '@/utilities/placeholderContent'
+import { visibleItems } from '@/utilities/visibility'
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getSustainability()
@@ -22,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function SustainabilityStrategyPage() {
   const data = await getSustainability()
   const strategyHero = data?.strategyHero
-  const sections = realStrategySections(data?.strategySections).map((section) => ({
+  const sections = visibleItems(realStrategySections(data?.strategySections)).map((section) => ({
     heading: section.heading || '',
     paragraphs: (section.body || '')
       .split(/\n+/)

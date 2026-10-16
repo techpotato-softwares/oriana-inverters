@@ -28,7 +28,7 @@ export function OriginSection({
   founders: Leader[]
 }) {
   return (
-    <section id="origin" aria-labelledby="origin-title" className="scroll-mt-24 bg-white py-20 lg:py-28">
+    <section id="origin" aria-labelledby="origin-title" className="scroll-mt-header bg-white section-safe-y">
       <div className="container grid gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-7">
           <FadeIn>
@@ -121,7 +121,7 @@ export function VisionSection({ content }: { content: BrandStoryContent['vision'
 
 export function JourneySection({ content }: { content: BrandStoryContent['journey'] }) {
   return (
-    <section aria-labelledby="journey-title" className="bg-oriana-surface py-20 lg:py-28">
+    <section aria-labelledby="journey-title" className="bg-oriana-surface section-safe-y">
       <div className="container">
         <FadeIn>
           <SectionHeading
@@ -262,7 +262,7 @@ export function UnitsSection({ content }: { content: BrandStoryContent['units'] 
 
 export function IndiaSection({ content }: { content: BrandStoryContent['india'] }) {
   return (
-    <section aria-labelledby="india-title" className="bg-white py-20 lg:py-28">
+    <section aria-labelledby="india-title" className="bg-white section-safe-y">
       <div className="container grid gap-14 lg:grid-cols-2 lg:items-center lg:gap-20">
         <FadeIn direction="right">
           <figure>
@@ -325,7 +325,7 @@ export function EcosystemSection({ content }: { content: BrandStoryContent['ecos
   return (
     <section
       aria-labelledby="ecosystem-title"
-      className="relative isolate overflow-hidden bg-oriana-deep py-20 lg:py-28"
+      className="relative isolate overflow-hidden bg-oriana-deep section-safe-y"
     >
       <Image
         src={content.image.src}
@@ -377,7 +377,7 @@ export function EcosystemSection({ content }: { content: BrandStoryContent['ecos
 
 export function PurposeSection({ content }: { content: BrandStoryContent['purpose'] }) {
   return (
-    <section aria-labelledby="purpose-title" className="bg-white py-20 lg:py-28">
+    <section aria-labelledby="purpose-title" className="bg-white section-safe-y">
       <div className="container grid gap-12 lg:grid-cols-12 lg:gap-16">
         <FadeIn className="lg:col-span-5">
           <SectionHeading
@@ -415,7 +415,7 @@ export function GlobalVisionSection({ content }: { content: BrandStoryContent['g
   return (
     <section
       aria-labelledby="global-title"
-      className="relative isolate overflow-hidden bg-oriana-deep py-24 lg:py-36"
+      className="relative isolate overflow-hidden bg-oriana-deep section-safe-y"
     >
       <Image src={content.image.src} alt={content.image.alt} fill sizes="100vw" className="-z-20 object-cover" />
       <div
@@ -456,7 +456,7 @@ export function GlobalVisionSection({ content }: { content: BrandStoryContent['g
 
 export function StoryRecapSection({ content }: { content: BrandStoryContent['recap'] }) {
   return (
-    <section aria-labelledby="recap-title" className="bg-oriana-surface py-20 lg:py-28">
+    <section aria-labelledby="recap-title" className="bg-oriana-surface section-safe-y">
       <div className="container grid gap-16 lg:grid-cols-2 lg:gap-24">
         <div>
           <FadeIn>

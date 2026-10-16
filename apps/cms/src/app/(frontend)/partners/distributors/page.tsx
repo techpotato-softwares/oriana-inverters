@@ -16,6 +16,7 @@ import {
   resolveMeta,
   resolveText,
 } from '@/utilities/cmsContent'
+import { isHidden } from '@/utilities/visibility'
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getPartnersPage()
@@ -69,7 +70,7 @@ export default async function DistributorsPage() {
           </div>
 
           <InlineLinks links={resolveLinks(cms?.links, defaults.links)} />
-          <CtaBand {...resolveCta(cms?.cta, defaults.cta)} />
+          {isHidden(cms?.cta) ? null : <CtaBand {...resolveCta(cms?.cta, defaults.cta)} />}
         </div>
       </section>
     </main>

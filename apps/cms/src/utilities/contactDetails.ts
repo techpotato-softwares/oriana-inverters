@@ -1,3 +1,5 @@
+import { isHidden } from '@/utilities/visibility'
+
 export type ContactCardData = {
   iconKey: 'phone' | 'wrench' | 'mapPin'
   title: string
@@ -45,14 +47,14 @@ function isLocationCard(card: { title?: string | null; iconKey?: string | null }
 
 /** Keep Sales/Service from CMS when valid; always use current Headquarter / Manufacturing copy. */
 export function resolveContactCards(
-  cmsCards: { iconKey?: string | null; title: string; detail: string }[],
+  cmsCards: { iconKey?: string | null; title: string; detail: string; hidden?: boolean | null }[],
 ): ContactCardData[] {
   if (!cmsCards.length || isPlaceholderContactCards(cmsCards)) {
     return defaultContactCards
   }
 
   const nonLocation = cmsCards
-    .filter((card) => !isLocationCard(card))
+    .filter((card) => !isHidden(card) && !isLocationCard(card))
     .map((card) => ({
       iconKey: (card.iconKey as ContactCardData['iconKey']) || 'phone',
       title: card.title,

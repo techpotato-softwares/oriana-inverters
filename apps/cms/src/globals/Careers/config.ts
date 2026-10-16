@@ -3,6 +3,7 @@ import type { GlobalConfig } from 'payload'
 import { authenticated } from '@/access/authenticated'
 import { pageHeroFields } from '@/fields/pageHero'
 import { seoFields } from '@/fields/seo'
+import { sectionHiddenField } from '@/fields/visibility'
 
 export const Careers: GlobalConfig = {
   slug: 'careers',
@@ -27,6 +28,7 @@ export const Careers: GlobalConfig = {
               type: 'upload',
               relationTo: 'media',
             },
+            sectionHiddenField({ name: 'lifeHidden', label: 'Hide “Life at Oriana” intro' }),
             {
               name: 'whyTitle',
               type: 'text',
@@ -38,6 +40,7 @@ export const Careers: GlobalConfig = {
               type: 'textarea',
               label: 'Life at Oriana body',
             },
+            sectionHiddenField({ name: 'openingsHidden', label: 'Hide open positions section' }),
             {
               name: 'openingsTitle',
               type: 'text',

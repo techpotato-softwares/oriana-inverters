@@ -51,7 +51,7 @@ export default async function ContactPage({
       />
       <Breadcrumbs items={[{ label: 'Contact' }]} />
 
-      <section className="py-20 lg:py-28">
+      <section className="section-safe-y">
         <div className="container">
           <ContactForm
             cards={cards}

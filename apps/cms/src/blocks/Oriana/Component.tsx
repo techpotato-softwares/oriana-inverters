@@ -8,6 +8,7 @@ import type {
   IconFeatureBlock as IconFeatureBlockProps,
   StatsGridBlock as StatsGridBlockProps,
 } from '@/payload-types'
+import { visibleItems } from '@/utilities/visibility'
 
 type MediaLike = { url?: string | null; alt?: string | null } | number | null | undefined
 
@@ -29,7 +30,7 @@ export const StatsGridBlock: React.FC<StatsGridBlockProps & { disableInnerContai
       <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy">{title}</h2>
     ) : null}
     <div className="mt-10 grid grid-cols-2 gap-8 lg:grid-cols-4">
-      {(stats || []).map((stat, i) => {
+      {visibleItems(stats).map((stat, i) => {
         const iconSrc = mediaUrl(stat.icon)
         return (
           <div key={`${stat.label}-${i}`}>
@@ -59,7 +60,7 @@ export const CardGridBlock: React.FC<CardGridBlockProps & { disableInnerContaine
       <h2 className="mt-3 font-display text-3xl font-semibold text-oriana-navy">{title}</h2>
     ) : null}
     <div className="mt-10 grid gap-8 md:grid-cols-3">
-      {(cards || []).map((card, i) => {
+      {visibleItems(cards).map((card, i) => {
         const body = (
           <>
             <h3 className="font-display text-xl font-semibold text-oriana-navy">{card.title}</h3>
@@ -116,7 +117,7 @@ export const ContentPageBlock: React.FC<
   ContentPageBlockProps & { disableInnerContainer?: boolean }
 > = ({ sections }) => (
   <section className="container max-w-3xl space-y-10 py-12">
-    {(sections || []).map((section, i) => (
+    {visibleItems(sections).map((section, i) => (
       <div key={`${section.heading}-${i}`}>
         <h2 className="font-display text-2xl font-semibold text-oriana-navy">{section.heading}</h2>
         <p className="mt-4 whitespace-pre-line leading-relaxed text-oriana-muted">{section.body}</p>

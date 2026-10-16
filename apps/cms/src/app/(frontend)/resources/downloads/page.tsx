@@ -34,32 +34,40 @@ export default async function DownloadsPage() {
     getCatalogueDownloads(),
   ])
 
-  // All categories stay as tabs; rows only include series with a datasheet and/or manual.
-  const productCategories: ProductDownloadCategory[] = categories.map((category) => {
-    const products = seriesList
-      .filter((series) => series.categorySlug === category.slug)
-      .map((series) => {
-        const datasheetUrl = firstDocUrl(series.variants.map((variant) => variant.datasheetUrl))
-        const manualUrl = firstDocUrl(series.variants.map((variant) => variant.manualUrl))
-        return {
-          id: series.slug,
-          name: series.series,
-          href: `/products/${series.slug}`,
-          powerRange: series.powerRange !== '—' ? series.powerRange : undefined,
-          datasheetUrl,
-          manualUrl,
-        }
-      })
-      .filter((product) => Boolean(product.datasheetUrl || product.manualUrl))
+  // Utility stays hidden on the download centre while product visibility is rolled out.
+  const isUtilityCategory = (slug: string) =>
+    slug === 'utility-scale-inverters' || /utility/i.test(slug)
 
-    return {
-      slug: category.slug,
-      title: category.title,
-      products,
-    }
-  })
+  // All visible non-utility categories stay as tabs; rows only include series with a datasheet and/or manual.
+  const productCategories: ProductDownloadCategory[] = categories
+    .filter((category) => !isUtilityCategory(category.slug))
+    .map((category) => {
+      const products = seriesList
+        .filter((series) => series.categorySlug === category.slug)
+        .map((series) => {
+          const datasheetUrl = firstDocUrl(series.variants.map((variant) => variant.datasheetUrl))
+          const manualUrl = firstDocUrl(series.variants.map((variant) => variant.manualUrl))
+          return {
+            id: series.slug,
+            name: series.series,
+            href: `/products/${series.slug}`,
+            powerRange: series.powerRange !== '—' ? series.powerRange : undefined,
+            datasheetUrl,
+            manualUrl,
+          }
+        })
+        .filter((product) => Boolean(product.datasheetUrl || product.manualUrl))
 
-  const certificates = downloads.filter((item) => item.documentType === 'certificate')
+      return {
+        slug: category.slug,
+        title: category.title,
+        products,
+      }
+    })
+
+  const certificates = downloads.filter(
+    (item) => item.documentType === 'certificate' && !/utility/i.test(item.title),
+  )
 
   return (
     <main>

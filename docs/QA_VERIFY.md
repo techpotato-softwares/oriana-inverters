@@ -18,6 +18,17 @@
 - [ ] CloudFront URL loads `/`
 - [ ] `/admin` works (QA DB must use Supabase **transaction** pooler port `6543`, not session `5432`)
 - [ ] Media uploads -> `oriana-invertors-web-media-qa` (browser PUTs via presigned URL; objects under `media/`)
-- [ ] Upload a file >6MB (e.g. short video) to confirm clientUploads bypasses Lambda body limit
+- [ ] Upload a file >6MB (e.g. short hero video) to confirm clientUploads bypasses Lambda body limit
+- [ ] Confirm Lambda env has `S3_BUCKET` set (without it, admin falls back to disk upload and >6MB fails on AWS)
+- [ ] Confirm media-bucket CORS includes the CloudFront/admin origin (CDK `MediaBucketClientUploadCors`)
+
+### How large media uploads work
+
+1. Admin selects a file in **Assets → Media**.
+2. Browser `POST /api/storage-s3-generate-signed-url` (small JSON: filename, size, mime).
+3. Browser `PUT` the file bytes **directly to S3** using the signed URL (never through Lambda).
+4. Payload saves the media document (metadata only).
+
+If step 3 fails (CORS / wrong bucket / missing IAM), the admin may appear to “upload through the API” and hit the ~6MB Function URL limit.
 
 Share CloudFront URL + admin link with the team.

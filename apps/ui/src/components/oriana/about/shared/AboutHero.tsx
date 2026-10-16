@@ -56,7 +56,7 @@ function HeroCopy({
             'linear-gradient(90deg, rgba(7,21,37,0.82) 0%, rgba(7,21,37,0.45) 55%, rgba(7,21,37,0.1) 100%)',
         }}
       />
-      <div className="container hero-safe-top relative flex flex-1 flex-col justify-end pb-8 lg:pb-10">
+      <div className="container hero-safe-top relative flex min-h-0 flex-1 flex-col justify-end pb-[clamp(1.25rem,3.5svh,2.5rem)]">
         <motion.p
           {...reveal(0.1)}
           className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-sky"
@@ -66,25 +66,24 @@ function HeroCopy({
         </motion.p>
         <motion.h1
           {...reveal(0.18)}
-          className="mt-5 max-w-4xl font-display font-medium tracking-[-0.02em] text-balance text-white"
-          style={{ fontSize: 'clamp(2.25rem, min(5.2vw, 8.5svh), 4.75rem)', lineHeight: 1.04 }}
+          className="fluid-display hero-copy-gap mt-5 max-w-4xl font-display font-medium tracking-[-0.02em] text-balance text-white"
         >
           {title}
         </motion.h1>
         {description ? (
           <motion.p
             {...reveal(0.28)}
-            className="mt-6 max-w-xl text-base leading-8 text-pretty text-white/80 md:text-lg"
+            className="hero-copy-gap mt-6 max-w-xl text-pretty text-white/80 text-[clamp(0.95rem,1.6svh,1.125rem)] leading-[1.65]"
           >
             {description}
           </motion.p>
         ) : null}
         {primary || secondary ? (
-          <motion.div {...reveal(0.36)} className="mt-8 flex flex-wrap gap-3">
+          <motion.div {...reveal(0.36)} className="hero-copy-gap-lg mt-8 flex flex-wrap gap-3">
             {primary ? (
               <Link
                 href={primary.href}
-                className="group inline-flex min-h-12 items-center gap-2 rounded-full bg-white px-7 text-sm font-semibold text-oriana-deep transition-colors duration-300 hover:bg-oriana-sky focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-oriana-deep transition-colors duration-300 hover:bg-oriana-sky focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:min-h-12 sm:px-7"
               >
                 {primary.label}
                 <ArrowRight
@@ -96,7 +95,7 @@ function HeroCopy({
             {secondary ? (
               <Link
                 href={secondary.href}
-                className="inline-flex min-h-12 items-center rounded-full border border-white/35 px-7 text-sm font-semibold text-white transition-colors duration-300 hover:border-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                className="inline-flex min-h-11 items-center rounded-full border border-white/35 px-6 text-sm font-semibold text-white transition-colors duration-300 hover:border-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:min-h-12 sm:px-7"
               >
                 {secondary.label}
               </Link>
@@ -104,7 +103,7 @@ function HeroCopy({
           </motion.div>
         ) : null}
         {nav ? (
-          <motion.div {...reveal(0.46)} className="mt-10 lg:mt-12">
+          <motion.div {...reveal(0.46)} className="mt-[clamp(1.25rem,3.5svh,3rem)] shrink-0">
             {nav}
           </motion.div>
         ) : null}
@@ -123,7 +122,7 @@ function ImageHero({ media, ...copy }: AboutHeroProps & { media: { kind: 'image'
     <section
       ref={ref}
       aria-label={copy.eyebrow}
-      className="relative isolate min-h-[100svh] w-full overflow-hidden bg-oriana-deep"
+      className="viewport-fill relative isolate w-full overflow-hidden bg-oriana-deep"
     >
       <motion.div
         className="absolute inset-0 -z-10"
@@ -135,7 +134,7 @@ function ImageHero({ media, ...copy }: AboutHeroProps & { media: { kind: 'image'
         <Image src={media.src} alt={media.alt} fill priority sizes="100vw" className="object-cover" />
       </motion.div>
       <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-oriana-deep/85 via-transparent to-oriana-deep/25" />
-      <div className="relative flex min-h-[100svh] flex-col">
+      <div className="viewport-fill relative flex min-h-0 flex-col">
         <HeroCopy {...copy} />
       </div>
     </section>

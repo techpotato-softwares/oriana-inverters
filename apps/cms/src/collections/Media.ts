@@ -29,7 +29,8 @@ export const Media: CollectionConfig = {
   },
   admin: {
     group: 'Assets',
-    description: 'Images, videos, and documents. Organize with folders (Hero, Products, Icons, …).',
+    description:
+      'Images, videos, and documents (up to 200 MB). On AWS the browser uploads directly to S3 via a presigned URL so files are not limited by the ~6 MB Lambda body cap. Organize with folders (Hero, Products, Icons, …).',
     defaultColumns: ['filename', 'alt', 'mediaType', 'updatedAt'],
   },
   fields: [

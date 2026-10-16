@@ -6,6 +6,7 @@ import {
 } from '@/components/oriana/about/leadership/leadershipData'
 import type { About, Media } from '@/payload-types'
 import { getAbout } from '@/utilities/getMarketing'
+import { isHidden, resolveCmsList } from '@/utilities/visibility'
 
 type CmsLeadership = NonNullable<About['leadership']>
 type CmsMember = NonNullable<CmsLeadership['members']>[number]
@@ -30,18 +31,21 @@ function toLeader(member: CmsMember): Leader {
   }
 }
 
-export function resolveLeadership(cms: About['leadership'] | null | undefined): LeadershipContent {
+/** `null` when an editor has hidden the Leadership section. */
+export function resolveLeadership(cms: About['leadership'] | null | undefined): LeadershipContent | null {
+  if (isHidden(cms)) return null
   const members = (cms?.members ?? []).filter((member) => member?.name?.trim())
+  const leaders = members.flatMap((member) => (isHidden(member) ? [] : [toLeader(member)]))
   return {
     id: defaultLeadership.id,
     eyebrow: cms?.intro?.eyebrow?.trim() || defaultLeadership.eyebrow,
     title: cms?.intro?.title?.trim() || defaultLeadership.title,
     description: cms?.intro?.description?.trim() || defaultLeadership.description,
-    leaders: members.length > 0 ? members.map(toLeader) : defaultLeadership.leaders,
+    leaders: resolveCmsList(members, leaders, defaultLeadership.leaders),
   }
 }
 
-export async function getLeadership(): Promise<LeadershipContent> {
+export async function getLeadership(): Promise<LeadershipContent | null> {
   const about = await getAbout()
   return resolveLeadership(about?.leadership)
 }

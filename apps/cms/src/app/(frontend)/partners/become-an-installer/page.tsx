@@ -15,6 +15,7 @@ import {
   resolveMeta,
   resolveText,
 } from '@/utilities/cmsContent'
+import { isHidden, resolveCmsList, visibleItems } from '@/utilities/visibility'
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getPartnersPage()
@@ -25,7 +26,11 @@ export default async function BecomeAnInstallerPage() {
   const cms = (await getPartnersPage())?.applyInstaller
   const hero = resolveHero(cms?.hero, defaults.hero)
   const steps = resolveCards(cms?.steps, defaults.steps)
-  const benefits = cms?.benefits?.length ? cms.benefits.map((item) => item.text) : defaults.benefits
+  const benefits = resolveCmsList(
+    cms?.benefits,
+    visibleItems(cms?.benefits).map((item) => item.text),
+    defaults.benefits,
+  )
 
   return (
     <main>
@@ -82,7 +87,7 @@ export default async function BecomeAnInstallerPage() {
             </div>
           </div>
 
-          <CtaBand {...resolveCta(cms?.cta, defaults.cta)} />
+          {isHidden(cms?.cta) ? null : <CtaBand {...resolveCta(cms?.cta, defaults.cta)} />}
         </div>
       </section>
     </main>

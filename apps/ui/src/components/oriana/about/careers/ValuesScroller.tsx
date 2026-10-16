@@ -120,7 +120,7 @@ export function ValuesScroller({
       ref={sectionRef}
       id={id}
       aria-labelledby={`${id}-title`}
-      className="relative scroll-mt-24 bg-oriana-surface"
+      className="relative scroll-mt-header bg-oriana-surface"
       style={pinned ? { height: `calc(${distance}px + 100svh)` } : undefined}
     >
       <div

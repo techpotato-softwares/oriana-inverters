@@ -11,6 +11,7 @@ import {
 } from '@/fields/marketing'
 import { pageHeroFields } from '@/fields/pageHero'
 import { seoFields } from '@/fields/seo'
+import { hiddenField, visibleArray } from '@/fields/visibility'
 
 const emptyStateField: Field = {
   name: 'emptyDescription',
@@ -74,8 +75,12 @@ export const About: GlobalConfig = {
           description:
             'Directors shown on /about (Leadership section) and /about/brand-story (Founded by). Leave the list empty to show the built-in directors.',
           fields: [
+            hiddenField({
+              description:
+                'Hide the Leadership section on /about and the “Founded by” strip on /about/brand-story.',
+            }),
             sectionIntro('intro', 'Section heading'),
-            {
+            visibleArray({
               name: 'members',
               type: 'array',
               label: 'Directors',
@@ -135,7 +140,7 @@ export const About: GlobalConfig = {
                   },
                 },
               ],
-            },
+            }),
           ],
         },
         {

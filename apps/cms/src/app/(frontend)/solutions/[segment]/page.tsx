@@ -51,7 +51,7 @@ export default async function SolutionPage({ params }: Props) {
         items={[{ label: 'Solutions', href: '/solutions/residential' }, { label: data.title }]}
       />
 
-      <section className="py-20 lg:py-28">
+      <section className="section-safe-y">
         <div className="container">
           <FadeIn>
             <div className="relative mx-auto mb-16 max-w-3xl overflow-hidden rounded-xl border border-oriana-navy/8 bg-oriana-silver">

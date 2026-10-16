@@ -34,6 +34,7 @@ import {
   resolveLink,
   resolveText,
 } from '@/utilities/cmsContent'
+import { isHidden, resolveCmsList, visibleItems } from '@/utilities/visibility'
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getSupport()
@@ -58,25 +59,30 @@ export default async function SupportPage() {
     primary: resolveLink(heroCms?.primary, defaultSupportHero.primary),
     secondary: resolveLink(heroCms?.secondary, defaultSupportHero.secondary),
     quickLinksLabel: resolveText(heroCms?.quickLinksLabel, defaultSupportHero.quickLinksLabel),
-    quickLinks: resolveCards(heroCms?.quickLinks?.map(({ label, href, icon }) => ({
+    quickLinks: resolveCards(heroCms?.quickLinks?.map(({ label, href, icon, hidden }) => ({
       title: label,
       href,
       icon,
+      hidden,
     })), defaultSupportHero.quickLinks),
   }
 
   const presenceCms = data?.presence
   const presence: GlobalPresenceContent = {
     intro: resolveIntro(presenceCms?.intro, defaultPresence.intro),
-    stats: presenceCms?.stats?.length
-      ? presenceCms.stats.map(({ value, label }) => ({ value, label }))
-      : defaultPresence.stats,
+    stats: resolveCmsList(
+      presenceCms?.stats,
+      visibleItems(presenceCms?.stats).map(({ value, label }) => ({ value, label })),
+      defaultPresence.stats,
+    ),
     cta: resolveLink(presenceCms?.cta, defaultPresence.cta),
     coverageLabel: resolveText(presenceCms?.coverageLabel, defaultPresence.coverageLabel),
     coverageBody: resolveText(presenceCms?.coverageBody, defaultPresence.coverageBody),
-    locations: presenceCms?.locations?.length
-      ? presenceCms.locations.map(({ label, top, left }) => ({ label, top, left }))
-      : defaultPresence.locations,
+    locations: resolveCmsList(
+      presenceCms?.locations,
+      visibleItems(presenceCms?.locations).map(({ label, top, left }) => ({ label, top, left })),
+      defaultPresence.locations,
+    ),
     pillars: resolveCards(presenceCms?.pillars, defaultPresence.pillars),
   }
 
@@ -97,39 +103,59 @@ export default async function SupportPage() {
   const strengthsIntro = resolveIntro(data?.strengths?.intro, defaultStrengthsIntro)
   const approachIntro = resolveIntro(data?.approach?.intro, defaultApproachIntro)
   const storiesIntro = resolveIntro(data?.stories?.intro, defaultStoriesIntro)
+  const show = {
+    strengths: !isHidden(data?.strengths),
+    approach: !isHidden(data?.approach),
+    presence: !isHidden(presenceCms),
+    stories: !isHidden(data?.stories),
+    resources: !isHidden(resourcesCms),
+    cases: !isHidden(data?.cases),
+  }
   const sections = [
-    { label: 'Service brand', id: 'service-brand' },
-    { label: strengthsIntro.eyebrow || 'Our strength', id: 'our-strengths' },
-    { label: approachIntro.eyebrow || 'Our approach', id: 'our-approach' },
-    { label: presence.intro.eyebrow || 'Global presence', id: 'global-presence' },
-    { label: storiesIntro.eyebrow || 'Service stories', id: 'service-stories' },
-    { label: resources.intro.eyebrow || 'Resources', id: 'resources' },
-  ]
+    { label: 'Service brand', id: 'service-brand', visible: true },
+    { label: strengthsIntro.eyebrow || 'Our strength', id: 'our-strengths', visible: show.strengths },
+    { label: approachIntro.eyebrow || 'Our approach', id: 'our-approach', visible: show.approach },
+    {
+      label: presence.intro.eyebrow || 'Global presence',
+      id: 'global-presence',
+      visible: show.presence,
+    },
+    { label: storiesIntro.eyebrow || 'Service stories', id: 'service-stories', visible: show.stories },
+    { label: resources.intro.eyebrow || 'Resources', id: 'resources', visible: show.resources },
+  ].flatMap(({ visible, ...section }) => (visible ? [section] : []))
 
   return (
     <main className="min-h-screen">
       <SupportHero content={hero} />
       <SupportSubNav sections={sections} />
-      <SupportStrengths
-        intro={strengthsIntro}
-        items={resolveCards(data?.strengths?.items, defaultStrengths)}
-      />
-      <SupportApproach
-        intro={approachIntro}
-        cta={resolveLink(data?.approach?.cta, defaultApproachCta)}
-        steps={resolveCards(data?.approach?.steps, defaultApproachSteps)}
-      />
-      <GlobalPresence content={presence} />
-      <ServiceStories
-        intro={storiesIntro}
-        stories={resolveCards(data?.stories?.items, defaultStories)}
-      />
-      <SupportResources content={resources} />
-      <SuccessStories
-        intro={resolveIntro(data?.cases?.intro, defaultCasesIntro)}
-        cta={resolveLink(data?.cases?.cta, defaultCasesCta)}
-        categories={resolveCards(data?.cases?.items, defaultCases)}
-      />
+      {show.strengths ? (
+        <SupportStrengths
+          intro={strengthsIntro}
+          items={resolveCards(data?.strengths?.items, defaultStrengths)}
+        />
+      ) : null}
+      {show.approach ? (
+        <SupportApproach
+          intro={approachIntro}
+          cta={resolveLink(data?.approach?.cta, defaultApproachCta)}
+          steps={resolveCards(data?.approach?.steps, defaultApproachSteps)}
+        />
+      ) : null}
+      {show.presence ? <GlobalPresence content={presence} /> : null}
+      {show.stories ? (
+        <ServiceStories
+          intro={storiesIntro}
+          stories={resolveCards(data?.stories?.items, defaultStories)}
+        />
+      ) : null}
+      {show.resources ? <SupportResources content={resources} /> : null}
+      {show.cases ? (
+        <SuccessStories
+          intro={resolveIntro(data?.cases?.intro, defaultCasesIntro)}
+          cta={resolveLink(data?.cases?.cta, defaultCasesCta)}
+          categories={resolveCards(data?.cases?.items, defaultCases)}
+        />
+      ) : null}
     </main>
   )
 }
