@@ -22,7 +22,7 @@ export function LeadershipSection({ content }: { content: LeadershipContent }) {
     <section
       id={content.id}
       aria-labelledby="leadership-title"
-      className="section-safe-y relative isolate scroll-mt-[calc(var(--site-header-height,5rem)+1rem)] overflow-x-clip bg-white"
+      className="section-safe-y relative isolate scroll-mt-header overflow-x-clip bg-white"
     >
       <div className="container">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
@@ -95,7 +95,7 @@ function LeaderCard({
           <LeaderPortrait
             leader={leader}
             sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-            className="object-cover object-[50%_18%] mix-blend-multiply transition-transform duration-700 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            className="object-cover object-[50%_8%] mix-blend-multiply transition-transform duration-700 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             initialsClassName="text-6xl"
           />
         </div>

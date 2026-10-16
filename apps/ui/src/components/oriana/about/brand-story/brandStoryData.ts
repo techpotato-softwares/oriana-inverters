@@ -40,8 +40,8 @@ export const brandStory = {
       'We understood the challenges faced by customers, EPCs, developers, distributors and businesses. We understood that an inverter is not simply a product — it is a critical part of an energy system where performance, reliability, efficiency and long-term support matter.',
     closing: 'And we believed we could build something better.',
     image: {
-      src: unsplash('1559302504-64aae6ca6b6d', 1400),
-      alt: 'Engineers in work gloves installing a solar panel',
+      src: unsplash('1563770660941-20978e870e26', 1400),
+      alt: 'Solar inverter power-electronics board during manufacturing',
     },
   },
 
@@ -56,8 +56,8 @@ export const brandStory = {
     closing: 'That ambition became ORIANA.',
     closingSupport: 'A brand created to bring engineering, intelligence and reliability together.',
     image: {
-      src: unsplash('1548337138-e87d889cc369', 1600),
-      alt: 'Offshore wind turbines rising from a calm sea',
+      src: unsplash('1509391366360-2e959784a276', 1600),
+      alt: 'Solar panel arrays under a clear sky',
     },
   },
 
@@ -70,22 +70,22 @@ export const brandStory = {
       {
         label: 'Residential',
         image: {
-          src: unsplash('1600585154340-be6161a56a0c', 1000),
-          alt: 'Modern family home',
+          src: unsplash('1611365892117-00ac5ef43c90', 1000),
+          alt: 'Residential rooftop solar installation',
         },
       },
       {
         label: 'Commercial & Industrial',
         image: {
-          src: unsplash('1486406146926-c627a92ad1ab', 1000),
-          alt: 'Commercial office towers',
+          src: unsplash('1613665813446-82a78c468a1d', 1000),
+          alt: 'Commercial rooftop solar arrays at dusk',
         },
       },
       {
         label: 'Utility-scale',
         image: {
-          src: unsplash('1473341304170-971dccb5ac1e', 1000),
-          alt: 'High-voltage transmission towers at dusk',
+          src: unsplash('1509390144018-eeaf65052242', 1000),
+          alt: 'Utility-scale solar plant stretching to the horizon',
         },
       },
     ],
@@ -134,8 +134,8 @@ export const brandStory = {
     beliefEmphasis: 'India should also become a global hub for energy technology.',
     closing: 'ORIANA is being built with that ambition.',
     image: {
-      src: unsplash('1581091226825-a6a2a5aee158', 1400),
-      alt: 'Engineer working on power electronics in a test lab',
+      src: unsplash('1581094794329-c8112a89af12', 1400),
+      alt: 'Technician on a solar manufacturing and assembly line',
     },
   },
 

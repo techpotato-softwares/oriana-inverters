@@ -79,18 +79,18 @@ export const achievements = {
     segments: [
       {
         label: 'Residential',
-        image: unsplash('1600585154340-be6161a56a0c', 1200),
+        image: unsplash('1611365892117-00ac5ef43c90', 1200),
         alt: 'Home with rooftop solar panels',
       },
       {
         label: 'Commercial & Industrial',
-        image: unsplash('1486406146926-c627a92ad1ab', 1200),
-        alt: 'Commercial building representing C&I solar',
+        image: unsplash('1613665813446-82a78c468a1d', 1200),
+        alt: 'Commercial rooftop solar installation',
       },
       {
         label: 'Utility-Scale',
         image: unsplash('1509390144018-eeaf65052242', 1200),
-        alt: 'Electrical substation connecting a utility-scale plant',
+        alt: 'Utility-scale solar plant',
       },
     ] satisfies ScaleSegment[],
   },
@@ -106,8 +106,8 @@ export const achievements = {
     lifecycle: ['Installation', 'Commissioning', 'Technical support', 'Long-term customer care'],
     commitmentLead: 'Our commitment is simple:',
     commitment: ['Deliver the technology.', 'Support the customer.', 'Stand behind the product.'],
-    image: unsplash('1581092795360-fd1ca04f0952', 1600),
-    imageAlt: 'Engineers monitoring systems in a control room',
+    image: unsplash('1613665813446-82a78c468a1d', 1600),
+    imageAlt: 'Rooftop solar installation supported by ORIANA service teams',
   },
 
   journey: {

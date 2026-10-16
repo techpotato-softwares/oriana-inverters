@@ -33,13 +33,13 @@ export const visionMission = {
     panels: [
       {
         label: 'Intelligent',
-        image: unsplash('1518770660439-4636190af475', 1200),
-        alt: 'Close-up of a printed circuit board',
+        image: unsplash('1563770660941-20978e870e26', 1200),
+        alt: 'Power-electronics board used in solar inverter control',
       },
       {
         label: 'Reliable',
-        image: unsplash('1581093450021-4a7360e9a6b5', 1200),
-        alt: 'Engineers testing equipment in a laboratory',
+        image: unsplash('1581092160607-ee22621dd758', 1200),
+        alt: 'Technician validating inverter electronics on the production line',
       },
       {
         label: 'Sustainable',
@@ -102,7 +102,7 @@ export const visionMission = {
     body: 'ORIANA — Intelligent Energy. Engineered for Tomorrow.',
     primary: { label: 'See our achievements', href: '/about/achievements' },
     secondary: { label: 'Read our brand story', href: '/about/brand-story' },
-    image: unsplash('1466611653911-95081537e5b7', 2400),
+    image: unsplash('1509391366360-2e959784a276', 2400),
   },
 }
 

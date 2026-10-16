@@ -18,7 +18,7 @@ export function FoundersStrip({ leaders, label = 'Founded by' }: { leaders: Lead
                 <LeaderPortrait
                   leader={leader}
                   sizes="(min-width: 1024px) 14vw, 30vw"
-                  className="object-cover object-[50%_18%]"
+                  className="object-cover object-[50%_8%]"
                   initialsClassName="text-2xl text-oriana-blue/30"
                 />
               </div>
