@@ -84,7 +84,7 @@ export default async function ProductsPage({ searchParams }: Props) {
         nav={<HeroPageNav label="Product categories" items={productCategoryNav(tabs)} />}
       />
       <Breadcrumbs items={[{ label: 'All Products' }]} />
-      <div id="catalogue" className="scroll-mt-24">
+      <div id="catalogue" className="scroll-mt-header">
         <AllProductsCatalogue tabs={tabs} catalogues={catalogues} />
       </div>
     </main>

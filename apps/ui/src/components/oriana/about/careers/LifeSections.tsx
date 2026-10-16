@@ -14,7 +14,7 @@ export function LifeIntroSection({
   content: Omit<LifeAtOrianaContent['intro'], 'paragraphs'> & { paragraphs: string[] }
 }) {
   return (
-    <section id="life" aria-labelledby="life-title" className="scroll-mt-24 bg-white py-20 lg:py-32">
+    <section id="life" aria-labelledby="life-title" className="scroll-mt-header bg-white section-safe-y">
       <div className="container">
         <FadeIn>
           <h2 id="life-title" className={`${eyebrowClass} text-oriana-blue`}>

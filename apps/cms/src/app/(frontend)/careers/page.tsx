@@ -101,7 +101,7 @@ export default async function CareersPage() {
         <section
           id="openings"
           aria-labelledby="openings-title"
-          className="scroll-mt-32 bg-white py-20 lg:py-28"
+          className="scroll-mt-header bg-white section-safe-y"
         >
           <div className="container">
             <FadeIn>
@@ -175,7 +175,7 @@ export default async function CareersPage() {
       <section
         id="apply"
         aria-labelledby="apply-title"
-        className="scroll-mt-32 bg-oriana-surface py-20 lg:py-28"
+        className="scroll-mt-header bg-oriana-surface section-safe-y"
       >
         <div className="container grid gap-12 lg:grid-cols-5 lg:gap-16">
           <FadeIn className="lg:col-span-2">

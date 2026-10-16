@@ -26,7 +26,7 @@ export function SupportHero({ content }: { content: SupportHeroContent }) {
     <section
       id="service-brand"
       ref={containerRef}
-      className="relative isolate flex min-h-[92svh] scroll-mt-32 items-end overflow-hidden bg-oriana-deep"
+      className="relative isolate flex min-h-[min(92svh,var(--viewport-height))] scroll-mt-[calc(var(--site-header-height,5rem)+1rem)] items-end overflow-hidden bg-oriana-deep"
     >
       <motion.div
         className="absolute inset-0 -z-10"
@@ -68,7 +68,7 @@ export function SupportHero({ content }: { content: SupportHeroContent }) {
       />
 
       <motion.div
-        className="container relative w-full pb-16 pt-40 lg:pb-24 lg:pt-52"
+        className="container hero-safe-top relative w-full pb-[clamp(2.5rem,6svh,6rem)]"
         style={reduceMotion ? undefined : { y: copyY, opacity: copyOpacity }}
       >
         <motion.p

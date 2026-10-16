@@ -51,7 +51,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   return (
     <main
-      className="bg-white pt-[var(--site-header-height,8.25rem)]"
+      className="bg-white pt-[var(--site-header-height,4.5rem)]"
       style={{ ['--product-breadcrumb-height' as string]: '3.25rem' }}
     >
       <Breadcrumbs

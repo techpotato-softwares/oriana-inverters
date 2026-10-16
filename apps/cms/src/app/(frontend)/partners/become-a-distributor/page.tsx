@@ -53,7 +53,7 @@ export default async function BecomeADistributorPage() {
         ]}
       />
 
-      <section className="py-16 lg:py-24">
+      <section className="section-safe-y-tight">
         <div className="container">
           <FadeIn>
             <h2 className="max-w-2xl font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
@@ -81,7 +81,7 @@ export default async function BecomeADistributorPage() {
         </div>
       </section>
 
-      <section id="distributor-form" className="scroll-mt-32 bg-oriana-surface py-16 lg:py-24">
+      <section id="distributor-form" className="scroll-mt-header bg-oriana-surface section-safe-y-tight">
         <div className="container grid gap-12 lg:grid-cols-5 lg:gap-16">
           <FadeIn className="lg:col-span-2">
             <h2 className="font-display text-3xl font-semibold text-oriana-navy">{form.title}</h2>

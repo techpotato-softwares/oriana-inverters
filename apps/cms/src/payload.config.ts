@@ -175,6 +175,13 @@ export default buildConfig({
   ],
   cors: [getServerSideURL()].filter(Boolean),
   serverURL: getServerSideURL(),
+  // Large videos/PDFs upload via S3 clientUploads (presigned PUT) — this limit is
+  // enforced when minting the signed URL, not by buffering the file through Lambda.
+  upload: {
+    limits: {
+      fileSize: 200 * 1024 * 1024, // 200 MB
+    },
+  },
   globals: [
     Header,
     Footer,

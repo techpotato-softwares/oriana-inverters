@@ -14,7 +14,7 @@ const eyebrowClass = 'flex items-center gap-3 text-[0.7rem] font-semibold upperc
 
 function VisionStatementSection({ content }: { content: VisionMissionContent['vision'] }) {
   return (
-    <section id={content.id} aria-labelledby="vision-title" className="scroll-mt-24 bg-white py-20 lg:py-32">
+    <section id={content.id} aria-labelledby="vision-title" className="scroll-mt-header bg-white section-safe-y">
       <div className="container">
         <FadeIn>
           <h2 id="vision-title" className={`${eyebrowClass} text-oriana-blue`}>
@@ -65,7 +65,7 @@ function MissionSection({ content }: { content: VisionMissionContent['mission'] 
     <section
       id={content.id}
       aria-labelledby="mission-title"
-      className="relative isolate scroll-mt-24 bg-oriana-deep py-20 text-white lg:py-32"
+      className="relative isolate scroll-mt-header bg-oriana-deep py-20 text-white lg:py-32"
     >
       <div
         aria-hidden
@@ -130,7 +130,7 @@ function LongTermSection({ content }: { content: VisionMissionContent['longTerm'
     <section
       id={content.id}
       aria-labelledby="long-term-title"
-      className="scroll-mt-24 overflow-hidden bg-oriana-surface py-20 lg:py-28"
+      className="scroll-mt-header overflow-hidden bg-oriana-surface section-safe-y"
     >
       <div className="container">
         <FadeIn>

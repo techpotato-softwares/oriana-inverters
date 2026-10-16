@@ -1,10 +1,11 @@
 /**
  * Sticky scrub pin under the fixed SiteHeader.
- * Uses svh so the pin always tracks the real viewport (Windows scaling, laptop
- * chrome, mobile browser UI) — no min-width / min-height gate that disables it.
+ * Uses svh / --available-viewport so the pin tracks Mac + Windows viewports
+ * (classic scrollbars, DPI scaling) without mixing vh/dvh families.
  */
 export const STICKY_BELOW_NAV_TOP = 'var(--site-header-height, 5rem)'
-export const STICKY_BELOW_NAV_HEIGHT = 'calc(100svh - var(--site-header-height, 5rem))'
+export const STICKY_BELOW_NAV_HEIGHT =
+  'var(--available-viewport, calc(100svh - var(--site-header-height, 5rem)))'
 
 export function readSiteHeaderHeightPx(fallback = 80) {
   if (typeof window === 'undefined') return fallback

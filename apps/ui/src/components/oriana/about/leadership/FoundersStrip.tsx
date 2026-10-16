@@ -14,16 +14,16 @@ export function FoundersStrip({ leaders, label = 'Founded by' }: { leaders: Lead
         {leaders.map((leader, index) => (
           <StaggerItem key={`${leader.name}-${index}`}>
             <figure>
-              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white">
+              <div className="relative aspect-[4/5] max-h-[min(14rem,36svh)] w-full overflow-hidden rounded-2xl bg-white [@media(max-height:52rem)]:aspect-[3/4]">
                 <LeaderPortrait
                   leader={leader}
                   sizes="(min-width: 1024px) 14vw, 30vw"
-                  className="object-cover object-top"
+                  className="object-cover object-[50%_18%]"
                   initialsClassName="text-2xl text-oriana-blue/30"
                 />
               </div>
               <figcaption className="mt-3">
-                <span className="flex items-center gap-1.5 font-display text-sm font-semibold leading-5 text-oriana-deep sm:text-base">
+                <span className="flex items-center gap-1.5 font-display text-[clamp(0.8rem,1.8svh,1rem)] font-semibold leading-5 text-oriana-deep">
                   {leader.linkedin ? (
                     <a
                       href={leader.linkedin}

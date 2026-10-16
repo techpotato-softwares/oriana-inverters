@@ -32,7 +32,7 @@ export function SustainabilityHero({
         }}
         aria-hidden
       />
-      <div className="container hero-safe-top relative flex flex-1 flex-col justify-end pb-8 lg:pb-10">
+      <div className="container hero-safe-top relative flex min-h-0 flex-1 flex-col justify-end pb-[clamp(1.25rem,3.5svh,2.5rem)]">
         <FadeIn>
           {eyebrow ? (
             <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-sky">
@@ -40,22 +40,19 @@ export function SustainabilityHero({
               {eyebrow}
             </p>
           ) : null}
-          <h1
-            className="mt-5 max-w-4xl font-display font-medium tracking-[-0.02em] text-balance text-white"
-            style={{ fontSize: 'clamp(2.25rem, min(5.2vw, 8.5svh), 4.75rem)', lineHeight: 1.04 }}
-          >
+          <h1 className="fluid-display hero-copy-gap mt-5 max-w-4xl font-display font-medium tracking-[-0.02em] text-balance text-white">
             {title}
           </h1>
         </FadeIn>
         <FadeIn delay={0.1}>
           {description ? (
-            <p className="mt-6 max-w-xl text-base leading-8 text-pretty text-white/80 md:text-lg">
+            <p className="hero-copy-gap mt-6 max-w-xl text-pretty text-white/80 text-[clamp(0.95rem,1.6svh,1.125rem)] leading-[1.65]">
               {description}
             </p>
           ) : null}
           <Link
             href={cta.href}
-            className="group mt-8 inline-flex min-h-12 items-center gap-2 rounded-full bg-white px-7 text-sm font-semibold text-oriana-deep transition-colors duration-300 hover:bg-oriana-sky focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            className="group hero-copy-gap-lg mt-8 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-oriana-deep transition-colors duration-300 hover:bg-oriana-sky focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:min-h-12 sm:px-7"
           >
             {cta.label}
             <ArrowRight
@@ -65,7 +62,7 @@ export function SustainabilityHero({
           </Link>
         </FadeIn>
         <FadeIn delay={0.18} direction="none">
-          <SustainabilitySubNav className="mt-10 lg:mt-12" variant="dark" />
+          <SustainabilitySubNav className="mt-[clamp(1.25rem,3.5svh,3rem)] shrink-0" variant="dark" />
         </FadeIn>
       </div>
     </VideoHero>

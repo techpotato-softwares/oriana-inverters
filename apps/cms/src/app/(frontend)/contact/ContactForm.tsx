@@ -213,7 +213,7 @@ export function ContactForm({ cards, form, successMessage, intent }: ContactForm
         </div>
       </div>
 
-      <div id="contact-form" className="scroll-mt-32 lg:col-span-3">
+      <div id="contact-form" className="scroll-mt-header lg:col-span-3">
         {status === 'sent' ? (
           <OrriSuccess title="Message received">
             <p>{successMessage}</p>

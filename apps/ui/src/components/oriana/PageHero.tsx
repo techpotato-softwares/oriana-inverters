@@ -31,10 +31,10 @@ export function PageHero({
   return (
     <section
       className={cn(
-        'relative overflow-hidden',
+        'hero-safe-top relative overflow-hidden',
         light
-          ? 'bg-oriana-surface pb-12 pt-32 lg:pb-16 lg:pt-44'
-          : 'bg-oriana-deep pb-16 pt-32 lg:pb-20 lg:pt-48',
+          ? 'bg-oriana-surface pb-[clamp(2rem,5svh,4rem)]'
+          : 'bg-oriana-deep pb-[clamp(2.5rem,6svh,5rem)]',
       )}
     >
       {light ? (
@@ -85,11 +85,9 @@ export function PageHero({
           ) : null}
           <h1
             className={cn(
-              'font-display font-semibold tracking-tight',
+              'fluid-display font-display font-semibold tracking-tight',
               eyebrow ? 'mt-4' : '',
-              light
-                ? 'text-4xl text-oriana-navy md:text-5xl lg:text-6xl xl:text-7xl'
-                : 'text-4xl text-white md:text-5xl lg:text-6xl',
+              light ? 'text-oriana-navy' : 'text-white',
             )}
           >
             {title}
@@ -97,12 +95,12 @@ export function PageHero({
           {description && (
             <p
               className={cn(
-                'mt-5 max-w-3xl leading-relaxed',
+                'mt-5 max-w-3xl text-[clamp(1rem,2svh,1.25rem)] leading-relaxed',
                 light
-                  ? 'text-lg text-oriana-muted md:text-xl'
+                  ? 'text-oriana-muted'
                   : photo
-                    ? 'text-lg text-white/80'
-                    : 'text-lg text-white/65',
+                    ? 'text-white/80'
+                    : 'text-white/65',
               )}
             >
               {description}
