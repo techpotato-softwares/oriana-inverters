@@ -54,7 +54,7 @@ export function StoryMilestones({ milestones }: { milestones: StoryMilestone[] }
               </span>
               <p
                 className="font-display font-semibold tracking-[-0.02em] whitespace-nowrap text-oriana-blue"
-                style={{ fontSize: 'clamp(1.25rem, 2.3vw, 2.25rem)', lineHeight: 1.1 }}
+                style={{ fontSize: 'clamp(1.15rem, 1.8vw, 1.5rem)', lineHeight: 1.1 }}
               >
                 {item.value}
               </p>

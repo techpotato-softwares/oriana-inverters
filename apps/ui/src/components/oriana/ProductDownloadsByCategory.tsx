@@ -75,7 +75,7 @@ export function ProductDownloadsByCategory({
             </p>
             <h2
               id="product-docs-heading"
-              className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl"
+              className="mt-3 fluid-heading font-display font-semibold text-oriana-navy"
             >
               Datasheets &amp; manuals
             </h2>

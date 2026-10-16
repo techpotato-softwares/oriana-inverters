@@ -51,7 +51,7 @@ export function AboutExplore({
                     <ArrowUpRight className="h-5 w-5" aria-hidden />
                   </span>
                   <span className="relative">
-                    <span className="block font-display text-xl font-semibold text-white lg:text-2xl">
+                    <span className="block fluid-title font-display font-semibold text-white">
                       {link.label}
                     </span>
                     <span className="mt-2 block text-sm leading-6 text-white/75">{link.description}</span>

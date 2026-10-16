@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { useRef, type ReactNode } from 'react'
 
+import { HeroFrame } from '@/components/oriana/HeroFrame'
 import { VideoHero } from '@/components/oriana/VideoHero'
 import { AboutPageNav } from '@/components/oriana/about/shared/AboutPageNav'
 
@@ -24,7 +25,7 @@ type AboutHeroProps = {
   media: AboutHeroMedia
   primary?: AboutHeroAction
   secondary?: AboutHeroAction
-  /** Sibling-page nav under the copy; defaults to the About section links. */
+  /** Sibling-page category nav at the hero foot; defaults to About links. */
   nav?: ReactNode
 }
 
@@ -56,7 +57,7 @@ function HeroCopy({
             'linear-gradient(90deg, rgba(7,21,37,0.82) 0%, rgba(7,21,37,0.45) 55%, rgba(7,21,37,0.1) 100%)',
         }}
       />
-      <div className="container hero-safe-top hero-copy relative flex min-h-0 flex-1 flex-col">
+      <HeroFrame footer={nav ? <motion.div {...reveal(0.46)}>{nav}</motion.div> : null}>
         <motion.p
           {...reveal(0.1)}
           className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-sky"
@@ -102,12 +103,7 @@ function HeroCopy({
             ) : null}
           </motion.div>
         ) : null}
-        {nav ? (
-          <motion.div {...reveal(0.46)} className="mt-[clamp(1.25rem,3.5svh,2.75rem)] shrink-0">
-            {nav}
-          </motion.div>
-        ) : null}
-      </div>
+      </HeroFrame>
     </>
   )
 }
@@ -141,7 +137,7 @@ function ImageHero({ media, ...copy }: AboutHeroProps & { media: { kind: 'image'
   )
 }
 
-/** Full-bleed About-section hero: video or image, headline, CTAs and sibling page nav. */
+/** Full-bleed hero: media + mid-frame copy + sibling category nav at the foot. */
 export function AboutHero(props: AboutHeroProps) {
   const { media, ...copy } = props
   if (media.kind === 'image') return <ImageHero {...props} media={media} />

@@ -3,8 +3,9 @@ import { Download } from 'lucide-react'
 
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { FadeIn } from '@/components/oriana/FadeIn'
-import { SustainabilitySubNav } from '@/components/oriana/sustainability/SustainabilitySubNav'
-import { getSustainabilityReports } from '@/utilities/getMarketing'
+import { SustainabilityHero } from '@/components/oriana/sustainability/SustainabilityHero'
+import { defaultHero } from '@/components/oriana/sustainability/sustainabilityData'
+import { getSustainability, getSustainabilityReports } from '@/utilities/getMarketing'
 import type { Media, SustainabilityReport } from '@/payload-types'
 
 function mediaUrl(v: unknown): string | null {
@@ -17,7 +18,10 @@ export const metadata = {
 }
 
 export default async function SustainabilityReportsPage() {
-  const docs = (await getSustainabilityReports()) as SustainabilityReport[]
+  const [docs, sustainability] = await Promise.all([
+    getSustainabilityReports() as Promise<SustainabilityReport[]>,
+    getSustainability(),
+  ])
 
   if (docs.length === 0) {
     return (
@@ -47,25 +51,18 @@ export default async function SustainabilityReportsPage() {
 
   return (
     <main>
-      <section className="relative overflow-hidden bg-oriana-deep pt-28 lg:pt-36">
-        <div className="absolute inset-0 bg-gradient-to-b from-oriana-deep via-[#0f2f6b] to-oriana-deep" />
-        <div className="container relative pb-12 lg:pb-16">
-          <FadeIn>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">
-              Sustainability
-            </p>
-            <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold tracking-tight text-white md:text-5xl">
-              Reports &amp; Policies
-            </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/70">
-              Download our latest environmental, social, and governance disclosures.
-            </p>
-          </FadeIn>
-          <FadeIn delay={0.08}>
-            <SustainabilitySubNav className="mt-10" variant="dark" />
-          </FadeIn>
-        </div>
-      </section>
+      <SustainabilityHero
+        eyebrow="Sustainability"
+        title="Reports & Policies"
+        description="Download our latest environmental, social, and governance disclosures."
+        videoSrc={mediaUrl(sustainability?.heroVideo) || defaultHero.videoSrc}
+        posterSrc={
+          mediaUrl(sustainability?.image) ||
+          mediaUrl(sustainability?.hero?.image) ||
+          defaultHero.posterSrc
+        }
+        cta={null}
+      />
 
       <section className="bg-white py-16 lg:py-24">
         <div className="container">

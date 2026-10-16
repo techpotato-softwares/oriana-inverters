@@ -43,7 +43,7 @@ export function SupportApproach({ intro, cta, steps }: SupportApproachProps) {
           </p>
           <h2
             className="mt-6 max-w-md text-balance font-display font-medium tracking-[-0.02em] text-oriana-navy"
-            style={{ fontSize: 'clamp(2rem, 3.8vw, 3.5rem)', lineHeight: 1.08 }}
+            style={{ fontSize: 'clamp(1.3rem, 2.1vw, 1.85rem)', lineHeight: 1.08 }}
           >
             {intro.title}
           </h2>
@@ -108,7 +108,7 @@ export function SupportApproach({ intro, cta, steps }: SupportApproachProps) {
                   />
                   <h3
                     className="absolute bottom-5 left-6 font-display font-medium text-white"
-                    style={{ fontSize: 'clamp(1.4rem, 2.2vw, 2rem)' }}
+                    style={{ fontSize: 'clamp(1.15rem, 1.8vw, 1.5rem)' }}
                   >
                     {step.title}
                   </h3>

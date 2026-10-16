@@ -329,7 +329,7 @@ export function AllProductsCatalogue({
             <section aria-labelledby="new-products-heading" className="mb-14 lg:mb-16">
               <h2
                 id="new-products-heading"
-                className="font-display text-2xl font-semibold text-oriana-navy md:text-3xl"
+                className="fluid-heading font-display font-semibold text-oriana-navy"
               >
                 New Products
               </h2>
@@ -341,7 +341,7 @@ export function AllProductsCatalogue({
                   <span className="inline-flex w-fit rounded-sm bg-oriana-sun px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.18em] text-oriana-navy">
                     New
                   </span>
-                  <h3 className="mt-5 font-display text-xl font-semibold tracking-tight text-white md:text-3xl lg:text-4xl">
+                  <h3 className="fluid-heading mt-5 font-display font-semibold tracking-tight text-white">
                     {featured.series}
                   </h3>
                   <span className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-oriana-blue px-5 py-2.5 text-sm font-semibold text-white">
@@ -405,7 +405,7 @@ export function AllProductsCatalogue({
       <section className="border-t border-oriana-navy/8 bg-oriana-silver/60">
         <div className="container flex flex-col items-start justify-between gap-6 py-14 md:flex-row md:items-center lg:py-16">
           <div className="max-w-2xl">
-            <h2 className="font-display text-2xl font-semibold text-oriana-navy md:text-3xl">
+            <h2 className="fluid-heading font-display font-semibold text-oriana-navy">
               Find a Distributor
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-oriana-muted md:text-base">

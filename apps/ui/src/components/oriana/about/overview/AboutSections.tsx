@@ -69,8 +69,8 @@ export function WhoWeAreSection({ content }: { content: AboutOverviewContent['wh
                   key={line}
                   className={
                     index === content.manifesto.length - 1
-                      ? 'font-display text-xl font-semibold text-oriana-blue lg:text-2xl'
-                      : 'font-display text-xl font-semibold text-oriana-deep lg:text-2xl'
+                      ? 'fluid-title font-display font-semibold text-oriana-blue'
+                      : 'fluid-title font-display font-semibold text-oriana-deep'
                   }
                 >
                   {line}
@@ -171,7 +171,7 @@ export function TechnologySection({ content }: { content: AboutOverviewContent['
         <FadeIn>
           <p
             className="mx-auto mt-16 max-w-3xl text-center font-display font-medium tracking-[-0.02em] text-balance text-white lg:mt-20"
-            style={{ fontSize: 'clamp(1.5rem, 2.8vw, 2.4rem)', lineHeight: 1.2 }}
+            style={{ fontSize: 'clamp(1.25rem, 2vw, 1.75rem)', lineHeight: 1.2 }}
           >
             {content.closing}{' '}
             <span className="text-oriana-sky">{content.closingEmphasis}</span>
@@ -389,7 +389,7 @@ export function AboutVisionSection({ content }: { content: AboutOverviewContent[
               <li
                 key={word}
                 className="flex items-center gap-4 font-display font-medium tracking-[-0.02em] text-white"
-                style={{ fontSize: 'clamp(1.6rem, 3vw, 2.6rem)', lineHeight: 1.2 }}
+                style={{ fontSize: 'clamp(1.3rem, 2.1vw, 1.85rem)', lineHeight: 1.2 }}
               >
                 <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-oriana-sun" />
                 {word}
@@ -490,7 +490,7 @@ export function CommitmentSection({ content }: { content: AboutOverviewContent['
         <FadeIn delay={0.12}>
           <p
             className="font-display font-medium tracking-[-0.02em] text-balance"
-            style={{ fontSize: 'clamp(1.35rem, 2.4vw, 2.15rem)', lineHeight: 1.2 }}
+            style={{ fontSize: 'clamp(1.2rem, 1.9vw, 1.65rem)', lineHeight: 1.2 }}
           >
             {content.statement}
             <span className="mt-2 block text-oriana-sky">{content.statementEmphasis}</span>

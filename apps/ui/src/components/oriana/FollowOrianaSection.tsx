@@ -93,10 +93,7 @@ export function FollowOrianaSection({
   return (
     <section className={`bg-white py-16 lg:py-20 ${className}`.trim()} aria-label={ariaLabel}>
       <div className="container text-center">
-        <h2
-          className="font-display font-medium tracking-tight text-[#606060]"
-          style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)' }}
-        >
+        <h2 className="fluid-heading font-display font-medium tracking-tight text-[#606060]">
           {title}
         </h2>
 

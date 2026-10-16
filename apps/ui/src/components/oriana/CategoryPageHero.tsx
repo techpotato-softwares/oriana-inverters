@@ -39,7 +39,7 @@ export function CategoryPageIntro({
 
   return (
     <div className="category-intro mb-12 lg:mb-16">
-      <h1 className="font-sans text-4xl font-bold text-oriana-navy">{title}</h1>
+      <h1 className="fluid-heading font-display font-semibold text-oriana-navy">{title}</h1>
       <div className="category-intro-body mt-5">
         {paragraphs.map((paragraph, index) => (
           <p

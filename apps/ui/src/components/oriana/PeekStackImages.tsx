@@ -267,7 +267,7 @@ function TitleCopy({ item }: { item: PeekStackImage }) {
       <h2
         className="font-display font-semibold leading-tight text-white"
         style={{
-          fontSize: 'clamp(1.65rem, 2.4vw, 2.35rem)',
+          fontSize: 'clamp(1.3rem, 2.1vw, 1.85rem)',
           textShadow: '0 2px 24px rgba(7, 21, 37, 0.45)',
         }}
       >

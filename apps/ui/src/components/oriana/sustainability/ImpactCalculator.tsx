@@ -82,7 +82,7 @@ export function ImpactCalculator({ config }: { config: CalculatorConfig }) {
               <label htmlFor={inputId} className="text-sm font-medium text-white/70">
                 Solar capacity installed
               </label>
-              <p className="font-display text-3xl font-medium tabular-nums text-white sm:text-4xl">
+              <p className="fluid-heading font-display font-medium tabular-nums text-white">
                 {kw}
                 <span className="ml-1 text-base font-semibold text-oriana-sky">kW</span>
               </p>

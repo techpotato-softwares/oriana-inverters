@@ -1,17 +1,22 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { Breadcrumbs } from '@/components/oriana/Breadcrumbs'
-import { CategoryPageHero, CategoryPageIntro } from '@/components/oriana/CategoryPageHero'
+import { CategoryPageIntro } from '@/components/oriana/CategoryPageHero'
+import { HeroPageNav } from '@/components/oriana/HeroPageNav'
+import { AboutHero } from '@/components/oriana/about/shared/AboutHero'
 import { ProductSeriesSections } from '@/components/oriana/ProductSeriesSections'
-import { getCategoryPageCopy } from '@/data/categoryPageCopy'
+import { CATEGORY_HERO_IMAGE, getCategoryPageCopy } from '@/data/categoryPageCopy'
+import { staticCategories } from '@/data/products'
 import {
   listingSectionTitle,
   segmentLabelForSlug,
   seriesMatchesSegment,
 } from '@/data/productMaster'
 import { seriesToCatalogueCard } from '@/utilities/allProductsCatalogue'
+import { productCategoryNav } from '@/utilities/productCategoryNav'
 import {
   getCategoryMeta,
+  getHiddenCategorySlugs,
   getSeriesByCategory,
   isCategoryHidden,
 } from '@/utilities/getCatalogue'
@@ -67,7 +72,13 @@ export default async function ProductCategoryPage({ params, searchParams }: Prop
   const meta = await getCategoryMeta(slug)
   if (!meta) notFound()
 
-  const allSeries = await getSeriesByCategory(slug)
+  const [allSeries, hidden] = await Promise.all([
+    getSeriesByCategory(slug),
+    getHiddenCategorySlugs(),
+  ])
+  const categoryTabs = staticCategories
+    .filter((item) => !hidden.has(item.slug))
+    .map((item) => ({ slug: item.slug, title: item.title }))
   const segmentLabel = segment ? segmentLabelForSlug(slug, segment) : null
   const listingLabel = segmentLabel ? listingSectionTitle(segmentLabel) : null
   const fallbackCopy = getCategoryPageCopy(slug)
@@ -79,10 +90,19 @@ export default async function ProductCategoryPage({ params, searchParams }: Prop
     segment && segmentLabel
       ? allSeries.filter((series) => seriesMatchesSegment(series, slug, segment))
       : allSeries
+  const heroSrc = meta.heroImageUrl?.trim() || CATEGORY_HERO_IMAGE
 
   return (
     <main>
-      <CategoryPageHero title={meta.title} imageUrl={meta.heroImageUrl} />
+      <AboutHero
+        eyebrow="Products"
+        title={meta.title}
+        description={meta.description}
+        media={{ kind: 'image', src: heroSrc, alt: `${meta.title} — Oriana product range` }}
+        primary={{ label: 'Browse the range', href: '#catalogue' }}
+        secondary={{ label: 'Find a distributor', href: '/where-to-buy' }}
+        nav={<HeroPageNav label="Product categories" items={productCategoryNav(categoryTabs)} />}
+      />
       <Breadcrumbs
         items={[
           { label: 'Inverters', href: '/products' },
@@ -94,7 +114,7 @@ export default async function ProductCategoryPage({ params, searchParams }: Prop
         ]}
       />
 
-      <section className="category-page bg-white py-16 lg:py-20">
+      <section id="catalogue" className="category-page scroll-mt-header bg-white py-16 lg:py-20">
         <div className="container">
           {introParagraphs.length > 0 ? (
             <CategoryPageIntro title={meta.title} paragraphs={introParagraphs} />

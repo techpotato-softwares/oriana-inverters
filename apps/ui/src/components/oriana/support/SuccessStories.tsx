@@ -32,7 +32,7 @@ export function SuccessStories({ intro, cta, categories }: SuccessStoriesProps) 
             </p>
             <h2
               className="mt-6 max-w-2xl font-display font-medium tracking-[-0.02em] text-white"
-              style={{ fontSize: 'clamp(2rem, 3.8vw, 3.5rem)', lineHeight: 1.08 }}
+              style={{ fontSize: 'clamp(1.3rem, 2.1vw, 1.85rem)', lineHeight: 1.08 }}
             >
               {intro.title}
             </h2>

@@ -39,7 +39,7 @@ export function ComingSoon({
       <FadeIn>
         <div className="rounded-2xl border border-oriana-navy/10 bg-oriana-surface px-8 py-12 text-center lg:px-12 lg:py-16">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-blue">Coming soon</p>
-          <h2 className="mt-4 font-display text-2xl font-semibold text-oriana-navy md:text-3xl">{title}</h2>
+          <h2 className="mt-4 fluid-heading font-display font-semibold text-oriana-navy">{title}</h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-oriana-muted">{description}</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link

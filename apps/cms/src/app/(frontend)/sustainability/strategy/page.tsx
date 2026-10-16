@@ -4,10 +4,16 @@ import { ArrowRight } from 'lucide-react'
 
 import { ComingSoon } from '@/components/oriana/ComingSoon'
 import { FadeIn } from '@/components/oriana/FadeIn'
-import { SustainabilitySubNav } from '@/components/oriana/sustainability/SustainabilitySubNav'
+import { SustainabilityHero } from '@/components/oriana/sustainability/SustainabilityHero'
+import { defaultHero } from '@/components/oriana/sustainability/sustainabilityData'
 import { getSustainability } from '@/utilities/getMarketing'
 import { realStrategySections } from '@/utilities/placeholderContent'
 import { visibleItems } from '@/utilities/visibility'
+import type { Media } from '@/payload-types'
+
+function mediaUrl(v: unknown): string | null {
+  return v && typeof v === 'object' && 'url' in v && (v as Media).url ? (v as Media).url! : null
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getSustainability()
@@ -52,27 +58,14 @@ export default async function SustainabilityStrategyPage() {
 
   return (
     <main>
-      <section className="relative overflow-hidden bg-oriana-deep pt-28 lg:pt-36">
-        <div className="absolute inset-0 bg-gradient-to-b from-oriana-deep via-[#0f2f6b] to-oriana-deep" />
-        <div className="container relative pb-12 lg:pb-16">
-          <FadeIn>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">
-              {strategyHero?.eyebrow || 'Sustainability'}
-            </p>
-            <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold tracking-tight text-white md:text-5xl">
-              {strategyHero?.title || 'Sustainability Strategy'}
-            </h1>
-            {strategyHero?.description ? (
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/70">
-                {strategyHero.description}
-              </p>
-            ) : null}
-          </FadeIn>
-          <FadeIn delay={0.08}>
-            <SustainabilitySubNav className="mt-10" variant="dark" />
-          </FadeIn>
-        </div>
-      </section>
+      <SustainabilityHero
+        eyebrow={strategyHero?.eyebrow || 'Sustainability'}
+        title={strategyHero?.title || 'Sustainability Strategy'}
+        description={strategyHero?.description || undefined}
+        videoSrc={mediaUrl(data?.heroVideo) || defaultHero.videoSrc}
+        posterSrc={mediaUrl(data?.image) || mediaUrl(data?.hero?.image) || defaultHero.posterSrc}
+        cta={null}
+      />
 
       <section className="bg-white py-16 lg:py-24">
         <div className="container">

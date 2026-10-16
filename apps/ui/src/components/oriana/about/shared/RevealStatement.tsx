@@ -29,13 +29,8 @@ export function RevealStatement({
       reduceMotion={!!reduceMotion}
       activeColor={tones[tone].active}
       faintColor={tones[tone].faint}
-      className={className}
-      style={{
-        fontSize: 'clamp(1.75rem, 3.6vw, 3.25rem)',
-        lineHeight: 1.15,
-        letterSpacing: '-0.02em',
-        ...style,
-      }}
+      className={['fluid-statement', className].filter(Boolean).join(' ')}
+      style={style}
     />
   )
 }

@@ -13,10 +13,7 @@ export default function NotFound() {
       <div className="container hero-safe-top relative grid min-h-[100svh] items-center gap-10 pb-16 md:grid-cols-[1.2fr_1fr] lg:gap-16">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-oriana-blue">Error 404</p>
-          <h1
-            className="mt-4 font-display font-medium tracking-[-0.02em] text-balance text-oriana-deep"
-            style={{ fontSize: 'clamp(2.25rem, 5vw, 4.25rem)', lineHeight: 1.05 }}
-          >
+          <h1 className="fluid-display mt-4 font-display font-medium tracking-[-0.02em] text-balance text-oriana-deep">
             This page went off-grid.
           </h1>
           <p className="mt-5 max-w-md text-base leading-8 text-oriana-muted">

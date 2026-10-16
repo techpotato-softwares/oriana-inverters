@@ -206,7 +206,7 @@ export function PillarsShowcase({ intro, pillars }: PillarsShowcaseProps) {
                   >
                     <h3
                       className="max-w-xl font-display font-medium tracking-[-0.01em] text-balance text-white"
-                      style={{ fontSize: 'clamp(1.4rem, 2.4vw, 2.25rem)', lineHeight: 1.15 }}
+                      style={{ fontSize: 'clamp(1.2rem, 1.9vw, 1.65rem)', lineHeight: 1.15 }}
                     >
                       {current.headline}
                     </h3>

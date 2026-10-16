@@ -24,8 +24,7 @@ export function LifeIntroSection({
         </FadeIn>
         <RevealStatement
           text={content.statement}
-          className="mt-8 max-w-5xl font-display font-medium text-balance"
-          style={{ fontSize: 'clamp(2rem, 4.6vw, 4.25rem)', lineHeight: 1.06 }}
+          className="fluid-display mt-8 max-w-5xl font-display font-medium text-balance"
         />
         <div className="mt-12 grid gap-6 border-t border-oriana-navy/10 pt-10 md:grid-cols-2 lg:mt-16 lg:gap-16">
           {content.paragraphs.map((p, index) => (
@@ -97,7 +96,7 @@ export function WorkplaceSection({ content }: { content: LifeAtOrianaContent['wo
           <FadeIn delay={0.1}>
             <p
               className="mt-8 border-l-2 border-oriana-sun pl-5 font-display font-semibold text-balance text-oriana-blue"
-              style={{ fontSize: 'clamp(1.35rem, 2.2vw, 1.9rem)', lineHeight: 1.25 }}
+              style={{ fontSize: 'clamp(1.15rem, 1.8vw, 1.5rem)', lineHeight: 1.25 }}
             >
               {content.purpose}
             </p>
@@ -133,7 +132,7 @@ export function CultureSection({ content }: { content: LifeAtOrianaContent['cult
           <h2
             id="culture-title"
             className="mx-auto mt-6 max-w-4xl text-center font-display font-medium tracking-[-0.03em] text-balance"
-            style={{ fontSize: 'clamp(1.75rem, 3.2vw, 2.75rem)', lineHeight: 1.1 }}
+            style={{ fontSize: 'clamp(1.4rem, 2.6vw, 2.25rem)', lineHeight: 1.1 }}
           >
             {content.title}
           </h2>

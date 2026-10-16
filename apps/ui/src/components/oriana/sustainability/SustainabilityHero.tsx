@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
 import { FadeIn } from '@/components/oriana/FadeIn'
+import { HeroFrame } from '@/components/oriana/HeroFrame'
 import { VideoHero } from '@/components/oriana/VideoHero'
 import { SustainabilitySubNav } from '@/components/oriana/sustainability/SustainabilitySubNav'
 
@@ -11,7 +12,7 @@ type SustainabilityHeroProps = {
   description?: string
   videoSrc: string
   posterSrc: string
-  cta?: { label: string; href: string }
+  cta?: { label: string; href: string } | null
 }
 
 export function SustainabilityHero({
@@ -32,7 +33,13 @@ export function SustainabilityHero({
         }}
         aria-hidden
       />
-      <div className="container hero-safe-top hero-copy relative flex min-h-0 flex-1 flex-col">
+      <HeroFrame
+        footer={
+          <FadeIn delay={0.18} direction="none">
+            <SustainabilitySubNav variant="dark" />
+          </FadeIn>
+        }
+      >
         <FadeIn>
           {eyebrow ? (
             <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-sky">
@@ -50,21 +57,20 @@ export function SustainabilityHero({
               {description}
             </p>
           ) : null}
-          <Link
-            href={cta.href}
-            className="group hero-copy-gap-lg mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-oriana-deep transition-colors duration-300 hover:bg-oriana-sky focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:min-h-12 sm:px-7"
-          >
-            {cta.label}
-            <ArrowRight
-              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
-              aria-hidden
-            />
-          </Link>
+          {cta ? (
+            <Link
+              href={cta.href}
+              className="group hero-copy-gap-lg mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-oriana-deep transition-colors duration-300 hover:bg-oriana-sky focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:min-h-12 sm:px-7"
+            >
+              {cta.label}
+              <ArrowRight
+                className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            </Link>
+          ) : null}
         </FadeIn>
-        <FadeIn delay={0.18} direction="none">
-          <SustainabilitySubNav className="mt-[clamp(1.25rem,3.5svh,2.75rem)] shrink-0" variant="dark" />
-        </FadeIn>
-      </div>
+      </HeroFrame>
     </VideoHero>
   )
 }

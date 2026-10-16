@@ -56,7 +56,7 @@ export default async function BecomeADistributorPage() {
       <section className="section-safe-y-tight">
         <div className="container">
           <FadeIn>
-            <h2 className="max-w-2xl font-display text-3xl font-semibold text-oriana-navy md:text-4xl">
+            <h2 className="fluid-heading max-w-2xl font-display font-semibold text-oriana-navy">
               {intro.title}
             </h2>
             {intro.description ? (
@@ -84,7 +84,7 @@ export default async function BecomeADistributorPage() {
       <section id="distributor-form" className="scroll-mt-header bg-oriana-surface section-safe-y-tight">
         <div className="container grid gap-12 lg:grid-cols-5 lg:gap-16">
           <FadeIn className="lg:col-span-2">
-            <h2 className="font-display text-3xl font-semibold text-oriana-navy">{form.title}</h2>
+            <h2 className="fluid-heading font-display font-semibold text-oriana-navy">{form.title}</h2>
             <p className="mt-4 text-sm leading-relaxed text-oriana-muted">{form.body}</p>
           </FadeIn>
           <FadeIn delay={0.08} className="lg:col-span-3">

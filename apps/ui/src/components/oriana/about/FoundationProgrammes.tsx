@@ -23,7 +23,7 @@ export function FoundationProgrammes({ intro, programmes, cta }: FoundationProgr
             ) : null}
             <h2
               className="mt-6 text-balance font-display font-medium tracking-[-0.02em] text-oriana-navy"
-              style={{ fontSize: 'clamp(2rem, 3.8vw, 3.25rem)', lineHeight: 1.08 }}
+              style={{ fontSize: 'clamp(1.3rem, 2.1vw, 1.85rem)', lineHeight: 1.08 }}
             >
               {intro.title}
             </h2>

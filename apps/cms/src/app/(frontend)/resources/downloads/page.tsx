@@ -95,7 +95,7 @@ export default async function DownloadsPage() {
               </p>
               <h2
                 id="certificates-heading"
-                className="mt-3 font-display text-3xl font-semibold text-oriana-navy md:text-4xl"
+                className="fluid-heading mt-3 font-display font-semibold text-oriana-navy"
               >
                 Certificates &amp; Compliance
               </h2>

@@ -23,7 +23,7 @@ function StatCopy({ stat, large }: { stat: AchievementStat; large?: boolean }) {
       <p
         className="font-display font-semibold tracking-[-0.04em] text-white"
         style={{
-          fontSize: large ? 'clamp(2.5rem, 6vw, 4.5rem)' : 'clamp(1.85rem, 3.2vw, 2.75rem)',
+          fontSize: large ? 'clamp(2rem, 4.5vw, 3.25rem)' : 'clamp(1.5rem, 2.6vw, 2.15rem)',
           lineHeight: 0.98,
         }}
       >
@@ -198,7 +198,7 @@ function ServiceSection({ content }: { content: AchievementsContent['service'] }
                       'font-display font-semibold tracking-[-0.02em]',
                       index === content.commitment.length - 1 ? 'text-oriana-blue' : 'text-oriana-deep',
                     )}
-                    style={{ fontSize: 'clamp(1.5rem, 2.6vw, 2.25rem)', lineHeight: 1.2 }}
+                    style={{ fontSize: 'clamp(1.25rem, 2vw, 1.75rem)', lineHeight: 1.2 }}
                   >
                     {line}
                   </p>

@@ -17,10 +17,10 @@ export function ImpactBand({ items }: { items: SustainabilityHighlight[] }) {
               className="font-display font-medium tracking-[-0.03em] text-oriana-blue tabular-nums"
               style={{
                 fontSize: /\d/.test(item.value)
-                  ? 'clamp(1.85rem, 3.2vw, 2.75rem)'
+                  ? 'clamp(1.5rem, 2.6vw, 2.15rem)'
                   : 'clamp(1.5rem, 2.6vw, 2.15rem)',
                 lineHeight: 1.08,
-                minHeight: 'clamp(1.85rem, 3.2vw, 2.75rem)',
+                minHeight: 'clamp(1.5rem, 2.6vw, 2.15rem)',
               }}
             >
               <AnimatedCounter value={item.value} />

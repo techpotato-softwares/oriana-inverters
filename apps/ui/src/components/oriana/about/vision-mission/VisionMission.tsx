@@ -25,7 +25,7 @@ function VisionStatementSection({ content }: { content: VisionMissionContent['vi
         <RevealStatement
           text={content.statement}
           className="mt-8 max-w-5xl font-display font-medium text-balance"
-          style={{ fontSize: 'clamp(1.45rem, 2.8vw, 2.5rem)', lineHeight: 1.2 }}
+          style={{ fontSize: 'clamp(1.3rem, 2.1vw, 1.85rem)', lineHeight: 1.2 }}
         />
 
         <ul className="mt-12 grid gap-4 sm:grid-cols-3 lg:mt-16 lg:gap-6">
@@ -46,7 +46,7 @@ function VisionStatementSection({ content }: { content: VisionMissionContent['vi
                   <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6 lg:p-8">
                     <span
                       className="font-display font-medium tracking-[-0.02em] text-white"
-                      style={{ fontSize: 'clamp(1.6rem, 2.6vw, 2.4rem)', lineHeight: 1 }}
+                      style={{ fontSize: 'clamp(1.25rem, 2vw, 1.75rem)', lineHeight: 1 }}
                     >
                       {panel.label}
                     </span>                  </figcaption>
@@ -88,7 +88,7 @@ function MissionSection({ content }: { content: VisionMissionContent['mission'] 
               text={content.statement}
               tone="dark"
               className="mt-8 font-display font-medium text-balance"
-              style={{ fontSize: 'clamp(1.6rem, 2.7vw, 2.6rem)', lineHeight: 1.18 }}
+              style={{ fontSize: 'clamp(1.3rem, 2.1vw, 1.85rem)', lineHeight: 1.18 }}
             />
             <FadeIn delay={0.1}>
               <p className="mt-10 text-sm font-semibold uppercase tracking-[0.24em] text-oriana-sun">
@@ -112,7 +112,7 @@ function MissionSection({ content }: { content: VisionMissionContent['mission'] 
                       className="object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                     />                  </div>
                   <div className="p-6 lg:p-8">
-                    <h3 className="font-display text-xl font-semibold text-white lg:text-2xl">{value.label}</h3>
+                    <h3 className="fluid-title font-display font-semibold text-white">{value.label}</h3>
                     <p className="mt-2 text-base leading-7 text-white/70">{value.description}</p>
                   </div>
                 </article>

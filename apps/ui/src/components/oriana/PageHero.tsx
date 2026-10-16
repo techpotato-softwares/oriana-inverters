@@ -95,7 +95,7 @@ export function PageHero({
           {description && (
             <p
               className={cn(
-                'mt-4 max-w-2xl text-[clamp(1rem,2svh,1.125rem)] leading-relaxed',
+                'fluid-lead mt-4 max-w-2xl text-pretty',
                 light
                   ? 'text-oriana-muted'
                   : photo

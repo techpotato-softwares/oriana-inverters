@@ -113,8 +113,8 @@ export function SiteHeader({
     setOpenMenu(null)
     setHoveredNav(null)
     lastScrollY.current = window.scrollY
-    // Short viewports start collapsed so the first screen keeps more content.
-    setNavCollapsed(compactViewport || window.scrollY > 16)
+    // Hero / page top: keep the logo + main nav row visible for easy navigation.
+    setNavCollapsed(window.scrollY > 16)
   }, [pathname, compactViewport])
 
   useEffect(() => {
@@ -130,38 +130,24 @@ export function SiteHeader({
         return
       }
 
-      // On short screens, only expand secondary nav when the user scrolls up a bit —
-      // never pin it open at the top of the page.
-      if (compactViewport) {
-        if (y <= 8) {
-          setNavCollapsed(true)
-          return
-        }
-        if (delta < -8) {
-          setNavCollapsed(false)
-          return
-        }
-        if (delta > 6) {
-          setNavCollapsed(true)
-          setOpenMenu(null)
-          setHoveredNav(null)
-        }
-        return
-      }
-
+      // At the hero (page top), always show the secondary nav under the logo.
       if (y <= 16) {
         setNavCollapsed(false)
         return
       }
 
-      if (delta > 6) {
+      // Scroll down → collapse to free space; scroll up → reveal again.
+      const downThreshold = compactViewport ? 4 : 6
+      const upThreshold = compactViewport ? -6 : -6
+
+      if (delta > downThreshold) {
         setNavCollapsed(true)
         setOpenMenu(null)
         setHoveredNav(null)
         return
       }
 
-      if (delta < -6) {
+      if (delta < upThreshold) {
         setNavCollapsed(false)
       }
     }

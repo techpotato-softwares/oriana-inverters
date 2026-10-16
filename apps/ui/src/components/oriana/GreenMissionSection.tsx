@@ -26,7 +26,7 @@ export function GreenMissionSection({
       className="border border-white/30 bg-white/15 px-8 py-8 text-center shadow-[0_8px_32px_rgba(7,21,37,0.18)] backdrop-blur-md sm:px-12 sm:py-10 lg:px-16 lg:py-12"
       style={{ borderRadius: 24, maxWidth: 'min(920px, 92vw)' }}
     >
-      <h2 className="font-display text-2xl font-semibold leading-tight text-white sm:text-3xl lg:text-4xl">
+      <h2 className="fluid-heading font-display font-semibold text-white">
         {title}
       </h2>
       {href ? (

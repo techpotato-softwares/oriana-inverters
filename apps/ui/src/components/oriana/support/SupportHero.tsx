@@ -81,10 +81,7 @@ export function SupportHero({ content }: { content: SupportHeroContent }) {
           {content.eyebrow}
         </motion.p>
 
-        <h1
-          className="mt-5 max-w-3xl font-display font-medium tracking-[-0.03em] text-white"
-          style={{ fontSize: 'clamp(1.9rem, min(4.2vw, 5.8svh), 3.4rem)', lineHeight: 1.06 }}
-        >
+        <h1 className="fluid-display mt-5 max-w-3xl font-display font-medium tracking-[-0.03em] text-white">
           {headline.map((line, index) => (
             <span key={line} className="block overflow-hidden pb-[0.08em]">
               <motion.span

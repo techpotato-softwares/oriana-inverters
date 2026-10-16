@@ -230,8 +230,8 @@
 }
 
 /*
-  Full-bleed hero copy: mid-frame (not stuck at the bottom), with nav clearance
-  and a modest bottom inset so short Windows viewports still fit.
+  Mid-frame copy for heroes without a foot sub-nav (MediaHero / SupportHero).
+  Sibling category menus use HeroFrame (copy mid + nav pinned to the foot).
 */
 .hero-copy {
   justify-content: center;
@@ -274,15 +274,49 @@
   );
 }
 
-/* Marketing heroes — modest display type that respects short viewports. */
+/*
+  Sitewide type scale — keep hero / section / statement sizes consistent.
+  Prefer these utilities over one-off text-4xl / large clamps.
+*/
 .fluid-display {
-  font-size: clamp(1.85rem, min(4vw, 5.5svh), 3.25rem);
-  line-height: 1.08;
+  font-size: clamp(1.65rem, min(3.4vw, 4.8svh), 2.75rem);
+  line-height: 1.1;
+}
+
+.fluid-heading {
+  font-size: clamp(1.3rem, 2.1vw, 1.85rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.fluid-statement {
+  font-size: clamp(1.4rem, 2.6vw, 2.25rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+}
+
+.fluid-title {
+  font-size: clamp(1.1rem, 1.7vw, 1.45rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.fluid-lead {
+  font-size: clamp(0.95rem, 1.35vw, 1.1rem);
+  line-height: 1.65;
 }
 
 @media (max-height: 52rem) {
   .fluid-display {
-    font-size: clamp(1.65rem, min(3.6vw, 5svh), 2.75rem);
+    font-size: clamp(1.5rem, min(3.2vw, 4.5svh), 2.35rem);
+  }
+
+  .fluid-heading {
+    font-size: clamp(1.2rem, 1.9vw, 1.65rem);
+  }
+
+  .fluid-statement {
+    font-size: clamp(1.25rem, 2.2vw, 1.95rem);
   }
 
   .hero-copy-gap {

@@ -652,7 +652,7 @@ export function ProductSeriesDetail({
                               isLeft ? 'sm:pr-10' : 'sm:pl-10',
                             )}
                           >
-                            <dt className="font-display text-2xl font-light tracking-tight text-[#606060] md:text-3xl">
+                            <dt className="fluid-title font-display font-light tracking-tight text-[#606060]">
                               {tile.value}
                             </dt>
                             <dd className="mt-2 text-sm text-oriana-muted">{tile.label}</dd>
@@ -684,7 +684,7 @@ export function ProductSeriesDetail({
             </div>
 
             <div className="container scroll-mt-[calc(var(--site-header-height,5rem)+3.75rem)] py-14 pt-16 lg:py-20">
-              <h2 className="text-center font-display text-2xl font-semibold text-oriana-navy md:text-3xl">
+              <h2 className="text-center fluid-heading font-display font-semibold text-oriana-navy">
                 Downloads
               </h2>
               <ul className="mx-auto mt-10 grid max-w-5xl gap-5 sm:grid-cols-2">
@@ -756,7 +756,7 @@ export function ProductSeriesDetail({
           <div className="container">
             <h2
               id="related-products-heading"
-              className="font-display text-2xl font-semibold text-oriana-navy md:text-3xl"
+              className="fluid-heading font-display font-semibold text-oriana-navy"
             >
               {relatedTitle}
             </h2>
@@ -789,7 +789,7 @@ export function ProductSeriesDetail({
       <section className="relative z-0 border-t border-oriana-navy/10 bg-oriana-surface">
         <div className="container grid gap-10 py-12 lg:grid-cols-2 lg:items-start lg:gap-16 lg:py-16">
           <div>
-            <h2 className="font-display text-2xl font-semibold uppercase tracking-wide text-oriana-navy md:text-3xl">
+            <h2 className="fluid-heading font-display font-semibold uppercase tracking-wide text-oriana-navy">
               Contact us
             </h2>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-oriana-muted md:text-base">

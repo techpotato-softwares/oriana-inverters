@@ -97,7 +97,7 @@ export function ImpactStats({
                 {eyebrow}
               </p>
             ) : null}
-            <h2 className="mt-3 font-display text-2xl font-semibold text-[#606060] md:text-3xl lg:text-4xl">
+            <h2 className="mt-3 fluid-heading font-display font-semibold text-[#606060]">
               {title || 'Our Impact'}
             </h2>
             {body ? (
@@ -113,7 +113,7 @@ export function ImpactStats({
                 <stat.icon className="h-10 w-10 stroke-[1.3] text-oriana-sky" aria-hidden />
                 <AnimatedCounter
                   value={stat.value}
-                  className="mt-5 block font-display text-3xl font-semibold tracking-tight text-[#606060] md:text-4xl"
+                  className="mt-5 block fluid-heading font-display font-semibold tracking-tight text-[#606060]"
                 />
                 <p className="mt-3 max-w-[12rem] text-sm leading-snug text-oriana-muted">
                   {stat.label}
@@ -257,7 +257,7 @@ export function NewsEventsSection({
         <FadeIn>
           <h2
             className="text-center font-display font-medium tracking-tight text-[#606060]"
-            style={{ fontSize: 'clamp(1.75rem, 3.2vw, 2.75rem)' }}
+            style={{ fontSize: 'clamp(1.4rem, 2.6vw, 2.25rem)' }}
           >
             {title || 'Trending News & Events'}
           </h2>

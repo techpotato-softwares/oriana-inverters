@@ -66,7 +66,7 @@ export function OriginSection({
             <p className="text-sm font-medium text-oriana-muted">{content.insightLead}</p>
             <blockquote
               className="mt-4 font-display font-medium tracking-[-0.02em] text-balance text-oriana-deep"
-              style={{ fontSize: 'clamp(1.6rem, 3vw, 2.6rem)', lineHeight: 1.15 }}
+              style={{ fontSize: 'clamp(1.3rem, 2.1vw, 1.85rem)', lineHeight: 1.15 }}
             >
               {content.insight}
             </blockquote>
@@ -179,7 +179,7 @@ export function JourneySection({ content }: { content: BrandStoryContent['journe
             ))}
           </p>
           <div className="mx-auto mt-10 max-w-2xl text-center">
-            <p className="font-display text-xl font-semibold text-oriana-blue lg:text-2xl">{content.closing}</p>
+            <p className="fluid-title font-display font-semibold text-oriana-blue">{content.closing}</p>
             <p className="mt-3 text-base leading-7 text-oriana-muted">{content.closingSupport}</p>
           </div>
         </FadeIn>
@@ -211,7 +211,7 @@ export function UnitsSection({ content }: { content: BrandStoryContent['units'] 
           <h2
             id="units-title"
             className="mt-5 max-w-2xl font-display font-medium tracking-[-0.02em] text-balance"
-            style={{ fontSize: 'clamp(1.5rem, 2.6vw, 2.35rem)', lineHeight: 1.15 }}
+            style={{ fontSize: 'clamp(1.3rem, 2.1vw, 1.85rem)', lineHeight: 1.15 }}
           >
             {content.title}
           </h2>
@@ -220,8 +220,7 @@ export function UnitsSection({ content }: { content: BrandStoryContent['units'] 
 
         <FadeIn delay={0.1} className="mt-10 lg:mt-14">
           <p
-            className="font-display font-semibold tracking-[-0.04em] text-white"
-            style={{ fontSize: 'clamp(2.25rem, 7vw, 4.75rem)', lineHeight: 0.95 }}
+            className="fluid-display font-display font-semibold tracking-[-0.04em] text-white"
           >
             {content.figure}
             <span className="text-oriana-sun">+</span>
@@ -249,7 +248,7 @@ export function UnitsSection({ content }: { content: BrandStoryContent['units'] 
                 <p key={p}>{p}</p>
               ))}
             </div>
-            <p className="mt-10 font-display text-2xl font-semibold text-white lg:text-3xl">
+            <p className="mt-10 fluid-title font-display font-semibold text-white">
               {content.statement}
               <span className="mt-1 block text-oriana-sky">{content.statementSupport}</span>
             </p>
@@ -447,7 +446,7 @@ export function GlobalVisionSection({ content }: { content: BrandStoryContent['g
           ))}
         </ul>
         <FadeIn>
-          <p className="mt-10 font-display text-xl font-semibold text-oriana-sky lg:text-2xl">{content.closing}</p>
+          <p className="mt-10 fluid-title font-display font-semibold text-oriana-sky">{content.closing}</p>
         </FadeIn>
       </div>
     </section>
@@ -486,8 +485,7 @@ export function StoryRecapSection({ content }: { content: BrandStoryContent['rec
 
         <FadeIn delay={0.1} className="lg:self-center">
           <p
-            className="font-display font-medium tracking-[-0.02em] text-balance text-oriana-deep"
-            style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', lineHeight: 1.08 }}
+            className="fluid-display font-display font-medium tracking-[-0.02em] text-balance text-oriana-deep"
           >
             {content.statement}
             <span className="block text-oriana-blue">{content.statementEmphasis}</span>

@@ -62,7 +62,7 @@ export function JourneyTimeline({ steps }: { steps: JourneyStep[] }) {
                   'font-display font-medium tracking-[-0.02em] text-balance',
                   final ? 'text-oriana-sun' : 'text-white',
                 )}
-                style={{ fontSize: 'clamp(1.5rem, 2.8vw, 2.5rem)', lineHeight: 1.1 }}
+                style={{ fontSize: 'clamp(1.25rem, 2vw, 1.75rem)', lineHeight: 1.1 }}
               >
                 {step.marker}
               </p>

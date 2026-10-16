@@ -77,9 +77,7 @@ export function MediaHero({
           <h1 className="fluid-display mt-4 max-w-3xl font-display font-semibold tracking-tight text-white">
             {title}
           </h1>
-          <p className="mt-4 max-w-2xl text-[clamp(1rem,2svh,1.125rem)] leading-relaxed text-white/75">
-            {description}
-          </p>
+          <p className="fluid-lead mt-4 max-w-2xl text-pretty text-white/75">{description}</p>
           {primary || secondary ? (
             <div className="mt-8 flex flex-wrap gap-3">
               {primary ? (

@@ -42,10 +42,7 @@ export function IntroductionSection({
     >
       <div className="container">
         <div className="mx-auto text-center" style={{ maxWidth: '72rem' }}>
-          <h2
-            className="font-display font-medium leading-snug"
-            style={{ color: '#606060', fontSize: 'clamp(1.65rem, 3vw, 2.5rem)' }}
-          >
+          <h2 className="fluid-statement font-display font-medium leading-snug text-[#606060]">
             {title}
           </h2>
 
@@ -62,12 +59,12 @@ export function IntroductionSection({
             className="mx-auto font-medium leading-relaxed"
             style={{
               maxWidth: '56rem',
-              fontSize: 'clamp(1rem, 1.55vw, 1.4rem)',
+              fontSize: 'clamp(0.95rem, 1.35vw, 1.1rem)',
             }}
           />
 
           {tagline ? (
-            <p className="mt-14 font-display text-xl font-medium tracking-tight text-[#606060] sm:text-2xl lg:text-3xl">
+            <p className="fluid-title mt-14 font-display font-medium tracking-tight text-[#606060]">
               {tagline}
             </p>
           ) : null}

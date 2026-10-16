@@ -45,7 +45,7 @@ export function GlobalPresence({ content }: { content: GlobalPresenceContent }) 
             </p>
             <h2
               className="mt-6 max-w-xl font-display font-medium tracking-[-0.02em] text-white"
-              style={{ fontSize: 'clamp(2rem, 3.8vw, 3.5rem)', lineHeight: 1.08 }}
+              style={{ fontSize: 'clamp(1.3rem, 2.1vw, 1.85rem)', lineHeight: 1.08 }}
             >
               {intro.title}
             </h2>
@@ -60,7 +60,7 @@ export function GlobalPresence({ content }: { content: GlobalPresenceContent }) 
                 <div className="border-t border-white/15 pt-5">
                   <AnimatedCounter
                     value={stat.value}
-                    className="block font-display text-3xl font-medium tracking-tight text-white md:text-4xl"
+                    className="fluid-heading block font-display font-medium tracking-tight text-white"
                   />
                   <p className="mt-3 text-xs leading-5 text-white/60 sm:text-sm">{stat.label}</p>
                 </div>
