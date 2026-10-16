@@ -105,7 +105,7 @@ export function ProductCategoriesSection({
           </p>
           <Link
             href={current.href}
-            className="group mt-6 inline-flex max-w-3xl items-center justify-center gap-3 self-center font-display text-3xl font-semibold leading-tight text-white sm:text-4xl lg:items-start lg:justify-start lg:self-start lg:text-5xl xl:text-6xl"
+            className="group mt-6 inline-flex max-w-3xl items-center justify-center gap-3 self-center font-display text-2xl font-semibold leading-tight text-white sm:text-3xl lg:items-start lg:justify-start lg:self-start lg:text-4xl"
           >
             <span>{current.label}</span>
             <ChevronRight

@@ -46,7 +46,7 @@ export function WhoWeAreSection({ content }: { content: AboutOverviewContent['wh
     <section
       id={content.id}
       aria-labelledby="who-we-are-title"
-      className="scroll-mt-24 bg-oriana-surface py-20 lg:py-28"
+      className="scroll-mt-24 bg-oriana-surface section-safe-y"
     >
       <div className="container grid gap-14 lg:grid-cols-12 lg:items-center lg:gap-16">
         <div className="lg:col-span-7">
@@ -109,7 +109,7 @@ export function TechnologySection({ content }: { content: AboutOverviewContent['
     <section
       id={content.id}
       aria-labelledby="technology-title"
-      className="relative isolate scroll-mt-24 overflow-hidden bg-oriana-deep py-20 lg:py-28"
+      className="relative isolate scroll-mt-24 overflow-hidden bg-oriana-deep section-safe-y"
     >
       <div
         aria-hidden
@@ -187,7 +187,7 @@ export function ManufacturingSection({ content }: { content: AboutOverviewConten
     <section
       id={content.id}
       aria-labelledby="manufacturing-title"
-      className="scroll-mt-24 bg-white py-20 lg:py-28"
+      className="scroll-mt-24 bg-white section-safe-y"
     >
       <div className="container grid gap-14 lg:grid-cols-2 lg:items-center lg:gap-20">
         <FadeIn direction="right">
@@ -250,7 +250,7 @@ export function QualitySection({ content }: { content: AboutOverviewContent['qua
     <section
       id={content.id}
       aria-labelledby="quality-title"
-      className="scroll-mt-24 bg-oriana-surface py-20 lg:py-28"
+      className="scroll-mt-24 bg-oriana-surface section-safe-y"
     >
       <div className="container grid gap-14 lg:grid-cols-12 lg:items-center lg:gap-16">
         <div className="lg:col-span-7">
@@ -347,7 +347,7 @@ export function AboutVisionSection({ content }: { content: AboutOverviewContent[
     <section
       id={content.id}
       aria-labelledby="about-vision-title"
-      className="relative isolate scroll-mt-24 overflow-hidden bg-oriana-deep py-24 lg:py-36"
+      className="relative isolate scroll-mt-header overflow-hidden bg-oriana-deep section-safe-y"
     >
       <Image src={content.image.src} alt={content.image.alt} fill sizes="100vw" className="-z-20 object-cover" />
       <div
@@ -413,7 +413,7 @@ const reasonIcons: Record<string, LucideIcon> = {
 
 export function WhyOrianaSection({ content }: { content: AboutOverviewContent['why'] }) {
   return (
-    <section id={content.id} aria-labelledby="why-title" className="scroll-mt-24 bg-white py-20 lg:py-28">
+    <section id={content.id} aria-labelledby="why-title" className="scroll-mt-24 bg-white section-safe-y">
       <div className="container">
         <FadeIn>
           <SectionHeading
@@ -454,7 +454,7 @@ export function CommitmentSection({ content }: { content: AboutOverviewContent['
   return (
     <section
       aria-labelledby="commitment-title"
-      className="relative isolate overflow-hidden bg-oriana-deep py-24 text-white lg:py-36"
+      className="relative isolate overflow-hidden bg-oriana-deep section-safe-y text-white"
     >
       <Image src={content.image.src} alt="" fill sizes="100vw" className="-z-20 object-cover opacity-60" />
       <div
@@ -465,7 +465,7 @@ export function CommitmentSection({ content }: { content: AboutOverviewContent['
             'linear-gradient(180deg, rgba(7,21,37,0.95) 0%, rgba(7,21,37,0.72) 50%, rgba(7,21,37,0.95) 100%)',
         }}
       />
-      <div className="container grid gap-16 lg:grid-cols-2 lg:gap-24">
+      <div className="container grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
         <div>
           <FadeIn>
             <SectionHeading
@@ -476,30 +476,30 @@ export function CommitmentSection({ content }: { content: AboutOverviewContent['
             />
           </FadeIn>
           <FadeIn delay={0.08}>
-            <ul className="mt-10 space-y-4 border-l-2 border-oriana-sky/60 pl-6">
+            <ul className="mt-8 space-y-3 border-l-2 border-oriana-sky/60 pl-5">
               {content.matters.map((line) => (
-                <li key={line} className="font-display text-lg font-medium text-white lg:text-xl">
+                <li key={line} className="font-display text-base font-medium text-white lg:text-lg">
                   {line}
                 </li>
               ))}
             </ul>
-            <p className="mt-10 max-w-xl text-base leading-8 text-white/70">{content.body}</p>
+            <p className="mt-8 max-w-xl text-sm leading-7 text-white/70 md:text-base md:leading-8">{content.body}</p>
           </FadeIn>
         </div>
 
-        <FadeIn delay={0.12} className="lg:self-end">
+        <FadeIn delay={0.12}>
           <p
             className="font-display font-medium tracking-[-0.02em] text-balance"
-            style={{ fontSize: 'clamp(1.8rem, 3.4vw, 3rem)', lineHeight: 1.12 }}
+            style={{ fontSize: 'clamp(1.35rem, 2.4vw, 2.15rem)', lineHeight: 1.2 }}
           >
             {content.statement}
             <span className="mt-2 block text-oriana-sky">{content.statementEmphasis}</span>
           </p>
 
-          <div className="mt-12 border-t border-white/15 pt-8">
-            <p className="font-display text-2xl font-bold tracking-[0.2em]">{content.brand}</p>
-            <p className="mt-2 text-base text-white/75">{content.tagline}</p>
-            <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold uppercase tracking-[0.18em] text-oriana-sky">
+          <div className="mt-8 border-t border-white/15 pt-6">
+            <p className="font-display text-xl font-bold tracking-[0.2em]">{content.brand}</p>
+            <p className="mt-2 text-sm text-white/75 md:text-base">{content.tagline}</p>
+            <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-oriana-sky sm:text-xs">
               {content.capabilities.map((item) => (
                 <li key={item} className="flex items-center gap-2">
                   <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-oriana-sun" />
@@ -509,7 +509,7 @@ export function CommitmentSection({ content }: { content: AboutOverviewContent['
             </ul>
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href={content.primary.href}
               className="group inline-flex min-h-12 items-center gap-2 rounded-full bg-white px-7 text-sm font-semibold text-oriana-deep transition-colors duration-300 hover:bg-oriana-sky focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"

@@ -43,14 +43,14 @@ export function SectionHeading({
           'mt-5 font-display font-medium tracking-[-0.02em] text-balance',
           dark ? 'text-white' : 'text-oriana-navy',
         )}
-        style={{ fontSize: 'clamp(1.9rem, 3.4vw, 3.1rem)', lineHeight: 1.1 }}
+        style={{ fontSize: 'clamp(1.5rem, 2.6vw, 2.35rem)', lineHeight: 1.15 }}
       >
         {title}
       </h2>
       {description ? (
         <p
           className={cn(
-            'mt-5 text-base leading-8 text-pretty',
+            'mt-4 text-sm leading-7 text-pretty md:text-base md:leading-8',
             dark ? 'text-white/70' : 'text-oriana-muted',
           )}
         >

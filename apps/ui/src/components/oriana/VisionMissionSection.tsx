@@ -110,7 +110,7 @@ function CompactVisionCards({
       <div className="container">
         {title ? (
           <div className="mx-auto mb-10 max-w-3xl text-center">
-            <h2 className="font-display text-3xl font-semibold text-[#606060] md:text-4xl lg:text-5xl">
+            <h2 className="font-display text-2xl font-semibold text-[#606060] md:text-3xl lg:text-4xl">
               {title}
             </h2>
             <GrowingAccentLine reduceMotion size="heading" className="mt-3" progress={1} />
@@ -288,7 +288,7 @@ export function VisionMissionSection({
         >
           {title ? (
             <>
-              <h2 className="text-center font-display text-3xl font-semibold text-[#606060] md:text-4xl lg:text-5xl">
+              <h2 className="text-center font-display text-2xl font-semibold text-[#606060] md:text-3xl lg:text-4xl">
                 {title}
               </h2>
               <GrowingAccentLine

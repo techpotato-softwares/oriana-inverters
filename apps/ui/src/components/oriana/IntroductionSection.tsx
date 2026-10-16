@@ -37,14 +37,14 @@ export function IntroductionSection({
   return (
     <section
       ref={sectionRef}
-      className={`relative overflow-hidden bg-white py-24 lg:py-32 ${className}`.trim()}
+      className={`relative overflow-hidden bg-white section-safe-y ${className}`.trim()}
       aria-label={ariaLabel}
     >
       <div className="container">
         <div className="mx-auto text-center" style={{ maxWidth: '72rem' }}>
           <h2
             className="font-display font-medium leading-snug"
-            style={{ color: '#606060', fontSize: 'clamp(2rem, 4vw, 3.25rem)' }}
+            style={{ color: '#606060', fontSize: 'clamp(1.65rem, 3vw, 2.5rem)' }}
           >
             {title}
           </h2>
@@ -52,8 +52,8 @@ export function IntroductionSection({
           <GrowingAccentLine
             sectionRef={sectionRef}
             reduceMotion={!!reduceMotion}
-            size="default"
-            className="mt-[clamp(1.25rem,3svh,2.5rem)]"
+            size="compact"
+            className="mt-[clamp(1rem,2.5svh,1.75rem)]"
           />
 
           <ScrollRevealText

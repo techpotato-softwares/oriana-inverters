@@ -13,7 +13,7 @@ const spans = [
 
 export function SupportStrengths({ intro, items }: { intro: Intro; items: CardItem[] }) {
   return (
-    <section id="our-strengths" className="scroll-mt-40 bg-white py-20 lg:py-28">
+    <section id="our-strengths" className="scroll-mt-40 bg-white section-safe-y">
       <div className="container">
         <FadeIn className="mb-12 grid gap-8 lg:mb-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
           <div>

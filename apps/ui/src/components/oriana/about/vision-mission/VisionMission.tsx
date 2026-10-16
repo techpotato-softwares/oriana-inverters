@@ -14,7 +14,7 @@ const eyebrowClass = 'flex items-center gap-3 text-[0.7rem] font-semibold upperc
 
 function VisionStatementSection({ content }: { content: VisionMissionContent['vision'] }) {
   return (
-    <section id={content.id} aria-labelledby="vision-title" className="scroll-mt-24 bg-white py-20 lg:py-32">
+    <section id={content.id} aria-labelledby="vision-title" className="scroll-mt-header bg-white section-safe-y">
       <div className="container">
         <FadeIn>
           <h2 id="vision-title" className={`${eyebrowClass} text-oriana-blue`}>
@@ -25,10 +25,10 @@ function VisionStatementSection({ content }: { content: VisionMissionContent['vi
         <RevealStatement
           text={content.statement}
           className="mt-8 max-w-5xl font-display font-medium text-balance"
-          style={{ fontSize: 'clamp(1.9rem, 4.4vw, 4rem)', lineHeight: 1.1 }}
+          style={{ fontSize: 'clamp(1.45rem, 2.8vw, 2.5rem)', lineHeight: 1.2 }}
         />
 
-        <ul className="mt-16 grid gap-4 sm:grid-cols-3 lg:mt-24 lg:gap-6">
+        <ul className="mt-12 grid gap-4 sm:grid-cols-3 lg:mt-16 lg:gap-6">
           {content.panels.map((panel, index) => (
             <li key={panel.label}>
               <FadeIn delay={index * 0.1}>
@@ -65,7 +65,7 @@ function MissionSection({ content }: { content: VisionMissionContent['mission'] 
     <section
       id={content.id}
       aria-labelledby="mission-title"
-      className="relative isolate scroll-mt-24 bg-oriana-deep py-20 text-white lg:py-32"
+      className="relative isolate scroll-mt-header bg-oriana-deep section-safe-y text-white"
     >
       <div
         aria-hidden
@@ -112,7 +112,7 @@ function MissionSection({ content }: { content: VisionMissionContent['mission'] 
                       className="object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                     />                  </div>
                   <div className="p-6 lg:p-8">
-                    <h3 className="font-display text-2xl font-semibold text-white">{value.label}</h3>
+                    <h3 className="font-display text-xl font-semibold text-white lg:text-2xl">{value.label}</h3>
                     <p className="mt-2 text-base leading-7 text-white/70">{value.description}</p>
                   </div>
                 </article>
@@ -130,7 +130,7 @@ function LongTermSection({ content }: { content: VisionMissionContent['longTerm'
     <section
       id={content.id}
       aria-labelledby="long-term-title"
-      className="scroll-mt-24 overflow-hidden bg-oriana-surface py-20 lg:py-28"
+      className="scroll-mt-header overflow-hidden bg-oriana-surface section-safe-y"
     >
       <div className="container">
         <FadeIn>

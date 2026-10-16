@@ -26,7 +26,7 @@ export function GreenMissionSection({
       className="border border-white/30 bg-white/15 px-8 py-8 text-center shadow-[0_8px_32px_rgba(7,21,37,0.18)] backdrop-blur-md sm:px-12 sm:py-10 lg:px-16 lg:py-12"
       style={{ borderRadius: 24, maxWidth: 'min(920px, 92vw)' }}
     >
-      <h2 className="font-display text-3xl font-semibold leading-tight text-white sm:text-4xl lg:text-5xl">
+      <h2 className="font-display text-2xl font-semibold leading-tight text-white sm:text-3xl lg:text-4xl">
         {title}
       </h2>
       {href ? (
@@ -45,7 +45,7 @@ export function GreenMissionSection({
       <div className="container">
         <article
           className="relative overflow-hidden"
-          style={{ minHeight: 'min(75svh, 720px)', borderRadius: 40 }}
+          style={{ minHeight: 'min(58svh, 520px)', borderRadius: 40 }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -62,7 +62,7 @@ export function GreenMissionSection({
 
           <div
             className="relative flex items-center justify-center p-6 sm:p-10 lg:p-14"
-            style={{ minHeight: 'min(75svh, 720px)' }}
+            style={{ minHeight: 'min(58svh, 520px)' }}
           >
             {href ? (
               <Link href={href} className="group transition hover:scale-[1.01]">

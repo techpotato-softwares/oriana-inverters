@@ -16,7 +16,7 @@ export function GlobalPresence({ content }: { content: GlobalPresenceContent }) 
   return (
     <section
       id="global-presence"
-      className="relative scroll-mt-40 overflow-hidden bg-oriana-deep py-20 lg:py-28"
+      className="relative scroll-mt-40 overflow-hidden bg-oriana-deep section-safe-y"
     >
       <div
         aria-hidden

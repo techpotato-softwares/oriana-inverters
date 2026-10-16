@@ -25,7 +25,7 @@ export function SupportApproach({ intro, cta, steps }: SupportApproachProps) {
   return (
     <section
       id="our-approach"
-      className="relative scroll-mt-40 overflow-hidden bg-oriana-surface py-20 lg:py-28"
+      className="relative scroll-mt-40 overflow-hidden bg-oriana-surface section-safe-y"
     >
       <div
         aria-hidden

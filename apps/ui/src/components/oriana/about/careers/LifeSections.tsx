@@ -14,7 +14,7 @@ export function LifeIntroSection({
   content: Omit<LifeAtOrianaContent['intro'], 'paragraphs'> & { paragraphs: string[] }
 }) {
   return (
-    <section id="life" aria-labelledby="life-title" className="scroll-mt-24 bg-white py-20 lg:py-32">
+    <section id="life" aria-labelledby="life-title" className="scroll-mt-header bg-white section-safe-y">
       <div className="container">
         <FadeIn>
           <h2 id="life-title" className={`${eyebrowClass} text-oriana-blue`}>
@@ -113,7 +113,7 @@ export function CultureSection({ content }: { content: LifeAtOrianaContent['cult
   return (
     <section
       aria-labelledby="culture-title"
-      className="relative isolate overflow-hidden bg-oriana-deep py-24 text-white lg:py-36"
+      className="relative isolate overflow-hidden bg-oriana-deep section-safe-y text-white"
     >
       <Image src={content.image} alt="" fill sizes="100vw" className="-z-20 object-cover opacity-40" />
       <div
@@ -133,7 +133,7 @@ export function CultureSection({ content }: { content: LifeAtOrianaContent['cult
           <h2
             id="culture-title"
             className="mx-auto mt-6 max-w-4xl text-center font-display font-medium tracking-[-0.03em] text-balance"
-            style={{ fontSize: 'clamp(2.25rem, 5.6vw, 5rem)', lineHeight: 1.02 }}
+            style={{ fontSize: 'clamp(1.75rem, 3.2vw, 2.75rem)', lineHeight: 1.1 }}
           >
             {content.title}
           </h2>

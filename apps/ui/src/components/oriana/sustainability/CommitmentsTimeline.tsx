@@ -33,7 +33,7 @@ export function CommitmentsTimeline({ intro, commitments }: CommitmentsTimelineP
     <section
       id="commitments"
       aria-labelledby={headingId}
-      className="scroll-mt-24 bg-white py-20 lg:py-28"
+      className="scroll-mt-24 bg-white section-safe-y"
     >
       <div className="container">
         <FadeIn>

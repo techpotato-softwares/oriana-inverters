@@ -75,8 +75,8 @@ export function VideoHero({
 
   return (
     <section
-      className={`relative min-h-[100svh] w-full overflow-hidden bg-oriana-deep ${className}`.trim()}
-      style={children ? undefined : { height: '100svh' }}
+      className={`relative min-h-[min(92svh,52rem)] w-full overflow-hidden bg-oriana-deep ${className}`.trim()}
+      style={children ? undefined : { height: 'min(92svh, 52rem)' }}
       aria-label={ariaLabel}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -109,9 +109,9 @@ export function VideoHero({
       />
 
       {caption ? (
-        <div className="absolute inset-x-0 bottom-0 z-10 flex justify-end px-8 pb-16 sm:px-12 lg:px-20 lg:pb-20">
+        <div className="absolute inset-x-0 bottom-0 z-10 flex justify-end px-8 pb-10 sm:px-12 lg:px-20 lg:pb-14">
           <p
-            className={`max-w-md text-right font-display text-2xl font-semibold tracking-tight text-white transition-all duration-300 sm:text-3xl md:text-4xl ${
+            className={`max-w-md text-right font-display text-xl font-semibold tracking-tight text-white transition-all duration-300 sm:text-2xl md:text-3xl ${
               captionVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
             }`}
           >
@@ -121,7 +121,7 @@ export function VideoHero({
       ) : null}
 
       {children ? (
-        <div className="relative z-10 flex min-h-[100svh] flex-col">{children}</div>
+        <div className="relative z-10 flex min-h-[min(92svh,52rem)] flex-col">{children}</div>
       ) : null}
     </section>
   )

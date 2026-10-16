@@ -13,7 +13,7 @@ export function SuccessStories({ intro, cta, categories }: SuccessStoriesProps) 
   return (
     <section
       id="success-stories"
-      className="relative scroll-mt-40 overflow-hidden bg-oriana-deep py-20 lg:py-28"
+      className="relative scroll-mt-40 overflow-hidden bg-oriana-deep section-safe-y"
     >
       <div
         aria-hidden

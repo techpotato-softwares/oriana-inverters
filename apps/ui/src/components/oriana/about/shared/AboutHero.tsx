@@ -56,7 +56,7 @@ function HeroCopy({
             'linear-gradient(90deg, rgba(7,21,37,0.82) 0%, rgba(7,21,37,0.45) 55%, rgba(7,21,37,0.1) 100%)',
         }}
       />
-      <div className="container hero-safe-top relative flex flex-1 flex-col justify-end pb-8 lg:pb-10">
+      <div className="container hero-safe-top hero-copy relative flex flex-1 flex-col">
         <motion.p
           {...reveal(0.1)}
           className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-sky"
@@ -66,21 +66,21 @@ function HeroCopy({
         </motion.p>
         <motion.h1
           {...reveal(0.18)}
-          className="mt-5 max-w-4xl font-display font-medium tracking-[-0.02em] text-balance text-white"
-          style={{ fontSize: 'clamp(2.25rem, min(5.2vw, 8.5svh), 4.75rem)', lineHeight: 1.04 }}
+          className="mt-4 max-w-3xl font-display font-medium tracking-[-0.02em] text-balance text-white"
+          style={{ fontSize: 'clamp(1.85rem, min(4vw, 5.5svh), 3.25rem)', lineHeight: 1.08 }}
         >
           {title}
         </motion.h1>
         {description ? (
           <motion.p
             {...reveal(0.28)}
-            className="mt-6 max-w-xl text-base leading-8 text-pretty text-white/80 md:text-lg"
+            className="mt-4 max-w-xl text-sm leading-7 text-pretty text-white/80 md:text-base md:leading-8"
           >
             {description}
           </motion.p>
         ) : null}
         {primary || secondary ? (
-          <motion.div {...reveal(0.36)} className="mt-8 flex flex-wrap gap-3">
+          <motion.div {...reveal(0.36)} className="mt-6 flex flex-wrap gap-3">
             {primary ? (
               <Link
                 href={primary.href}
@@ -104,7 +104,7 @@ function HeroCopy({
           </motion.div>
         ) : null}
         {nav ? (
-          <motion.div {...reveal(0.46)} className="mt-10 lg:mt-12">
+          <motion.div {...reveal(0.46)} className="mt-8 lg:mt-10">
             {nav}
           </motion.div>
         ) : null}
@@ -123,7 +123,7 @@ function ImageHero({ media, ...copy }: AboutHeroProps & { media: { kind: 'image'
     <section
       ref={ref}
       aria-label={copy.eyebrow}
-      className="relative isolate min-h-[100svh] w-full overflow-hidden bg-oriana-deep"
+      className="relative isolate min-h-[min(92svh,52rem)] w-full overflow-hidden bg-oriana-deep"
     >
       <motion.div
         className="absolute inset-0 -z-10"
@@ -135,7 +135,7 @@ function ImageHero({ media, ...copy }: AboutHeroProps & { media: { kind: 'image'
         <Image src={media.src} alt={media.alt} fill priority sizes="100vw" className="object-cover" />
       </motion.div>
       <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-oriana-deep/85 via-transparent to-oriana-deep/25" />
-      <div className="relative flex min-h-[100svh] flex-col">
+      <div className="relative flex min-h-[min(92svh,52rem)] flex-col">
         <HeroCopy {...copy} />
       </div>
     </section>

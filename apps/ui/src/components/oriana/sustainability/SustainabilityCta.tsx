@@ -26,7 +26,7 @@ export function SustainabilityCta({ content }: { content: SustainabilityCtaConte
               'linear-gradient(100deg, rgba(7,21,37,0.92) 0%, rgba(7,21,37,0.7) 50%, rgba(7,21,37,0.35) 100%)',
           }}
         />
-        <div className="container py-24 lg:py-36">
+        <div className="container section-safe-y">
           <FadeIn>
             <h2
               id="sustainability-cta-heading"

@@ -56,7 +56,7 @@ export function ImpactCalculator({ config }: { config: CalculatorConfig }) {
     <section
       id="estimator"
       aria-labelledby={headingId}
-      className="relative scroll-mt-24 overflow-hidden bg-oriana-deep py-20 text-white lg:py-28"
+      className="relative scroll-mt-24 overflow-hidden bg-oriana-deep section-safe-y text-white"
     >
       <div
         aria-hidden

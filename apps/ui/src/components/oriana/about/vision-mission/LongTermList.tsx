@@ -18,12 +18,12 @@ function LongTermRow({ item }: { item: LongTermItem }) {
     <li ref={ref} className="border-b border-oriana-navy/10">
       <motion.div
         style={reduceMotion ? undefined : { opacity, x }}
-        className="grid gap-4 py-8 sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:items-center sm:gap-8 lg:py-10"
+        className="grid gap-3 py-5 sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:items-center sm:gap-6 lg:py-6"
       >
         <span aria-hidden className="h-2 w-2 rounded-full bg-oriana-sky" />
         <p
           className="font-display font-medium tracking-[-0.02em] text-balance text-oriana-deep"
-          style={{ fontSize: 'clamp(1.5rem, 3.2vw, 2.75rem)', lineHeight: 1.12 }}
+          style={{ fontSize: 'clamp(1.15rem, 2.1vw, 1.65rem)', lineHeight: 1.25 }}
         >
           {item.label}
         </p>

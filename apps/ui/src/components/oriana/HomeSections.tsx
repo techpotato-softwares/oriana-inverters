@@ -97,7 +97,7 @@ export function ImpactStats({
                 {eyebrow}
               </p>
             ) : null}
-            <h2 className="mt-3 font-display text-3xl font-semibold text-[#606060] md:text-4xl lg:text-5xl">
+            <h2 className="mt-3 font-display text-2xl font-semibold text-[#606060] md:text-3xl lg:text-4xl">
               {title || 'Our Impact'}
             </h2>
             {body ? (
@@ -252,7 +252,7 @@ export function NewsEventsSection({
   const sideItems = rest.slice(0, 4)
 
   return (
-    <section className="bg-oriana-surface py-16 lg:py-24" aria-label="News and events">
+    <section className="bg-oriana-surface section-safe-y-tight" aria-label="News and events">
       <div className="container">
         <FadeIn>
           <h2

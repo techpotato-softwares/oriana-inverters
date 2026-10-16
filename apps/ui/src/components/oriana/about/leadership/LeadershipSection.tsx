@@ -22,7 +22,7 @@ export function LeadershipSection({ content }: { content: LeadershipContent }) {
     <section
       id={content.id}
       aria-labelledby="leadership-title"
-      className="relative isolate scroll-mt-24 overflow-hidden bg-white py-20 lg:py-28"
+      className="relative isolate scroll-mt-24 overflow-hidden bg-white section-safe-y"
     >
       <div className="container">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">

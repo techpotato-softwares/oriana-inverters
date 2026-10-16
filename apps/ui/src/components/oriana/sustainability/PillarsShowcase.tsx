@@ -82,7 +82,7 @@ export function PillarsShowcase({ intro, pillars }: PillarsShowcaseProps) {
     <section
       id="pillars"
       aria-labelledby={`${baseId}-heading`}
-      className="relative scroll-mt-24 overflow-hidden bg-oriana-surface py-20 lg:py-28"
+      className="relative scroll-mt-24 overflow-hidden bg-oriana-surface section-safe-y"
     >
       <div
         aria-hidden

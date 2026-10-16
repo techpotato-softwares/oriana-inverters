@@ -23,8 +23,8 @@ function StatCopy({ stat, large }: { stat: AchievementStat; large?: boolean }) {
       <p
         className="font-display font-semibold tracking-[-0.04em] text-white"
         style={{
-          fontSize: large ? 'clamp(3.5rem, 9vw, 8rem)' : 'clamp(2.25rem, 4.4vw, 3.75rem)',
-          lineHeight: 0.95,
+          fontSize: large ? 'clamp(2.5rem, 6vw, 4.5rem)' : 'clamp(1.85rem, 3.2vw, 2.75rem)',
+          lineHeight: 0.98,
         }}
       >
         <AnimatedCounter value={stat.value} />
@@ -84,7 +84,7 @@ function PresenceStat({ stat, className }: { stat: AchievementStat; className?: 
 function NumbersSection({ content }: { content: AchievementsContent['numbers'] }) {
   const [supply, experience, presence, partners] = content.stats
   return (
-    <section id={content.id} aria-labelledby="numbers-title" className="scroll-mt-24 bg-white py-20 lg:py-28">
+    <section id={content.id} aria-labelledby="numbers-title" className="scroll-mt-24 bg-white section-safe-y">
       <div className="container">
         <FadeIn>
           <SectionHeading id="numbers-title" eyebrow={content.eyebrow} title={content.title} />
@@ -110,7 +110,7 @@ function NumbersSection({ content }: { content: AchievementsContent['numbers'] }
 
 function ScaleSection({ content }: { content: AchievementsContent['scale'] }) {
   return (
-    <section id={content.id} aria-labelledby="scale-title" className="scroll-mt-24 bg-oriana-surface py-20 lg:py-28">
+    <section id={content.id} aria-labelledby="scale-title" className="scroll-mt-24 bg-oriana-surface section-safe-y">
       <div className="container">
         <FadeIn>
           <SectionHeading
@@ -153,7 +153,7 @@ function ScaleSection({ content }: { content: AchievementsContent['scale'] }) {
 
 function ServiceSection({ content }: { content: AchievementsContent['service'] }) {
   return (
-    <section id={content.id} aria-labelledby="service-title" className="scroll-mt-24 bg-white py-20 lg:py-32">
+    <section id={content.id} aria-labelledby="service-title" className="scroll-mt-header bg-white section-safe-y">
       <div className="container grid gap-14 lg:grid-cols-2 lg:items-center lg:gap-20">
         <FadeIn direction="right">
           <ParallaxImage
@@ -217,7 +217,7 @@ function JourneySection({ content }: { content: AchievementsContent['journey'] }
     <section
       id={content.id}
       aria-labelledby="journey-title"
-      className="relative isolate scroll-mt-24 overflow-hidden bg-oriana-deep py-20 lg:py-32"
+      className="relative isolate scroll-mt-header overflow-hidden bg-oriana-deep section-safe-y"
     >
       <div
         aria-hidden

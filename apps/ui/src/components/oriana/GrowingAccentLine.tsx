@@ -44,11 +44,11 @@ function clamp01(n: number) {
 const SIZE_HEIGHT: Record<GrowingAccentLineSize, string> = {
   micro: 'clamp(1.5rem, 3.25svh, 3.25rem)',
   compact: 'clamp(2rem, 5svh, 5.5rem)',
-  fluid: 'clamp(2.25rem, 5.5svh, 6rem)',
+  fluid: 'clamp(1.75rem, 4svh, 4rem)',
   /** Sticky section headings (Vision / Mission) — must not eat the pin. */
-  heading: 'clamp(2.25rem, 6.5svh, 7.5rem)',
-  default: 'clamp(2.5rem, 8svh, 10rem)',
-  tall: 'clamp(2.75rem, 10svh, 12rem)',
+  heading: 'clamp(1.75rem, 4.5svh, 4.5rem)',
+  default: 'clamp(2rem, 5.5svh, 6rem)',
+  tall: 'clamp(2.25rem, 7svh, 8rem)',
 }
 
 /**

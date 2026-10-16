@@ -23,7 +23,7 @@ export function AboutExplore({
   links: AboutExploreLink[]
 }) {
   return (
-    <section aria-labelledby="about-explore-title" className="bg-oriana-surface py-20 lg:py-28">
+    <section aria-labelledby="about-explore-title" className="bg-oriana-surface section-safe-y">
       <div className="container">
         <FadeIn>
           <SectionHeading id="about-explore-title" eyebrow={eyebrow} title={title} />

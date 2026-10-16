@@ -33,7 +33,7 @@ export function SustainabilityReports({
   const docs = tab === 'reports' ? reports : policies
 
   return (
-    <section id="reports" className="scroll-mt-24 bg-oriana-surface py-20 lg:py-28">
+    <section id="reports" className="scroll-mt-24 bg-oriana-surface section-safe-y">
       <div className="container">
         <FadeIn>
           <SectionHeading eyebrow="Transparency" title="Latest reports & policies" />
@@ -110,7 +110,7 @@ export function SustainabilityHonors({ honors }: { honors: SustainabilityHonor[]
   if (honors.length === 0) return null
 
   return (
-    <section id="honors" className="scroll-mt-24 bg-white py-20 lg:py-28">
+    <section id="honors" className="scroll-mt-24 bg-white section-safe-y">
       <div className="container">
         <FadeIn>
           <SectionHeading eyebrow="Recognition" title="Honors and awards" />

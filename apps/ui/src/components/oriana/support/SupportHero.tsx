@@ -26,7 +26,7 @@ export function SupportHero({ content }: { content: SupportHeroContent }) {
     <section
       id="service-brand"
       ref={containerRef}
-      className="relative isolate flex min-h-[92svh] scroll-mt-32 items-end overflow-hidden bg-oriana-deep"
+      className="relative isolate flex min-h-[min(88svh,50rem)] scroll-mt-32 items-center overflow-hidden bg-oriana-deep"
     >
       <motion.div
         className="absolute inset-0 -z-10"
@@ -68,7 +68,7 @@ export function SupportHero({ content }: { content: SupportHeroContent }) {
       />
 
       <motion.div
-        className="container relative w-full pb-16 pt-40 lg:pb-24 lg:pt-52"
+        className="container hero-safe-top hero-copy relative w-full"
         style={reduceMotion ? undefined : { y: copyY, opacity: copyOpacity }}
       >
         <motion.p
@@ -82,8 +82,8 @@ export function SupportHero({ content }: { content: SupportHeroContent }) {
         </motion.p>
 
         <h1
-          className="mt-7 max-w-4xl font-display font-medium tracking-[-0.03em] text-white"
-          style={{ fontSize: 'clamp(2.5rem, 6vw, 5.25rem)', lineHeight: 1.02 }}
+          className="mt-5 max-w-3xl font-display font-medium tracking-[-0.03em] text-white"
+          style={{ fontSize: 'clamp(1.9rem, min(4.2vw, 5.8svh), 3.4rem)', lineHeight: 1.06 }}
         >
           {headline.map((line, index) => (
             <span key={line} className="block overflow-hidden pb-[0.08em]">
@@ -108,11 +108,11 @@ export function SupportHero({ content }: { content: SupportHeroContent }) {
           animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="mt-8 max-w-2xl text-base leading-8 text-white/75 md:text-lg">
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-white/75 md:text-base md:leading-8">
             {content.description}
           </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-3">
+          <div className="mt-7 flex flex-wrap items-center gap-3">
             <Link
               href={content.primary.href}
               className="group inline-flex min-h-12 items-center gap-2 rounded-full bg-oriana-blue px-7 text-sm font-semibold text-white transition-colors duration-300 hover:bg-oriana-sky hover:text-oriana-deep focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
@@ -133,7 +133,7 @@ export function SupportHero({ content }: { content: SupportHeroContent }) {
         </motion.div>
 
         <motion.div
-          className="mt-14 border-t border-white/15 pt-6 lg:mt-20"
+          className="mt-10 border-t border-white/15 pt-5 lg:mt-12"
           initial={reduceMotion ? undefined : { opacity: 0, y: 24 }}
           animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}

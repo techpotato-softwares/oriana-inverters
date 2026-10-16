@@ -328,7 +328,7 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Images, videos, and documents. Organize with folders (Hero, Products, Icons, …).
+ * Images, videos, and documents. On AWS, large files (>~6MB) upload directly to S3 — if that fails, check media-bucket CORS for the admin origin. Organize with folders (Hero, Products, Icons, …).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".

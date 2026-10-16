@@ -17,7 +17,7 @@ export function ServiceStories({ intro, stories }: { intro: Intro; stories: Card
   }, [])
 
   return (
-    <section id="service-stories" className="scroll-mt-40 overflow-hidden bg-white py-20 lg:py-28">
+    <section id="service-stories" className="scroll-mt-40 overflow-hidden bg-white section-safe-y">
       <div className="container">
         <FadeIn className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div>

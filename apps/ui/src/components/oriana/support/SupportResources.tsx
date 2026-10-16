@@ -8,7 +8,7 @@ export function SupportResources({ content }: { content: SupportResourcesContent
   const { intro, feature, items } = content
 
   return (
-    <section id="resources" className="scroll-mt-40 bg-white py-20 lg:py-28">
+    <section id="resources" className="scroll-mt-40 bg-white section-safe-y">
       <div className="container">
         <FadeIn className="mb-12 max-w-3xl lg:mb-16">
           <p className="flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-oriana-blue">
@@ -28,7 +28,7 @@ export function SupportResources({ content }: { content: SupportResourcesContent
 
         <div className="grid gap-5 lg:grid-cols-[1.05fr_1fr]">
           <FadeIn className="h-full">
-            <div className="group relative h-full min-h-[22rem] overflow-hidden rounded-[1.75rem] bg-oriana-deep lg:min-h-[32rem]">
+            <div className="group relative h-full min-h-[18rem] overflow-hidden rounded-[1.75rem] bg-oriana-deep lg:min-h-[24rem]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={feature.image}

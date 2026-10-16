@@ -6,7 +6,7 @@ export function ImpactBand({ items }: { items: SustainabilityHighlight[] }) {
   if (items.length === 0) return null
 
   return (
-    <section aria-label="Sustainability at a glance" className="bg-white py-16 lg:py-24">
+    <section aria-label="Sustainability at a glance" className="bg-white section-safe-y-tight">
       <Stagger className="container grid divide-y divide-oriana-deep/10 md:grid-cols-3 md:divide-x md:divide-y-0">
         {items.map((item) => (
           <StaggerItem
@@ -17,15 +17,15 @@ export function ImpactBand({ items }: { items: SustainabilityHighlight[] }) {
               className="font-display font-medium tracking-[-0.03em] text-oriana-blue tabular-nums"
               style={{
                 fontSize: /\d/.test(item.value)
-                  ? 'clamp(2.5rem, 4.6vw, 4.25rem)'
-                  : 'clamp(2rem, 3.2vw, 3rem)',
-                lineHeight: 1.05,
-                minHeight: 'clamp(2.5rem, 4.6vw, 4.25rem)',
+                  ? 'clamp(1.85rem, 3.2vw, 2.75rem)'
+                  : 'clamp(1.5rem, 2.6vw, 2.15rem)',
+                lineHeight: 1.08,
+                minHeight: 'clamp(1.85rem, 3.2vw, 2.75rem)',
               }}
             >
               <AnimatedCounter value={item.value} />
             </p>
-            <p className="mt-5 text-sm font-semibold uppercase tracking-[0.16em] text-oriana-navy">
+            <p className="mt-3 text-sm font-semibold uppercase tracking-[0.16em] text-oriana-navy">
               {item.label}
             </p>
             {item.description ? (
