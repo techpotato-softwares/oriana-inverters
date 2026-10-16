@@ -26,7 +26,7 @@ export function SupportHero({ content }: { content: SupportHeroContent }) {
     <section
       id="service-brand"
       ref={containerRef}
-      className="relative isolate flex min-h-[min(88svh,50rem)] scroll-mt-32 items-center overflow-hidden bg-oriana-deep"
+      className="relative isolate flex min-h-[min(88svh,var(--viewport-height))] scroll-mt-header items-center overflow-hidden bg-oriana-deep"
     >
       <motion.div
         className="absolute inset-0 -z-10"

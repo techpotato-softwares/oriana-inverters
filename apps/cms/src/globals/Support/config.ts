@@ -11,6 +11,7 @@ import {
   subpageHero,
 } from '@/fields/marketing'
 import { seoFields } from '@/fields/seo'
+import { sectionHiddenField, visibleArray } from '@/fields/visibility'
 
 const statFields: Field[] = [
   {
@@ -56,7 +57,10 @@ export const Support: GlobalConfig = {
                     {
                       name: 'highlight',
                       type: 'text',
-                      admin: { width: '50%', description: 'Second headline line, shown in sky blue.' },
+                      admin: {
+                        width: '50%',
+                        description: 'Second headline line, shown in sky blue.',
+                      },
                     },
                   ],
                 },
@@ -65,7 +69,7 @@ export const Support: GlobalConfig = {
                 optionalLink('primary', 'Primary button'),
                 optionalLink('secondary', 'Secondary button'),
                 { name: 'quickLinksLabel', type: 'text' },
-                {
+                visibleArray({
                   name: 'quickLinks',
                   type: 'array',
                   admin: { description: 'Leave empty to keep the default quick links.' },
@@ -79,7 +83,7 @@ export const Support: GlobalConfig = {
                       ],
                     },
                   ],
-                },
+                }),
               ],
             },
           ],
@@ -88,13 +92,18 @@ export const Support: GlobalConfig = {
           name: 'strengths',
           label: 'Strengths',
           description: '/support — mosaic of capabilities',
-          fields: [sectionIntro('intro'), cardList('items', { label: 'Capabilities', image: true })],
+          fields: [
+            sectionHiddenField(),
+            sectionIntro('intro'),
+            cardList('items', { label: 'Capabilities', image: true }),
+          ],
         },
         {
           name: 'approach',
           label: 'Approach',
           description: '/support — four-step service sequence',
           fields: [
+            sectionHiddenField(),
             sectionIntro('intro'),
             optionalLink('cta', 'Button'),
             cardList('steps', { label: 'Steps', image: true }),
@@ -105,17 +114,18 @@ export const Support: GlobalConfig = {
           label: 'Global presence',
           description: '/support — network stats and map',
           fields: [
+            sectionHiddenField(),
             sectionIntro('intro'),
-            {
+            visibleArray({
               name: 'stats',
               type: 'array',
               admin: { description: 'Leave empty to keep the default stats.' },
               fields: statFields,
-            },
+            }),
             optionalLink('cta', 'Button'),
             { name: 'coverageLabel', type: 'text' },
             { name: 'coverageBody', type: 'textarea' },
-            {
+            visibleArray({
               name: 'locations',
               type: 'array',
               admin: {
@@ -132,7 +142,7 @@ export const Support: GlobalConfig = {
                   ],
                 },
               ],
-            },
+            }),
             cardList('pillars', { label: 'Service pillars', icon: true }),
           ],
         },
@@ -140,13 +150,18 @@ export const Support: GlobalConfig = {
           name: 'stories',
           label: 'Service stories',
           description: '/support — horizontal story rail',
-          fields: [sectionIntro('intro'), cardList('items', { label: 'Stories', image: true, tag: true })],
+          fields: [
+            sectionHiddenField(),
+            sectionIntro('intro'),
+            cardList('items', { label: 'Stories', image: true, tag: true }),
+          ],
         },
         {
           name: 'resources',
           label: 'Resources',
           description: '/support — resource centre',
           fields: [
+            sectionHiddenField(),
             sectionIntro('intro'),
             {
               name: 'feature',
@@ -168,6 +183,7 @@ export const Support: GlobalConfig = {
           label: 'Cases & stories',
           description: '/support — case study categories',
           fields: [
+            sectionHiddenField(),
             sectionIntro('intro'),
             optionalLink('cta', 'Button'),
             cardList('items', { label: 'Categories', image: true, link: true }),
@@ -199,7 +215,7 @@ export const Support: GlobalConfig = {
           description: '/support/security',
           fields: [
             subpageHero(),
-            {
+            visibleArray({
               name: 'sections',
               type: 'array',
               admin: {
@@ -210,7 +226,7 @@ export const Support: GlobalConfig = {
                 { name: 'heading', type: 'text', required: true },
                 { name: 'body', type: 'textarea', required: true },
               ],
-            },
+            }),
             { name: 'ctaPrompt', type: 'text' },
             optionalLink('cta', 'Button'),
             pageMeta(),

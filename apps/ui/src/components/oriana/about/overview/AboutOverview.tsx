@@ -21,15 +21,16 @@ export function AboutOverview({
   leadership,
 }: {
   content: AboutOverviewContent
-  leadership: LeadershipContent
+  leadership: LeadershipContent | null
 }) {
   const { hero, whoWeAre, technology, manufacturing, quality, vision, why } = content
   const chapters = [whoWeAre, technology, manufacturing, quality, vision, why].map(
     ({ id, eyebrow }) => ({ id, label: eyebrow }),
   )
+  const team = leadership && leadership.leaders.length > 0 ? leadership : null
   const sections = [
     chapters[0],
-    { id: leadership.id, label: leadership.eyebrow },
+    ...(team ? [{ id: team.id, label: team.eyebrow }] : []),
     ...chapters.slice(1),
   ]
 
@@ -41,13 +42,13 @@ export function AboutOverview({
         description={hero.description}
         media={{ kind: 'video', src: hero.video.src, poster: hero.video.poster }}
         primary={{ label: 'Who we are', href: `#${whoWeAre.id}` }}
-        secondary={{ label: 'Meet our leadership', href: `#${leadership.id}` }}
+        secondary={team ? { label: 'Meet our leadership', href: `#${team.id}` } : undefined}
       />
       <SectionSubNav sections={sections} label="About page sections" pillId="about-subnav-pill" />
       <Breadcrumbs items={[{ label: 'About' }]} />
       <AboutIntroSection content={content.intro} />
       <WhoWeAreSection content={whoWeAre} />
-      <LeadershipSection content={leadership} />
+      {team ? <LeadershipSection content={team} /> : null}
       <TechnologySection content={technology} />
       <ManufacturingSection content={manufacturing} />
       <QualitySection content={quality} />

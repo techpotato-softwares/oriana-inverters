@@ -43,8 +43,8 @@ export const aboutOverview = {
     ],
     manifesto: ['Technology that performs.', 'Engineering that lasts.', 'Energy that moves the world forward.'],
     image: {
-      src: unsplash('1581092160562-40aa08e78837', 1400),
-      alt: 'Engineer reviewing technical drawings at a workbench',
+      src: unsplash('1563770660941-20978e870e26', 1400),
+      alt: 'Power-electronics assembly for solar inverter manufacturing',
     },
   },
 
@@ -110,8 +110,8 @@ export const aboutOverview = {
     closing: 'Built in India.',
     closingEmphasis: 'Engineered for global standards.',
     image: {
-      src: unsplash('1581092918056-0c4c3acd3789', 1400),
-      alt: 'Technician assembling a circuit board',
+      src: unsplash('1581094794329-c8112a89af12', 1400),
+      alt: 'Technician assembling solar inverter electronics',
     },
   },
 
@@ -127,8 +127,8 @@ export const aboutOverview = {
     principles: ['Design', 'Test', 'Validate', 'Improve'],
     closing: 'Because when energy systems are critical, reliability cannot be compromised.',
     image: {
-      src: unsplash('1581093450021-4a7360e9a6b5', 1400),
-      alt: 'Engineers testing equipment in a laboratory',
+      src: unsplash('1581092160607-ee22621dd758', 1400),
+      alt: 'Technician assembling and testing power-electronics boards',
     },
   },
 
@@ -202,7 +202,7 @@ export const aboutOverview = {
         label: 'Vision & Mission',
         description: 'Where we are going — and how we get there.',
         href: '/about/vision-mission',
-        image: unsplash('1466611653911-95081537e5b7', 900),
+        image: unsplash('1592833159155-c62df1b65634', 900),
       },
       {
         label: 'Achievements',
@@ -214,7 +214,7 @@ export const aboutOverview = {
         label: 'Life at ORIANA',
         description: 'Build the future. Grow with us.',
         href: '/careers',
-        image: unsplash('1531545514256-b1400bc00f31', 900),
+        image: unsplash('1581094794329-c8112a89af12', 900),
       },
     ],
   },
@@ -236,8 +236,8 @@ export const aboutOverview = {
     primary: { label: 'Explore products', href: '/products' },
     secondary: { label: 'Read our brand story', href: '/about/brand-story' },
     image: {
-      src: unsplash('1466611653911-95081537e5b7', 2400),
-      alt: 'Wind farm silhouetted against a sunset',
+      src: unsplash('1497435334941-8c899ee9e8e9', 2400),
+      alt: 'Solar farm on a hillside under open sky',
     },
   },
 }

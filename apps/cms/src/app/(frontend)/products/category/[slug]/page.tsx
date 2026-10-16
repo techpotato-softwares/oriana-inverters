@@ -13,6 +13,7 @@ import { seriesToCatalogueCard } from '@/utilities/allProductsCatalogue'
 import {
   getCategoryMeta,
   getSeriesByCategory,
+  isCategoryHidden,
 } from '@/utilities/getCatalogue'
 
 type Props = {
@@ -56,6 +57,7 @@ export default async function ProductCategoryPage({ params, searchParams }: Prop
   const { slug } = await params
   const { segment } = await searchParams
   if (legacyCategorySlugs[slug]) {
+    if (await isCategoryHidden(legacyCategorySlugs[slug])) notFound()
     const next = segment
       ? `/products/category/${legacyCategorySlugs[slug]}?segment=${encodeURIComponent(segment)}`
       : `/products/category/${legacyCategorySlugs[slug]}`

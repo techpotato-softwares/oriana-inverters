@@ -34,6 +34,28 @@ export function SectionSubNav({
   const reduceMotion = useReducedMotion()
 
   useEffect(() => {
+    const nav = navRef.current
+    if (!nav) return
+
+    const syncStickyOffset = () => {
+      const bottom = getStickyBottom(nav)
+      document.documentElement.style.setProperty(
+        '--site-sticky-offset',
+        `${Math.ceil(bottom)}px`,
+      )
+    }
+
+    syncStickyOffset()
+    const ro = new ResizeObserver(syncStickyOffset)
+    ro.observe(nav)
+    window.addEventListener('resize', syncStickyOffset)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', syncStickyOffset)
+    }
+  }, [])
+
+  useEffect(() => {
     let frame = 0
 
     const update = () => {

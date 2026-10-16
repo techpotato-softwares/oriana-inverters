@@ -17,7 +17,8 @@ export function CategoryPageHero({
         alt=""
         style={{
           display: 'block',
-          width: '100vw',
+          // 100% avoids Windows classic-scrollbar 100vw overflow/crop vs Mac
+          width: '100%',
           height: 'auto',
           objectFit: 'cover',
           objectPosition: 'center',

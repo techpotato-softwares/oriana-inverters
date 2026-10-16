@@ -63,7 +63,10 @@ export function ProductCategoriesSection({
   return (
     <section
       className={cn('relative overflow-hidden bg-oriana-deep', className)}
-      style={{ height: '100svh', minHeight: '100svh' }}
+      style={{
+        height: 'var(--viewport-height, 100svh)',
+        minHeight: 'var(--viewport-height, 100svh)',
+      }}
       aria-label={ariaLabel}
       onMouseLeave={() => setHoverIndex(null)}
     >
@@ -96,8 +99,11 @@ export function ProductCategoriesSection({
         <div
           className="container flex flex-1 flex-col justify-center text-center lg:text-left"
           style={{
-            paddingTop: 'max(calc(var(--header-offset) + 1.5rem), calc(env(safe-area-inset-top, 0px) + 5rem))',
-            paddingBottom: compactTabs ? '9rem' : '14rem',
+            paddingTop:
+              'max(calc(var(--site-header-height, var(--header-offset)) + 1rem), calc(env(safe-area-inset-top, 0px) + 3.5rem))',
+            paddingBottom: compactTabs
+              ? 'clamp(5.5rem, 14svh, 9rem)'
+              : 'clamp(7rem, 18svh, 12rem)',
           }}
         >
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">

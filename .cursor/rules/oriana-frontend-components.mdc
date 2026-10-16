@@ -30,3 +30,4 @@ alwaysApply: false
 - Keyboard focus visible; interactive elements are real buttons/links.
 - Images: Next `Image` or existing `ProductImage`; always meaningful `alt`.
 - After larger UI changes, apply `core-web-vitals` / `performance` skills (LCP, CLS, INP).
+- Cross-platform: follow `oriana-cross-platform` (no `100vw` shells; sticky math via `useStickyScrub`; consistent viewport units).

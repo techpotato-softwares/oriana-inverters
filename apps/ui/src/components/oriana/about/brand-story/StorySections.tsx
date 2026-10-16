@@ -28,7 +28,7 @@ export function OriginSection({
   founders: Leader[]
 }) {
   return (
-    <section id="origin" aria-labelledby="origin-title" className="scroll-mt-24 bg-white section-safe-y">
+    <section id="origin" aria-labelledby="origin-title" className="scroll-mt-header bg-white section-safe-y">
       <div className="container grid gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-7">
           <FadeIn>

@@ -133,9 +133,12 @@ export const plugins: Plugin[] = [
   s3Storage({
     enabled: Boolean(s3Bucket),
     alwaysInsertFields: true,
-    // Required on Lambda/Function URL: buffered invoke caps request bodies at ~6MB.
-    // Browser PUTs the file to S3 via a short-lived presigned URL instead.
-    // Bucket CORS must allow PUT from the admin origin (see CDK S3Construct).
+    // Required on Lambda Function URL (buffered): request/response bodies cap ~6MB.
+    // Browser PUTs the file straight to S3 with a short-lived presigned URL from
+    // POST /api/storage-s3-generate-signed-url — never through the Lambda body.
+    // Infra: CDK S3Construct IAM (PutObject + multipart) + MediaBucketClientUploadCors.
+    // Without S3_BUCKET this plugin stays schema-only and local disk upload is used
+    // (fine for dev; >6MB uploads only work on AWS with S3_BUCKET set).
     clientUploads: true,
     collections: {
       media: {

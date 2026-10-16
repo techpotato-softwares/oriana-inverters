@@ -113,7 +113,7 @@ export const defaultApproachSteps: CardItem[] = [
   {
     title: 'Identify',
     body: 'Capture the operating condition, site context, and support requirement so nothing is assumed.',
-    image: img('1497435334941-8c899ee9e8e9'),
+    image: img('1559302504-64aae6ca6b6d'),
   },
   {
     title: 'Diagnose',

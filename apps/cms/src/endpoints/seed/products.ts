@@ -270,7 +270,7 @@ export async function seedProducts({ payload }: { payload: Payload }) {
   const sampleDownloads = [
     { title: 'On Grid Inverters Datasheet', type: 'datasheet' as const },
     { title: 'Hybrid Inverters Datasheet', type: 'datasheet' as const },
-    { title: 'Utility Scale Inverters Datasheet', type: 'datasheet' as const },
+    // Utility datasheets omitted while utility catalogue is hidden on the download centre.
     { title: 'BESS Home Datasheet', type: 'datasheet' as const },
     { title: 'UL 1741 SA Certificate', type: 'certificate' as const },
     { title: 'ISO 9001 Quality Certificate', type: 'certificate' as const },

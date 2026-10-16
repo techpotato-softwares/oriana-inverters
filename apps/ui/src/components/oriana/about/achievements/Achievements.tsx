@@ -84,7 +84,7 @@ function PresenceStat({ stat, className }: { stat: AchievementStat; className?: 
 function NumbersSection({ content }: { content: AchievementsContent['numbers'] }) {
   const [supply, experience, presence, partners] = content.stats
   return (
-    <section id={content.id} aria-labelledby="numbers-title" className="scroll-mt-24 bg-white section-safe-y">
+    <section id={content.id} aria-labelledby="numbers-title" className="scroll-mt-header bg-white section-safe-y">
       <div className="container">
         <FadeIn>
           <SectionHeading id="numbers-title" eyebrow={content.eyebrow} title={content.title} />
@@ -110,7 +110,7 @@ function NumbersSection({ content }: { content: AchievementsContent['numbers'] }
 
 function ScaleSection({ content }: { content: AchievementsContent['scale'] }) {
   return (
-    <section id={content.id} aria-labelledby="scale-title" className="scroll-mt-24 bg-oriana-surface section-safe-y">
+    <section id={content.id} aria-labelledby="scale-title" className="scroll-mt-header bg-oriana-surface section-safe-y">
       <div className="container">
         <FadeIn>
           <SectionHeading

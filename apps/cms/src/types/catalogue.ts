@@ -26,6 +26,8 @@ export type CatalogueProduct = {
   enableHeroCarousel?: boolean
   gallery?: ProductGalleryImage[]
   datasheetUrl?: string | null
+  /** User / installation manual PDF from the product family. */
+  manualUrl?: string | null
   /** CMS product-page chrome when present; UI falls back to onGridProductPage.ts. */
   productPage?: OnGridSeriesPageData | null
 }

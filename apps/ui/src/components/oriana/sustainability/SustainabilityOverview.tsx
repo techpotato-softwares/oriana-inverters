@@ -29,16 +29,17 @@ export type SustainabilityOverviewProps = {
     videoSrc: string
     posterSrc: string
   }
+  /** Empty lists and `null` sections are not rendered (hidden in the CMS). */
   highlights: SustainabilityHighlight[]
   pillarsIntro: SectionIntro
   pillars: SustainabilityPillar[]
-  calculator: CalculatorConfig
+  calculator: CalculatorConfig | null
   commitmentsIntro: SectionIntro
   commitments: SustainabilityCommitment[]
   reports?: ReportCard[]
   policies?: ReportCard[]
   honors?: SustainabilityHonor[]
-  cta: SustainabilityCtaContent
+  cta: SustainabilityCtaContent | null
 }
 
 export function SustainabilityOverview({
@@ -57,13 +58,15 @@ export function SustainabilityOverview({
   return (
     <main>
       <SustainabilityHero {...hero} />
-      <ImpactBand items={highlights} />
-      <PillarsShowcase intro={pillarsIntro} pillars={pillars} />
-      <ImpactCalculator config={calculator} />
-      <CommitmentsTimeline intro={commitmentsIntro} commitments={commitments} />
+      {highlights.length > 0 ? <ImpactBand items={highlights} /> : null}
+      {pillars.length > 0 ? <PillarsShowcase intro={pillarsIntro} pillars={pillars} /> : null}
+      {calculator ? <ImpactCalculator config={calculator} /> : null}
+      {commitments.length > 0 ? (
+        <CommitmentsTimeline intro={commitmentsIntro} commitments={commitments} />
+      ) : null}
       <SustainabilityReports reports={reports} policies={policies} />
       <SustainabilityHonors honors={honors} />
-      <SustainabilityCta content={cta} />
+      {cta ? <SustainabilityCta content={cta} /> : null}
     </main>
   )
 }

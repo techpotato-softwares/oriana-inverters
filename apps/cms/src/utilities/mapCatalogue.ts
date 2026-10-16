@@ -114,6 +114,7 @@ function baseProductFields(doc: Product): Omit<
     enableHeroCarousel: Boolean(doc.enableHeroCarousel),
     gallery: productGallery(doc),
     datasheetUrl: mediaUrl(doc.datasheetPdf),
+    manualUrl: mediaUrl(doc.manualPdf),
     productPage: productPageFromDoc(doc),
   }
 }

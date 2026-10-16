@@ -6,6 +6,7 @@ import { useReducedMotion } from 'framer-motion'
 
 import { GrowingAccentLine } from './GrowingAccentLine'
 import {
+  measureStickyPinHeightPx,
   readSiteHeaderHeightPx,
   STICKY_BELOW_NAV_HEIGHT,
   STICKY_BELOW_NAV_TOP,
@@ -185,7 +186,8 @@ export function VisionMissionSection({
       const section = sectionRef.current
       if (!section) return 0
       const headerH = readSiteHeaderHeightPx()
-      const pinHeight = Math.max(window.innerHeight - headerH, 1)
+      // Match CSS `100svh - header` pin — not innerHeight (Windows scrollbar/DPI drift)
+      const pinHeight = measureStickyPinHeightPx(section)
       const rect = section.getBoundingClientRect()
       const scrollSpan = Math.max(section.offsetHeight - pinHeight, 1)
       // 0 while the heading is still approaching the nav; effect starts once pinned below it
@@ -275,6 +277,7 @@ export function VisionMissionSection({
       aria-label={ariaLabel}
     >
       <div
+        data-sticky-pin
         className="sticky z-10 flex flex-col overflow-hidden bg-white"
         style={{
           top: STICKY_BELOW_NAV_TOP,

@@ -117,13 +117,17 @@
   }
 
   .category-hero {
-    padding-top: var(--header-offset);
+    /* Prefer live measured header; static --header-offset is fallback only */
+    padding-top: var(--site-header-height, var(--header-offset));
     background: #8ec8f4;
+    overflow-x: clip;
   }
 
   .category-hero img {
     display: block;
-    width: 100vw;
+    /* 100% — not 100vw — so classic Windows scrollbars do not cause horizontal crop */
+    width: 100%;
+    max-width: 100%;
     height: auto;
     object-fit: cover;
     object-position: center;
@@ -169,7 +173,7 @@
 
 /*
  * Viewport system — Mac + Windows + any browser
- * - Prefer svh for pins / full-bleed sections; do not mix with dvh/vh
+ * - Prefer svh (stable) for pins / full-bleed sections; do not mix with dvh/vh
  *   for the same measured box.
  * - --site-header-height is measured live by SiteHeader; these are SSR / first-paint
  *   fallbacks only. --header-offset aliases it so older call sites stay in sync.
@@ -180,6 +184,7 @@
   --header-offset: var(--site-header-height);
   --available-viewport: calc(var(--viewport-height) - var(--site-header-height));
   --hero-safe-extra: clamp(1rem, 2.2svh, 2rem);
+  /* Tighter section rhythm so marketing blocks fit short viewports */
   --section-y: clamp(2.75rem, 6.5svh, 5rem);
   --section-y-tight: clamp(2rem, 4.5svh, 3.5rem);
   --background: #ffffff;
@@ -194,7 +199,7 @@
   --radius: 0.75rem;
 }
 
-/* Desktop with primary nav row (xl) — keep below the old 8.5rem so content fits */
+/* Desktop with primary nav row (xl) — still below the old 8.5rem so content fits */
 @media (min-width: 80rem) {
   :root {
     --site-header-height: 7rem;
@@ -214,6 +219,7 @@
 
 @media (max-height: 52rem) and (min-width: 80rem) {
   :root {
+    /* Collapse secondary nav on short desktops — SiteHeader also forces this */
     --site-header-height: 4.25rem;
   }
 }
@@ -232,6 +238,7 @@
   padding-bottom: clamp(2rem, 6svh, 3.5rem);
 }
 
+/* Full viewport shells — width 100% (never 100vw) to avoid classic-scrollbar crop. */
 .viewport-fill {
   width: 100%;
   min-height: var(--viewport-height);
@@ -252,12 +259,15 @@
   padding-block: var(--section-y-tight);
 }
 
+/* Sticky / scroll pins share one formula with useStickyScrub helpers. */
 .sticky-below-nav {
   top: var(--site-header-height, 5rem);
   height: var(--available-viewport);
   max-height: var(--available-viewport);
 }
 
+/* Anchor targets clear fixed chrome. Prefer --site-sticky-offset when a page
+   sticky subnav is mounted (SectionSubNav sets it); otherwise header only. */
 .scroll-mt-header {
   scroll-margin-top: calc(
     var(--site-sticky-offset, var(--site-header-height, 5rem)) + 0.75rem
@@ -273,6 +283,14 @@
 @media (max-height: 52rem) {
   .fluid-display {
     font-size: clamp(1.65rem, min(3.6vw, 5svh), 2.75rem);
+  }
+
+  .hero-copy-gap {
+    margin-top: 0.85rem;
+  }
+
+  .hero-copy-gap-lg {
+    margin-top: 1.25rem;
   }
 }
 

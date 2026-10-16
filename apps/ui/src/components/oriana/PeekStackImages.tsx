@@ -30,8 +30,11 @@ const FRAME_EXPANDED = { width: '100%', borderRadius: '0px' } as const
 const FRAME_INSET = { width: '89.58%', borderRadius: '2.083vw' } as const
 const FRAME_TRANSITION = { duration: 0.5, ease: 'easeInOut' } as const
 
-/** Full-viewport panel height — match project pattern (Tailwind `h-dvh` is not emitted here). */
-const PANEL_STYLE = { height: '100dvh', minHeight: '100dvh' } as const
+/** Full-viewport panels — svh only (matches sticky pins; do not mix with dvh). */
+const PANEL_STYLE = {
+  height: 'var(--viewport-height, 100svh)',
+  minHeight: 'var(--viewport-height, 100svh)',
+} as const
 
 /**
  * Sungrow `#ParallaxScrolling` port:
@@ -50,11 +53,17 @@ export function PeekStackImages({
 
   useLayoutEffect(() => {
     const sync = () => {
-      const vh = Math.max(window.innerHeight, 1)
-      // Align the rounded mask to the fixed header bottom so top corners
-      // appear where the image meets the nav (Sungrow behavior).
+      // Prefer measured --site-header-height + layout viewport so Windows DPI /
+      // classic scrollbars do not drift from Mac overlay-scrollbar math.
+      const cssHeader = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--site-header-height'),
+      )
       const headerEl = document.querySelector('header')
-      const headerH = headerEl?.getBoundingClientRect().height ?? 0
+      const headerH =
+        (Number.isFinite(cssHeader) && cssHeader > 0
+          ? cssHeader
+          : headerEl?.getBoundingClientRect().height) ?? 0
+      const vh = Math.max(document.documentElement.clientHeight || window.innerHeight, 1)
       const topPx = Math.max(75, Math.ceil(headerH || 80))
       setInsetTopPx(topPx)
       setInsetTopPct((topPx / vh) * 100)
@@ -139,7 +148,9 @@ export function PeekStackImages({
               className="absolute left-1/2 -translate-x-1/2 overflow-hidden"
               style={{
                 top: insetTopPx,
-                height: '100vh',
+                // Same unit family as PANEL_STYLE (svh) — mixing dvh misaligns on Windows
+                height: 'var(--viewport-height, 100svh)',
+                minHeight: 'var(--viewport-height, 100svh)',
                 borderRadius: '2.083vw',
                 boxShadow: '0 0 0 6.25vw #fff',
               }}
@@ -213,7 +224,10 @@ function StackCard({
 
       <div
         className="relative flex h-full w-full flex-col justify-start px-[6.25vw]"
-        style={{ paddingTop: 'max(7.5rem, 11vw)' }}
+        style={{
+          paddingTop:
+            'max(calc(var(--site-header-height, 4.5rem) + 1.25rem), clamp(4.5rem, 10svh, 7.5rem))',
+        }}
       >
         {item.title ? (
           reduceMotion ? (

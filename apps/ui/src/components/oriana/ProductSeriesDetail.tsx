@@ -538,7 +538,7 @@ export function ProductSeriesDetail({
       heroImageAlt={selected.heroImageAlt ?? series.heroImageAlt}
       gallery={gallery}
       enabled={enableHeroCarousel}
-      className="mx-auto aspect-square w-full max-w-[min(100%,min(28rem,52svh))] bg-transparent"
+      className="mx-auto aspect-square w-full max-w-[min(100%,min(22rem,40svh))] bg-transparent"
       imageClassName="aspect-square"
       priority={tab === 'overview'}
     />
@@ -628,8 +628,8 @@ export function ProductSeriesDetail({
                   'linear-gradient(180deg, #d9dee6 0%, #e8ecf1 42%, #f4f6f8 78%, #ffffff 100%)',
               }}
             >
-              <div className="container grid items-center gap-12 py-14 lg:grid-cols-2 lg:gap-16 lg:py-24">
-                <div className="order-2 lg:order-1">
+              <div className="container grid items-center gap-10 py-10 lg:grid-cols-2 lg:gap-14 lg:py-16">
+                <div className="order-2 min-w-0 lg:order-1">
                   {typeLabel ? (
                     <p className="text-sm font-medium text-oriana-muted md:text-base">{typeLabel}</p>
                   ) : null}
@@ -639,7 +639,7 @@ export function ProductSeriesDetail({
                     {productTitle}
                   </h1>
                   {tiles.length > 0 ? (
-                    <dl className="mt-10 grid sm:grid-cols-2">
+                    <dl className="mt-8 grid sm:grid-cols-2">
                       {tiles.map((tile, index) => {
                         const isTopRow = index < 2
                         const isLeft = index % 2 === 0
@@ -647,12 +647,12 @@ export function ProductSeriesDetail({
                           <div
                             key={tile.label}
                             className={cn(
-                              'py-6',
+                              'py-5',
                               isTopRow && tiles.length > 2 ? 'border-b border-oriana-navy/10' : null,
                               isLeft ? 'sm:pr-10' : 'sm:pl-10',
                             )}
                           >
-                            <dt className="font-display text-3xl font-light tracking-tight text-[#606060] md:text-4xl">
+                            <dt className="font-display text-2xl font-light tracking-tight text-[#606060] md:text-3xl">
                               {tile.value}
                             </dt>
                             <dd className="mt-2 text-sm text-oriana-muted">{tile.label}</dd>
@@ -666,7 +666,7 @@ export function ProductSeriesDetail({
                     </p>
                   )}
                 </div>
-                <div className="order-1 mx-auto w-full max-w-xl lg:order-2 lg:max-w-none">
+                <div className="order-1 mx-auto flex w-full max-w-[min(100%,20rem)] items-center justify-center sm:max-w-[min(100%,22rem)] lg:order-2 lg:max-w-[min(100%,24rem)]">
                   <ProductImageCarousel
                     key={`${selected.slug}-documents`}
                     name={series.series}
@@ -675,8 +675,8 @@ export function ProductSeriesDetail({
                     heroImageAlt={selected.heroImageAlt ?? series.heroImageAlt}
                     gallery={gallery}
                     enabled={enableHeroCarousel}
-                    className="aspect-[4/5] w-full bg-transparent sm:aspect-square"
-                    imageClassName="aspect-[4/5] sm:aspect-square"
+                    className="aspect-square w-full bg-transparent"
+                    imageClassName="aspect-square"
                     priority
                   />
                 </div>

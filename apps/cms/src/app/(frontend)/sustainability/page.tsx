@@ -20,6 +20,7 @@ import {
   realSustainabilityHighlights,
 } from '@/utilities/placeholderContent'
 import type { Award, Media, SustainabilityReport } from '@/payload-types'
+import { isHidden, resolveCmsList, visibleItems } from '@/utilities/visibility'
 
 function mediaUrl(v: unknown): string | null {
   return v && typeof v === 'object' && 'url' in v && (v as Media).url ? (v as Media).url! : null
@@ -86,56 +87,75 @@ export default async function SustainabilityPage() {
   }
 
   const cmsHighlights = realSustainabilityHighlights(data?.highlights)
-  const highlights =
-    cmsHighlights.length > 0
-      ? cmsHighlights.map((item) => ({
+  const highlights = data?.highlightsHidden
+    ? []
+    : resolveCmsList(
+        cmsHighlights,
+        visibleItems(cmsHighlights).map((item) => ({
           value: item.value,
           label: item.label,
           description: item.description || undefined,
-        }))
-      : defaultHighlights
+        })),
+        defaultHighlights,
+      )
 
-  const pillars =
-    data?.pillars && data.pillars.length > 0
-      ? data.pillars.map((pillar, index) => ({
-          title: pillar.title,
-          headline: pillar.headline,
-          body: pillar.body,
-          icon: (pillar.icon || 'leaf') as PillarIcon,
-          image:
-            mediaUrl(pillar.image) || defaultPillars[index % defaultPillars.length].image,
-        }))
-      : defaultPillars
+  const pillars = data?.pillarsHidden
+    ? []
+    : resolveCmsList(
+        data?.pillars,
+        (data?.pillars ?? []).flatMap((pillar, index) =>
+          isHidden(pillar)
+            ? []
+            : [
+                {
+                  title: pillar.title,
+                  headline: pillar.headline,
+                  body: pillar.body,
+                  icon: (pillar.icon || 'leaf') as PillarIcon,
+                  image:
+                    mediaUrl(pillar.image) || defaultPillars[index % defaultPillars.length].image,
+                },
+              ],
+        ),
+        defaultPillars,
+      )
 
   const calc = data?.calculator
-  const calculator = {
-    title: calc?.title || defaultCalculator.title,
-    description: calc?.description || defaultCalculator.description,
-    kwhPerKw: calc?.kwhPerKw || defaultCalculator.kwhPerKw,
-    co2TonnesPerKw: calc?.co2TonnesPerKw || defaultCalculator.co2TonnesPerKw,
-    treesPerKw: calc?.treesPerKw || defaultCalculator.treesPerKw,
-    disclaimer: calc?.disclaimer || defaultCalculator.disclaimer,
-  }
+  const calculator = isHidden(calc)
+    ? null
+    : {
+        title: calc?.title || defaultCalculator.title,
+        description: calc?.description || defaultCalculator.description,
+        kwhPerKw: calc?.kwhPerKw || defaultCalculator.kwhPerKw,
+        co2TonnesPerKw: calc?.co2TonnesPerKw || defaultCalculator.co2TonnesPerKw,
+        treesPerKw: calc?.treesPerKw || defaultCalculator.treesPerKw,
+        disclaimer: calc?.disclaimer || defaultCalculator.disclaimer,
+      }
 
-  const commitments =
-    data?.commitments && data.commitments.length > 0
-      ? data.commitments.map((item) => ({
+  const commitments = data?.commitmentsHidden
+    ? []
+    : resolveCmsList(
+        data?.commitments,
+        visibleItems(data?.commitments).map((item) => ({
           phase: item.phase,
           timeframe: item.timeframe,
           title: item.title,
           body: item.body || undefined,
-        }))
-      : defaultCommitments
+        })),
+        defaultCommitments,
+      )
 
   const cmsCta = data?.cta
-  const cta = {
-    title: cmsCta?.title || defaultCta.title,
-    body: cmsCta?.body || defaultCta.body,
-    primary: link(cmsCta?.primary, defaultCta.primary),
-    secondary: defaultCta.secondary ? link(cmsCta?.secondary, defaultCta.secondary) : undefined,
-    image: mediaUrl(cmsCta?.image) || defaultCta.image,
-    contactEmail: cmsCta?.contactEmail || defaultCta.contactEmail,
-  }
+  const cta = isHidden(cmsCta)
+    ? null
+    : {
+        title: cmsCta?.title || defaultCta.title,
+        body: cmsCta?.body || defaultCta.body,
+        primary: link(cmsCta?.primary, defaultCta.primary),
+        secondary: defaultCta.secondary ? link(cmsCta?.secondary, defaultCta.secondary) : undefined,
+        image: mediaUrl(cmsCta?.image) || defaultCta.image,
+        contactEmail: cmsCta?.contactEmail || defaultCta.contactEmail,
+      }
 
   return (
     <SustainabilityOverview

@@ -4,6 +4,7 @@ import { authenticated } from '@/access/authenticated'
 import { pageHeroFields } from '@/fields/pageHero'
 import { seoFields } from '@/fields/seo'
 import { simpleLinkFields } from '@/fields/simpleLink'
+import { sectionHiddenField, visibleArray } from '@/fields/visibility'
 
 const pillarIconOptions = [
   { label: 'Shield (longevity)', value: 'shield-check' },
@@ -61,7 +62,11 @@ export const Sustainability: GlobalConfig = {
                 mimeType: { contains: 'image' },
               },
             },
-            {
+            sectionHiddenField({
+              name: 'highlightsHidden',
+              label: 'Hide impact numbers',
+            }),
+            visibleArray({
               name: 'highlights',
               type: 'array',
               labels: { singular: 'Impact number', plural: 'Impact numbers' },
@@ -73,7 +78,7 @@ export const Sustainability: GlobalConfig = {
                 { name: 'label', type: 'text', required: true },
                 { name: 'description', type: 'text' },
               ],
-            },
+            }),
             {
               name: 'approachTitle',
               type: 'text',
@@ -92,6 +97,7 @@ export const Sustainability: GlobalConfig = {
         {
           label: 'Pillars',
           fields: [
+            sectionHiddenField({ name: 'pillarsHidden', label: 'Hide pillars section' }),
             {
               name: 'pillarsIntro',
               type: 'group',
@@ -101,7 +107,7 @@ export const Sustainability: GlobalConfig = {
                 { name: 'description', type: 'textarea' },
               ],
             },
-            {
+            visibleArray({
               name: 'pillars',
               type: 'array',
               labels: { singular: 'Pillar', plural: 'Pillars' },
@@ -124,7 +130,7 @@ export const Sustainability: GlobalConfig = {
                   },
                 },
               ],
-            },
+            }),
           ],
         },
         {
@@ -134,6 +140,7 @@ export const Sustainability: GlobalConfig = {
               name: 'calculator',
               type: 'group',
               fields: [
+                sectionHiddenField(),
                 { name: 'title', type: 'text' },
                 { name: 'description', type: 'textarea' },
                 {
@@ -159,6 +166,7 @@ export const Sustainability: GlobalConfig = {
         {
           label: 'Commitments',
           fields: [
+            sectionHiddenField({ name: 'commitmentsHidden', label: 'Hide commitments section' }),
             {
               name: 'commitmentsIntro',
               type: 'group',
@@ -168,7 +176,7 @@ export const Sustainability: GlobalConfig = {
                 { name: 'description', type: 'textarea' },
               ],
             },
-            {
+            visibleArray({
               name: 'commitments',
               type: 'array',
               labels: { singular: 'Commitment', plural: 'Commitments' },
@@ -178,7 +186,7 @@ export const Sustainability: GlobalConfig = {
                 { name: 'title', type: 'text', required: true },
                 { name: 'body', type: 'textarea' },
               ],
-            },
+            }),
           ],
         },
         {
@@ -188,6 +196,7 @@ export const Sustainability: GlobalConfig = {
               name: 'cta',
               type: 'group',
               fields: [
+                sectionHiddenField(),
                 { name: 'title', type: 'text' },
                 { name: 'body', type: 'textarea' },
                 {
@@ -235,14 +244,14 @@ export const Sustainability: GlobalConfig = {
                 { name: 'description', type: 'textarea' },
               ],
             },
-            {
+            visibleArray({
               name: 'strategySections',
               type: 'array',
               fields: [
                 { name: 'heading', type: 'text', required: true },
                 { name: 'body', type: 'textarea', required: true },
               ],
-            },
+            }),
           ],
         },
         { label: 'SEO', fields: [seoFields] },

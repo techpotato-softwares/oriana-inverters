@@ -75,8 +75,8 @@ export function VideoHero({
 
   return (
     <section
-      className={`relative min-h-[min(92svh,52rem)] w-full overflow-hidden bg-oriana-deep ${className}`.trim()}
-      style={children ? undefined : { height: 'min(92svh, 52rem)' }}
+      className={`viewport-fill relative w-full overflow-hidden bg-oriana-deep ${className}`.trim()}
+      style={children ? undefined : { height: 'var(--viewport-height, 100svh)' }}
       aria-label={ariaLabel}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -109,11 +109,21 @@ export function VideoHero({
       />
 
       {caption ? (
-        <div className="absolute inset-x-0 bottom-0 z-10 flex justify-end px-8 pb-10 sm:px-12 lg:px-20 lg:pb-14">
+        <div
+          className="absolute inset-x-0 bottom-0 z-10 flex justify-end px-[clamp(1rem,4vw,5rem)]"
+          style={{
+            paddingBottom:
+              'max(1rem, env(safe-area-inset-bottom, 0px), clamp(1rem, 4svh, 3.5rem))',
+          }}
+        >
           <p
-            className={`max-w-md text-right font-display text-xl font-semibold tracking-tight text-white transition-all duration-300 sm:text-2xl md:text-3xl ${
+            className={`max-w-[min(28rem,90%)] text-right font-display font-semibold tracking-tight text-balance text-white transition-all duration-300 ${
               captionVisible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
             }`}
+            style={{
+              fontSize: 'clamp(1.15rem, min(3.8vw, 5.5svh), 2.25rem)',
+              lineHeight: 1.15,
+            }}
           >
             {caption}
           </p>
@@ -121,7 +131,7 @@ export function VideoHero({
       ) : null}
 
       {children ? (
-        <div className="relative z-10 flex min-h-[min(92svh,52rem)] flex-col">{children}</div>
+        <div className="viewport-fill relative z-10 flex min-h-0 flex-col">{children}</div>
       ) : null}
     </section>
   )

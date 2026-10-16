@@ -4,6 +4,7 @@ import { authenticated } from '@/access/authenticated'
 import { iconOrMediaFields } from '@/fields/iconOrMedia'
 import { pageHeroFields } from '@/fields/pageHero'
 import { seoFields } from '@/fields/seo'
+import { visibleArray } from '@/fields/visibility'
 
 export const Contact: GlobalConfig = {
   slug: 'contact',
@@ -23,7 +24,7 @@ export const Contact: GlobalConfig = {
           label: 'Content',
           fields: [
             pageHeroFields,
-            {
+            visibleArray({
               name: 'cards',
               type: 'array',
               fields: [
@@ -31,7 +32,7 @@ export const Contact: GlobalConfig = {
                 { name: 'title', type: 'text', required: true },
                 { name: 'detail', type: 'textarea', required: true },
               ],
-            },
+            }),
             {
               name: 'form',
               type: 'relationship',

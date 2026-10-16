@@ -4,6 +4,7 @@ import { ContentPage } from '@/components/oriana/ContentPage'
 import { defaultSecurityPage as defaults } from '@/components/oriana/support/supportData'
 import { getSupport } from '@/utilities/getMarketing'
 import { resolveLink, resolveMeta, resolveText } from '@/utilities/cmsContent'
+import { resolveCmsList, visibleItems } from '@/utilities/visibility'
 
 const PARAGRAPH_BREAK = /\n\s*\n/
 
@@ -15,15 +16,17 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function SecurityPage() {
   const data = await getSupport()
   const cms = data?.security
-  const sections = cms?.sections?.length
-    ? cms.sections.map(({ heading, body }) => ({
-        heading,
-        paragraphs: body
-          .split(PARAGRAPH_BREAK)
-          .map((paragraph) => paragraph.trim())
-          .filter(Boolean),
-      }))
-    : defaults.sections
+  const sections = resolveCmsList(
+    cms?.sections,
+    visibleItems(cms?.sections).map(({ heading, body }) => ({
+      heading,
+      paragraphs: body
+        .split(PARAGRAPH_BREAK)
+        .map((paragraph) => paragraph.trim())
+        .filter(Boolean),
+    })),
+    defaults.sections,
+  )
   const cta = resolveLink(cms?.cta, defaults.cta)
 
   return (

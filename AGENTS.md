@@ -26,6 +26,8 @@ Project skills live in `.agents/skills/` (locked via `skills-lock.json`). For an
 
 Cursor rules in `.cursor/rules/` reinforce the same standards automatically.
 
+**Cross-platform:** UI must match on Mac and Windows. Always apply `oriana-cross-platform` — no `100vw` layout shells, sticky scrub via `useStickyScrub` (not bare `innerHeight`), consistent `svh`/`dvh` units, sized parents for `fill` images.
+
 ## Local dev
 
 ```bash

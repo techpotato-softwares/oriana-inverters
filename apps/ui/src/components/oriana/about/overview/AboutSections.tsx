@@ -46,7 +46,7 @@ export function WhoWeAreSection({ content }: { content: AboutOverviewContent['wh
     <section
       id={content.id}
       aria-labelledby="who-we-are-title"
-      className="scroll-mt-24 bg-oriana-surface section-safe-y"
+      className="scroll-mt-header bg-oriana-surface section-safe-y"
     >
       <div className="container grid gap-14 lg:grid-cols-12 lg:items-center lg:gap-16">
         <div className="lg:col-span-7">
@@ -109,7 +109,7 @@ export function TechnologySection({ content }: { content: AboutOverviewContent['
     <section
       id={content.id}
       aria-labelledby="technology-title"
-      className="relative isolate scroll-mt-24 overflow-hidden bg-oriana-deep section-safe-y"
+      className="relative isolate scroll-mt-header overflow-hidden bg-oriana-deep section-safe-y"
     >
       <div
         aria-hidden
@@ -187,7 +187,7 @@ export function ManufacturingSection({ content }: { content: AboutOverviewConten
     <section
       id={content.id}
       aria-labelledby="manufacturing-title"
-      className="scroll-mt-24 bg-white section-safe-y"
+      className="scroll-mt-header bg-white section-safe-y"
     >
       <div className="container grid gap-14 lg:grid-cols-2 lg:items-center lg:gap-20">
         <FadeIn direction="right">
@@ -250,7 +250,7 @@ export function QualitySection({ content }: { content: AboutOverviewContent['qua
     <section
       id={content.id}
       aria-labelledby="quality-title"
-      className="scroll-mt-24 bg-oriana-surface section-safe-y"
+      className="scroll-mt-header bg-oriana-surface section-safe-y"
     >
       <div className="container grid gap-14 lg:grid-cols-12 lg:items-center lg:gap-16">
         <div className="lg:col-span-7">
@@ -413,7 +413,7 @@ const reasonIcons: Record<string, LucideIcon> = {
 
 export function WhyOrianaSection({ content }: { content: AboutOverviewContent['why'] }) {
   return (
-    <section id={content.id} aria-labelledby="why-title" className="scroll-mt-24 bg-white section-safe-y">
+    <section id={content.id} aria-labelledby="why-title" className="scroll-mt-header bg-white section-safe-y">
       <div className="container">
         <FadeIn>
           <SectionHeading

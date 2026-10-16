@@ -52,9 +52,9 @@ export const lifeAtOriana = {
     closing:
       'Whether you are designing a product, developing technology, working with customers, building our manufacturing capabilities or growing our business, your work contributes to something bigger than a job.',
     images: [
-      { src: unsplash('1522071820081-009f0129c71c', 1200), alt: 'Colleagues collaborating around laptops' },
-      { src: unsplash('1581091226825-a6a2a5aee158', 1000), alt: 'Engineer working on power electronics in a test lab' },
-      { src: unsplash('1521737604893-d14cc237f11d', 1000), alt: 'Team working together in a bright office' },
+      { src: unsplash('1559302504-64aae6ca6b6d', 1200), alt: 'Technicians installing solar panels on site' },
+      { src: unsplash('1563770660941-20978e870e26', 1000), alt: 'Power-electronics assembly for solar inverters' },
+      { src: unsplash('1581094794329-c8112a89af12', 1000), alt: 'Engineer on a solar manufacturing line' },
     ],
   },
 
@@ -140,7 +140,7 @@ export const lifeAtOriana = {
     body: 'We are ambitious about where ORIANA can go, but we remain grounded in the fundamentals that matter:',
     values: ['Integrity', 'Ownership', 'Respect', 'Teamwork', 'Customer Focus', 'Continuous Improvement'],
     closing: 'We celebrate success together, learn from challenges and keep moving forward.',
-    image: unsplash('1523240795612-9a054b0db644', 2000),
+    image: unsplash('1581092160607-ee22621dd758', 2000),
   },
 
   cta: {
@@ -148,7 +148,7 @@ export const lifeAtOriana = {
     body: 'ORIANA is on a journey to become a globally trusted energy-technology brand from India. There is a lot to build—and a lot of opportunity for people who are curious, ambitious and ready to make an impact. Come build the future of energy with us.',
     primary: { label: 'Explore open positions', href: '#openings' },
     secondary: { label: 'Apply now', href: '#apply' },
-    image: unsplash('1504384308090-c894fdcc538d', 2400),
+    image: unsplash('1509391366360-2e959784a276', 2400),
   },
 }
 

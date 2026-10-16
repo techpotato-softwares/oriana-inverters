@@ -483,6 +483,10 @@ export interface FolderInterface {
  */
 export interface Download {
   id: number;
+  /**
+   * Hide this document from the downloads page without deleting it.
+   */
+  hidden?: boolean | null;
   title: string;
   file: number | Media;
   documentType: 'datasheet' | 'manual' | 'certificate' | 'warranty' | 'brochure' | 'software';
@@ -703,6 +707,10 @@ export interface Product {
 export interface Category {
   id: number;
   /**
+   * Hide this category, its products, menu/footer links and home tiles from visitors. Data is kept; untick to show again.
+   */
+  hidden?: boolean | null;
+  /**
    * Category / product-family name shown in nav and on /products.
    */
   title: string;
@@ -817,6 +825,10 @@ export interface User {
  * via the `definition` "CallToActionBlock".
  */
 export interface CallToActionBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   richText?: {
     root: {
       type: string;
@@ -865,8 +877,16 @@ export interface CallToActionBlock {
  * via the `definition` "ContentBlock".
  */
 export interface ContentBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   columns?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
         richText?: {
           root: {
@@ -915,6 +935,10 @@ export interface ContentBlock {
  * via the `definition` "MediaBlock".
  */
 export interface MediaBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   media: number | Media;
   id?: string | null;
   blockName?: string | null;
@@ -925,6 +949,10 @@ export interface MediaBlock {
  * via the `definition` "ArchiveBlock".
  */
 export interface ArchiveBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   introContent?: {
     root: {
       type: string;
@@ -959,6 +987,10 @@ export interface ArchiveBlock {
  * via the `definition` "FormBlock".
  */
 export interface FormBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   form: number | Form;
   enableIntro?: boolean | null;
   introContent?: {
@@ -1161,9 +1193,17 @@ export interface Form {
  * via the `definition` "StatsGridBlock".
  */
 export interface StatsGridBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   eyebrow?: string | null;
   title?: string | null;
   stats: {
+    /**
+     * Hide this item from visitors without deleting it.
+     */
+    hidden?: boolean | null;
     /**
      * Preferred: upload an SVG/PNG icon.
      */
@@ -1204,9 +1244,17 @@ export interface StatsGridBlock {
  * via the `definition` "CardGridBlock".
  */
 export interface CardGridBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   eyebrow?: string | null;
   title?: string | null;
   cards: {
+    /**
+     * Hide this item from visitors without deleting it.
+     */
+    hidden?: boolean | null;
     /**
      * Preferred: upload an SVG/PNG icon.
      */
@@ -1248,6 +1296,10 @@ export interface CardGridBlock {
  * via the `definition` "CtaBandBlock".
  */
 export interface CtaBandBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   title: string;
   body?: string | null;
   primaryCta: {
@@ -1273,7 +1325,15 @@ export interface CtaBandBlock {
  * via the `definition` "ContentPageBlock".
  */
 export interface ContentPageBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   sections: {
+    /**
+     * Hide this item from visitors without deleting it.
+     */
+    hidden?: boolean | null;
     heading: string;
     body: string;
     id?: string | null;
@@ -1287,6 +1347,10 @@ export interface ContentPageBlock {
  * via the `definition` "IconFeatureBlock".
  */
 export interface IconFeatureBlock {
+  /**
+   * Hide this block from visitors without deleting it.
+   */
+  hidden?: boolean | null;
   /**
    * Preferred: upload an SVG/PNG icon.
    */
@@ -2019,6 +2083,7 @@ export interface PagesSelect<T extends boolean = true> {
  * via the `definition` "CallToActionBlock_select".
  */
 export interface CallToActionBlockSelect<T extends boolean = true> {
+  hidden?: T;
   richText?: T;
   links?:
     | T
@@ -2043,9 +2108,11 @@ export interface CallToActionBlockSelect<T extends boolean = true> {
  * via the `definition` "ContentBlock_select".
  */
 export interface ContentBlockSelect<T extends boolean = true> {
+  hidden?: T;
   columns?:
     | T
     | {
+        hidden?: T;
         size?: T;
         richText?: T;
         enableLink?: T;
@@ -2069,6 +2136,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
  * via the `definition` "MediaBlock_select".
  */
 export interface MediaBlockSelect<T extends boolean = true> {
+  hidden?: T;
   media?: T;
   id?: T;
   blockName?: T;
@@ -2078,6 +2146,7 @@ export interface MediaBlockSelect<T extends boolean = true> {
  * via the `definition` "ArchiveBlock_select".
  */
 export interface ArchiveBlockSelect<T extends boolean = true> {
+  hidden?: T;
   introContent?: T;
   populateBy?: T;
   relationTo?: T;
@@ -2092,6 +2161,7 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
  * via the `definition` "FormBlock_select".
  */
 export interface FormBlockSelect<T extends boolean = true> {
+  hidden?: T;
   form?: T;
   enableIntro?: T;
   introContent?: T;
@@ -2103,11 +2173,13 @@ export interface FormBlockSelect<T extends boolean = true> {
  * via the `definition` "StatsGridBlock_select".
  */
 export interface StatsGridBlockSelect<T extends boolean = true> {
+  hidden?: T;
   eyebrow?: T;
   title?: T;
   stats?:
     | T
     | {
+        hidden?: T;
         icon?: T;
         iconKey?: T;
         value?: T;
@@ -2122,11 +2194,13 @@ export interface StatsGridBlockSelect<T extends boolean = true> {
  * via the `definition` "CardGridBlock_select".
  */
 export interface CardGridBlockSelect<T extends boolean = true> {
+  hidden?: T;
   eyebrow?: T;
   title?: T;
   cards?:
     | T
     | {
+        hidden?: T;
         icon?: T;
         iconKey?: T;
         title?: T;
@@ -2142,6 +2216,7 @@ export interface CardGridBlockSelect<T extends boolean = true> {
  * via the `definition` "CtaBandBlock_select".
  */
 export interface CtaBandBlockSelect<T extends boolean = true> {
+  hidden?: T;
   title?: T;
   body?: T;
   primaryCta?:
@@ -2164,9 +2239,11 @@ export interface CtaBandBlockSelect<T extends boolean = true> {
  * via the `definition` "ContentPageBlock_select".
  */
 export interface ContentPageBlockSelect<T extends boolean = true> {
+  hidden?: T;
   sections?:
     | T
     | {
+        hidden?: T;
         heading?: T;
         body?: T;
         id?: T;
@@ -2179,6 +2256,7 @@ export interface ContentPageBlockSelect<T extends boolean = true> {
  * via the `definition` "IconFeatureBlock_select".
  */
 export interface IconFeatureBlockSelect<T extends boolean = true> {
+  hidden?: T;
   icon?: T;
   iconKey?: T;
   title?: T;
@@ -2318,6 +2396,7 @@ export interface ProductsSelect<T extends boolean = true> {
  * via the `definition` "downloads_select".
  */
 export interface DownloadsSelect<T extends boolean = true> {
+  hidden?: T;
   title?: T;
   file?: T;
   documentType?: T;
@@ -2445,6 +2524,7 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
+  hidden?: T;
   title?: T;
   generateSlug?: T;
   slug?: T;
@@ -3182,9 +3262,17 @@ export interface SiteSetting {
    */
   footerColumns?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         title: string;
         links?:
           | {
+              /**
+               * Hide this item from visitors without deleting it.
+               */
+              hidden?: boolean | null;
               label: string;
               /**
                * Internal path (/about) or full URL (https://…).
@@ -3201,6 +3289,10 @@ export interface SiteSetting {
    */
   legalLinks?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         label: string;
         /**
          * Internal path (/about) or full URL (https://…).
@@ -3211,6 +3303,10 @@ export interface SiteSetting {
     | null;
   socialLinks?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         platform: 'linkedin' | 'facebook' | 'youtube' | 'instagram' | 'x';
         href: string;
         id?: string | null;
@@ -3241,15 +3337,27 @@ export interface Home {
      */
     captions?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           text: string;
           id?: string | null;
         }[]
       | null;
   };
   introduction?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     paragraphs?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           text: string;
           id?: string | null;
         }[]
@@ -3257,10 +3365,18 @@ export interface Home {
     tagline?: string | null;
   };
   /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  peekImagesHidden?: boolean | null;
+  /**
    * Stacked full-viewport scenario images (For Home, Business, Utility, Storage).
    */
   peekImages?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         /**
          * Stable id used by the UI (home, business, utility, storage).
          */
@@ -3275,8 +3391,16 @@ export interface Home {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  visionMissionHidden?: boolean | null;
   visionMission?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         /**
          * Stable id (vision, mission).
          */
@@ -3294,6 +3418,10 @@ export interface Home {
       }[]
     | null;
   impactSection?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     body?: string | null;
     link?: {
@@ -3305,6 +3433,10 @@ export interface Home {
     };
     stats?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           /**
            * Preferred: upload an SVG/PNG icon.
            */
@@ -3339,9 +3471,17 @@ export interface Home {
       | null;
   };
   productCategories?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     items?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           /**
            * Stable id (on-grid, hybrid, utility, bess).
            */
@@ -3358,10 +3498,18 @@ export interface Home {
       | null;
   };
   whySection?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     body?: string | null;
     cards?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           idKey: string;
           title: string;
           href?: string | null;
@@ -3375,6 +3523,10 @@ export interface Home {
       | null;
   };
   greenMission?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     /**
      * Background image. If empty, the page uses the built-in Unsplash fallback.
@@ -3385,10 +3537,18 @@ export interface Home {
     ctaLabel?: string | null;
   };
   newsSection?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     mode?: ('live' | 'manual') | null;
     manualItems?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           date?: string | null;
           href: string;
@@ -3410,6 +3570,10 @@ export interface Home {
    * Social URLs come from Site Settings → Footer → Social links. Only the heading is edited here.
    */
   followSection?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
   };
   seo?: {
@@ -3463,6 +3627,10 @@ export interface About {
     | null;
   leadership?: {
     /**
+     * Hide the Leadership section on /about and the “Founded by” strip on /about/brand-story.
+     */
+    hidden?: boolean | null;
+    /**
      * Leave blank to keep the default copy.
      */
     intro?: {
@@ -3475,6 +3643,10 @@ export interface About {
      */
     members?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           name: string;
           title?: string | null;
           /**
@@ -3567,6 +3739,10 @@ export interface About {
      */
     programmes?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           image?: (number | null) | Media;
@@ -3624,6 +3800,10 @@ export interface PartnersPage {
      */
     tracks?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           icon?:
@@ -3658,12 +3838,20 @@ export interface PartnersPage {
      */
     quickLinks?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           href: string;
           id?: string | null;
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -3708,6 +3896,10 @@ export interface PartnersPage {
      */
     coverage?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
@@ -3719,6 +3911,10 @@ export interface PartnersPage {
      */
     benefits?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
@@ -3729,12 +3925,20 @@ export interface PartnersPage {
      */
     links?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           href: string;
           id?: string | null;
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -3794,6 +3998,10 @@ export interface PartnersPage {
      */
     points?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
@@ -3842,6 +4050,10 @@ export interface PartnersPage {
      */
     pillars?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           icon?:
@@ -3874,12 +4086,20 @@ export interface PartnersPage {
      */
     quickLinks?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           href: string;
           id?: string | null;
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -3917,6 +4137,10 @@ export interface PartnersPage {
      */
     steps?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
@@ -3928,6 +4152,10 @@ export interface PartnersPage {
      */
     benefits?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           text: string;
           id?: string | null;
         }[]
@@ -3937,12 +4165,20 @@ export interface PartnersPage {
      */
     links?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           href: string;
           id?: string | null;
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -3987,6 +4223,10 @@ export interface PartnersPage {
      */
     paths?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           href?: string | null;
@@ -3999,12 +4239,20 @@ export interface PartnersPage {
      */
     enablement?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -4041,6 +4289,10 @@ export interface PartnersPage {
      */
     topics?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           href?: string | null;
@@ -4053,12 +4305,20 @@ export interface PartnersPage {
      */
     quickLinks?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           href: string;
           id?: string | null;
         }[]
       | null;
     cta?: {
+      /**
+       * Hide this whole section from visitors without deleting its content.
+       */
+      hidden?: boolean | null;
       title?: string | null;
       body?: string | null;
       primary?: {
@@ -4101,8 +4361,16 @@ export interface Career {
     image?: (number | null) | Media;
   };
   image?: (number | null) | Media;
+  /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  lifeHidden?: boolean | null;
   whyTitle?: string | null;
   whyBody?: string | null;
+  /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  openingsHidden?: boolean | null;
   openingsTitle?: string | null;
   /**
    * Where Apply buttons send candidates. Prefer the contact form with intent=career.
@@ -4161,6 +4429,10 @@ export interface Support {
        */
       quickLinks?:
         | {
+            /**
+             * Hide this item from visitors without deleting it.
+             */
+            hidden?: boolean | null;
             label: string;
             href: string;
             icon?:
@@ -4192,6 +4464,10 @@ export interface Support {
   };
   strengths?: {
     /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
+    /**
      * Leave blank to keep the default copy.
      */
     intro?: {
@@ -4204,6 +4480,10 @@ export interface Support {
      */
     items?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           image?: (number | null) | Media;
@@ -4212,6 +4492,10 @@ export interface Support {
       | null;
   };
   approach?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     /**
      * Leave blank to keep the default copy.
      */
@@ -4232,6 +4516,10 @@ export interface Support {
      */
     steps?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           image?: (number | null) | Media;
@@ -4240,6 +4528,10 @@ export interface Support {
       | null;
   };
   presence?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     /**
      * Leave blank to keep the default copy.
      */
@@ -4253,6 +4545,10 @@ export interface Support {
      */
     stats?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           value: string;
           label: string;
           id?: string | null;
@@ -4272,6 +4568,10 @@ export interface Support {
      */
     locations?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           label: string;
           top: string;
           left: string;
@@ -4283,6 +4583,10 @@ export interface Support {
      */
     pillars?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           icon?:
@@ -4313,6 +4617,10 @@ export interface Support {
   };
   stories?: {
     /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
+    /**
      * Leave blank to keep the default copy.
      */
     intro?: {
@@ -4325,6 +4633,10 @@ export interface Support {
      */
     items?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           tag?: string | null;
           title: string;
           body?: string | null;
@@ -4334,6 +4646,10 @@ export interface Support {
       | null;
   };
   resources?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     /**
      * Leave blank to keep the default copy.
      */
@@ -4360,6 +4676,10 @@ export interface Support {
      */
     items?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           icon?:
@@ -4392,6 +4712,10 @@ export interface Support {
   };
   cases?: {
     /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
+    /**
      * Leave blank to keep the default copy.
      */
     intro?: {
@@ -4411,6 +4735,10 @@ export interface Support {
      */
     items?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           image?: (number | null) | Media;
@@ -4435,6 +4763,10 @@ export interface Support {
      */
     steps?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           title: string;
           body?: string | null;
           id?: string | null;
@@ -4477,6 +4809,10 @@ export interface Support {
      */
     sections?:
       | {
+          /**
+           * Hide this item from visitors without deleting it.
+           */
+          hidden?: boolean | null;
           heading: string;
           body: string;
           id?: string | null;
@@ -4532,10 +4868,18 @@ export interface Sustainability {
    */
   image?: (number | null) | Media;
   /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  highlightsHidden?: boolean | null;
+  /**
    * Big numbers shown directly below the hero (3 recommended).
    */
   highlights?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         value: string;
         label: string;
         description?: string | null;
@@ -4554,6 +4898,10 @@ export interface Sustainability {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  pillarsHidden?: boolean | null;
   pillarsIntro?: {
     eyebrow?: string | null;
     title?: string | null;
@@ -4561,6 +4909,10 @@ export interface Sustainability {
   };
   pillars?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         title: string;
         headline: string;
         body: string;
@@ -4583,6 +4935,10 @@ export interface Sustainability {
       }[]
     | null;
   calculator?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     description?: string | null;
     /**
@@ -4599,6 +4955,10 @@ export interface Sustainability {
     treesPerKw?: number | null;
     disclaimer?: string | null;
   };
+  /**
+   * Hide this whole section from visitors without deleting its content.
+   */
+  commitmentsHidden?: boolean | null;
   commitmentsIntro?: {
     eyebrow?: string | null;
     title?: string | null;
@@ -4606,6 +4966,10 @@ export interface Sustainability {
   };
   commitments?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         phase: string;
         timeframe: string;
         title: string;
@@ -4614,6 +4978,10 @@ export interface Sustainability {
       }[]
     | null;
   cta?: {
+    /**
+     * Hide this whole section from visitors without deleting its content.
+     */
+    hidden?: boolean | null;
     title?: string | null;
     body?: string | null;
     primary?: {
@@ -4637,6 +5005,10 @@ export interface Sustainability {
   };
   strategySections?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         heading: string;
         body: string;
         id?: string | null;
@@ -4670,6 +5042,10 @@ export interface Contact {
   };
   cards?:
     | {
+        /**
+         * Hide this item from visitors without deleting it.
+         */
+        hidden?: boolean | null;
         /**
          * Preferred: upload an SVG/PNG icon.
          */
@@ -4811,10 +5187,12 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   footerColumns?:
     | T
     | {
+        hidden?: T;
         title?: T;
         links?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -4824,6 +5202,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   legalLinks?:
     | T
     | {
+        hidden?: T;
         label?: T;
         href?: T;
         id?: T;
@@ -4831,6 +5210,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   socialLinks?:
     | T
     | {
+        hidden?: T;
         platform?: T;
         href?: T;
         id?: T;
@@ -4852,6 +5232,7 @@ export interface HomeSelect<T extends boolean = true> {
         captions?:
           | T
           | {
+              hidden?: T;
               text?: T;
               id?: T;
             };
@@ -4859,18 +5240,22 @@ export interface HomeSelect<T extends boolean = true> {
   introduction?:
     | T
     | {
+        hidden?: T;
         title?: T;
         paragraphs?:
           | T
           | {
+              hidden?: T;
               text?: T;
               id?: T;
             };
         tagline?: T;
       };
+  peekImagesHidden?: T;
   peekImages?:
     | T
     | {
+        hidden?: T;
         idKey?: T;
         title?: T;
         href?: T;
@@ -4878,9 +5263,11 @@ export interface HomeSelect<T extends boolean = true> {
         alt?: T;
         id?: T;
       };
+  visionMissionHidden?: T;
   visionMission?:
     | T
     | {
+        hidden?: T;
         idKey?: T;
         label?: T;
         body?: T;
@@ -4893,6 +5280,7 @@ export interface HomeSelect<T extends boolean = true> {
   impactSection?:
     | T
     | {
+        hidden?: T;
         title?: T;
         body?: T;
         link?:
@@ -4904,6 +5292,7 @@ export interface HomeSelect<T extends boolean = true> {
         stats?:
           | T
           | {
+              hidden?: T;
               icon?: T;
               iconKey?: T;
               value?: T;
@@ -4914,10 +5303,12 @@ export interface HomeSelect<T extends boolean = true> {
   productCategories?:
     | T
     | {
+        hidden?: T;
         title?: T;
         items?:
           | T
           | {
+              hidden?: T;
               idKey?: T;
               label?: T;
               href?: T;
@@ -4929,11 +5320,13 @@ export interface HomeSelect<T extends boolean = true> {
   whySection?:
     | T
     | {
+        hidden?: T;
         title?: T;
         body?: T;
         cards?:
           | T
           | {
+              hidden?: T;
               idKey?: T;
               title?: T;
               href?: T;
@@ -4945,6 +5338,7 @@ export interface HomeSelect<T extends boolean = true> {
   greenMission?:
     | T
     | {
+        hidden?: T;
         title?: T;
         image?: T;
         alt?: T;
@@ -4954,11 +5348,13 @@ export interface HomeSelect<T extends boolean = true> {
   newsSection?:
     | T
     | {
+        hidden?: T;
         title?: T;
         mode?: T;
         manualItems?:
           | T
           | {
+              hidden?: T;
               title?: T;
               date?: T;
               href?: T;
@@ -4977,6 +5373,7 @@ export interface HomeSelect<T extends boolean = true> {
   followSection?:
     | T
     | {
+        hidden?: T;
         title?: T;
       };
   seo?:
@@ -5030,6 +5427,7 @@ export interface AboutSelect<T extends boolean = true> {
   leadership?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5040,6 +5438,7 @@ export interface AboutSelect<T extends boolean = true> {
         members?:
           | T
           | {
+              hidden?: T;
               name?: T;
               title?: T;
               bio?: T;
@@ -5118,6 +5517,7 @@ export interface AboutSelect<T extends boolean = true> {
         programmes?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               image?: T;
@@ -5171,6 +5571,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         tracks?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               icon?: T;
@@ -5181,6 +5582,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         quickLinks?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -5188,6 +5590,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5230,6 +5633,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         coverage?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;
@@ -5238,6 +5642,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         benefits?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;
@@ -5245,6 +5650,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         links?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -5252,6 +5658,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5307,6 +5714,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         points?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;
@@ -5352,6 +5760,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         pillars?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               icon?: T;
@@ -5360,6 +5769,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         quickLinks?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -5367,6 +5777,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5403,6 +5814,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         steps?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;
@@ -5411,12 +5823,14 @@ export interface PartnersPageSelect<T extends boolean = true> {
         benefits?:
           | T
           | {
+              hidden?: T;
               text?: T;
               id?: T;
             };
         links?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -5424,6 +5838,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5466,6 +5881,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         paths?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               href?: T;
@@ -5475,6 +5891,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         enablement?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;
@@ -5482,6 +5899,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5517,6 +5935,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         topics?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               href?: T;
@@ -5526,6 +5945,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         quickLinks?:
           | T
           | {
+              hidden?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -5533,6 +5953,7 @@ export interface PartnersPageSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               primary?:
@@ -5574,8 +5995,10 @@ export interface CareersSelect<T extends boolean = true> {
         image?: T;
       };
   image?: T;
+  lifeHidden?: T;
   whyTitle?: T;
   whyBody?: T;
+  openingsHidden?: T;
   openingsTitle?: T;
   applyHref?: T;
   applyLabel?: T;
@@ -5625,6 +6048,7 @@ export interface SupportSelect<T extends boolean = true> {
               quickLinks?:
                 | T
                 | {
+                    hidden?: T;
                     label?: T;
                     href?: T;
                     icon?: T;
@@ -5635,6 +6059,7 @@ export interface SupportSelect<T extends boolean = true> {
   strengths?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5645,6 +6070,7 @@ export interface SupportSelect<T extends boolean = true> {
         items?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               image?: T;
@@ -5654,6 +6080,7 @@ export interface SupportSelect<T extends boolean = true> {
   approach?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5670,6 +6097,7 @@ export interface SupportSelect<T extends boolean = true> {
         steps?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               image?: T;
@@ -5679,6 +6107,7 @@ export interface SupportSelect<T extends boolean = true> {
   presence?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5689,6 +6118,7 @@ export interface SupportSelect<T extends boolean = true> {
         stats?:
           | T
           | {
+              hidden?: T;
               value?: T;
               label?: T;
               id?: T;
@@ -5704,6 +6134,7 @@ export interface SupportSelect<T extends boolean = true> {
         locations?:
           | T
           | {
+              hidden?: T;
               label?: T;
               top?: T;
               left?: T;
@@ -5712,6 +6143,7 @@ export interface SupportSelect<T extends boolean = true> {
         pillars?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               icon?: T;
@@ -5721,6 +6153,7 @@ export interface SupportSelect<T extends boolean = true> {
   stories?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5731,6 +6164,7 @@ export interface SupportSelect<T extends boolean = true> {
         items?:
           | T
           | {
+              hidden?: T;
               tag?: T;
               title?: T;
               body?: T;
@@ -5741,6 +6175,7 @@ export interface SupportSelect<T extends boolean = true> {
   resources?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5765,6 +6200,7 @@ export interface SupportSelect<T extends boolean = true> {
         items?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               icon?: T;
@@ -5776,6 +6212,7 @@ export interface SupportSelect<T extends boolean = true> {
   cases?:
     | T
     | {
+        hidden?: T;
         intro?:
           | T
           | {
@@ -5792,6 +6229,7 @@ export interface SupportSelect<T extends boolean = true> {
         items?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               image?: T;
@@ -5814,6 +6252,7 @@ export interface SupportSelect<T extends boolean = true> {
         steps?:
           | T
           | {
+              hidden?: T;
               title?: T;
               body?: T;
               id?: T;
@@ -5851,6 +6290,7 @@ export interface SupportSelect<T extends boolean = true> {
         sections?:
           | T
           | {
+              hidden?: T;
               heading?: T;
               body?: T;
               id?: T;
@@ -5898,9 +6338,11 @@ export interface SustainabilitySelect<T extends boolean = true> {
       };
   heroVideo?: T;
   image?: T;
+  highlightsHidden?: T;
   highlights?:
     | T
     | {
+        hidden?: T;
         value?: T;
         label?: T;
         description?: T;
@@ -5915,6 +6357,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
         href?: T;
         id?: T;
       };
+  pillarsHidden?: T;
   pillarsIntro?:
     | T
     | {
@@ -5925,6 +6368,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
   pillars?:
     | T
     | {
+        hidden?: T;
         title?: T;
         headline?: T;
         body?: T;
@@ -5935,6 +6379,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
   calculator?:
     | T
     | {
+        hidden?: T;
         title?: T;
         description?: T;
         kwhPerKw?: T;
@@ -5942,6 +6387,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
         treesPerKw?: T;
         disclaimer?: T;
       };
+  commitmentsHidden?: T;
   commitmentsIntro?:
     | T
     | {
@@ -5952,6 +6398,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
   commitments?:
     | T
     | {
+        hidden?: T;
         phase?: T;
         timeframe?: T;
         title?: T;
@@ -5961,6 +6408,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
   cta?:
     | T
     | {
+        hidden?: T;
         title?: T;
         body?: T;
         primary?:
@@ -5988,6 +6436,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
   strategySections?:
     | T
     | {
+        hidden?: T;
         heading?: T;
         body?: T;
         id?: T;
@@ -6022,6 +6471,7 @@ export interface ContactSelect<T extends boolean = true> {
   cards?:
     | T
     | {
+        hidden?: T;
         icon?: T;
         iconKey?: T;
         title?: T;

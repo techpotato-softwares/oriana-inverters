@@ -14,6 +14,7 @@ import {
   IconFeatureBlock,
   StatsGridBlock,
 } from '@/blocks/Oriana/Component'
+import { isHidden } from '@/utilities/visibility'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -39,6 +40,7 @@ export const RenderBlocks: React.FC<{
     return (
       <Fragment>
         {blocks.map((block, index) => {
+          if (isHidden(block)) return null
           const { blockType } = block
 
           if (blockType && blockType in blockComponents) {

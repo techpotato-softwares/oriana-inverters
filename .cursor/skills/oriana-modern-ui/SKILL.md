@@ -49,7 +49,15 @@ Task Progress:
 - [ ] Implement in apps/ui (or thin page compose in cms)
 - [ ] Pass accessibility + web-design-guidelines checks
 - [ ] Spot-check mobile + reduced motion
+- [ ] Mac/Windows parity (oriana-cross-platform rule)
 ```
+
+## Cross-platform (Mac = Windows)
+
+- Prefer `w-full` / `100%` over `100vw` for shells.
+- Sticky/scroll JS must use `useStickyScrub` helpers — not bare `window.innerHeight` against CSS `svh`.
+- Do not mix `vh` with `dvh`/`svh` for the same visual box.
+- `fill` images need a sized `relative` parent + explicit `sizes`.
 
 ## Anti-patterns
 
@@ -58,5 +66,6 @@ Task Progress:
 - Card-heavy marketing grids when a composition will do
 - Hardcoded product catalogue when Payload should supply data
 - Hover-only navigation or CTAs
+- `100vw` full-bleed widths; `innerHeight` scrub vs `svh` pins
 ---
 

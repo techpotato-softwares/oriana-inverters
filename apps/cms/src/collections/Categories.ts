@@ -4,6 +4,17 @@ import { slugField } from 'payload'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { defaultLexical } from '@/fields/defaultLexical'
+import { hiddenField } from '@/fields/visibility'
+
+async function revalidateCatalogueSurfaces(slug?: string | null) {
+  const { revalidatePath, revalidateTag } = await import('next/cache')
+  revalidatePath('/', 'layout')
+  revalidatePath('/products')
+  if (slug) revalidatePath(`/products/category/${slug}`)
+  revalidateTag('categories')
+  revalidateTag('products')
+  revalidateTag('global_site-settings')
+}
 
 function slugifySegmentName(value: string): string {
   return value
@@ -51,30 +62,25 @@ export const Categories: CollectionConfig = {
     afterChange: [
       async ({ doc, req: { payload, context } }) => {
         if (context.disableRevalidate) return doc
-        const { revalidatePath, revalidateTag } = await import('next/cache')
         payload.logger.info(`Revalidating category: /products/category/${doc.slug}`)
-        revalidatePath('/')
-        revalidatePath(`/products/category/${doc.slug}`)
-        revalidatePath('/products')
-        revalidateTag('categories')
-        revalidateTag('products')
+        await revalidateCatalogueSurfaces(doc.slug)
         return doc
       },
     ],
     afterDelete: [
       async ({ doc, req: { context } }) => {
         if (context.disableRevalidate) return doc
-        const { revalidatePath, revalidateTag } = await import('next/cache')
-        revalidatePath('/')
-        revalidatePath(`/products/category/${doc.slug}`)
-        revalidatePath('/products')
-        revalidateTag('categories')
-        revalidateTag('products')
+        await revalidateCatalogueSurfaces(doc.slug)
         return doc
       },
     ],
   },
   fields: [
+    hiddenField({
+      sidebar: true,
+      description:
+        'Hide this category, its products, menu/footer links and home tiles from visitors. Data is kept; untick to show again.',
+    }),
     {
       name: 'title',
       type: 'text',

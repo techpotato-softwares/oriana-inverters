@@ -120,10 +120,11 @@ export function ValuesScroller({
       ref={sectionRef}
       id={id}
       aria-labelledby={`${id}-title`}
-      className="relative scroll-mt-24 bg-oriana-surface"
+      className="relative scroll-mt-header bg-oriana-surface"
       style={pinned ? { height: `calc(${distance}px + 100svh)` } : undefined}
     >
       <div
+        data-sticky-pin={pinned ? '' : undefined}
         className={cn(pinned ? 'sticky flex flex-col justify-center overflow-hidden' : 'py-20')}
         style={pinned ? { top: STICKY_BELOW_NAV_TOP, height: STICKY_BELOW_NAV_HEIGHT } : undefined}
       >

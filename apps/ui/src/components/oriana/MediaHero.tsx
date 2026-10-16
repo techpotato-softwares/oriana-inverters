@@ -33,7 +33,7 @@ export function MediaHero({
   const reduceMotion = useReducedMotion()
 
   return (
-    <section className="relative isolate flex min-h-[min(78svh,44rem)] items-center overflow-hidden bg-oriana-deep">
+    <section className="relative isolate flex min-h-[min(78svh,var(--viewport-height))] items-center overflow-hidden bg-oriana-deep">
       <motion.div
         className="absolute inset-0 -z-10"
         initial={reduceMotion ? undefined : { scale: 1.06, opacity: 0 }}
@@ -74,10 +74,12 @@ export function MediaHero({
           transition={{ duration: reduceMotion ? 0 : 0.7, delay: reduceMotion ? 0 : 0.15, ease: [0.16, 1, 0.3, 1] }}
         >
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">{eyebrow}</p>
-          <h1 className="mt-4 max-w-3xl font-display text-3xl font-semibold tracking-tight text-white md:text-4xl lg:text-5xl">
+          <h1 className="fluid-display mt-4 max-w-3xl font-display font-semibold tracking-tight text-white">
             {title}
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">{description}</p>
+          <p className="mt-4 max-w-2xl text-[clamp(1rem,2svh,1.125rem)] leading-relaxed text-white/75">
+            {description}
+          </p>
           {primary || secondary ? (
             <div className="mt-8 flex flex-wrap gap-3">
               {primary ? (

@@ -4,7 +4,7 @@ import { PageHero } from '@/components/oriana/PageHero'
 import { heroImages } from '@/components/oriana/heroImages'
 import { mediaUrl } from '@/utilities/cmsContent'
 import { getContactForm } from '@/utilities/getContactForm'
-import { defaultContactCards, isPlaceholderContactCards } from '@/utilities/contactDetails'
+import { resolveContactCards } from '@/utilities/contactDetails'
 import { getContact } from '@/utilities/getMarketing'
 import { ContactForm, type ContactCard } from './ContactForm'
 
@@ -33,15 +33,7 @@ export default async function ContactPage({
   const heroImage = cmsHeroImage
     ? { src: cmsHeroImage, alt: heroImages.contact.alt }
     : heroImages.contact
-  const cmsCards = contact?.cards ?? []
-  const cards: ContactCard[] =
-    cmsCards.length && !isPlaceholderContactCards(cmsCards)
-      ? cmsCards.map((c) => ({
-          iconKey: c.iconKey,
-          title: c.title,
-          detail: c.detail,
-        }))
-      : defaultContactCards
+  const cards: ContactCard[] = resolveContactCards(contact?.cards ?? [])
   const successMessage =
     contact?.successMessage ||
     'Thank you for reaching out. Our team will contact you within one business day.'
@@ -59,7 +51,7 @@ export default async function ContactPage({
       />
       <Breadcrumbs items={[{ label: 'Contact' }]} />
 
-      <section className="py-20 lg:py-28">
+      <section className="section-safe-y">
         <div className="container">
           <ContactForm
             cards={cards}
