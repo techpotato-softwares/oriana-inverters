@@ -109,7 +109,10 @@ export const cardList = (name: string, options: CardOptions = {}): Field =>
     name,
     type: 'array',
     label: options.label,
-    admin: { description: 'Leave empty to keep the default cards.' },
+    admin: {
+      description:
+        'Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.',
+    },
     fields: [
       ...(options.tag ? [{ name: 'tag', type: 'text' } as Field] : []),
       { name: 'title', type: 'text', required: true },

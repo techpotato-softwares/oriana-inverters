@@ -13,8 +13,28 @@ on:
         description: What to seed
         required: true
         type: choice
-        options: [catalogue, content, admin, full]
+        options: [catalogue, content, marketing-pages, admin, full]
         default: catalogue
+      page_support:
+        description: (marketing-pages / full) Seed Support Pages
+        required: false
+        type: boolean
+        default: true
+      page_sustainability:
+        description: (marketing-pages / full) Seed Sustainability
+        required: false
+        type: boolean
+        default: true
+      page_about:
+        description: (marketing-pages / full) Seed About Pages
+        required: false
+        type: boolean
+        default: true
+      force_marketing_pages:
+        description: Overwrite Support / Sustainability / About even if hub copy exists
+        required: false
+        type: boolean
+        default: true
       admin_email:
         description: Admin email (workflow input only — not stored as a GitHub secret)
         required: false
@@ -135,6 +155,40 @@ jobs:
           NODE_OPTIONS: "--dns-result-order=ipv4first"
         run: npm run seed:content
 
+      - name: Build marketing page list
+        id: marketing_pages
+        if: ${{ github.event.inputs.seed_type == 'marketing-pages' || github.event.inputs.seed_type == 'full' }}
+        run: |
+          PAGES=""
+          if [ "${{ github.event.inputs.page_support }}" = "true" ]; then
+            PAGES="${PAGES:+$PAGES,}support"
+          fi
+          if [ "${{ github.event.inputs.page_sustainability }}" = "true" ]; then
+            PAGES="${PAGES:+$PAGES,}sustainability"
+          fi
+          if [ "${{ github.event.inputs.page_about }}" = "true" ]; then
+            PAGES="${PAGES:+$PAGES,}about"
+          fi
+          if [ -z "$PAGES" ]; then
+            echo "Select at least one of page_support / page_sustainability / page_about."
+            exit 1
+          fi
+          echo "list=$PAGES" >> "$GITHUB_OUTPUT"
+          echo "Marketing pages to seed: $PAGES"
+
+      - name: Seed marketing pages (Support / Sustainability / About)
+        if: ${{ github.event.inputs.seed_type == 'marketing-pages' || github.event.inputs.seed_type == 'full' }}
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+          SEED_PAGES: ${{ steps.marketing_pages.outputs.list }}
+        run: |
+          if [ "${{ github.event.inputs.force_marketing_pages }}" = "true" ]; then
+            npm run seed:marketing-pages -- --force
+          else
+            npm run seed:marketing-pages
+          fi
+
       - name: Seed admin user
         if: ${{ github.event.inputs.seed_type == 'admin' || github.event.inputs.seed_type == 'full' }}
         working-directory: apps/cms
@@ -157,6 +211,11 @@ jobs:
           echo "### Seed complete" >> "$GITHUB_STEP_SUMMARY"
           echo "- Environment: \`$ENV\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Seed type: \`${{ github.event.inputs.seed_type }}\`" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ github.event.inputs.seed_type }}" = "marketing-pages" ] || [ "${{ github.event.inputs.seed_type }}" = "full" ]; then
+            echo "- Marketing pages: \`${{ steps.marketing_pages.outputs.list }}\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Force overwrite: \`${{ github.event.inputs.force_marketing_pages }}\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "- After run: Admin → **Support Pages** / **Sustainability** / **About Pages**." >> "$GITHUB_STEP_SUMMARY"
+          fi
           if [ "$ENV" = "prod" ]; then
             echo "- RDS: \`oriana-web\` / schema \`oriana_invertors\`" >> "$GITHUB_STEP_SUMMARY"
           fi

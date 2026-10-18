@@ -25,7 +25,7 @@ export const Sustainability: GlobalConfig = {
   admin: {
     group: 'Marketing',
     description:
-      'Sustainability overview page: hero video, impact numbers, pillars, carbon estimator, commitments, and CTA. Empty fields fall back to default copy and stock media.',
+      'Hub + Strategy tabs for /sustainability and /sustainability/strategy. Reports PDFs live in Sustainability Reports. To fill defaults: npm run seed:marketing-pages -- --pages=sustainability --force',
   },
   access: {
     read: () => true,

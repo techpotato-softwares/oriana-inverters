@@ -29,7 +29,7 @@ export const Support: GlobalConfig = {
   admin: {
     group: 'Support',
     description:
-      'Live on the public site: /support, /support/warranty, /support/security. Blank fields keep built-in defaults. Warranty coverage rows come from Support → Warranty plans (collection).',
+      'Public site: /support, /support/warranty, /support/security. Each tab below maps to a section on the page — edit copy/media here. If tabs look empty, run: npm run seed:marketing-pages --workspace=@oriana/cms (or seed:support). Warranty table rows: Support → Warranty plans.',
   },
   access: {
     read: () => true,
@@ -41,22 +41,36 @@ export const Support: GlobalConfig = {
       tabs: [
         {
           name: 'hub',
-          label: 'Support hub',
-          description: '/support — hero',
+          label: '1. Hero',
+          description: '/support — top full-bleed hero + quick links',
           fields: [
             {
               name: 'hero',
               type: 'group',
-              admin: { description: 'Leave blank to keep the default copy.' },
+              label: 'Hero',
+              admin: {
+                description:
+                  'First thing visitors see. Seed fills these; change any field and publish.',
+              },
               fields: [
-                { name: 'eyebrow', type: 'text' },
+                {
+                  name: 'eyebrow',
+                  type: 'text',
+                  defaultValue: 'Service & Support',
+                },
                 {
                   type: 'row',
                   fields: [
-                    { name: 'title', type: 'text', admin: { width: '50%' } },
+                    {
+                      name: 'title',
+                      type: 'text',
+                      defaultValue: 'Professional support.',
+                      admin: { width: '50%' },
+                    },
                     {
                       name: 'highlight',
                       type: 'text',
+                      defaultValue: 'Reliable performance.',
                       admin: {
                         width: '50%',
                         description: 'Second headline line, shown in sky blue.',
@@ -64,15 +78,24 @@ export const Support: GlobalConfig = {
                     },
                   ],
                 },
-                { name: 'description', type: 'textarea' },
+                {
+                  name: 'description',
+                  type: 'textarea',
+                  defaultValue:
+                    'Dependable service across the product lifecycle — technical expertise, responsive support, systematic troubleshooting, and field-level assistance that keeps customers, installers, and EPC partners running with minimal downtime.',
+                },
                 { name: 'image', type: 'upload', relationTo: 'media' },
                 optionalLink('primary', 'Primary button'),
                 optionalLink('secondary', 'Secondary button'),
-                { name: 'quickLinksLabel', type: 'text' },
+                {
+                  name: 'quickLinksLabel',
+                  type: 'text',
+                  defaultValue: 'Frequently needed',
+                },
                 visibleArray({
                   name: 'quickLinks',
                   type: 'array',
-                  admin: { description: 'Leave empty to keep the default quick links.' },
+                  admin: { description: 'Three shortcut chips under the hero.' },
                   fields: [
                     {
                       type: 'row',
@@ -90,8 +113,8 @@ export const Support: GlobalConfig = {
         },
         {
           name: 'strengths',
-          label: 'Strengths',
-          description: '/support — mosaic of capabilities',
+          label: '2. Strengths',
+          description: '/support — “Our strength” capability mosaic',
           fields: [
             sectionHiddenField(),
             sectionIntro('intro'),
@@ -100,8 +123,8 @@ export const Support: GlobalConfig = {
         },
         {
           name: 'approach',
-          label: 'Approach',
-          description: '/support — four-step service sequence',
+          label: '3. Approach',
+          description: '/support — Identify → Diagnose → Resolve → Support',
           fields: [
             sectionHiddenField(),
             sectionIntro('intro'),
@@ -111,15 +134,15 @@ export const Support: GlobalConfig = {
         },
         {
           name: 'presence',
-          label: 'Global presence',
-          description: '/support — network stats and map',
+          label: '4. Global presence',
+          description: '/support — stats, India map pins, service pillars',
           fields: [
             sectionHiddenField(),
             sectionIntro('intro'),
             visibleArray({
               name: 'stats',
               type: 'array',
-              admin: { description: 'Leave empty to keep the default stats.' },
+              label: 'Stats',
               fields: statFields,
             }),
             optionalLink('cta', 'Button'),
@@ -128,9 +151,10 @@ export const Support: GlobalConfig = {
             visibleArray({
               name: 'locations',
               type: 'array',
+              label: 'Map pins',
               admin: {
                 description:
-                  'Map pins. Position is a percentage from the top and left of the India outline, e.g. Delhi 29.2% / 30.2%, Bengaluru 83.1% / 31.5%.',
+                  'Position is % from top/left of the India outline (e.g. Delhi 29.2% / 30.2%).',
               },
               fields: [
                 {
@@ -148,8 +172,8 @@ export const Support: GlobalConfig = {
         },
         {
           name: 'stories',
-          label: 'Service stories',
-          description: '/support — horizontal story rail',
+          label: '5. Service stories',
+          description: '/support — horizontal story cards',
           fields: [
             sectionHiddenField(),
             sectionIntro('intro'),
@@ -158,8 +182,8 @@ export const Support: GlobalConfig = {
         },
         {
           name: 'resources',
-          label: 'Resources',
-          description: '/support — resource centre',
+          label: '6. Resources',
+          description: '/support — resource centre feature + links',
           fields: [
             sectionHiddenField(),
             sectionIntro('intro'),
@@ -180,8 +204,8 @@ export const Support: GlobalConfig = {
         },
         {
           name: 'cases',
-          label: 'Cases & stories',
-          description: '/support — case study categories',
+          label: '7. Cases & stories',
+          description: '/support — case study category cards at the bottom',
           fields: [
             sectionHiddenField(),
             sectionIntro('intro'),
@@ -191,12 +215,12 @@ export const Support: GlobalConfig = {
         },
         {
           name: 'warranty',
-          label: 'Warranty',
+          label: '8. Warranty page',
           description:
-            '/support/warranty — the coverage table comes from Support → Warranty plans.',
+            '/support/warranty — hero + steps. Coverage table: Support → Warranty plans.',
           fields: [
             subpageHero('hero', { image: true }),
-            { name: 'matrixTitle', type: 'text' },
+            { name: 'matrixTitle', type: 'text', defaultValue: 'Coverage by Product Line' },
             cardList('steps', { label: 'Registration and claim steps' }),
             optionalLink('primary', 'Primary button'),
             optionalLink('secondary', 'Secondary button'),
@@ -211,17 +235,15 @@ export const Support: GlobalConfig = {
         },
         {
           name: 'security',
-          label: 'Security',
-          description: '/support/security',
+          label: '9. Security page',
+          description: '/support/security — incident response copy',
           fields: [
             subpageHero('hero', { image: true }),
             visibleArray({
               name: 'sections',
               type: 'array',
-              admin: {
-                description:
-                  'Leave empty to keep the default sections. Separate paragraphs with a blank line.',
-              },
+              label: 'Sections',
+              admin: { description: 'Separate paragraphs inside Body with a blank line.' },
               fields: [
                 { name: 'heading', type: 'text', required: true },
                 { name: 'body', type: 'textarea', required: true },
@@ -232,7 +254,7 @@ export const Support: GlobalConfig = {
             pageMeta(),
           ],
         },
-        { label: 'SEO', fields: [seoFields] },
+        { label: '10. SEO', fields: [seoFields] },
       ],
     },
   ],

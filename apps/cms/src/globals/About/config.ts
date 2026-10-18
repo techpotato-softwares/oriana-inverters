@@ -25,7 +25,8 @@ export const About: GlobalConfig = {
   label: 'About Pages',
   admin: {
     group: 'Marketing',
-    description: 'About us and its subpages. Leave a field blank to keep the built-in copy.',
+    description:
+      'About us and its subpages. Leave a field blank to keep the built-in copy. To fill all tabs from site defaults: npm run seed:marketing-pages -- --pages=about --force',
   },
   access: {
     read: () => true,

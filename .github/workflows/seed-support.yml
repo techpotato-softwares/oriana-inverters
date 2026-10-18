@@ -1,0 +1,150 @@
+name: Seed Marketing Pages
+
+# Fills Admin → Support / Sustainability / About (hub + all CMS subpage tabs)
+# with editable site defaults. Pick which globals to seed via checkboxes.
+# DB + Payload credentials come from AWS Secrets Manager (same as Deploy / Seed CMS).
+# GitHub secrets required: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY only.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options: [dev, qa, prod]
+        default: qa
+      page_support:
+        description: Seed Support Pages (/support, warranty, security + all tabs)
+        required: false
+        type: boolean
+        default: true
+      page_sustainability:
+        description: Seed Sustainability (/sustainability + strategy)
+        required: false
+        type: boolean
+        default: true
+      page_about:
+        description: Seed About (/about + brand story, vision, achievements, …)
+        required: false
+        type: boolean
+        default: true
+      force:
+        description: Overwrite even if hub hero copy already exists
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'ap-south-1' }}
+  NODE_VERSION: "22"
+
+jobs:
+  seed-marketing-pages:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Ensure secrets exist
+        run: ./scripts/bootstrap-secrets.sh "${{ github.event.inputs.environment }}"
+
+      - name: Sync RDS app secret (prod)
+        if: ${{ github.event.inputs.environment == 'prod' }}
+        run: |
+          chmod +x ./scripts/sync-rds-app-secret.sh ./scripts/ensure-rds-available.sh
+          RDS_INSTANCE_ID=oriana-web ./scripts/ensure-rds-available.sh
+          RDS_INSTANCE_ID=oriana-web DB_SCHEMA=oriana_invertors \
+            ./scripts/sync-rds-app-secret.sh prod
+
+      - name: Load secrets from Secrets Manager
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          eval "$(./scripts/load-deploy-secrets.sh "$ENV")"
+
+          if [ "$DB_PASSWORD" = "CHANGE_ME_UPDATE_IN_AWS_CONSOLE" ]; then
+            echo "Update DB_PASSWORD in Secrets Manager /oriana-invertors-web/$ENV/database (QA) or run sync-rds-app-secret.sh (prod)"
+            exit 1
+          fi
+
+          echo "::add-mask::$PAYLOAD_SECRET"
+          echo "::add-mask::$DATABASE_URL"
+          echo "::add-mask::$DB_PASSWORD"
+
+          {
+            echo "PAYLOAD_SECRET=$PAYLOAD_SECRET"
+            echo "CRON_SECRET=$CRON_SECRET"
+            echo "PREVIEW_SECRET=$PREVIEW_SECRET"
+            echo "DATABASE_URL=$DATABASE_URL"
+            echo "DB_SCHEMA=${DB_SCHEMA:-}"
+            echo "PAYLOAD_DB_SCHEMA=${PAYLOAD_DB_SCHEMA:-}"
+          } >> "$GITHUB_ENV"
+
+          if [ "${PAYLOAD_DB_SCHEMA:-}" = "public" ] || [ "${DB_SCHEMA:-}" = "public" ]; then
+            echo "PAYLOAD_DB_SCHEMA=" >> "$GITHUB_ENV"
+            echo "DB_SCHEMA=" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build page list
+        id: pages
+        run: |
+          PAGES=""
+          if [ "${{ github.event.inputs.page_support }}" = "true" ]; then
+            PAGES="${PAGES:+$PAGES,}support"
+          fi
+          if [ "${{ github.event.inputs.page_sustainability }}" = "true" ]; then
+            PAGES="${PAGES:+$PAGES,}sustainability"
+          fi
+          if [ "${{ github.event.inputs.page_about }}" = "true" ]; then
+            PAGES="${PAGES:+$PAGES,}about"
+          fi
+          if [ -z "$PAGES" ]; then
+            echo "Select at least one page (Support, Sustainability, or About)."
+            exit 1
+          fi
+          echo "list=$PAGES" >> "$GITHUB_OUTPUT"
+          echo "Seeding pages: $PAGES"
+
+      - name: Seed marketing pages
+        working-directory: apps/cms
+        env:
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+          SEED_PAGES: ${{ steps.pages.outputs.list }}
+        run: |
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then
+            npm run seed:marketing-pages -- --force
+          else
+            npm run seed:marketing-pages
+          fi
+
+      - name: Summary
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          echo "### Marketing pages seeded" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Environment: \`$ENV\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Pages: \`${{ steps.pages.outputs.list }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Force overwrite: \`${{ github.event.inputs.force }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Secrets: \`/$APP/${ENV}/database\` + \`/$APP/${ENV}/payload\` (via \`load-deploy-secrets.sh\`)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Next: open Admin → **Support Pages** / **Sustainability** / **About Pages** and edit any tab, then publish." >> "$GITHUB_STEP_SUMMARY"
+        env:
+          APP: oriana-invertors-web

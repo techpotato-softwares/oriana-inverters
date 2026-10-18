@@ -20,6 +20,9 @@ import {
 import { megaMenus } from '@/config/navigation'
 import { defaultContactCards } from '@/utilities/contactDetails'
 import { footerNav, socialLinks as defaultSocialLinks } from '@/config/footer'
+import { buildAboutGlobalData } from '@/endpoints/seed/oriana/aboutDefaults'
+import { buildSupportGlobalData } from '@/endpoints/seed/oriana/supportDefaults'
+import { buildSustainabilityGlobalData } from '@/endpoints/seed/oriana/sustainabilityDefaults'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -88,7 +91,9 @@ async function uploadAsset(
           ? 'image/svg+xml'
           : name.endsWith('.png')
             ? 'image/png'
-            : 'application/octet-stream',
+            : name.endsWith('.jpg') || name.endsWith('.jpeg')
+              ? 'image/jpeg'
+              : 'application/octet-stream',
         name,
         size: data.length,
       },
@@ -384,50 +389,24 @@ export async function seedOrianaContent({
   })
 
   // About
+  const aboutHero = await uploadAsset(
+    payload,
+    req,
+    'heroes/solutions.jpg',
+    'About hero',
+    undefined,
+  )
   await payload.updateGlobal({
     slug: 'about',
-    data: {
-      hero: {
-        eyebrow: 'About',
-        title: 'Powering a Cleaner Tomorrow',
-        description:
-          'Oriana Inverters is a global manufacturer of solar inverter technology, serving residential, commercial, and utility markets with products engineered for performance and longevity.',
-      },
-      storyTitle: 'Our Story',
-      storyParagraphs: [
-        {
-          text: 'Founded by power electronics engineers with decades of experience in renewable energy, Oriana was built on a simple belief: the world needs inverters that are as reliable as the sun itself.',
-        },
-        {
-          text: 'Today, over one million Oriana inverters operate across 25 countries — on rooftops, in industrial parks, and across desert solar farms — converting sunlight into clean, dependable power for millions of people.',
-        },
-      ],
-      stats: [
-        { value: '2010', label: 'Founded' },
-        { value: '1M+', label: 'Units Deployed' },
-        { value: '25+', label: 'Countries' },
-        { value: '500+', label: 'Team Members' },
-      ],
-      values: [
-        {
-          title: 'Engineering Excellence',
-          description:
-            'Every product undergoes rigorous design validation, environmental stress testing, and field trials before market release.',
-        },
-        {
-          title: 'Customer Partnership',
-          description:
-            'We work alongside installers, EPCs, and distributors with dedicated technical support, training, and co-marketing resources.',
-        },
-        {
-          title: 'Sustainable Future',
-          description:
-            'Our mission is to accelerate the global transition to clean energy through reliable, accessible power conversion technology.',
-        },
-      ],
-      seo: { metaTitle: 'About Us', metaDescription: 'Learn about Oriana Inverters.' },
-      _status: 'published',
-    } as never,
+    data: buildAboutGlobalData({
+      hero: aboutHero,
+      brandStory: aboutHero,
+      visionMission: aboutHero,
+      achievements: aboutHero,
+      certifications: aboutHero,
+      partners: aboutHero,
+      foundation: aboutHero,
+    }) as never,
     overrideAccess: true,
     context: { disableRevalidate: true },
   })
@@ -455,150 +434,59 @@ export async function seedOrianaContent({
     context: { disableRevalidate: true },
   })
 
-  // Support — section tabs stay empty so the built-in page copy shows until an admin edits it.
+  // Support — populate every tab with live-site defaults so Admin is editable (not blank).
+  const supportHero = await uploadAsset(
+    payload,
+    req,
+    'heroes/solutions.jpg',
+    'Support hero — solar field',
+    undefined,
+  )
+  const supportWarranty = await uploadAsset(
+    payload,
+    req,
+    'heroes/warranty.jpg',
+    'Warranty hero',
+    undefined,
+  )
+  const supportDownloads = await uploadAsset(
+    payload,
+    req,
+    'heroes/downloads.jpg',
+    'Resources feature',
+    undefined,
+  )
   await payload.updateGlobal({
     slug: 'support',
-    data: {
-      seo: {
-        metaTitle: 'Support & Service',
-        metaDescription:
-          'Dependable service support throughout the product lifecycle for installers, homeowners, and businesses.',
-      },
-      _status: 'published',
-    } as never,
+    data: buildSupportGlobalData({
+      hero: supportHero,
+      warranty: supportWarranty,
+      security: supportHero,
+      resourceFeature: supportDownloads,
+      strength: [supportHero, supportDownloads, supportWarranty, supportHero, supportWarranty, supportDownloads],
+      approach: [supportHero, supportDownloads, supportWarranty, supportHero],
+      story: [supportHero, supportDownloads, supportWarranty, supportHero, supportDownloads],
+      cases: [supportHero, supportDownloads, supportWarranty, supportHero],
+    }) as never,
     overrideAccess: true,
     context: { disableRevalidate: true },
   })
 
-  // Sustainability
+  // Sustainability — hub + strategy (non-placeholder headings so public page keeps them)
+  const sustainabilityHero = await uploadAsset(
+    payload,
+    req,
+    'heroes/solutions.jpg',
+    'Sustainability hero',
+    undefined,
+  )
   await payload.updateGlobal({
     slug: 'sustainability',
-    data: {
-      hero: {
-        eyebrow: 'Our Commitment',
-        title: 'Powering India’s Clean Energy Transition from the Ground Up.',
-        description:
-          'We engineer every unit for product longevity, responsible manufacturing, and circular lifecycles.',
-      },
-      highlights: [
-        {
-          value: '97%+',
-          label: 'Peak efficiency',
-          description: 'Minimising conversion losses across the grid.',
-        },
-        {
-          value: '100%',
-          label: 'Recyclable packaging goal',
-          description: 'Phasing out single-use expanded plastics.',
-        },
-        {
-          value: 'Make in India',
-          label: 'Localised sourcing',
-          description: 'Fewer long-haul carbon miles in every unit.',
-        },
-      ],
-      pillarsIntro: {
-        eyebrow: 'Core pillars',
-        title: 'Sustainability built in, from day one',
-        description:
-          'Four principles shape how we design, build, and support every Oriana product.',
-      },
-      pillars: [
-        {
-          title: 'Design for Longevity',
-          headline: 'Built to outlast, not to be replaced',
-          body: 'The greenest hardware is the one that stays out of landfills for decades. Our systems feature high-grade thermal engineering, industrial-grade silicon, and repairable component architecture that maximises uptime and energy yield across India’s harsh climate conditions.',
-          icon: 'shield-check',
-        },
-        {
-          title: 'Responsible Manufacturing',
-          headline: 'Cleaner practices on the shop floor',
-          body: 'Clean energy hardware should not be born from dirty manufacturing. We enforce lead-free soldering, RoHS-compliant electronics, water-conscious assembly, and corrugated honeycomb cushioning in place of single-use Styrofoam.',
-          icon: 'factory',
-        },
-        {
-          title: 'Local Communities',
-          headline: 'Made in India, building resilience',
-          body: 'Sourcing components locally strengthens domestic manufacturing and cuts international freight emissions. We invest in local engineering talent, transparent workplace safety standards, and regional technician upskilling.',
-          icon: 'users',
-        },
-        {
-          title: 'Circularity & E-Waste',
-          headline: 'Lifecycle responsibility beyond the sale',
-          body: 'Aligned with India’s E-Waste (Management) Rules, our enclosures and modular components are designed for straightforward disassembly, material recovery of aluminium, copper, and PCB silicon, and verified recycling partnerships.',
-          icon: 'recycle',
-        },
-      ],
-      calculator: {
-        title: 'Sustainability in numbers',
-        description: 'Move the slider to see what a solar installation can displace every year.',
-        kwhPerKw: 1450,
-        co2TonnesPerKw: 1.2,
-        treesPerKw: 15,
-        disclaimer:
-          'Estimates calculated using Central Electricity Authority (CEA) average grid emission factors. Actual results vary with location, orientation, and system design.',
-      },
-      commitmentsIntro: {
-        eyebrow: 'Roadmap',
-        title: 'Our day-one commitments',
-        description: 'A practical baseline we are delivering on now, and building towards next.',
-      },
-      commitments: [
-        {
-          phase: 'Phase 1',
-          timeframe: 'Current',
-          title: 'Plastic-minimised dispatch and RoHS lines',
-          body: '100% plastic-minimised dispatch boxes and RoHS-compliant manufacturing lines.',
-        },
-        {
-          phase: 'Phase 2',
-          timeframe: 'Next 12 months',
-          title: 'Solar-powered shop floor',
-          body: 'Moving testing and assembly power consumption to self-hosted rooftop solar.',
-        },
-        {
-          phase: 'Phase 3',
-          timeframe: 'Long-term',
-          title: 'Closed-loop takeback',
-          body: 'A certified takeback and refurbishment programme for field units across India.',
-        },
-      ],
-      cta: {
-        title: 'Join us in accelerating India’s solar decade.',
-        body: 'Partner with Oriana to deploy efficient, long-lived inverters built responsibly in India.',
-        primary: { label: 'Partner With Us', href: '/contact' },
-        secondary: { label: 'Download Product Spec Sheets', href: '/products' },
-        contactEmail: 'esg@orianainverters.com',
-      },
-      approachTitle: 'Our Approach',
-      approachBody:
-        'Every Oriana inverter helps displace fossil generation over a 25+ year operational life.',
-      links: [
-        { label: 'Our Strategy', href: '/sustainability/strategy' },
-        { label: 'Reports & Policies →', href: '/sustainability/reports' },
-      ],
-      strategyHero: {
-        eyebrow: 'Sustainability',
-        title: 'Sustainability Strategy',
-        description: 'Our roadmap to net-zero operations and responsible product lifecycle management.',
-      },
-      strategySections: [
-        {
-          heading: '2030 Targets',
-          body: 'Reduce Scope 1 and 2 greenhouse gas emissions by 50% versus 2020 baseline. Achieve 80% renewable electricity at major production sites.',
-        },
-        {
-          heading: 'Product Lifecycle',
-          body: 'Lifecycle assessments on flagship platforms; extended warranty and modular serviceability reduce e-waste.',
-        },
-        {
-          heading: 'Supply Chain',
-          body: 'Key suppliers audited against our Supplier Code of Conduct.',
-        },
-      ],
-      seo: { metaTitle: 'Sustainability' },
-      _status: 'published',
-    } as never,
+    data: buildSustainabilityGlobalData({
+      heroPoster: sustainabilityHero,
+      pillar: [sustainabilityHero, sustainabilityHero, sustainabilityHero, sustainabilityHero],
+      cta: sustainabilityHero,
+    }) as never,
     overrideAccess: true,
     context: { disableRevalidate: true },
   })
