@@ -39,6 +39,7 @@ export default async function WarrantyPage() {
   const primary = resolveLink(cms?.primary, defaults.primary)
   const secondary = resolveLink(cms?.secondary, defaults.secondary)
   const policyUrl = mediaUrl(cms?.policyFile)
+  const heroImage = mediaUrl(cms?.hero?.image) || heroImages.warranty.src
 
   return (
     <main>
@@ -46,7 +47,7 @@ export default async function WarrantyPage() {
         eyebrow={hero.eyebrow}
         title={hero.title}
         description={hero.description}
-        media={{ kind: 'image', src: heroImages.warranty.src, alt: heroImages.warranty.alt }}
+        media={{ kind: 'image', src: heroImage, alt: heroImages.warranty.alt }}
         primary={primary}
         secondary={{ label: 'Download Center', href: '/resources/downloads' }}
         nav={<SupportResourcesNav />}

@@ -1,14 +1,20 @@
-import { AboutOverview } from '@/components/oriana/about/overview/AboutOverview'
-import { aboutOverview } from '@/components/oriana/about/overview/aboutOverviewData'
-import { getLeadership } from '@/utilities/getLeadership'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = {
-  title: aboutOverview.meta.title,
-  description: aboutOverview.meta.description,
+import { AboutOverview } from '@/components/oriana/about/overview/AboutOverview'
+import { getLeadership } from '@/utilities/getLeadership'
+import { getAbout } from '@/utilities/getMarketing'
+import { mapAboutOverview } from '@/utilities/mapAboutOverview'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const about = await getAbout()
+  const content = mapAboutOverview(about)
+  return {
+    title: content.meta.title,
+    description: content.meta.description,
+  }
 }
 
 export default async function AboutPage() {
-  const leadership = await getLeadership()
-  return <AboutOverview content={aboutOverview} leadership={leadership} />
+  const [about, leadership] = await Promise.all([getAbout(), getLeadership()])
+  return <AboutOverview content={mapAboutOverview(about)} leadership={leadership} />
 }

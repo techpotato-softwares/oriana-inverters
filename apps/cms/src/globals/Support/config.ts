@@ -29,7 +29,7 @@ export const Support: GlobalConfig = {
   admin: {
     group: 'Support',
     description:
-      'Content for /support and its subpages. Any field left blank shows the current default copy.',
+      'Live on the public site: /support, /support/warranty, /support/security. Blank fields keep built-in defaults. Warranty coverage rows come from Support → Warranty plans (collection).',
   },
   access: {
     read: () => true,
@@ -195,7 +195,7 @@ export const Support: GlobalConfig = {
           description:
             '/support/warranty — the coverage table comes from Support → Warranty plans.',
           fields: [
-            subpageHero(),
+            subpageHero('hero', { image: true }),
             { name: 'matrixTitle', type: 'text' },
             cardList('steps', { label: 'Registration and claim steps' }),
             optionalLink('primary', 'Primary button'),
@@ -214,7 +214,7 @@ export const Support: GlobalConfig = {
           label: 'Security',
           description: '/support/security',
           fields: [
-            subpageHero(),
+            subpageHero('hero', { image: true }),
             visibleArray({
               name: 'sections',
               type: 'array',
@@ -237,7 +237,9 @@ export const Support: GlobalConfig = {
     },
   ],
   hooks: {
-    afterChange: [revalidateGlobal('support', ['/support'])],
+    afterChange: [
+      revalidateGlobal('support', ['/support', '/support/warranty', '/support/security']),
+    ],
   },
   versions: { drafts: true },
 }

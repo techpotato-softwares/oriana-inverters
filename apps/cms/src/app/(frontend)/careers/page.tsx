@@ -87,15 +87,34 @@ export default async function CareersPage() {
           }}
         />
       ) : null}
-      <WorkplaceSection content={content.workplace} />
+      <WorkplaceSection
+        content={{
+          ...content.workplace,
+          title: careers?.workplaceTitle?.trim() || content.workplace.title,
+          lead: careers?.workplaceLead?.trim() || content.workplace.lead,
+          closing: careers?.workplaceClosing?.trim() || content.workplace.closing,
+        }}
+      />
       <ValuesScroller
         id={content.values.id}
         eyebrow={content.values.eyebrow}
-        title={content.values.title}
+        title={careers?.valuesTitle?.trim() || content.values.title}
         values={content.values.items}
       />
-      <CultureSection content={content.culture} />
-      <SustainabilityCta content={content.cta} />
+      <CultureSection
+        content={{
+          ...content.culture,
+          title: careers?.cultureTitle?.trim() || content.culture.title,
+          body: careers?.cultureBody?.trim() || content.culture.body,
+        }}
+      />
+      <SustainabilityCta
+        content={{
+          ...content.cta,
+          title: careers?.ctaTitle?.trim() || content.cta.title,
+          body: careers?.ctaBody?.trim() || content.cta.body,
+        }}
+      />
 
       {showOpenings ? (
         <section

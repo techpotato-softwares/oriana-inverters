@@ -328,7 +328,7 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Images, videos, and documents. Organize with folders (Hero, Products, Icons, …).
+ * Images, videos, and documents (up to 200 MB). On AWS the browser uploads directly to S3 via a presigned URL so files are not limited by the ~6 MB Lambda body cap. Organize with folders (Hero, Products, Icons, …).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
@@ -3604,13 +3604,27 @@ export interface About {
     description?: string | null;
     image?: (number | null) | Media;
   };
+  /**
+   * Optional MP4 for the full-bleed hero. Poster uses the hero image when set.
+   */
+  heroVideo?: (number | null) | Media;
+  /**
+   * Fallback poster if hero image is empty.
+   */
+  heroPoster?: (number | null) | Media;
   storyTitle?: string | null;
+  /**
+   * Replaces the Who we are section body. First paragraph also feeds the intro band.
+   */
   storyParagraphs?:
     | {
         text: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Reserved for future use on the About hub.
+   */
   stats?:
     | {
         value: string;
@@ -3618,6 +3632,9 @@ export interface About {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Replaces the Why ORIANA cards when at least one reason is saved.
+   */
   values?:
     | {
         title: string;
@@ -3625,6 +3642,73 @@ export interface About {
         id?: string | null;
       }[]
     | null;
+  brandStory?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+      image?: (number | null) | Media;
+    };
+    /**
+     * Leave empty to keep the built-in origin story.
+     */
+    originParagraphs?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  visionMission?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+      image?: (number | null) | Media;
+    };
+    visionStatement?: string | null;
+    missionStatement?: string | null;
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  achievements?: {
+    /**
+     * Leave blank to keep the default copy.
+     */
+    hero?: {
+      eyebrow?: string | null;
+      title?: string | null;
+      description?: string | null;
+      image?: (number | null) | Media;
+    };
+    /**
+     * Replaces the “By the numbers” cards when saved. Image stays on the built-in defaults.
+     */
+    stats?:
+      | {
+          value: string;
+          label: string;
+          description?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    meta?: {
+      title?: string | null;
+      description?: string | null;
+    };
+  };
   leadership?: {
     /**
      * Hide the Leadership section on /about and the “Founded by” strip on /about/brand-story.
@@ -4373,10 +4457,21 @@ export interface Career {
   openingsHidden?: boolean | null;
   openingsTitle?: string | null;
   /**
-   * Where Apply buttons send candidates. Prefer the contact form with intent=career.
+   * Where Apply buttons send candidates. Prefer #apply on this page.
    */
   applyHref?: string | null;
   applyLabel?: string | null;
+  /**
+   * Leave blank to keep the built-in title.
+   */
+  workplaceTitle?: string | null;
+  workplaceLead?: string | null;
+  workplaceClosing?: string | null;
+  valuesTitle?: string | null;
+  cultureTitle?: string | null;
+  cultureBody?: string | null;
+  ctaTitle?: string | null;
+  ctaBody?: string | null;
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -4389,7 +4484,7 @@ export interface Career {
   createdAt?: string | null;
 }
 /**
- * Content for /support and its subpages. Any field left blank shows the current default copy.
+ * Live on the public site: /support, /support/warranty, /support/security. Blank fields keep built-in defaults. Warranty coverage rows come from Support → Warranty plans (collection).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "support".
@@ -4756,6 +4851,7 @@ export interface Support {
       eyebrow?: string | null;
       title?: string | null;
       description?: string | null;
+      image?: (number | null) | Media;
     };
     matrixTitle?: string | null;
     /**
@@ -4803,6 +4899,7 @@ export interface Support {
       eyebrow?: string | null;
       title?: string | null;
       description?: string | null;
+      image?: (number | null) | Media;
     };
     /**
      * Leave empty to keep the default sections. Separate paragraphs with a blank line.
@@ -5403,6 +5500,8 @@ export interface AboutSelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
+  heroVideo?: T;
+  heroPoster?: T;
   storyTitle?: T;
   storyParagraphs?:
     | T
@@ -5423,6 +5522,76 @@ export interface AboutSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         id?: T;
+      };
+  brandStory?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+              image?: T;
+            };
+        originParagraphs?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  visionMission?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+              image?: T;
+            };
+        visionStatement?: T;
+        missionStatement?: T;
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
+      };
+  achievements?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              description?: T;
+              image?: T;
+            };
+        stats?:
+          | T
+          | {
+              value?: T;
+              label?: T;
+              description?: T;
+              id?: T;
+            };
+        meta?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+            };
       };
   leadership?:
     | T
@@ -6002,6 +6171,14 @@ export interface CareersSelect<T extends boolean = true> {
   openingsTitle?: T;
   applyHref?: T;
   applyLabel?: T;
+  workplaceTitle?: T;
+  workplaceLead?: T;
+  workplaceClosing?: T;
+  valuesTitle?: T;
+  cultureTitle?: T;
+  cultureBody?: T;
+  ctaTitle?: T;
+  ctaBody?: T;
   seo?:
     | T
     | {
@@ -6247,6 +6424,7 @@ export interface SupportSelect<T extends boolean = true> {
               eyebrow?: T;
               title?: T;
               description?: T;
+              image?: T;
             };
         matrixTitle?: T;
         steps?:
@@ -6286,6 +6464,7 @@ export interface SupportSelect<T extends boolean = true> {
               eyebrow?: T;
               title?: T;
               description?: T;
+              image?: T;
             };
         sections?:
           | T

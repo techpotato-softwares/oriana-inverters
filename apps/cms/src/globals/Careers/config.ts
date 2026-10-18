@@ -49,15 +49,56 @@ export const Careers: GlobalConfig = {
             {
               name: 'applyHref',
               type: 'text',
-              defaultValue: '/contact?intent=career#contact-form',
+              defaultValue: '/careers#apply',
               admin: {
-                description: 'Where Apply buttons send candidates. Prefer the contact form with intent=career.',
+                description: 'Where Apply buttons send candidates. Prefer #apply on this page.',
               },
             },
             {
               name: 'applyLabel',
               type: 'text',
               defaultValue: 'Apply',
+            },
+            {
+              name: 'workplaceTitle',
+              type: 'text',
+              label: 'Workplace section title',
+              admin: { description: 'Leave blank to keep the built-in title.' },
+            },
+            {
+              name: 'workplaceLead',
+              type: 'textarea',
+              label: 'Workplace lead line',
+            },
+            {
+              name: 'workplaceClosing',
+              type: 'textarea',
+              label: 'Workplace closing paragraph',
+            },
+            {
+              name: 'valuesTitle',
+              type: 'text',
+              label: 'Values scroller title',
+            },
+            {
+              name: 'cultureTitle',
+              type: 'text',
+              label: 'Culture section title',
+            },
+            {
+              name: 'cultureBody',
+              type: 'textarea',
+              label: 'Culture body',
+            },
+            {
+              name: 'ctaTitle',
+              type: 'text',
+              label: 'Bottom CTA title',
+            },
+            {
+              name: 'ctaBody',
+              type: 'textarea',
+              label: 'Bottom CTA body',
             },
           ],
         },

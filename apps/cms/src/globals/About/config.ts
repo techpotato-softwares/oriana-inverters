@@ -37,22 +37,47 @@ export const About: GlobalConfig = {
       tabs: [
         {
           label: 'About us',
-          description: '/about',
+          description: '/about — leave blank to keep the built-in page copy',
           fields: [
             pageHeroFields,
             {
+              name: 'heroVideo',
+              type: 'upload',
+              relationTo: 'media',
+              label: 'Hero video',
+              admin: {
+                description:
+                  'Optional MP4 for the full-bleed hero. Poster uses the hero image when set.',
+              },
+            },
+            {
+              name: 'heroPoster',
+              type: 'upload',
+              relationTo: 'media',
+              label: 'Hero video poster',
+              admin: { description: 'Fallback poster if hero image is empty.' },
+            },
+            {
               name: 'storyTitle',
               type: 'text',
-              defaultValue: 'Our Story',
+              label: 'Who we are — title',
+              defaultValue: 'Built on Engineering. Driven by Energy.',
             },
             {
               name: 'storyParagraphs',
               type: 'array',
+              label: 'Who we are — paragraphs',
+              admin: {
+                description:
+                  'Replaces the Who we are section body. First paragraph also feeds the intro band.',
+              },
               fields: [{ name: 'text', type: 'textarea', required: true }],
             },
             {
               name: 'stats',
               type: 'array',
+              label: 'Highlight stats (optional)',
+              admin: { description: 'Reserved for future use on the About hub.' },
               fields: [
                 { name: 'value', type: 'text', required: true },
                 { name: 'label', type: 'text', required: true },
@@ -61,12 +86,74 @@ export const About: GlobalConfig = {
             {
               name: 'values',
               type: 'array',
-              labels: { singular: 'Value', plural: 'Values' },
+              label: 'Why ORIANA reasons',
+              labels: { singular: 'Reason', plural: 'Reasons' },
+              admin: {
+                description: 'Replaces the Why ORIANA cards when at least one reason is saved.',
+              },
               fields: [
                 { name: 'title', type: 'text', required: true },
                 { name: 'description', type: 'textarea', required: true },
               ],
             },
+          ],
+        },
+        {
+          name: 'brandStory',
+          label: 'Brand story',
+          description: '/about/brand-story',
+          fields: [
+            subpageHero('hero', { image: true }),
+            {
+              name: 'originParagraphs',
+              type: 'array',
+              label: 'Origin paragraphs',
+              admin: { description: 'Leave empty to keep the built-in origin story.' },
+              fields: [{ name: 'text', type: 'textarea', required: true }],
+            },
+            pageMeta(),
+          ],
+        },
+        {
+          name: 'visionMission',
+          label: 'Vision & Mission',
+          description: '/about/vision-mission',
+          fields: [
+            subpageHero('hero', { image: true }),
+            {
+              name: 'visionStatement',
+              type: 'textarea',
+              label: 'Vision statement',
+            },
+            {
+              name: 'missionStatement',
+              type: 'textarea',
+              label: 'Mission statement',
+            },
+            pageMeta(),
+          ],
+        },
+        {
+          name: 'achievements',
+          label: 'Achievements',
+          description: '/about/achievements',
+          fields: [
+            subpageHero('hero', { image: true }),
+            {
+              name: 'stats',
+              type: 'array',
+              label: 'Headline stats',
+              admin: {
+                description:
+                  'Replaces the “By the numbers” cards when saved. Image stays on the built-in defaults.',
+              },
+              fields: [
+                { name: 'value', type: 'text', required: true },
+                { name: 'label', type: 'text', required: true },
+                { name: 'description', type: 'textarea' },
+              ],
+            },
+            pageMeta(),
           ],
         },
         {
@@ -192,7 +279,17 @@ export const About: GlobalConfig = {
     },
   ],
   hooks: {
-    afterChange: [revalidateGlobal('about', ['/about', '/about/brand-story'])],
+    afterChange: [
+      revalidateGlobal('about', [
+        '/about',
+        '/about/brand-story',
+        '/about/vision-mission',
+        '/about/achievements',
+        '/about/certifications',
+        '/about/partners',
+        '/about/foundation',
+      ]),
+    ],
   },
   versions: { drafts: true },
 }

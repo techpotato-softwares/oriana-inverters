@@ -47,7 +47,7 @@ async function fetchHeaderNav(): Promise<HeaderNavView> {
         label: doc?.requestQuote?.label || defaultHeaderNav.requestQuote.label,
         href: quoteHref(doc?.requestQuote?.href),
       },
-      mainNav: defaultHeaderNav.mainNav,
+      mainNav: mergeMainNavLabels(doc?.primaryNav, defaultHeaderNav.mainNav),
     }
   } catch (error) {
     console.error('[getHeaderNav] failed:', error)
@@ -55,10 +55,28 @@ async function fetchHeaderNav(): Promise<HeaderNavView> {
   }
 }
 
+/** Apply CMS mega-menu labels onto the code-defined nav structure (structure stays in navigation.ts). */
+function mergeMainNavLabels(
+  primaryNav: { key?: string | null; label?: string | null }[] | null | undefined,
+  fallback: MainNavEntry[],
+): MainNavEntry[] {
+  if (!primaryNav?.length) return fallback
+  const byKey = new Map(
+    primaryNav.flatMap((item) =>
+      item.key && item.label?.trim() ? [[item.key, item.label.trim()] as const] : [],
+    ),
+  )
+  return fallback.map((item) => {
+    if (item.type === 'link') return item
+    const label = byKey.get(item.type)
+    return label ? { ...item, label } : item
+  })
+}
+
 function quoteHref(href: string | null | undefined): string {
   const value = href?.trim()
   if (!value || value === '/contact' || value === '/contact/') {
-    return '/contact?intent=quote#contact-form'
+    return '/contact/quote'
   }
   return value
 }

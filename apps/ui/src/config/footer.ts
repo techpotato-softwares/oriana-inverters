@@ -13,7 +13,7 @@ export const footerNav = [
     title: 'Partners',
     links: [
       { label: 'Become a Distributor', href: '/partners/become-a-distributor' },
-      { label: 'Find a Distributor', href: '/where-to-buy' },
+      { label: 'Become a Distributor', href: '/partners/become-a-distributor' },
     ],
   },
   {
