@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache'
 
 import { footerNav, socialLinks as defaultSocial } from '@/config/footer'
 import { getHiddenCategorySlugs } from '@/utilities/getCatalogue'
+import { DEFAULT_KEYWORDS, parseKeywords } from '@/utilities/seoKeywords'
 import { isHidden, resolveCmsList } from '@/utilities/visibility'
 import type {
   SiteFooterColumn,
@@ -11,6 +12,8 @@ import type {
   SiteSettingsView,
   SiteSocialLink,
 } from '@/types/siteSettings'
+
+export { parseKeywords } from '@/utilities/seoKeywords'
 
 const defaultLegalLinks: SiteNavLink[] = [
   { label: 'Privacy Policy', href: '/privacy' },
@@ -26,7 +29,8 @@ const defaultSettings: SiteSettingsView = {
   seoTitle: 'Oriana Inverters | Advanced Solar Inverter Solutions',
   seoTitleTemplate: '%s | Oriana Inverters',
   seoDescription:
-    'High-efficiency string, hybrid, and utility-scale solar inverters for residential, commercial, and utility applications.',
+    'High-efficiency string, hybrid, and utility-scale solar inverters for residential, commercial, and utility applications. Made in India by Oriana Inverters.',
+  seoKeywords: DEFAULT_KEYWORDS,
   twitterHandle: '@OrianaInverters',
   ogImageUrl: null,
   googleAnalyticsId: null,
@@ -162,6 +166,10 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
       seoTitle: text(doc.seoTitle, defaultSettings.seoTitle),
       seoTitleTemplate: text(doc.seoTitleTemplate, defaultSettings.seoTitleTemplate),
       seoDescription: text(doc.seoDescription, defaultSettings.seoDescription),
+      seoKeywords: parseKeywords(
+        (doc as { seoKeywords?: unknown }).seoKeywords,
+        defaultSettings.seoKeywords,
+      ),
       twitterHandle: text(doc.twitterHandle, defaultSettings.twitterHandle),
       ogImageUrl,
       googleAnalyticsId: optionalId(doc.googleAnalyticsId),
@@ -176,7 +184,7 @@ async function fetchSiteSettings(): Promise<SiteSettingsView> {
   }
 }
 
-const getCachedSiteSettings = unstable_cache(fetchSiteSettings, ['site-settings', 'footer-ia-2026-09'], {
+const getCachedSiteSettings = unstable_cache(fetchSiteSettings, ['site-settings', 'seo-keywords-2026-10'], {
   tags: ['global_site-settings'],
 })
 

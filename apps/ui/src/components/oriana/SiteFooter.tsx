@@ -63,6 +63,17 @@ export function SiteFooter({ settings }: { settings: SiteSettingsView }) {
             <div>
               <Logo variant="light" />
               <p className="mt-4 text-xs text-oriana-muted">{copyright}</p>
+              <p className="mt-2 text-xs text-oriana-muted">
+                Built with love by{' '}
+                <a
+                  href="https://techpotato.in"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-oriana-navy underline-offset-2 transition hover:text-oriana-blue hover:underline"
+                >
+                  TechPotato Software LLP
+                </a>
+              </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -84,12 +95,22 @@ export function SiteFooter({ settings }: { settings: SiteSettingsView }) {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-6 text-xs text-oriana-muted">
-            {settings.legalLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="hover:text-oriana-blue">
-                {link.label}
-              </Link>
-            ))}
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 text-xs text-oriana-muted">
+            <div className="flex flex-wrap gap-6">
+              {settings.legalLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="hover:text-oriana-blue">
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+            <a
+              href="https://techpotato.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-oriana-blue"
+            >
+              techpotato.in
+            </a>
           </div>
         </div>
       </footer>

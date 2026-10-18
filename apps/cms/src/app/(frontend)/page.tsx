@@ -13,16 +13,18 @@ import { VisionMissionSection } from '@/components/oriana/VisionMissionSection'
 import { WhyChooseOrianaSection } from '@/components/oriana/WhyChooseOrianaSection'
 import { HOME_SEO } from '@/data/homeFallback'
 import { getHiddenCategorySlugs } from '@/utilities/getCatalogue'
+import { metadataFromSeo } from '@/utilities/generateMeta'
 import { getHome } from '@/utilities/getMarketing'
 import { getSiteSettings } from '@/utilities/getSiteSettings'
 import { mapHomePage } from '@/utilities/mapHomePage'
 
 export async function generateMetadata(): Promise<Metadata> {
   const { home } = await getHome()
-  return {
+  return metadataFromSeo(home?.seo, {
     title: home?.seo?.metaTitle || HOME_SEO.metaTitle,
     description: home?.seo?.metaDescription || HOME_SEO.metaDescription,
-  }
+    path: '/',
+  })
 }
 
 export default async function HomePage() {

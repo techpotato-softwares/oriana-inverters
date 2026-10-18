@@ -20,6 +20,8 @@ export type SiteSettingsView = {
   seoTitle: string
   seoTitleTemplate: string
   seoDescription: string
+  /** Comma-separated or already-split site-wide keywords. */
+  seoKeywords: string[]
   twitterHandle: string
   ogImageUrl: string | null
   googleAnalyticsId: string | null

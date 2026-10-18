@@ -34,14 +34,16 @@ import {
   resolveLink,
   resolveText,
 } from '@/utilities/cmsContent'
+import { metadataFromSeo } from '@/utilities/generateMeta'
 import { isHidden, resolveCmsList, visibleItems } from '@/utilities/visibility'
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getSupport()
-  return {
+  return metadataFromSeo(data?.seo, {
     title: data?.seo?.metaTitle || supportMeta.title,
     description: data?.seo?.metaDescription || supportMeta.description,
-  }
+    path: '/support',
+  })
 }
 
 export default async function SupportPage() {

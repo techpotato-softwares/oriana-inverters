@@ -4,6 +4,7 @@ import React from 'react'
 
 import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery'
 import { SiteAnalytics, SiteAnalyticsNoscript } from '@/components/SiteAnalytics'
+import { SiteJsonLd } from '@/components/SiteJsonLd'
 import { SiteFooter } from '@/components/oriana/SiteFooter'
 import { SiteHeader } from '@/components/oriana/SiteHeader'
 import { Providers } from '@/providers'
@@ -43,11 +44,40 @@ export async function generateMetadata(): Promise<Metadata> {
       template: settings.seoTitleTemplate,
     },
     description: settings.seoDescription,
+    keywords: settings.seoKeywords,
+    authors: [
+      { name: settings.siteName },
+      { name: 'TechPotato Software LLP', url: 'https://techpotato.in' },
+    ],
+    creator: 'TechPotato Software LLP',
+    publisher: settings.siteName,
+    category: 'Solar Energy',
+    applicationName: settings.siteName,
+    referrer: 'origin-when-cross-origin',
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      nocache: false,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
     openGraph: mergeOpenGraph({
       siteName: settings.siteName,
       title: settings.seoTitle,
       description: settings.seoDescription,
       images: settings.ogImageUrl ? [{ url: settings.ogImageUrl }] : undefined,
+      locale: 'en_IN',
+      type: 'website',
     }),
     twitter: {
       card: 'summary_large_image',
@@ -66,6 +96,11 @@ export async function generateMetadata(): Promise<Metadata> {
       apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
     },
     manifest: '/site.webmanifest',
+    other: {
+      'geo.region': 'IN',
+      designer: 'TechPotato Software LLP',
+      copyright: settings.siteName,
+    },
   }
 }
 
@@ -121,6 +156,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SiteAnalytics
           googleAnalyticsId={settings.googleAnalyticsId}
           googleTagManagerId={settings.googleTagManagerId}
+        />
+        <SiteJsonLd
+          siteName={settings.siteName}
+          description={settings.seoDescription}
+          keywords={settings.seoKeywords}
         />
       </head>
       <body className="font-sans antialiased">

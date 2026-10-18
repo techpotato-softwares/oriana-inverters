@@ -16,6 +16,7 @@ import {
   type SectionIntro,
 } from '@/components/oriana/sustainability/sustainabilityData'
 import { getAwards, getSustainability, getSustainabilityReports } from '@/utilities/getMarketing'
+import { metadataFromSeo } from '@/utilities/generateMeta'
 import {
   isPlaceholderSustainabilityTitle,
   realSustainabilityHighlights,
@@ -50,12 +51,13 @@ function link(
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getSustainability()
-  return {
+  return metadataFromSeo(data?.seo, {
     title: data?.seo?.metaTitle || 'Sustainability',
     description:
       data?.seo?.metaDescription ||
       'How Oriana builds sustainability into every inverter: product longevity, responsible manufacturing in India, and circular lifecycles.',
-  }
+    path: '/sustainability',
+  })
 }
 
 export default async function SustainabilityPage() {

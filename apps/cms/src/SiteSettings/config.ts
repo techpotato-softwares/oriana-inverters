@@ -84,7 +84,17 @@ export const SiteSettings: GlobalConfig = {
               name: 'seoDescription',
               type: 'textarea',
               defaultValue:
-                'High-efficiency string, hybrid, and utility-scale solar inverters for residential, commercial, and utility applications.',
+                'High-efficiency string, hybrid, and utility-scale solar inverters for residential, commercial, and utility applications. Made in India by Oriana Inverters.',
+            },
+            {
+              name: 'seoKeywords',
+              type: 'textarea',
+              defaultValue:
+                'Oriana Inverters, solar inverter, solar inverters India, string inverter, hybrid inverter, utility scale inverter, on-grid inverter, energy storage, Make in India solar, TechPotato Software LLP',
+              admin: {
+                description:
+                  'Comma-separated default meta keywords (site-wide). Page SEO keywords override when set.',
+              },
             },
             {
               name: 'twitterHandle',
