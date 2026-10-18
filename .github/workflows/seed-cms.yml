@@ -97,10 +97,18 @@ jobs:
         run: |
           ENV="${{ github.event.inputs.environment }}"
           eval "$(./scripts/load-deploy-secrets.sh "$ENV")"
+          chmod +x ./scripts/load-media-env.sh
+          eval "$(./scripts/load-media-env.sh "$ENV")"
 
           if [ "$DB_PASSWORD" = "CHANGE_ME_UPDATE_IN_AWS_CONSOLE" ]; then
             echo "Update DB_PASSWORD in Secrets Manager /oriana-invertors-web/$ENV/database (QA) or run sync-rds-app-secret.sh (prod)"
             exit 1
+          fi
+
+          if [ -z "${S3_BUCKET:-}" ]; then
+            echo "::warning::S3_BUCKET unresolved — seed will keep existing photo relations and skip new uploads in CI"
+          else
+            echo "Media uploads → s3://${S3_BUCKET} (${S3_REGION:-$AWS_REGION})"
           fi
 
           echo "::add-mask::$PAYLOAD_SECRET"
@@ -114,6 +122,8 @@ jobs:
             echo "DATABASE_URL=$DATABASE_URL"
             echo "DB_SCHEMA=${DB_SCHEMA:-}"
             echo "PAYLOAD_DB_SCHEMA=${PAYLOAD_DB_SCHEMA:-}"
+            echo "S3_BUCKET=${S3_BUCKET:-}"
+            echo "S3_REGION=${S3_REGION:-$AWS_REGION}"
           } >> "$GITHUB_ENV"
 
           # Never pass schemaName=public to Payload (Drizzle rejects it)

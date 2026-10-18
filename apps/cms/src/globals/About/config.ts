@@ -237,7 +237,7 @@ export const About: GlobalConfig = {
           description:
             '/about/certifications — the listings come from the Certifications and Awards collections.',
           fields: [
-            subpageHero(),
+            subpageHero('hero', { image: true }),
             {
               type: 'row',
               fields: [
@@ -254,7 +254,7 @@ export const About: GlobalConfig = {
           label: 'Partners',
           description: '/about/partners — the partner names come from the Partners collection.',
           fields: [
-            subpageHero(),
+            subpageHero('hero', { image: true }),
             optionalLink('programmeLink', 'Partner programmes link'),
             emptyStateField,
             optionalLink('emptyCta', 'Coming-soon button'),
@@ -267,7 +267,7 @@ export const About: GlobalConfig = {
           description:
             '/about/foundation — the page shows a coming-soon message until at least one programme is added.',
           fields: [
-            subpageHero(),
+            subpageHero('hero', { image: true }),
             sectionIntro('intro', 'Intro'),
             cardList('programmes', { label: 'Programmes', image: true, link: true }),
             optionalLink('cta', 'Partner button'),

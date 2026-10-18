@@ -77,8 +77,7 @@ export function buildAboutGlobalData(images: AboutSeedImages = {}) {
         title: 'Founded by engineers. Led with purpose.',
         description: 'The people steering ORIANA’s product, manufacturing, and market journey.',
       },
-      // members left empty — use seed:leadership or built-in directors until edited
-      members: [],
+      // Do not set `members` — an empty array would wipe seeded directors + photos.
     },
     brandStory: {
       hero: {
@@ -206,7 +205,7 @@ export function buildAboutGlobalData(images: AboutSeedImages = {}) {
         description:
           'The Oriana Foundation focuses on skills, community energy access, and education around clean power.',
       },
-      programmes: [],
+      // Do not set `programmes` — an empty array would wipe CMS entries + images.
       cta: { label: 'Partner with us', href: '/contact/sales' },
       emptyDescription:
         'Foundation programmes will appear here once at least one programme is added in this tab.',

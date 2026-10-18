@@ -81,10 +81,18 @@ jobs:
         run: |
           ENV="${{ github.event.inputs.environment }}"
           eval "$(./scripts/load-deploy-secrets.sh "$ENV")"
+          chmod +x ./scripts/load-media-env.sh
+          eval "$(./scripts/load-media-env.sh "$ENV")"
 
           if [ "$DB_PASSWORD" = "CHANGE_ME_UPDATE_IN_AWS_CONSOLE" ]; then
             echo "Update DB_PASSWORD in Secrets Manager /oriana-invertors-web/$ENV/database (QA) or run sync-rds-app-secret.sh (prod)"
             exit 1
+          fi
+
+          if [ -z "${S3_BUCKET:-}" ]; then
+            echo "::warning::S3_BUCKET unresolved — seed will keep existing photo relations and skip new uploads in CI"
+          else
+            echo "Media uploads → s3://${S3_BUCKET} (${S3_REGION:-$AWS_REGION})"
           fi
 
           echo "::add-mask::$PAYLOAD_SECRET"
@@ -98,12 +106,27 @@ jobs:
             echo "DATABASE_URL=$DATABASE_URL"
             echo "DB_SCHEMA=${DB_SCHEMA:-}"
             echo "PAYLOAD_DB_SCHEMA=${PAYLOAD_DB_SCHEMA:-}"
+            echo "S3_BUCKET=${S3_BUCKET:-}"
+            echo "S3_REGION=${S3_REGION:-$AWS_REGION}"
           } >> "$GITHUB_ENV"
 
           if [ "${PAYLOAD_DB_SCHEMA:-}" = "public" ] || [ "${DB_SCHEMA:-}" = "public" ]; then
             echo "PAYLOAD_DB_SCHEMA=" >> "$GITHUB_ENV"
             echo "DB_SCHEMA=" >> "$GITHUB_ENV"
           fi
+
+      - name: Bootstrap schema (push tables)
+        working-directory: apps/cms
+        env:
+          # Payload only drizzle-pushes when NODE_ENV !== production
+          NODE_ENV: development
+          NODE_OPTIONS: "--dns-result-order=ipv4first"
+          PAYLOAD_FORCE_SCHEMA_PUSH: "true"
+          PAYLOAD_FORCE_DRIZZLE_PUSH: "true"
+          DRIZZLE_PUSH_NONINTERACTIVE: "true"
+          PG_POOL_MAX: "3"
+          PG_CONNECT_TIMEOUT_MS: "60000"
+        run: npm run schema:push
 
       - name: Build page list
         id: pages
@@ -144,7 +167,9 @@ jobs:
           echo "- Environment: \`$ENV\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Pages: \`${{ steps.pages.outputs.list }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Force overwrite: \`${{ github.event.inputs.force }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- S3_BUCKET: \`${S3_BUCKET:-unset}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Secrets: \`/$APP/${ENV}/database\` + \`/$APP/${ENV}/payload\` (via \`load-deploy-secrets.sh\`)" >> "$GITHUB_STEP_SUMMARY"
           echo "- Next: open Admin → **Support Pages** / **Sustainability** / **About Pages** and edit any tab, then publish." >> "$GITHUB_STEP_SUMMARY"
         env:
           APP: oriana-invertors-web
+          S3_BUCKET: ${{ env.S3_BUCKET }}
