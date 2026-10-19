@@ -21,6 +21,7 @@ import { megaMenus } from '@/config/navigation'
 import { defaultContactCards } from '@/utilities/contactDetails'
 import { footerNav, socialLinks as defaultSocialLinks } from '@/config/footer'
 import { buildAboutGlobalData } from '@/endpoints/seed/oriana/aboutDefaults'
+import { seedLaunchPage } from '@/endpoints/seed/oriana/seedLaunchPage'
 import { seedLegalPages } from '@/endpoints/seed/oriana/seedLegalPages'
 import { buildSupportGlobalData } from '@/endpoints/seed/oriana/supportDefaults'
 import { buildSustainabilityGlobalData } from '@/endpoints/seed/oriana/sustainabilityDefaults'
@@ -1020,6 +1021,7 @@ export async function seedOrianaContent({
   }
 
   await seedLegalPages(payload)
+  await seedLaunchPage(payload)
 
   payload.logger.info('— Oriana marketing content seed complete.')
 }

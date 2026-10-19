@@ -6,12 +6,14 @@ import { ImpactStats, NewsEventsSection } from '@/components/oriana/HomeSections
 import { FollowOrianaSection } from '@/components/oriana/FollowOrianaSection'
 import { GreenMissionSection } from '@/components/oriana/GreenMissionSection'
 import { IntroductionSection } from '@/components/oriana/IntroductionSection'
+import { LaunchCountdown } from '@/components/oriana/LaunchCountdown'
 import { PeekStackImages } from '@/components/oriana/PeekStackImages'
 import { ProductCategoriesSection } from '@/components/oriana/ProductCategoriesSection'
 import { VideoHero } from '@/components/oriana/VideoHero'
 import { VisionMissionSection } from '@/components/oriana/VisionMissionSection'
 import { WhyChooseOrianaSection } from '@/components/oriana/WhyChooseOrianaSection'
 import { HOME_SEO } from '@/data/homeFallback'
+import { isBeforeWebsiteLaunch } from '@/data/launchConfig'
 import { getHiddenCategorySlugs } from '@/utilities/getCatalogue'
 import { metadataFromSeo } from '@/utilities/generateMeta'
 import { getHome } from '@/utilities/getMarketing'
@@ -19,6 +21,14 @@ import { getSiteSettings } from '@/utilities/getSiteSettings'
 import { mapHomePage } from '@/utilities/mapHomePage'
 
 export async function generateMetadata(): Promise<Metadata> {
+  if (isBeforeWebsiteLaunch()) {
+    return {
+      title: 'Launching soon',
+      description: 'Oriana Inverters website launches on 20 October 2026 at 2:30 PM IST.',
+      robots: { index: false, follow: true },
+    }
+  }
+
   const { home } = await getHome()
   return metadataFromSeo(home?.seo, {
     title: home?.seo?.metaTitle || HOME_SEO.metaTitle,
@@ -28,13 +38,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
+  // Static gate until 20 Oct 2026, 2:30 PM IST — other routes stay open.
+  if (isBeforeWebsiteLaunch()) {
+    return <LaunchCountdown />
+  }
+
   const [{ home }, settings, hiddenCategorySlugs] = await Promise.all([
     getHome(),
     getSiteSettings(),
     getHiddenCategorySlugs(),
   ])
   const view = mapHomePage(home, settings.socialLinks, { hiddenCategorySlugs })
-
   let livePosts: {
     title: string
     slug: string

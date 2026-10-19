@@ -31,6 +31,7 @@ import { About } from './globals/About/config'
 import { Careers } from './globals/Careers/config'
 import { Contact } from './globals/Contact/config'
 import { Home } from './globals/Home/config'
+import { LaunchPage } from './globals/LaunchPage/config'
 import { PartnersPage } from './globals/PartnersPage/config'
 import { Support } from './globals/Support/config'
 import { Sustainability } from './globals/Sustainability/config'
@@ -193,6 +194,7 @@ export default buildConfig({
     Support,
     Sustainability,
     Contact,
+    LaunchPage,
   ],
   plugins,
   secret: process.env.PAYLOAD_SECRET,

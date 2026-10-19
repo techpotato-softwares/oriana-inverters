@@ -150,6 +150,7 @@ export interface Config {
     support: Support;
     sustainability: Sustainability;
     contact: Contact;
+    'launch-page': LaunchPage;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
@@ -162,6 +163,7 @@ export interface Config {
     support: SupportSelect<false> | SupportSelect<true>;
     sustainability: SustainabilitySelect<false> | SustainabilitySelect<true>;
     contact: ContactSelect<false> | ContactSelect<true>;
+    'launch-page': LaunchPageSelect<false> | LaunchPageSelect<true>;
   };
   locale: null;
   widgets: {
@@ -5273,6 +5275,39 @@ export interface Contact {
   createdAt?: string | null;
 }
 /**
+ * Countdown splash at /launch. Visitors see the timer, celebration, then redirect to the site. Disable to skip straight to the redirect URL.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "launch-page".
+ */
+export interface LaunchPage {
+  id: number;
+  /**
+   * When off, /launch immediately redirects to the redirect URL.
+   */
+  enabled?: boolean | null;
+  /**
+   * Timer length when the page loads (3–60).
+   */
+  countdownSeconds: number;
+  headline?: string | null;
+  subheadline?: string | null;
+  /**
+   * Shown when the countdown hits zero, before redirect.
+   */
+  launchMessage?: string | null;
+  /**
+   * Where to send visitors after the celebration (usually /).
+   */
+  redirectUrl: string;
+  /**
+   * How long to show the launch celebration (slower rocket + confetti) before navigating. Default 3200 ms.
+   */
+  redirectDelayMs: number;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -6760,6 +6795,22 @@ export interface ContactSelect<T extends boolean = true> {
         noIndex?: T;
       };
   _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "launch-page_select".
+ */
+export interface LaunchPageSelect<T extends boolean = true> {
+  enabled?: T;
+  countdownSeconds?: T;
+  headline?: T;
+  subheadline?: T;
+  launchMessage?: T;
+  redirectUrl?: T;
+  redirectDelayMs?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
