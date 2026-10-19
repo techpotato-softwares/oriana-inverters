@@ -203,7 +203,7 @@ export function LaunchCountdown() {
 
   return (
     <main
-      className="fixed inset-0 z-50 flex h-[100svh] max-h-[100svh] w-full flex-col items-center justify-center overflow-hidden bg-oriana-surface text-oriana-navy"
+      className="fixed inset-0 z-[60] flex h-[100svh] max-h-[100svh] w-full flex-col items-center overflow-x-hidden overflow-y-auto bg-oriana-surface text-oriana-navy"
       aria-live="polite"
     >
       <EnergyMesh className="pointer-events-none absolute inset-0 opacity-35" />
@@ -264,17 +264,21 @@ export function LaunchCountdown() {
         </motion.div>
       ) : null}
 
-      <div className="relative z-10 flex h-full w-full max-w-3xl flex-col items-center justify-center px-5 py-[3svh] text-center">
+      <div className="relative z-10 flex min-h-full w-full max-w-3xl flex-col items-center justify-center px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(1.75rem,env(safe-area-inset-top))] text-center">
         <motion.div
-          className="mb-[1.5svh] shrink-0"
-          animate={reduceMotion || celebrating ? { scale: 1 } : { scale: [1, 1.04, 1] }}
+          className="mb-[1.5svh] shrink-0 overflow-visible px-3 py-1"
+          animate={reduceMotion || celebrating ? { scale: 1 } : { scale: [1, 1.03, 1] }}
           transition={
             reduceMotion || celebrating
               ? undefined
               : { duration: 2.2, repeat: Infinity, ease: 'easeInOut' }
           }
         >
-          <Logo variant="light" priority className="h-[clamp(3rem,8.5svh,5.25rem)] w-auto" />
+          <Logo
+            variant="light"
+            priority
+            className="h-[clamp(2.75rem,7svh,4.5rem)] w-auto max-w-[min(68vw,15rem)] object-contain"
+          />
         </motion.div>
 
         {!celebrating ? (
