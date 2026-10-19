@@ -8,6 +8,7 @@ import {
   EnvironmentConfig,
   APP_NAME,
   cloudFrontHostnames,
+  customDomainActive,
 } from "../config/environment";
 import { S3Construct } from "../constructs/storage/s3-construct";
 import { RDSConstruct } from "../constructs/database/rds-construct";
@@ -78,7 +79,7 @@ export class OrianaInvertorsWebStack extends Stack {
 
     const mediaBucket = s3Construct?.getBucket("media");
     const repoRoot = path.join(__dirname, "../../../");
-    const publicOrigin = config.customDomain
+    const publicOrigin = customDomainActive(config)
       ? `https://${config.customDomain}`
       : process.env.NEXT_PUBLIC_SERVER_URL ||
         process.env.PAYLOAD_SERVER_URL ||

@@ -45,10 +45,22 @@ export interface EnvironmentConfig {
   customDomains?: string[];
   /** ACM certificate in us-east-1. Required whenever a custom domain is set. */
   cloudFrontCertificateArn?: string;
+  /**
+   * Attach the custom domain on this deploy. Leave false while the ACM
+   * certificate is still Pending validation — CloudFront rejects it.
+   */
+  attachCustomDomain?: boolean;
 }
+
+/** True only when the certificate is ready to attach to CloudFront. */
+export const customDomainActive = (config: EnvironmentConfig): boolean =>
+  Boolean(config.attachCustomDomain) &&
+  Boolean(config.customDomain?.trim()) &&
+  Boolean(config.cloudFrontCertificateArn?.trim());
 
 /** Hostnames CloudFront should accept. The canonical domain is first. */
 export const cloudFrontHostnames = (config: EnvironmentConfig): string[] => {
+  if (!customDomainActive(config)) return [];
   const hosts = [config.customDomain, ...(config.customDomains ?? [])];
   return [
     ...new Set(
@@ -136,12 +148,13 @@ export const environmentConfigs: Record<Environment, EnvironmentConfig> = {
       ssl: true,
       external: false,
     },
-    // Kept in this file so a later deploy does not drop the live hostname.
-    // The certificate must be Issued in us-east-1 and must cover every hostname below.
+    // Host and certificate stay here so a later deploy does not drop them.
+    // Flip attachCustomDomain to true only after ACM status is Issued.
     customDomain: "orianainverters.com",
     customDomains: ["www.orianainverters.com"],
     cloudFrontCertificateArn:
       "arn:aws:acm:us-east-1:856727777833:certificate/6bde73fd-b1a6-4ad5-ad86-232e249d505f",
+    attachCustomDomain: false,
   },
 };
 

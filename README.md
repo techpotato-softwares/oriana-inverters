@@ -128,10 +128,10 @@ AWS Console → **Secrets Manager** → `/oriana-invertors-web/qa/database` → 
 
 ## Go live (orianainverters.com)
 
-Production already knows the public host. `cdk/lib/config/environment.ts` attaches `orianainverters.com` and `www.orianainverters.com` to CloudFront with the us-east-1 certificate. Later deploys keep that hostname and set the app URL to `https://orianainverters.com`.
+The hostname and certificate ARN live in `cdk/lib/config/environment.ts`. CloudFront attaches them only when `attachCustomDomain` is `true`. That flag stays `false` while the certificate is **Pending validation** — a pending certificate fails the prod deploy with `The specified SSL certificate doesn't exist`.
 
-1. In AWS Certificate Manager (**us-east-1**), confirm the certificate status is **Issued** and that it covers both `orianainverters.com` and `www.orianainverters.com`.
-2. Push this change, then run **Actions → Deploy oriana-invertors-web → prod**.
+1. In AWS Certificate Manager (**us-east-1**), confirm the certificate status is **Issued** and that it covers both `orianainverters.com` and `www.orianainverters.com`. Add the ACM validation CNAME at GoDaddy first; issuance usually follows within 30 minutes.
+2. Set `attachCustomDomain: true` in the prod block, push, then run **Actions → Deploy oriana-invertors-web → prod**.
 3. Open the finished job summary and copy **DNS target** (`dxxxx.cloudfront.net`).
 4. At the domain’s DNS host, add:
    - `orianainverters.com` — Route 53 **A** and **AAAA** alias to that CloudFront distribution, or your registrar’s ALIAS / ANAME. A normal CNAME is not valid on the root name at most registrars.

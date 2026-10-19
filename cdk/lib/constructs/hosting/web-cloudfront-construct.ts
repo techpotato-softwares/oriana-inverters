@@ -9,6 +9,7 @@ import {
   EnvironmentConfig,
   APP_NAME,
   cloudFrontHostnames,
+  customDomainActive,
 } from "../../config/environment";
 
 export interface WebCloudFrontConstructProps {
@@ -118,7 +119,7 @@ export class WebCloudFrontConstruct extends Construct {
     });
 
     this.distributionUrl = `https://${this.distribution.distributionDomainName}`;
-    this.publicSiteUrl = config.customDomain
+    this.publicSiteUrl = customDomainActive(config)
       ? `https://${config.customDomain}`
       : this.distributionUrl;
 

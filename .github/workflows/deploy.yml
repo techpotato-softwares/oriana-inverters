@@ -183,7 +183,7 @@ jobs:
       - name: Build CMS
         working-directory: apps/cms
         env:
-          NEXT_PUBLIC_SERVER_URL: ${{ steps.env.outputs.environment == 'prod' && 'https://orianainverters.com' || vars.NEXT_PUBLIC_SERVER_URL || 'https://placeholder.cloudfront.net' }}
+          NEXT_PUBLIC_SERVER_URL: ${{ vars.NEXT_PUBLIC_SERVER_URL || 'https://placeholder.cloudfront.net' }}
           NEXT_IMAGE_UNOPTIMIZED: 'true'
           PAYLOAD_SECRET: ${{ env.PAYLOAD_SECRET }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
@@ -320,9 +320,9 @@ jobs:
             if [ -n "$CF_URL" ] && [ "$CF_URL" != "null" ]; then
               echo "- CloudFront: $CF_URL"
             fi
-            if [ "$ENV" = "prod" ] && [ -n "$CF_DOMAIN" ] && [ "$CF_DOMAIN" != "null" ]; then
+            if [ "$ENV" = "prod" ] && [ "$SITE_URL" = "https://orianainverters.com" ] && [ -n "$CF_DOMAIN" ] && [ "$CF_DOMAIN" != "null" ]; then
               echo "- DNS target: \`$CF_DOMAIN\`"
-              echo "- Point \`orianainverters.com\` (alias) and \`www\` (CNAME) at that name."
+              echo "- Point \`www\` (CNAME) at that name, and forward the root domain to \`https://www.orianainverters.com\`."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
