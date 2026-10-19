@@ -89,7 +89,7 @@ function ElectricWattField({ active }: { active: boolean }) {
       {[0, 1, 2].map((i) => (
         <motion.div
           key={`ring-${i}`}
-          className="absolute left-1/2 top-1/2 h-[42vmin] w-[42vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-oriana-sky/25"
+          className="absolute left-1/2 top-1/2 h-[32vmin] w-[32vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border border-oriana-sky/25 sm:h-[42vmin] sm:w-[42vmin]"
           initial={{ scale: 0.55 + i * 0.12, opacity: 0 }}
           animate={
             reduceMotion
@@ -126,7 +126,7 @@ function ElectricWattField({ active }: { active: boolean }) {
         <motion.svg
           key={`bolt-${i}`}
           viewBox="0 0 40 80"
-          className="absolute top-[8%] h-24 w-10 text-oriana-sun sm:h-32"
+          className="absolute top-[8%] h-16 w-7 text-oriana-sun sm:h-32 sm:w-10"
           style={{ left: bolt.x, scale: bolt.scale }}
           initial={{ opacity: 0 }}
           animate={
@@ -266,7 +266,7 @@ export function LaunchCountdown() {
 
       <div className="relative z-10 flex min-h-full w-full max-w-3xl flex-col items-center justify-center px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(1.75rem,env(safe-area-inset-top))] text-center">
         <motion.div
-          className="mb-[1.5svh] shrink-0 overflow-visible px-3 py-1"
+          className="mb-[1.5svh] shrink-0 overflow-visible px-4 py-2"
           animate={reduceMotion || celebrating ? { scale: 1 } : { scale: [1, 1.03, 1] }}
           transition={
             reduceMotion || celebrating
@@ -277,16 +277,13 @@ export function LaunchCountdown() {
           <Logo
             variant="light"
             priority
-            className="h-[clamp(2.75rem,7svh,4.5rem)] w-auto max-w-[min(68vw,15rem)] object-contain"
+            className="h-[clamp(2.5rem,6.5svh,4.5rem)] w-auto max-w-[min(72vw,14rem)] overflow-visible object-contain object-center"
           />
         </motion.div>
 
         {!celebrating ? (
           <>
-            <h1
-              className="shrink-0 font-display font-bold leading-tight tracking-[-0.02em] text-oriana-navy"
-              style={{ fontSize: 60, paddingTop: 24 }}
-            >
+            <h1 className="shrink-0 px-1 font-display text-[clamp(1.75rem,5.4svh,3.75rem)] font-bold leading-[1.12] tracking-[-0.02em] text-oriana-navy">
               We’re launching
             </h1>
 
@@ -337,7 +334,7 @@ export function LaunchCountdown() {
               immediate
               priority
               alt={`Orri ${orriPose}`}
-              className="mt-[2svh] w-[clamp(5.5rem,16svh,9rem)] shrink-0"
+              className="mt-[2svh] w-[clamp(5rem,14svh,9rem)] shrink-0"
               sizes="144px"
             />
           </>

@@ -20,11 +20,11 @@ export const Logo = (props: Props) => {
   return (
     <Image
       alt="Oriana Inverters"
-      width={190}
-      height={98}
+      width={824}
+      height={464}
       priority={priority}
       {...(priority ? {} : { loading })}
-      className={cn('h-11 w-auto md:h-14', className)}
+      className={cn('h-11 w-auto object-contain object-center md:h-14', className)}
       src={src}
     />
   )
