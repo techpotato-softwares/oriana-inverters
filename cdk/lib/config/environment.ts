@@ -152,8 +152,7 @@ export const environmentConfigs: Record<Environment, EnvironmentConfig> = {
     // ACM certificate is Issued; CloudFront attaches these names on prod deploy.
     customDomain: "orianainverters.com",
     customDomains: ["www.orianainverters.com"],
-    cloudFrontCertificateArn:
-      "arn:aws:acm:us-east-1:856727777833:certificate/6bde73fd-b1a6-4ad5-ad86-232e249d505f",
+    cloudFrontCertificateArn: "arn:aws:acm:us-east-1:856727777833:certificate/3f980f7d-3bfb-4f99-aadd-229902a4a082",
     attachCustomDomain: true,
   },
 };
