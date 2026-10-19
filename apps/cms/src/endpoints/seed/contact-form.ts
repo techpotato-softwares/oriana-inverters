@@ -89,12 +89,20 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
       width: 50,
     },
     {
+      name: 'phone',
+      blockName: 'phone',
+      blockType: 'text',
+      label: 'Phone',
+      required: true,
+      width: 50,
+    },
+    {
       name: 'company',
       blockName: 'company',
       blockType: 'text',
       label: 'Company',
       required: false,
-      width: 100,
+      width: 50,
     },
     {
       name: 'message',

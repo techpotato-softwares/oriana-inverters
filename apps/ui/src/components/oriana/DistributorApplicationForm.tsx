@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 
+import { FormHoneypot } from '@/components/oriana/FormHoneypot'
 import { OrriSuccess } from '@/components/oriana/mascot/OrriSuccess'
+import { PhoneField } from '@/components/oriana/PhoneField'
 
 const fieldClass =
   'w-full rounded-xl border border-oriana-navy/12 bg-oriana-surface px-4 py-3 text-sm text-oriana-navy focus:border-oriana-blue focus:outline-none focus:ring-2 focus:ring-oriana-blue/15'
@@ -38,6 +40,7 @@ export function DistributorApplicationForm({
           phone: String(fd.get('phone') ?? ''),
           cityState: String(fd.get('cityState') ?? ''),
           message: String(fd.get('message') ?? ''),
+          companyWebsite: String(fd.get('companyWebsite') ?? ''),
         }),
       })
 
@@ -66,7 +69,11 @@ export function DistributorApplicationForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-oriana-navy/8 bg-white p-8 shadow-sm lg:p-10">
+    <form
+      onSubmit={handleSubmit}
+      className="relative rounded-2xl border border-oriana-navy/8 bg-white p-8 shadow-sm lg:p-10"
+    >
+      <FormHoneypot />
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-oriana-navy" htmlFor="distributor-name">
@@ -99,12 +106,7 @@ export function DistributorApplicationForm({
             className={fieldClass}
           />
         </div>
-        <div>
-          <label className="mb-2 block text-sm font-medium text-oriana-navy" htmlFor="distributor-phone">
-            Phone
-          </label>
-          <input id="distributor-phone" name="phone" type="tel" required autoComplete="tel" className={fieldClass} />
-        </div>
+        <PhoneField id="distributor-phone" name="phone" label="Phone" required className={fieldClass} />
       </div>
       <div className="mt-5">
         <label className="mb-2 block text-sm font-medium text-oriana-navy" htmlFor="distributor-city">
