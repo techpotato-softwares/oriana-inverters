@@ -183,7 +183,7 @@ jobs:
       - name: Build CMS
         working-directory: apps/cms
         env:
-          NEXT_PUBLIC_SERVER_URL: ${{ vars.NEXT_PUBLIC_SERVER_URL || 'https://placeholder.cloudfront.net' }}
+          NEXT_PUBLIC_SERVER_URL: ${{ steps.env.outputs.environment == 'prod' && 'https://orianainverters.com' || vars.NEXT_PUBLIC_SERVER_URL || 'https://placeholder.cloudfront.net' }}
           NEXT_IMAGE_UNOPTIMIZED: 'true'
           PAYLOAD_SECRET: ${{ env.PAYLOAD_SECRET }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
@@ -276,12 +276,20 @@ jobs:
           echo "::add-mask::$PAYLOAD_SECRET"
 
           CF_URL=$(jq -r --arg s "$STACK" '.[$s] | to_entries[] | select(.key|test("CloudFrontURL")) | .value' "$OUT" 2>/dev/null | head -1)
+          PUBLIC_URL=$(jq -r --arg s "$STACK" '.[$s] | to_entries[] | select(.key|test("RecommendedServerURL")) | .value' "$OUT" 2>/dev/null | head -1)
+          CF_DOMAIN=$(jq -r --arg s "$STACK" '.[$s] | to_entries[] | select(.key|test("CloudFrontDomainName")) | .value' "$OUT" 2>/dev/null | head -1)
           MEDIA_BUCKET=$(jq -r --arg s "$STACK" '.[$s] | to_entries[] | select(.key|test("MediaBucketName")) | .value' "$OUT" 2>/dev/null | head -1)
+
+          # Prod keeps https://orianainverters.com. Other envs stay on the CloudFront hostname.
+          SITE_URL="$PUBLIC_URL"
+          if [ -z "$SITE_URL" ] || [ "$SITE_URL" = "null" ]; then
+            SITE_URL="${CF_URL:-https://placeholder.cloudfront.net}"
+          fi
 
           aws lambda get-function-configuration --function-name "$FN" --query 'Environment.Variables' --output json > /tmp/env.json 2>/dev/null || echo '{}' > /tmp/env.json
 
           jq \
-            --arg url "${CF_URL:-https://placeholder.cloudfront.net}" \
+            --arg url "$SITE_URL" \
             --arg db "$DATABASE_URL" \
             --arg ps "$PAYLOAD_SECRET" \
             --arg cs "$CRON_SECRET" \
@@ -305,9 +313,16 @@ jobs:
             if [ "$ENV" = "prod" ]; then
               echo "- RDS: \`oriana-web\` / schema \`oriana_invertors\`"
             fi
+            if [ -n "$SITE_URL" ] && [ "$SITE_URL" != "null" ]; then
+              echo "- Site: $SITE_URL"
+              echo "- Admin: $SITE_URL/admin"
+            fi
             if [ -n "$CF_URL" ] && [ "$CF_URL" != "null" ]; then
               echo "- CloudFront: $CF_URL"
-              echo "- Admin: $CF_URL/admin"
+            fi
+            if [ "$ENV" = "prod" ] && [ -n "$CF_DOMAIN" ] && [ "$CF_DOMAIN" != "null" ]; then
+              echo "- DNS target: \`$CF_DOMAIN\`"
+              echo "- Point \`orianainverters.com\` (alias) and \`www\` (CNAME) at that name."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 

@@ -46,6 +46,8 @@ const nextConfig: NextConfig = {
       allowedOrigins: [
         '*.cloudfront.net',
         'localhost:3000',
+        'orianainverters.com',
+        'www.orianainverters.com',
         ...(() => {
           try {
             return [new URL(NEXT_PUBLIC_SERVER_URL).host]

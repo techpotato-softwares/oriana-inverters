@@ -5,7 +5,11 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import { CfnOutput, Duration, RemovalPolicy } from "aws-cdk-lib";
-import { EnvironmentConfig, APP_NAME } from "../../config/environment";
+import {
+  EnvironmentConfig,
+  APP_NAME,
+  cloudFrontHostnames,
+} from "../../config/environment";
 
 export interface WebCloudFrontConstructProps {
   config: EnvironmentConfig;
@@ -20,6 +24,8 @@ export interface WebCloudFrontConstructProps {
 export class WebCloudFrontConstruct extends Construct {
   public readonly distribution: cloudfront.Distribution;
   public readonly distributionUrl: string;
+  /** Public site origin: custom domain when configured, otherwise CloudFront. */
+  public readonly publicSiteUrl: string;
   public readonly staticAssetsBucket: s3.Bucket;
 
   constructor(scope: Construct, id: string, props: WebCloudFrontConstructProps) {
@@ -27,8 +33,9 @@ export class WebCloudFrontConstruct extends Construct {
 
     const { config, functionUrl, mediaBucket } = props;
 
+    const domainNames = cloudFrontHostnames(config);
     const useCustomDomain =
-      Boolean(config.customDomain) && Boolean(config.cloudFrontCertificateArn);
+      domainNames.length > 0 && Boolean(config.cloudFrontCertificateArn);
     const certificate = useCustomDomain
       ? acm.Certificate.fromCertificateArn(
           this,
@@ -104,13 +111,16 @@ export class WebCloudFrontConstruct extends Construct {
         Object.keys(additionalBehaviors).length > 0
           ? additionalBehaviors
           : undefined,
-      domainNames: useCustomDomain ? [config.customDomain!] : undefined,
+      domainNames: useCustomDomain ? domainNames : undefined,
       certificate,
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
       priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
     });
 
     this.distributionUrl = `https://${this.distribution.distributionDomainName}`;
+    this.publicSiteUrl = config.customDomain
+      ? `https://${config.customDomain}`
+      : this.distributionUrl;
 
     new CfnOutput(this, "CloudFrontURL", {
       value: this.distributionUrl,
@@ -118,8 +128,21 @@ export class WebCloudFrontConstruct extends Construct {
       exportName: `${APP_NAME}-CloudFrontURL-${config.environment}`,
     });
 
+    new CfnOutput(this, "CloudFrontDomainName", {
+      value: this.distribution.distributionDomainName,
+      description:
+        "DNS target. Point the public hostname at this name (CNAME or Route 53 alias).",
+      exportName: `${APP_NAME}-CloudFrontDomainName-${config.environment}`,
+    });
+
+    new CfnOutput(this, "PublicURL", {
+      value: this.publicSiteUrl,
+      description: "Canonical public site URL",
+      exportName: `${APP_NAME}-PublicURL-${config.environment}`,
+    });
+
     new CfnOutput(this, "AdminURL", {
-      value: `${this.distributionUrl}/admin`,
+      value: `${this.publicSiteUrl}/admin`,
       description: "Payload CMS admin URL",
       exportName: `${APP_NAME}-AdminURL-${config.environment}`,
     });

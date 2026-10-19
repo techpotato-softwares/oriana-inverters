@@ -39,9 +39,25 @@ export interface EnvironmentConfig {
   tags: Record<string, string>;
   features: FeatureFlags;
   database: DatabaseConfig;
+  /** Canonical public hostname. Payload and the Lambda server URL use this. */
   customDomain?: string;
+  /** Extra hostnames on the same CloudFront certificate (for example www). */
+  customDomains?: string[];
+  /** ACM certificate in us-east-1. Required whenever a custom domain is set. */
   cloudFrontCertificateArn?: string;
 }
+
+/** Hostnames CloudFront should accept. The canonical domain is first. */
+export const cloudFrontHostnames = (config: EnvironmentConfig): string[] => {
+  const hosts = [config.customDomain, ...(config.customDomains ?? [])];
+  return [
+    ...new Set(
+      hosts
+        .map((host) => host?.trim())
+        .filter((host): host is string => Boolean(host)),
+    ),
+  ];
+};
 
 const APP = process.env.APP_NAME || "oriana-invertors-web";
 
@@ -120,9 +136,12 @@ export const environmentConfigs: Record<Environment, EnvironmentConfig> = {
       ssl: true,
       external: false,
     },
-    customDomain: process.env.CUSTOM_DOMAIN || undefined,
+    // Kept in this file so a later deploy does not drop the live hostname.
+    // The certificate must be Issued in us-east-1 and must cover every hostname below.
+    customDomain: "orianainverters.com",
+    customDomains: ["www.orianainverters.com"],
     cloudFrontCertificateArn:
-      process.env.CLOUDFRONT_CERTIFICATE_ARN || undefined,
+      "arn:aws:acm:us-east-1:856727777833:certificate/6bde73fd-b1a6-4ad5-ad86-232e249d505f",
   },
 };
 

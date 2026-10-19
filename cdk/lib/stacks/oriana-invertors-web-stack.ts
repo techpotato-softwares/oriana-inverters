@@ -4,7 +4,11 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 import * as cr from "aws-cdk-lib/custom-resources";
 import * as path from "path";
-import { EnvironmentConfig, APP_NAME } from "../config/environment";
+import {
+  EnvironmentConfig,
+  APP_NAME,
+  cloudFrontHostnames,
+} from "../config/environment";
 import { S3Construct } from "../constructs/storage/s3-construct";
 import { RDSConstruct } from "../constructs/database/rds-construct";
 import { WebLambdaConstruct } from "../constructs/core/web-lambda-construct";
@@ -74,8 +78,13 @@ export class OrianaInvertorsWebStack extends Stack {
 
     const mediaBucket = s3Construct?.getBucket("media");
     const repoRoot = path.join(__dirname, "../../../");
+    const publicOrigin = config.customDomain
+      ? `https://${config.customDomain}`
+      : process.env.NEXT_PUBLIC_SERVER_URL ||
+        process.env.PAYLOAD_SERVER_URL ||
+        "https://placeholder.cloudfront.net";
 
-    // Placeholder env — deploy workflow overwrites with Secrets Manager values + CloudFront URL
+    // Placeholder env — deploy workflow overwrites secrets and keeps this origin.
     const lambdaEnv: Record<string, string> = {
       DATABASE_URL:
         process.env.DATABASE_URL ||
@@ -99,14 +108,9 @@ export class OrianaInvertorsWebStack extends Stack {
       PG_POOL_MAX: "5",
       PG_CONNECT_TIMEOUT_MS: "20000",
       NODE_OPTIONS: "--dns-result-order=ipv4first",
-      NEXT_PUBLIC_SERVER_URL:
-        process.env.NEXT_PUBLIC_SERVER_URL ||
-        "https://placeholder.cloudfront.net",
-      // Runtime (not build-inlined). Deploy workflow overwrites with CloudFront URL.
-      PAYLOAD_SERVER_URL:
-        process.env.PAYLOAD_SERVER_URL ||
-        process.env.NEXT_PUBLIC_SERVER_URL ||
-        "https://placeholder.cloudfront.net",
+      NEXT_PUBLIC_SERVER_URL: publicOrigin,
+      // Runtime (not build-inlined). Deploy workflow keeps this on the custom domain.
+      PAYLOAD_SERVER_URL: publicOrigin,
     };
 
     if (rdsConstruct) {
@@ -148,10 +152,10 @@ export class OrianaInvertorsWebStack extends Stack {
     // Must be an AwsCustomResource — putting the CF domain on the bucket CORS property
     // creates a CloudFormation cycle (bucket ↔ distribution).
     if (mediaBucket) {
-      const corsOrigins = [cf.distributionUrl];
-      if (config.customDomain) {
-        corsOrigins.push(`https://${config.customDomain}`);
-      }
+      const corsOrigins = [
+        cf.distributionUrl,
+        ...cloudFrontHostnames(config).map((host) => `https://${host}`),
+      ];
       if (config.environment === "dev") {
         corsOrigins.push("http://localhost:3000");
       }
@@ -191,9 +195,9 @@ export class OrianaInvertorsWebStack extends Stack {
     }
 
     new CfnOutput(this, "RecommendedServerURL", {
-      value: cf.distributionUrl,
+      value: cf.publicSiteUrl,
       description:
-        "Set PAYLOAD_SERVER_URL (and NEXT_PUBLIC_SERVER_URL) on the Lambda to this value after deploy",
+        "Canonical origin written to PAYLOAD_SERVER_URL and NEXT_PUBLIC_SERVER_URL",
       exportName: `${APP_NAME}-RecommendedServerURL-${config.environment}`,
     });
 

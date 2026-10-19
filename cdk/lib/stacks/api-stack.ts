@@ -2,7 +2,7 @@ import { Stack, StackProps, Tags, RemovalPolicy } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as path from "path";
-import { EnvironmentConfig } from "../config/environment";
+import { EnvironmentConfig, cloudFrontHostnames } from "../config/environment";
 import { LambdaConstruct } from "../constructs/core/lambda-construct";
 import { ApiGatewayConstruct } from "../constructs/core/api-gateway-construct";
 import {
@@ -151,8 +151,8 @@ export class ApiStack extends Stack {
       if (cloudFrontUrl) {
         additionalCorsOrigins.push(cloudFrontUrl);
       }
-      if (config.customDomain) {
-        additionalCorsOrigins.push(`https://${config.customDomain}`);
+      for (const host of cloudFrontHostnames(config)) {
+        additionalCorsOrigins.push(`https://${host}`);
       }
 
       const s3Construct = new S3Construct(this, "S3Construct", {

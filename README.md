@@ -126,6 +126,21 @@ AWS Console → **Secrets Manager** → `/oriana-invertors-web/qa/database` → 
 | `/oriana-invertors-web/prod/database` | App connection: host, user, password, `DB_SCHEMA=oriana_invertors`, `DATABASE_URL` |
 | `/oriana-invertors-web/qa/database` | External Supabase connection (password set once in AWS Console) |
 
+## Go live (orianainverters.com)
+
+Production already knows the public host. `cdk/lib/config/environment.ts` attaches `orianainverters.com` and `www.orianainverters.com` to CloudFront with the us-east-1 certificate. Later deploys keep that hostname and set the app URL to `https://orianainverters.com`.
+
+1. In AWS Certificate Manager (**us-east-1**), confirm the certificate status is **Issued** and that it covers both `orianainverters.com` and `www.orianainverters.com`.
+2. Push this change, then run **Actions → Deploy oriana-invertors-web → prod**.
+3. Open the finished job summary and copy **DNS target** (`dxxxx.cloudfront.net`).
+4. At the domain’s DNS host, add:
+   - `orianainverters.com` — Route 53 **A** and **AAAA** alias to that CloudFront distribution, or your registrar’s ALIAS / ANAME. A normal CNAME is not valid on the root name at most registrars.
+   - `www` — **CNAME** to the same `dxxxx.cloudfront.net` value (no `https://`).
+5. Leave the certificate’s validation CNAME in place.
+6. After DNS updates, open `https://orianainverters.com` and `https://orianainverters.com/admin`. `www` serves the same site.
+
+CloudFront can take several minutes after the deploy before the new hostname is active. If the deploy fails because the certificate does not include one of the names, remove that name from `customDomain` / `customDomains` in the prod config and deploy again.
+
 ## Environments
 
 | Env | Database | Stack |
