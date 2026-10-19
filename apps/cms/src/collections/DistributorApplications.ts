@@ -1,23 +1,28 @@
 import type { CollectionConfig } from 'payload'
-import { APIError } from 'payload'
 
 import { anyone } from '@/access/anyone'
 import { authenticated } from '@/access/authenticated'
+import {
+  assertFormRateLimit,
+  assertHoneypotEmpty,
+  clientKeyFromHeaders,
+  FIELD_LIMITS,
+  sanitizeEmail,
+  sanitizeMessage,
+  sanitizePersonName,
+  sanitizePhone,
+  sanitizeShortText,
+} from '@/utilities/formSecurity'
+import { allowEditField, unlockedLeadFieldAccess } from '@/utilities/leadAdmin'
 import { sendDistributorApplicationEmail } from '@/utilities/sendDistributorApplicationEmail'
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-function text(value: unknown): string {
-  return typeof value === 'string' ? value.trim() : ''
-}
 
 export const DistributorApplications: CollectionConfig = {
   slug: 'distributor-applications',
   labels: { singular: 'Distributor application', plural: 'Distributor applications' },
   admin: {
     group: 'Forms & Leads',
-    useAsTitle: 'company',
-    defaultColumns: ['company', 'name', 'email', 'cityState', 'emailStatus', 'createdAt'],
+    useAsTitle: 'name',
+    defaultColumns: ['name', 'company', 'email', 'cityState', 'emailStatus', 'createdAt'],
     description: 'Applications submitted from Become a Distributor.',
   },
   access: {
@@ -27,12 +32,56 @@ export const DistributorApplications: CollectionConfig = {
     update: authenticated,
   },
   fields: [
-    { name: 'name', type: 'text', required: true },
-    { name: 'company', type: 'text', required: true },
-    { name: 'email', type: 'email', required: true },
-    { name: 'phone', type: 'text', required: true },
-    { name: 'cityState', type: 'text', required: true, label: 'City / State' },
-    { name: 'message', type: 'textarea', required: true },
+    {
+      name: 'companyWebsite',
+      type: 'text',
+      admin: { hidden: true },
+      access: { update: () => false },
+    },
+    allowEditField(),
+    {
+      name: 'name',
+      type: 'text',
+      label: 'Full name',
+      required: true,
+      maxLength: FIELD_LIMITS.name,
+      access: { update: unlockedLeadFieldAccess },
+    },
+    {
+      name: 'company',
+      type: 'text',
+      required: true,
+      maxLength: FIELD_LIMITS.company,
+      access: { update: unlockedLeadFieldAccess },
+    },
+    {
+      name: 'email',
+      type: 'email',
+      required: true,
+      access: { update: unlockedLeadFieldAccess },
+    },
+    {
+      name: 'phone',
+      type: 'text',
+      required: true,
+      maxLength: FIELD_LIMITS.phone,
+      access: { update: unlockedLeadFieldAccess },
+    },
+    {
+      name: 'cityState',
+      type: 'text',
+      required: true,
+      label: 'City / State',
+      maxLength: FIELD_LIMITS.city,
+      access: { update: unlockedLeadFieldAccess },
+    },
+    {
+      name: 'message',
+      type: 'textarea',
+      required: true,
+      maxLength: FIELD_LIMITS.message,
+      access: { update: unlockedLeadFieldAccess },
+    },
     {
       name: 'emailStatus',
       type: 'select',
@@ -51,22 +100,29 @@ export const DistributorApplications: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
-      async ({ data, operation }) => {
+      async ({ data, operation, req }) => {
         if (operation !== 'create' || !data) return data
 
-        const name = text(data.name)
-        const company = text(data.company)
-        const email = text(data.email)
-        const phone = text(data.phone)
-        const cityState = text(data.cityState)
-        const message = text(data.message)
+        assertHoneypotEmpty(data as Record<string, unknown>)
+        assertFormRateLimit({
+          key: `distributor-applications:${clientKeyFromHeaders(req.headers)}`,
+          limit: 5,
+        })
 
-        if (!name || !company || !email || !phone || !cityState || !message) {
-          throw new APIError('Please complete every field.', 400, null, true)
-        }
-        if (!EMAIL_PATTERN.test(email)) {
-          throw new APIError('Enter a valid email address.', 400, null, true)
-        }
+        const name = sanitizePersonName(data.name)
+        const company = sanitizeShortText(data.company, {
+          maxLength: FIELD_LIMITS.company,
+          required: true,
+          label: 'Company',
+        })
+        const email = sanitizeEmail(data.email)
+        const phone = sanitizePhone(data.phone)
+        const cityState = sanitizeShortText(data.cityState, {
+          maxLength: FIELD_LIMITS.city,
+          required: true,
+          label: 'City / State',
+        })
+        const message = sanitizeMessage(data.message, true)
 
         const emailStatus = await sendDistributorApplicationEmail({
           name,
@@ -76,6 +132,8 @@ export const DistributorApplications: CollectionConfig = {
           cityState,
           message,
         })
+
+        delete (data as Record<string, unknown>).companyWebsite
 
         return {
           ...data,

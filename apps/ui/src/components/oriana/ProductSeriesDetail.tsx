@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Activity, BarChart3, CircleChevronRight, Shield, Waves } from 'lucide-react'
+import { FormHoneypot } from '@/components/oriana/FormHoneypot'
+import { PhoneField } from '@/components/oriana/PhoneField'
 import { ProductImageCarousel } from './ProductImageCarousel'
 import {
   formatProductPowerLabel,
@@ -200,6 +202,7 @@ function ProductInquiryForm({
     const firstName = String(fd.get('firstName') ?? '').trim()
     const lastName = String(fd.get('lastName') ?? '').trim()
     const email = String(fd.get('email') ?? '').trim()
+    const phone = String(fd.get('phone') ?? '').trim()
     const role = String(fd.get('role') ?? '').trim()
     const city = String(fd.get('city') ?? '').trim()
     const name = [firstName, lastName].filter(Boolean).join(' ')
@@ -214,6 +217,7 @@ function ProductInquiryForm({
     const submissionData = [
       { field: 'name', value: name },
       { field: 'email', value: email },
+      { field: 'phone', value: phone },
       { field: 'company', value: role },
       { field: 'message', value: message },
     ].filter((row) => row.value)
@@ -230,7 +234,11 @@ function ProductInquiryForm({
       const res = await fetch('/api/form-submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ form: formId, submissionData }),
+        body: JSON.stringify({
+          form: formId,
+          submissionData,
+          companyWebsite: String(fd.get('companyWebsite') ?? ''),
+        }),
       })
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as {
@@ -257,7 +265,8 @@ function ProductInquiryForm({
     'w-full rounded-md border border-oriana-navy/12 bg-white px-4 py-3 text-sm text-oriana-navy placeholder:text-oriana-muted/70 focus:border-oriana-blue focus:outline-none focus:ring-2 focus:ring-oriana-blue/15'
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
+    <form onSubmit={handleSubmit} className="relative grid gap-4 sm:grid-cols-2">
+      <FormHoneypot />
       <label className="block text-sm text-oriana-navy">
         <span className="mb-2 block">Which best describes you?</span>
         <select name="role" required defaultValue="" className={fieldClass}>
@@ -280,10 +289,11 @@ function ProductInquiryForm({
         <span className="mb-2 block">Last Name</span>
         <input name="lastName" required autoComplete="family-name" className={fieldClass} />
       </label>
-      <label className="block text-sm text-oriana-navy sm:col-span-2">
+      <label className="block text-sm text-oriana-navy">
         <span className="mb-2 block">Email</span>
         <input name="email" type="email" required autoComplete="email" className={fieldClass} />
       </label>
+      <PhoneField name="phone" label="Phone" required className={fieldClass} />
       <label className="block text-sm text-oriana-navy sm:col-span-2">
         <span className="mb-2 block">City</span>
         <input name="city" autoComplete="address-level2" className={fieldClass} />

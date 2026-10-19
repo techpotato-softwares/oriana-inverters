@@ -21,6 +21,8 @@ import { megaMenus } from '@/config/navigation'
 import { defaultContactCards } from '@/utilities/contactDetails'
 import { footerNav, socialLinks as defaultSocialLinks } from '@/config/footer'
 import { buildAboutGlobalData } from '@/endpoints/seed/oriana/aboutDefaults'
+import { seedLaunchPage } from '@/endpoints/seed/oriana/seedLaunchPage'
+import { seedLegalPages } from '@/endpoints/seed/oriana/seedLegalPages'
 import { buildSupportGlobalData } from '@/endpoints/seed/oriana/supportDefaults'
 import { buildSustainabilityGlobalData } from '@/endpoints/seed/oriana/sustainabilityDefaults'
 
@@ -1018,101 +1020,8 @@ export async function seedOrianaContent({
     }
   }
 
-  // Legal pages via Pages collection
-  const legalPages = [
-    {
-      slug: 'privacy',
-      title: 'Privacy Policy',
-      sections: [
-        {
-          heading: 'Information We Collect',
-          body: 'We collect information you provide when requesting quotes, registering products, or contacting support. We also collect technical data via cookies and analytics.',
-        },
-        {
-          heading: 'How We Use Your Information',
-          body: 'Your information is used to respond to inquiries, process warranty registrations, and improve our products. We do not sell personal information.',
-        },
-        {
-          heading: 'Your Rights',
-          body: 'Request access, correction, or deletion by contacting privacy@orianainverters.com.',
-        },
-      ],
-    },
-    {
-      slug: 'terms',
-      title: 'Terms of Use',
-      sections: [
-        {
-          heading: 'Acceptance of Terms',
-          body: 'By accessing this website you agree to these Terms of Use.',
-        },
-        {
-          heading: 'Website Content',
-          body: 'Product specifications are for general reference. Always refer to the official datasheet for installed products.',
-        },
-        {
-          heading: 'Intellectual Property',
-          body: 'All trademarks, logos, and content are owned by Oriana Inverters or its licensors.',
-        },
-      ],
-    },
-    {
-      slug: 'disclaimer',
-      title: 'Disclaimer',
-      sections: [
-        {
-          heading: 'General',
-          body: 'Information on this website is provided for general informational purposes only.',
-        },
-        {
-          heading: 'Product Information',
-          body: 'Specifications are subject to change without notice. Consult the official datasheet for your model.',
-        },
-        {
-          heading: 'Third-Party Links',
-          body: 'Oriana does not endorse and is not responsible for content on third-party sites.',
-        },
-      ],
-    },
-  ]
-
-  for (const page of legalPages) {
-    const existing = await payload.find({
-      collection: 'pages',
-      where: { slug: { equals: page.slug } },
-      limit: 1,
-      overrideAccess: true,
-    })
-    const data = {
-      title: page.title,
-      slug: page.slug,
-      _status: 'published',
-      hero: { type: 'lowImpact' },
-      layout: [
-        {
-          blockType: 'contentPage',
-          sections: page.sections,
-        },
-      ],
-      meta: { title: page.title },
-    }
-    if (existing.docs[0]) {
-      await payload.update({
-        collection: 'pages',
-        id: existing.docs[0].id,
-        data: data as never,
-        overrideAccess: true,
-        context: { disableRevalidate: true },
-      })
-    } else {
-      await payload.create({
-        collection: 'pages',
-        data: data as never,
-        overrideAccess: true,
-        context: { disableRevalidate: true },
-      })
-    }
-  }
+  await seedLegalPages(payload)
+  await seedLaunchPage(payload)
 
   payload.logger.info('— Oriana marketing content seed complete.')
 }

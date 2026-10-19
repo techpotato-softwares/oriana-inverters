@@ -6,7 +6,9 @@ import { Building2, Headphones, Mail, MapPin, Phone, Wrench, type LucideIcon } f
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 
+import { FormHoneypot } from '@/components/oriana/FormHoneypot'
 import { OrriSuccess } from '@/components/oriana/mascot/OrriSuccess'
+import { PhoneField } from '@/components/oriana/PhoneField'
 import type { WebsiteForm, WebsiteFormField } from '@/utilities/getContactForm'
 
 export type ContactCard = {
@@ -46,7 +48,8 @@ const intentCopy: Record<ContactIntent, { title: string; placeholder: string; pr
 const fallbackFields: WebsiteFormField[] = [
   { blockType: 'text', name: 'name', label: 'Full Name', required: true, width: 50 },
   { blockType: 'email', name: 'email', label: 'Email', required: true, width: 50 },
-  { blockType: 'text', name: 'company', label: 'Company', width: 100 },
+  { blockType: 'text', name: 'phone', label: 'Phone', required: true, width: 50 },
+  { blockType: 'text', name: 'company', label: 'Company', width: 50 },
   { blockType: 'textarea', name: 'message', label: 'Project Details', required: true, width: 100 },
 ]
 
@@ -107,6 +110,30 @@ function isNamed(field: WebsiteFormField): field is NamedField {
   return field.blockType !== 'message'
 }
 
+function isPhoneField(field: NamedField): boolean {
+  if (field.name.toLowerCase() === 'phone') return true
+  return /phone|mobile|whatsapp/i.test(field.label || '')
+}
+
+const PHONE_FIELD: WebsiteFormField = {
+  blockType: 'text',
+  name: 'phone',
+  label: 'Phone',
+  required: true,
+  width: 50,
+}
+
+/** Sales / quote / contact share one Form Builder form — inject Phone when the CMS form omits it. */
+function withPhoneField(fields: WebsiteFormField[]): WebsiteFormField[] {
+  if (fields.some((field) => isNamed(field) && isPhoneField(field))) return fields
+  const emailAt = fields.findIndex((field) => isNamed(field) && field.name === 'email')
+  if (emailAt >= 0) {
+    return [...fields.slice(0, emailAt + 1), PHONE_FIELD, ...fields.slice(emailAt + 1)]
+  }
+  const rest = fields.slice(1)
+  return fields[0] ? [fields[0], PHONE_FIELD, ...rest] : [PHONE_FIELD, ...rest]
+}
+
 /** The field that receives the intent prefix and placeholder: `message`, else the first textarea. */
 function messageFieldName(fields: WebsiteFormField[]): string | undefined {
   const named = fields.filter(isNamed)
@@ -121,7 +148,7 @@ export function ContactForm({ cards, form, successMessage, intent }: ContactForm
   const formRef = useRef<HTMLFormElement>(null)
   const topic = asIntent(intent)
   const copy = topic ? intentCopy[topic] : null
-  const fields = form?.fields.length ? form.fields : fallbackFields
+  const fields = withPhoneField(form?.fields.length ? form.fields : fallbackFields)
   const messageName = messageFieldName(fields)
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
@@ -165,7 +192,8 @@ export function ContactForm({ cards, form, successMessage, intent }: ContactForm
     }
 
     const fd = new FormData(e.currentTarget)
-    const submissionData = form.fields.filter(isNamed).flatMap((field) => {
+    // Use rendered fields (includes injected Phone) so sales/quote submissions store the number.
+    const submissionData = fields.filter(isNamed).flatMap((field) => {
       if (field.blockType === 'checkbox') {
         return [{ field: field.name, value: fd.get(field.name) ? 'Yes' : 'No' }]
       }
@@ -181,7 +209,11 @@ export function ContactForm({ cards, form, successMessage, intent }: ContactForm
       const res = await fetch('/api/form-submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ form: form.id, submissionData }),
+        body: JSON.stringify({
+          form: form.id,
+          submissionData,
+          companyWebsite: String(fd.get('companyWebsite') ?? ''),
+        }),
       })
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { errors?: { message?: string }[] } | null
@@ -241,8 +273,9 @@ export function ContactForm({ cards, form, successMessage, intent }: ContactForm
           <form
             ref={formRef}
             onSubmit={handleSubmit}
-            className="rounded-2xl border border-oriana-navy/8 bg-white p-8 shadow-sm lg:p-10"
+            className="relative rounded-2xl border border-oriana-navy/8 bg-white p-8 shadow-sm lg:p-10"
           >
+            <FormHoneypot />
             <h2 className="font-display text-2xl font-bold text-oriana-navy">
               {copy?.title || 'Send a message'}
             </h2>
@@ -300,6 +333,20 @@ function FormFieldControl({
 
   const id = `contact-${field.name}`
   const span = field.width && field.width <= 50 ? '' : 'sm:col-span-2'
+
+  if (isPhoneField(field)) {
+    return (
+      <PhoneField
+        id={id}
+        name={field.name}
+        label={field.label || 'Phone'}
+        required={Boolean(field.required)}
+        className={inputClass}
+        wrapperClassName={span}
+      />
+    )
+  }
+
   const label = (
     <>
       {field.label || field.name}

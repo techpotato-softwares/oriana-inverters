@@ -27,6 +27,8 @@
     "seed:marketing-pages": "cross-env NODE_OPTIONS=--no-deprecation NODE_ENV=production payload run src/scripts/seed-marketing-pages.ts",
     "seed:full": "cross-env NODE_OPTIONS=--no-deprecation NODE_ENV=production payload run src/scripts/seed-full.ts",
     "seed:leadership": "cross-env NODE_OPTIONS=--no-deprecation NODE_ENV=production payload run src/scripts/seed-leadership.ts",
+    "seed:legal-pages": "cross-env NODE_OPTIONS=--no-deprecation NODE_ENV=production payload run src/scripts/seed-legal-pages.ts",
+    "seed:launch-page": "cross-env NODE_OPTIONS=--no-deprecation NODE_ENV=production payload run src/scripts/seed-launch-page.ts",
     "seed:admin": "cross-env NODE_OPTIONS=--no-deprecation NODE_ENV=production payload run src/scripts/create-admin.ts",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
   },

@@ -7,6 +7,7 @@ import { SiteAnalytics, SiteAnalyticsNoscript } from '@/components/SiteAnalytics
 import { SiteJsonLd } from '@/components/SiteJsonLd'
 import { SiteFooter } from '@/components/oriana/SiteFooter'
 import { SiteHeader } from '@/components/oriana/SiteHeader'
+import { SiteShell } from '@/components/oriana/SiteShell'
 import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { getCatalogueNav, getProductsMegaMenu, uniqueProductsMegaMenuImageUrls } from '@/utilities/getCatalogue'
@@ -181,9 +182,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </div>
         <Providers>
           <ChunkLoadRecovery />
-          <SiteHeader catalogueMenu={catalogueMenu} nav={nav} />
-          {children}
-          <SiteFooter settings={settings} />
+          <SiteShell
+            header={<SiteHeader catalogueMenu={catalogueMenu} nav={nav} />}
+            footer={<SiteFooter settings={settings} />}
+          >
+            {children}
+          </SiteShell>
         </Providers>
       </body>
     </html>

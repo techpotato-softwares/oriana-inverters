@@ -4,15 +4,28 @@ import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
 import { s3Storage } from '@payloadcms/storage-s3'
-import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, Plugin } from 'payload'
+import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, Field, Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
 
+import { authenticated } from '@/access/authenticated'
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import {
+  assertFormRateLimit,
+  assertHoneypotEmpty,
+  clientKeyFromHeaders,
+  sanitizePersonName,
+  sanitizeSubmissionData,
+} from '@/utilities/formSecurity'
+import {
+  allowEditField,
+  fullNameFromSubmissionData,
+  unlockedLeadFieldAccess,
+} from '@/utilities/leadAdmin'
 
 export const FORMS_GROUP = 'Forms & Leads'
 
@@ -117,7 +130,89 @@ export const plugins: Plugin[] = [
       admin: {
         group: FORMS_GROUP,
         description: 'Every contact and product enquiry submitted on the website.',
-        defaultColumns: ['form', 'createdAt'],
+        defaultColumns: ['fullName', 'form', 'createdAt'],
+        useAsTitle: 'fullName',
+      },
+      access: {
+        // Public create from the site; logged-in users may unlock and edit.
+        update: authenticated,
+      },
+      fields: ({ defaultFields }): Field[] => {
+        const lockedDefaults = defaultFields.map((field): Field => {
+          if (!('name' in field)) return field
+          if (field.name !== 'form' && field.name !== 'submissionData') return field
+          return {
+            ...field,
+            access: {
+              update: unlockedLeadFieldAccess,
+            },
+          } as Field
+        })
+        return [
+          {
+            name: 'fullName',
+            type: 'text',
+            label: 'Full name',
+            admin: {
+              description: 'Taken from the enquiry’s name field. Used as the document title.',
+              readOnly: true,
+            },
+          },
+          {
+            // Bot trap — public forms post this; must stay empty. Hidden from editors.
+            name: 'companyWebsite',
+            type: 'text',
+            admin: { hidden: true },
+            access: { update: () => false },
+          },
+          allowEditField(),
+          ...lockedDefaults,
+        ]
+      },
+      hooks: {
+        beforeChange: [
+          ({ data, operation, req }) => {
+            if (!data) return data
+            if (operation === 'create') {
+              assertHoneypotEmpty(data as Record<string, unknown>)
+              assertFormRateLimit({
+                key: `form-submissions:${clientKeyFromHeaders(req.headers)}`,
+              })
+              data.submissionData = sanitizeSubmissionData(data.submissionData)
+              // Never persist honeypot even if a client posts it as a top-level field.
+              delete (data as Record<string, unknown>).companyWebsite
+            } else if (Array.isArray(data.submissionData)) {
+              // Admin edits of older leads — scrub markup without re-enforcing new phone rules.
+              data.submissionData = sanitizeSubmissionData(data.submissionData, { mode: 'scrub' })
+            }
+            const fromRows = fullNameFromSubmissionData(data.submissionData)
+            if (fromRows) {
+              try {
+                data.fullName = sanitizePersonName(fromRows)
+              } catch {
+                data.fullName = fromRows.slice(0, 120)
+              }
+            } else if (typeof data.fullName === 'string' && data.fullName.trim()) {
+              try {
+                data.fullName = sanitizePersonName(data.fullName)
+              } catch {
+                data.fullName = String(data.fullName).trim().slice(0, 120)
+              }
+            } else {
+              data.fullName = 'Untitled enquiry'
+            }
+            return data
+          },
+        ],
+        afterRead: [
+          ({ doc }) => {
+            if (!doc) return doc
+            if (!doc.fullName) {
+              doc.fullName = fullNameFromSubmissionData(doc.submissionData) || 'Untitled enquiry'
+            }
+            return doc
+          },
+        ],
       },
     },
   }),

@@ -3,7 +3,9 @@
 import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
+import { FormHoneypot } from '@/components/oriana/FormHoneypot'
 import { OrriSuccess } from '@/components/oriana/mascot/OrriSuccess'
+import { PhoneField } from '@/components/oriana/PhoneField'
 
 const fieldClass =
   'w-full rounded-xl border border-oriana-navy/12 bg-oriana-surface px-4 py-3 text-sm text-oriana-navy focus:border-oriana-blue focus:outline-none focus:ring-2 focus:ring-oriana-blue/15'
@@ -44,6 +46,7 @@ function CareerApplicationFormInner() {
         location: String(fd.get('location') ?? ''),
         role,
         message: String(fd.get('message') ?? ''),
+        companyWebsite: String(fd.get('companyWebsite') ?? ''),
       }),
     )
 
@@ -82,7 +85,11 @@ function CareerApplicationFormInner() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-oriana-navy/8 bg-white p-8 shadow-sm lg:p-10">
+    <form
+      onSubmit={handleSubmit}
+      className="relative rounded-2xl border border-oriana-navy/8 bg-white p-8 shadow-sm lg:p-10"
+    >
+      <FormHoneypot />
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-oriana-navy" htmlFor="career-name">
@@ -96,12 +103,7 @@ function CareerApplicationFormInner() {
           </label>
           <input id="career-email" name="email" type="email" required autoComplete="email" className={fieldClass} />
         </div>
-        <div>
-          <label className="mb-2 block text-sm font-medium text-oriana-navy" htmlFor="career-phone">
-            Phone
-          </label>
-          <input id="career-phone" name="phone" type="tel" required autoComplete="tel" className={fieldClass} />
-        </div>
+        <PhoneField id="career-phone" name="phone" label="Phone" required className={fieldClass} />
         <div>
           <label className="mb-2 block text-sm font-medium text-oriana-navy" htmlFor="career-location">
             City
