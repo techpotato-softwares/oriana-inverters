@@ -39,12 +39,13 @@ export async function sendCareerApplicationEmail(
     auth: user && pass ? { user, pass } : undefined,
   })
 
+  const safe = (value: string) => value.replace(/[\r\n]+/g, ' ').trim()
   const lines = [
-    `Name: ${application.name}`,
-    `Email: ${application.email}`,
-    `Phone: ${application.phone}`,
-    `Location: ${application.location || '—'}`,
-    `Role: ${application.role || 'Open application'}`,
+    `Name: ${safe(application.name)}`,
+    `Email: ${safe(application.email)}`,
+    `Phone: ${safe(application.phone)}`,
+    `Location: ${safe(application.location) || '—'}`,
+    `Role: ${safe(application.role) || 'Open application'}`,
     '',
     application.message || 'No cover note.',
   ]
@@ -53,13 +54,15 @@ export async function sendCareerApplicationEmail(
     await transporter.sendMail({
       from,
       to,
-      replyTo: application.email,
-      subject: `Career application — ${application.name}${application.role ? ` (${application.role})` : ''}`,
+      replyTo: safe(application.email),
+      subject: safe(
+        `Career application — ${application.name}${application.role ? ` (${application.role})` : ''}`,
+      ),
       text: lines.join('\n'),
       attachments: application.attachment
         ? [
             {
-              filename: application.attachment.filename,
+              filename: safe(application.attachment.filename).replace(/[^\w.\-()+ ]+/g, '_'),
               content: application.attachment.content,
               contentType: application.attachment.contentType,
             },

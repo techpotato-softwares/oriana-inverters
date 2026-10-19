@@ -34,12 +34,13 @@ export async function sendDistributorApplicationEmail(
     auth: user && pass ? { user, pass } : undefined,
   })
 
+  const safe = (value: string) => value.replace(/[\r\n]+/g, ' ').trim()
   const lines = [
-    `Name: ${application.name}`,
-    `Company: ${application.company}`,
-    `Email: ${application.email}`,
-    `Phone: ${application.phone}`,
-    `City / State: ${application.cityState}`,
+    `Name: ${safe(application.name)}`,
+    `Company: ${safe(application.company)}`,
+    `Email: ${safe(application.email)}`,
+    `Phone: ${safe(application.phone)}`,
+    `City / State: ${safe(application.cityState)}`,
     '',
     application.message,
   ]
@@ -48,8 +49,8 @@ export async function sendDistributorApplicationEmail(
     await transporter.sendMail({
       from,
       to,
-      replyTo: application.email,
-      subject: `Distributor application — ${application.company}`,
+      replyTo: safe(application.email),
+      subject: safe(`Distributor application — ${application.company}`),
       text: lines.join('\n'),
     })
     return 'sent'

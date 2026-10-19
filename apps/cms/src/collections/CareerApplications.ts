@@ -5,16 +5,24 @@ import { APIError } from 'payload'
 
 import { anyone } from '@/access/anyone'
 import { authenticated } from '@/access/authenticated'
+import {
+  assertFormRateLimit,
+  assertHoneypotEmpty,
+  clientKeyFromHeaders,
+  FIELD_LIMITS,
+  sanitizeEmail,
+  sanitizeMessage,
+  sanitizePersonName,
+  sanitizePhone,
+  sanitizeShortText,
+  sanitizeUploadFilename,
+} from '@/utilities/formSecurity'
+import { allowEditField, unlockedLeadFieldAccess } from '@/utilities/leadAdmin'
 import { sendCareerApplicationEmail } from '@/utilities/sendCareerApplicationEmail'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MAX_RESUME_BYTES = 4 * 1024 * 1024
 const ALLOWED_EXTENSIONS = new Set(['pdf', 'doc', 'docx'])
-
-function text(value: unknown): string {
-  return typeof value === 'string' ? value.trim() : ''
-}
 
 type UploadedResume = {
   name?: string
@@ -49,12 +57,55 @@ export const CareerApplications: CollectionConfig = {
     filesRequiredOnCreate: true,
   },
   fields: [
-    { name: 'name', type: 'text', required: true },
-    { name: 'email', type: 'email', required: true },
-    { name: 'phone', type: 'text', required: true },
-    { name: 'location', type: 'text', label: 'City' },
-    { name: 'role', type: 'text', label: 'Role of interest' },
-    { name: 'message', type: 'textarea', label: 'Cover note' },
+    {
+      name: 'companyWebsite',
+      type: 'text',
+      admin: { hidden: true },
+      access: { update: () => false },
+    },
+    allowEditField(),
+    {
+      name: 'name',
+      type: 'text',
+      label: 'Full name',
+      required: true,
+      maxLength: FIELD_LIMITS.name,
+      access: { update: unlockedLeadFieldAccess },
+    },
+    {
+      name: 'email',
+      type: 'email',
+      required: true,
+      access: { update: unlockedLeadFieldAccess },
+    },
+    {
+      name: 'phone',
+      type: 'text',
+      required: true,
+      maxLength: FIELD_LIMITS.phone,
+      access: { update: unlockedLeadFieldAccess },
+    },
+    {
+      name: 'location',
+      type: 'text',
+      label: 'City',
+      maxLength: FIELD_LIMITS.city,
+      access: { update: unlockedLeadFieldAccess },
+    },
+    {
+      name: 'role',
+      type: 'text',
+      label: 'Role of interest',
+      maxLength: FIELD_LIMITS.role,
+      access: { update: unlockedLeadFieldAccess },
+    },
+    {
+      name: 'message',
+      type: 'textarea',
+      label: 'Cover note',
+      maxLength: FIELD_LIMITS.message,
+      access: { update: unlockedLeadFieldAccess },
+    },
     {
       name: 'emailStatus',
       type: 'select',
@@ -76,30 +127,36 @@ export const CareerApplications: CollectionConfig = {
       async ({ data, operation, req }) => {
         if (operation !== 'create' || !data) return data
 
-        const name = text(data.name)
-        const email = text(data.email)
-        const phone = text(data.phone)
-        const location = text(data.location)
-        const role = text(data.role)
-        const message = text(data.message)
-        const file = req.file as UploadedResume | undefined
-        const extension = file?.name?.split('.').pop()?.toLowerCase() || ''
+        assertHoneypotEmpty(data as Record<string, unknown>)
+        assertFormRateLimit({
+          key: `career-applications:${clientKeyFromHeaders(req.headers)}`,
+          limit: 5,
+        })
 
-        if (!name || !email || !phone) {
-          throw new APIError('Name, email, and phone are required.', 400, null, true)
-        }
-        if (!EMAIL_PATTERN.test(email)) {
-          throw new APIError('Enter a valid email address.', 400, null, true)
-        }
+        const name = sanitizePersonName(data.name)
+        const email = sanitizeEmail(data.email)
+        const phone = sanitizePhone(data.phone)
+        const location = sanitizeShortText(data.location, {
+          maxLength: FIELD_LIMITS.city,
+          label: 'City',
+        })
+        const role = sanitizeShortText(data.role, {
+          maxLength: FIELD_LIMITS.role,
+          label: 'Role',
+        })
+        const message = sanitizeMessage(data.message)
+        const file = req.file as UploadedResume | undefined
+
         if (!file?.data || !file.name) {
           throw new APIError('Upload a resume (PDF, DOC, or DOCX).', 400, null, true)
         }
-        if (!ALLOWED_EXTENSIONS.has(extension)) {
-          throw new APIError('Resume must be a PDF, DOC, or DOCX file.', 400, null, true)
-        }
+        const safeFilename = sanitizeUploadFilename(file.name, ALLOWED_EXTENSIONS)
         if ((file.size || file.data.length) > MAX_RESUME_BYTES) {
           throw new APIError('Resume must be 4 MB or smaller.', 400, null, true)
         }
+
+        // Mutate upload metadata so storage never keeps a hostile original name.
+        file.name = safeFilename
 
         const emailStatus = await sendCareerApplicationEmail({
           name,
@@ -109,11 +166,13 @@ export const CareerApplications: CollectionConfig = {
           role,
           message,
           attachment: {
-            filename: file.name,
+            filename: safeFilename,
             content: file.data,
             contentType: file.mimetype || 'application/octet-stream',
           },
         })
+
+        delete (data as Record<string, unknown>).companyWebsite
 
         return {
           ...data,

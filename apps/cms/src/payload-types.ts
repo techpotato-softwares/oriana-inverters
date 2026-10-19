@@ -1526,6 +1526,11 @@ export interface Distributor {
  */
 export interface DistributorApplication {
   id: number;
+  companyWebsite?: string | null;
+  /**
+   * Submissions open as view-only. Tick this, save, then edit fields. Untick again when finished.
+   */
+  allowEdit?: boolean | null;
   name: string;
   company: string;
   email: string;
@@ -1547,6 +1552,11 @@ export interface DistributorApplication {
  */
 export interface CareerApplication {
   id: number;
+  companyWebsite?: string | null;
+  /**
+   * Submissions open as view-only. Tick this, save, then edit fields. Untick again when finished.
+   */
+  allowEdit?: boolean | null;
   name: string;
   email: string;
   phone: string;
@@ -1756,6 +1766,15 @@ export interface Redirect {
  */
 export interface FormSubmission {
   id: number;
+  /**
+   * Taken from the enquiry’s name field. Used as the document title.
+   */
+  fullName?: string | null;
+  companyWebsite?: string | null;
+  /**
+   * Submissions open as view-only. Tick this, save, then edit fields. Untick again when finished.
+   */
+  allowEdit?: boolean | null;
   form: number | Form;
   submissionData?:
     | {
@@ -2692,6 +2711,8 @@ export interface DistributorsSelect<T extends boolean = true> {
  * via the `definition` "distributor-applications_select".
  */
 export interface DistributorApplicationsSelect<T extends boolean = true> {
+  companyWebsite?: T;
+  allowEdit?: T;
   name?: T;
   company?: T;
   email?: T;
@@ -2707,6 +2728,8 @@ export interface DistributorApplicationsSelect<T extends boolean = true> {
  * via the `definition` "career-applications_select".
  */
 export interface CareerApplicationsSelect<T extends boolean = true> {
+  companyWebsite?: T;
+  allowEdit?: T;
   name?: T;
   email?: T;
   phone?: T;
@@ -3031,6 +3054,9 @@ export interface FormsSelect<T extends boolean = true> {
  * via the `definition` "form-submissions_select".
  */
 export interface FormSubmissionsSelect<T extends boolean = true> {
+  fullName?: T;
+  companyWebsite?: T;
+  allowEdit?: T;
   form?: T;
   submissionData?:
     | T
