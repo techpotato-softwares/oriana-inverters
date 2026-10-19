@@ -149,12 +149,12 @@ export const environmentConfigs: Record<Environment, EnvironmentConfig> = {
       external: false,
     },
     // Host and certificate stay here so a later deploy does not drop them.
-    // Flip attachCustomDomain to true only after ACM status is Issued.
+    // ACM certificate is Issued; CloudFront attaches these names on prod deploy.
     customDomain: "orianainverters.com",
     customDomains: ["www.orianainverters.com"],
     cloudFrontCertificateArn:
       "arn:aws:acm:us-east-1:856727777833:certificate/6bde73fd-b1a6-4ad5-ad86-232e249d505f",
-    attachCustomDomain: false,
+    attachCustomDomain: true,
   },
 };
 
