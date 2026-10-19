@@ -53,6 +53,8 @@ export const Pages: CollectionConfig = {
   },
   admin: {
     group: 'Content',
+    description:
+      'Marketing and legal pages. Privacy Policy (slug: privacy), Terms of Use (slug: terms), and Disclaimer (slug: disclaimer) use a “Legal / content sections” block under the Content tab — edit section headings and body text there, then publish.',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
@@ -107,6 +109,8 @@ export const Pages: CollectionConfig = {
             },
           ],
           label: 'Content',
+          description:
+            'For legal pages (privacy / terms / disclaimer), add one “Legal / content sections” block and edit its sections. Other page types may use different blocks.',
         },
         {
           name: 'meta',

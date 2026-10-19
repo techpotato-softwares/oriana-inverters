@@ -44,7 +44,7 @@ export function ContentPage({
               {section.paragraphs.map((p) => (
                 <p
                   key={p.slice(0, 40)}
-                  className={`text-sm leading-relaxed text-oriana-muted ${section.heading ? 'mt-4' : ''}`}
+                  className={`whitespace-pre-line text-sm leading-relaxed text-oriana-muted ${section.heading ? 'mt-4' : ''}`}
                 >
                   {p}
                 </p>

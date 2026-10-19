@@ -198,6 +198,8 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Marketing and legal pages. Privacy Policy (slug: privacy), Terms of Use (slug: terms), and Disclaimer (slug: disclaimer) use a “Legal / content sections” block under the Content tab — edit section headings and body text there, then publish.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
@@ -690,8 +692,15 @@ export interface Product {
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
+    /**
+     * Comma-separated keywords for this page (also used in meta keywords). Prefer natural phrases over stuffing.
+     */
+    keywords?: string | null;
     ogImage?: (number | null) | Media;
     canonicalUrl?: string | null;
+    /**
+     * Ask search engines not to index this page (robots: noindex).
+     */
     noIndex?: boolean | null;
   };
   updatedAt: string;
@@ -1329,12 +1338,21 @@ export interface ContentPageBlock {
    * Hide this block from visitors without deleting it.
    */
   hidden?: boolean | null;
+  /**
+   * Used by Privacy Policy (/privacy), Terms of Use (/terms), and Disclaimer (/disclaimer). Edit heading + body per section; blank lines in Body become separate paragraphs on the site.
+   */
   sections: {
     /**
      * Hide this item from visitors without deleting it.
      */
     hidden?: boolean | null;
+    /**
+     * Section title (e.g. “Introduction and Acceptance”).
+     */
     heading: string;
+    /**
+     * Full section text. Use a blank line between paragraphs.
+     */
     body: string;
     id?: string | null;
   }[];
@@ -1427,8 +1445,15 @@ export interface CaseStudy {
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
+    /**
+     * Comma-separated keywords for this page (also used in meta keywords). Prefer natural phrases over stuffing.
+     */
+    keywords?: string | null;
     ogImage?: (number | null) | Media;
     canonicalUrl?: string | null;
+    /**
+     * Ask search engines not to index this page (robots: noindex).
+     */
     noIndex?: boolean | null;
   };
   updatedAt: string;
@@ -1647,8 +1672,15 @@ export interface Solution {
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
+    /**
+     * Comma-separated keywords for this page (also used in meta keywords). Prefer natural phrases over stuffing.
+     */
+    keywords?: string | null;
     ogImage?: (number | null) | Media;
     canonicalUrl?: string | null;
+    /**
+     * Ask search engines not to index this page (robots: noindex).
+     */
     noIndex?: boolean | null;
   };
   updatedAt: string;
@@ -2383,6 +2415,7 @@ export interface ProductsSelect<T extends boolean = true> {
     | {
         metaTitle?: T;
         metaDescription?: T;
+        keywords?: T;
         ogImage?: T;
         canonicalUrl?: T;
         noIndex?: T;
@@ -2596,6 +2629,7 @@ export interface CaseStudiesSelect<T extends boolean = true> {
     | {
         metaTitle?: T;
         metaDescription?: T;
+        keywords?: T;
         ogImage?: T;
         canonicalUrl?: T;
         noIndex?: T;
@@ -2781,6 +2815,7 @@ export interface SolutionsSelect<T extends boolean = true> {
     | {
         metaTitle?: T;
         metaDescription?: T;
+        keywords?: T;
         ogImage?: T;
         canonicalUrl?: T;
         noIndex?: T;
@@ -3242,6 +3277,10 @@ export interface SiteSetting {
   seoTitleTemplate?: string | null;
   seoDescription?: string | null;
   /**
+   * Comma-separated default meta keywords (site-wide). Page SEO keywords override when set.
+   */
+  seoKeywords?: string | null;
+  /**
    * Twitter/X handle including @.
    */
   twitterHandle?: string | null;
@@ -3579,8 +3618,15 @@ export interface Home {
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
+    /**
+     * Comma-separated keywords for this page (also used in meta keywords). Prefer natural phrases over stuffing.
+     */
+    keywords?: string | null;
     ogImage?: (number | null) | Media;
     canonicalUrl?: string | null;
+    /**
+     * Ask search engines not to index this page (robots: noindex).
+     */
     noIndex?: boolean | null;
   };
   _status?: ('draft' | 'published') | null;
@@ -3588,7 +3634,7 @@ export interface Home {
   createdAt?: string | null;
 }
 /**
- * About us and its subpages. Leave a field blank to keep the built-in copy.
+ * About us and its subpages. Leave a field blank to keep the built-in copy. To fill all tabs from site defaults: npm run seed:marketing-pages -- --pages=about --force
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "about".
@@ -3757,6 +3803,7 @@ export interface About {
       eyebrow?: string | null;
       title?: string | null;
       description?: string | null;
+      image?: (number | null) | Media;
     };
     certificationsTitle?: string | null;
     awardsTitle?: string | null;
@@ -3777,6 +3824,7 @@ export interface About {
       eyebrow?: string | null;
       title?: string | null;
       description?: string | null;
+      image?: (number | null) | Media;
     };
     programmeLink?: {
       label?: string | null;
@@ -3809,6 +3857,7 @@ export interface About {
       eyebrow?: string | null;
       title?: string | null;
       description?: string | null;
+      image?: (number | null) | Media;
     };
     /**
      * Leave blank to keep the default copy.
@@ -3819,7 +3868,7 @@ export interface About {
       description?: string | null;
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     programmes?:
       | {
@@ -3854,8 +3903,15 @@ export interface About {
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
+    /**
+     * Comma-separated keywords for this page (also used in meta keywords). Prefer natural phrases over stuffing.
+     */
+    keywords?: string | null;
     ogImage?: (number | null) | Media;
     canonicalUrl?: string | null;
+    /**
+     * Ask search engines not to index this page (robots: noindex).
+     */
     noIndex?: boolean | null;
   };
   _status?: ('draft' | 'published') | null;
@@ -3880,7 +3936,7 @@ export interface PartnersPage {
       description?: string | null;
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     tracks?:
       | {
@@ -3976,7 +4032,7 @@ export interface PartnersPage {
       description?: string | null;
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     coverage?:
       | {
@@ -3991,7 +4047,7 @@ export interface PartnersPage {
       | null;
     benefitsTitle?: string | null;
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     benefits?:
       | {
@@ -4078,7 +4134,7 @@ export interface PartnersPage {
       description?: string | null;
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     points?:
       | {
@@ -4130,7 +4186,7 @@ export interface PartnersPage {
       description?: string | null;
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     pillars?:
       | {
@@ -4217,7 +4273,7 @@ export interface PartnersPage {
     };
     stepsTitle?: string | null;
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     steps?:
       | {
@@ -4303,7 +4359,7 @@ export interface PartnersPage {
       description?: string | null;
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     paths?:
       | {
@@ -4319,7 +4375,7 @@ export interface PartnersPage {
         }[]
       | null;
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     enablement?:
       | {
@@ -4369,7 +4425,7 @@ export interface PartnersPage {
       description?: string | null;
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     topics?:
       | {
@@ -4475,8 +4531,15 @@ export interface Career {
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
+    /**
+     * Comma-separated keywords for this page (also used in meta keywords). Prefer natural phrases over stuffing.
+     */
+    keywords?: string | null;
     ogImage?: (number | null) | Media;
     canonicalUrl?: string | null;
+    /**
+     * Ask search engines not to index this page (robots: noindex).
+     */
     noIndex?: boolean | null;
   };
   _status?: ('draft' | 'published') | null;
@@ -4484,7 +4547,7 @@ export interface Career {
   createdAt?: string | null;
 }
 /**
- * Live on the public site: /support, /support/warranty, /support/security. Blank fields keep built-in defaults. Warranty coverage rows come from Support → Warranty plans (collection).
+ * Public site: /support, /support/warranty, /support/security. Each tab below maps to a section on the page — edit copy/media here. If tabs look empty, run: npm run seed:marketing-pages --workspace=@oriana/cms (or seed:support). Warranty table rows: Support → Warranty plans.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "support".
@@ -4493,7 +4556,7 @@ export interface Support {
   id: number;
   hub?: {
     /**
-     * Leave blank to keep the default copy.
+     * First thing visitors see. Seed fills these; change any field and publish.
      */
     hero?: {
       eyebrow?: string | null;
@@ -4520,7 +4583,7 @@ export interface Support {
       };
       quickLinksLabel?: string | null;
       /**
-       * Leave empty to keep the default quick links.
+       * Three shortcut chips under the hero.
        */
       quickLinks?:
         | {
@@ -4571,7 +4634,7 @@ export interface Support {
       description?: string | null;
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     items?:
       | {
@@ -4607,7 +4670,7 @@ export interface Support {
       href?: string | null;
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     steps?:
       | {
@@ -4635,9 +4698,6 @@ export interface Support {
       title?: string | null;
       description?: string | null;
     };
-    /**
-     * Leave empty to keep the default stats.
-     */
     stats?:
       | {
           /**
@@ -4659,7 +4719,7 @@ export interface Support {
     coverageLabel?: string | null;
     coverageBody?: string | null;
     /**
-     * Map pins. Position is a percentage from the top and left of the India outline, e.g. Delhi 29.2% / 30.2%, Bengaluru 83.1% / 31.5%.
+     * Position is % from top/left of the India outline (e.g. Delhi 29.2% / 30.2%).
      */
     locations?:
       | {
@@ -4674,7 +4734,7 @@ export interface Support {
         }[]
       | null;
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     pillars?:
       | {
@@ -4724,7 +4784,7 @@ export interface Support {
       description?: string | null;
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     items?:
       | {
@@ -4767,7 +4827,7 @@ export interface Support {
       };
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     items?:
       | {
@@ -4826,7 +4886,7 @@ export interface Support {
       href?: string | null;
     };
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     items?:
       | {
@@ -4855,7 +4915,7 @@ export interface Support {
     };
     matrixTitle?: string | null;
     /**
-     * Leave empty to keep the default cards.
+     * Add or edit rows here. An empty list uses built-in site copy until this section is seeded or filled.
      */
     steps?:
       | {
@@ -4902,7 +4962,7 @@ export interface Support {
       image?: (number | null) | Media;
     };
     /**
-     * Leave empty to keep the default sections. Separate paragraphs with a blank line.
+     * Separate paragraphs inside Body with a blank line.
      */
     sections?:
       | {
@@ -4931,8 +4991,15 @@ export interface Support {
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
+    /**
+     * Comma-separated keywords for this page (also used in meta keywords). Prefer natural phrases over stuffing.
+     */
+    keywords?: string | null;
     ogImage?: (number | null) | Media;
     canonicalUrl?: string | null;
+    /**
+     * Ask search engines not to index this page (robots: noindex).
+     */
     noIndex?: boolean | null;
   };
   _status?: ('draft' | 'published') | null;
@@ -4940,7 +5007,7 @@ export interface Support {
   createdAt?: string | null;
 }
 /**
- * Sustainability overview page: hero video, impact numbers, pillars, carbon estimator, commitments, and CTA. Empty fields fall back to default copy and stock media.
+ * Hub + Strategy tabs for /sustainability and /sustainability/strategy. Reports PDFs live in Sustainability Reports. To fill defaults: npm run seed:marketing-pages -- --pages=sustainability --force
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "sustainability".
@@ -5114,8 +5181,15 @@ export interface Sustainability {
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
+    /**
+     * Comma-separated keywords for this page (also used in meta keywords). Prefer natural phrases over stuffing.
+     */
+    keywords?: string | null;
     ogImage?: (number | null) | Media;
     canonicalUrl?: string | null;
+    /**
+     * Ask search engines not to index this page (robots: noindex).
+     */
     noIndex?: boolean | null;
   };
   _status?: ('draft' | 'published') | null;
@@ -5183,8 +5257,15 @@ export interface Contact {
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
+    /**
+     * Comma-separated keywords for this page (also used in meta keywords). Prefer natural phrases over stuffing.
+     */
+    keywords?: string | null;
     ogImage?: (number | null) | Media;
     canonicalUrl?: string | null;
+    /**
+     * Ask search engines not to index this page (robots: noindex).
+     */
     noIndex?: boolean | null;
   };
   _status?: ('draft' | 'published') | null;
@@ -5277,6 +5358,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   seoTitle?: T;
   seoTitleTemplate?: T;
   seoDescription?: T;
+  seoKeywords?: T;
   twitterHandle?: T;
   ogImage?: T;
   googleAnalyticsId?: T;
@@ -5478,6 +5560,7 @@ export interface HomeSelect<T extends boolean = true> {
     | {
         metaTitle?: T;
         metaDescription?: T;
+        keywords?: T;
         ogImage?: T;
         canonicalUrl?: T;
         noIndex?: T;
@@ -5625,6 +5708,7 @@ export interface AboutSelect<T extends boolean = true> {
               eyebrow?: T;
               title?: T;
               description?: T;
+              image?: T;
             };
         certificationsTitle?: T;
         awardsTitle?: T;
@@ -5645,6 +5729,7 @@ export interface AboutSelect<T extends boolean = true> {
               eyebrow?: T;
               title?: T;
               description?: T;
+              image?: T;
             };
         programmeLink?:
           | T
@@ -5675,6 +5760,7 @@ export interface AboutSelect<T extends boolean = true> {
               eyebrow?: T;
               title?: T;
               description?: T;
+              image?: T;
             };
         intro?:
           | T
@@ -5713,6 +5799,7 @@ export interface AboutSelect<T extends boolean = true> {
     | {
         metaTitle?: T;
         metaDescription?: T;
+        keywords?: T;
         ogImage?: T;
         canonicalUrl?: T;
         noIndex?: T;
@@ -6184,6 +6271,7 @@ export interface CareersSelect<T extends boolean = true> {
     | {
         metaTitle?: T;
         metaDescription?: T;
+        keywords?: T;
         ogImage?: T;
         canonicalUrl?: T;
         noIndex?: T;
@@ -6493,6 +6581,7 @@ export interface SupportSelect<T extends boolean = true> {
     | {
         metaTitle?: T;
         metaDescription?: T;
+        keywords?: T;
         ogImage?: T;
         canonicalUrl?: T;
         noIndex?: T;
@@ -6625,6 +6714,7 @@ export interface SustainabilitySelect<T extends boolean = true> {
     | {
         metaTitle?: T;
         metaDescription?: T;
+        keywords?: T;
         ogImage?: T;
         canonicalUrl?: T;
         noIndex?: T;
@@ -6664,6 +6754,7 @@ export interface ContactSelect<T extends boolean = true> {
     | {
         metaTitle?: T;
         metaDescription?: T;
+        keywords?: T;
         ogImage?: T;
         canonicalUrl?: T;
         noIndex?: T;

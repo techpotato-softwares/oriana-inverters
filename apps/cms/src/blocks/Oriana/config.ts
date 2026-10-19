@@ -70,15 +70,37 @@ export const CtaBand: Block = {
 export const ContentPageSections: Block = {
   slug: 'contentPage',
   interfaceName: 'ContentPageBlock',
-  labels: { singular: 'Content sections', plural: 'Content sections' },
+  labels: {
+    singular: 'Legal / content sections',
+    plural: 'Legal / content sections',
+  },
   fields: [
     visibleArray({
       name: 'sections',
       type: 'array',
+      labels: { singular: 'Section', plural: 'Sections' },
       required: true,
+      admin: {
+        description:
+          'Used by Privacy Policy (/privacy), Terms of Use (/terms), and Disclaimer (/disclaimer). Edit heading + body per section; blank lines in Body become separate paragraphs on the site.',
+        initCollapsed: false,
+      },
       fields: [
-        { name: 'heading', type: 'text', required: true },
-        { name: 'body', type: 'textarea', required: true },
+        {
+          name: 'heading',
+          type: 'text',
+          required: true,
+          admin: { description: 'Section title (e.g. “Introduction and Acceptance”).' },
+        },
+        {
+          name: 'body',
+          type: 'textarea',
+          required: true,
+          admin: {
+            rows: 12,
+            description: 'Full section text. Use a blank line between paragraphs.',
+          },
+        },
       ],
     }),
   ],
