@@ -16,11 +16,12 @@ import {
   HOME_WHY_CHOOSE,
 } from '@/data/homeFallback'
 import type { SiteSocialLink } from '@/types/siteSettings'
+import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { isHidden, resolveCmsList } from '@/utilities/visibility'
 
 function mediaUrl(value: unknown): string | undefined {
   if (value && typeof value === 'object' && 'url' in value && typeof value.url === 'string') {
-    return value.url || undefined
+    return value.url ? getMediaUrl(value.url) : undefined
   }
   return undefined
 }

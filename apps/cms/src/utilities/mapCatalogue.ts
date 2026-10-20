@@ -6,6 +6,7 @@ import type {
   CatalogueProduct,
   CatalogueSegmentImage,
 } from '@/types/catalogue'
+import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { productPageFromDoc } from '@/utilities/mapProductPage'
 
 const segmentLabels: Record<string, string> = {
@@ -28,8 +29,8 @@ function mediaUrl(media?: number | Media | null): string | null {
   if (!media || typeof media === 'number') return null
   const url = media.url?.trim()
   if (!url) return null
-  if (/^https?:\/\//i.test(url) || url.startsWith('/')) return url
-  return `/${url}`
+  if (/^https?:\/\//i.test(url) || url.startsWith('/')) return getMediaUrl(url)
+  return getMediaUrl(`/${url}`)
 }
 
 function productGallery(doc: Product): CatalogueProduct['gallery'] {

@@ -9,6 +9,7 @@ import type {
   PageMeta,
 } from '@/components/oriana/marketing/types'
 import type { Media } from '@/payload-types'
+import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { isHidden, resolveCmsList } from '@/utilities/visibility'
 
 type Maybe<T> = T | null | undefined
@@ -38,7 +39,7 @@ type CmsCard = {
 export function mediaUrl(value: unknown): string | undefined {
   if (value && typeof value === 'object' && 'url' in value) {
     const url = (value as Media).url
-    if (url) return url
+    if (url) return getMediaUrl(url)
   }
   return undefined
 }
