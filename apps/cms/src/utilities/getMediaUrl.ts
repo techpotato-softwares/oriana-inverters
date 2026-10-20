@@ -14,7 +14,7 @@
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
   if (!url) return ''
 
-  let next = toSiteRelative(url)
+  const next = toSiteRelative(url)
   if (!cacheTag) return next
 
   // Payload already appends `?prefix=…` for S3-backed uploads, so a second `?`
