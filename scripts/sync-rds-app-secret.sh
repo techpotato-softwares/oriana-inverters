@@ -138,12 +138,27 @@ export PGPASSWORD="$DB_PASSWORD"
 export PGSSLMODE=require
 
 echo "Ensuring schema \"${SCHEMA}\" exists…"
-psql \
-  -h "$ENDPOINT" \
-  -p "$PORT" \
-  -U "$DB_USER" \
-  -d "$DB_NAME" \
-  -v ON_ERROR_STOP=1 \
-  -c "CREATE SCHEMA IF NOT EXISTS ${SCHEMA}; GRANT ALL ON SCHEMA ${SCHEMA} TO ${DB_USER}; ALTER ROLE ${DB_USER} SET search_path TO ${SCHEMA}, public;"
+SCHEMA_OK=0
+for i in $(seq 1 12); do
+  if psql \
+    -h "$ENDPOINT" \
+    -p "$PORT" \
+    -U "$DB_USER" \
+    -d "$DB_NAME" \
+    -v ON_ERROR_STOP=1 \
+    -c "CREATE SCHEMA IF NOT EXISTS ${SCHEMA}; GRANT ALL ON SCHEMA ${SCHEMA} TO ${DB_USER}; ALTER ROLE ${DB_USER} SET search_path TO ${SCHEMA}, public;"
+  then
+    SCHEMA_OK=1
+    break
+  fi
+  echo "  schema ensure failed (attempt ${i}/12) — RDS connection slots may be exhausted; retrying…"
+  sleep 5
+done
+
+if [[ "$SCHEMA_OK" != "1" ]]; then
+  echo "WARNING: could not connect to create/verify schema ${SCHEMA} (remaining slots reserved for rds_reserved)."
+  echo "App secret was still updated. Schema likely already exists from a prior deploy."
+  echo "Free slots, then re-run: SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE state = 'idle' AND pid <> pg_backend_pid();"
+fi
 
 echo "RDS app secret + schema sync complete."

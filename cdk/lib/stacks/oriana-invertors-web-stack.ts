@@ -106,7 +106,8 @@ export class OrianaInvertorsWebStack extends Stack {
       S3_REGION: Stack.of(this).region,
       // Prefer Supabase transaction pooler (:6543). Publish needs several concurrent
       // clients (locks + relations); keep modest so warm Lambdas don't exhaust pooler.
-      PG_POOL_MAX: "5",
+      // t4g.micro ~80 connections; each warm Lambda holds this many. Keep tiny on shared RDS.
+      PG_POOL_MAX: "2",
       PG_CONNECT_TIMEOUT_MS: "20000",
       NODE_OPTIONS: "--dns-result-order=ipv4first",
       NEXT_PUBLIC_SERVER_URL: publicOrigin,

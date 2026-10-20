@@ -225,6 +225,8 @@ SYNC_PAGES=(
   /careers
   /case-studies
   /search
+  /news
+  /posts
 )
 
 wait_for_lambda_html() {

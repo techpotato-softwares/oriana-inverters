@@ -134,7 +134,7 @@ export default buildConfig({
         process.env.PG_POOL_MAX ||
           // Payload holds 1 client for reconnect; drizzle push needs extras.
           // max=1 causes "timeout exceeded when trying to connect" during push.
-          (process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 3 : 5),
+          (process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 3 : 2),
       ),
       idleTimeoutMillis: process.env.PAYLOAD_DATABASE_PUSH === 'true' ? 1000 : 5_000,
       connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 20_000),
