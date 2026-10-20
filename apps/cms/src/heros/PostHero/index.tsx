@@ -15,66 +15,68 @@ export const PostHero: React.FC<{
     populatedAuthors && populatedAuthors.length > 0 && formatAuthors(populatedAuthors) !== ''
 
   return (
-    <div className="relative -mt-[10.4rem] flex items-end">
-      <div className="container z-10 relative lg:grid lg:grid-cols-[1fr_48rem_1fr] text-white pb-8">
-        <div className="col-start-1 col-span-1 md:col-start-2 md:col-span-2">
-          <div className="uppercase text-sm mb-6">
-            {categories?.map((category, index) => {
-              if (typeof category === 'object' && category !== null) {
-                const { title: categoryTitle } = category
-
-                const titleToUse = categoryTitle || 'Untitled category'
-
-                const isLast = index === categories.length - 1
-
-                return (
-                  <React.Fragment key={index}>
-                    {titleToUse}
-                    {!isLast && <React.Fragment>, &nbsp;</React.Fragment>}
-                  </React.Fragment>
-                )
-              }
-              return null
-            })}
-          </div>
-
-          <div className="">
-            <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl">{title}</h1>
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-4 md:gap-16">
-            {hasAuthors && (
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm">Author</p>
-
-                  <p>{formatAuthors(populatedAuthors)}</p>
-                </div>
-              </div>
-            )}
-            {publishedAt && (
-              <div className="flex flex-col gap-1">
-                <p className="text-sm">Date Published</p>
-
-                <time dateTime={publishedAt}>{formatDateTime(publishedAt)}</time>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-      <div className="absolute inset-0 -z-10 min-h-[80svh] select-none">
-        {heroImage && typeof heroImage === 'object' && (
+    <section className="relative isolate flex min-h-[min(72svh,var(--viewport-height))] items-end overflow-hidden bg-oriana-deep">
+      <div className="absolute inset-0">
+        {heroImage && typeof heroImage === 'object' ? (
           <Media
             fill
             priority
-            imgClassName="object-cover"
-            className="absolute inset-0 min-h-[80svh]"
+            imgClassName="object-cover object-center"
+            className="absolute inset-0"
             size="100vw"
             resource={heroImage}
           />
-        )}
-        <div className="absolute pointer-events-none left-0 bottom-0 w-full h-1/2 bg-linear-to-t from-black to-transparent" />
+        ) : null}
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(100deg, rgba(7,21,37,0.9) 0%, rgba(7,21,37,0.62) 48%, rgba(7,21,37,0.28) 100%)',
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 h-3/5"
+          style={{
+            background: 'linear-gradient(180deg, rgba(7,21,37,0) 0%, rgba(7,21,37,0.92) 100%)',
+          }}
+        />
       </div>
-    </div>
+
+      <div className="container relative z-10 w-full pb-10 pt-[calc(var(--site-header-height,var(--header-offset))+1.25rem)] text-white">
+        <div className="max-w-3xl">
+          {categories?.some((category) => typeof category === 'object' && category !== null) ? (
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-oriana-sky">
+              {categories.flatMap((category, index) => {
+                if (typeof category !== 'object' || category === null) return []
+                const label = category.title || 'Untitled category'
+                const isLast = index === categories.length - 1
+                return isLast ? [label] : [`${label}, `]
+              })}
+            </p>
+          ) : null}
+
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-white md:text-5xl lg:text-6xl">
+            {title}
+          </h1>
+
+          <div className="mt-6 flex flex-col gap-4 md:flex-row md:gap-16">
+            {hasAuthors ? (
+              <div className="flex flex-col gap-1">
+                <p className="text-sm text-white/70">Author</p>
+                <p className="text-white">{formatAuthors(populatedAuthors)}</p>
+              </div>
+            ) : null}
+            {publishedAt ? (
+              <div className="flex flex-col gap-1">
+                <p className="text-sm text-white/70">Date Published</p>
+                <time dateTime={publishedAt}>{formatDateTime(publishedAt)}</time>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
