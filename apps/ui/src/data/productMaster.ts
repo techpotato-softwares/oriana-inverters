@@ -63,36 +63,16 @@ export function categoryHref(name: string): string {
   return `/products/category/${categorySlug(name)}`
 }
 
-export const SEGMENT_IMAGE_STRING = '/assets/products/segment-string.png'
-export const SEGMENT_IMAGE_CABINET = '/assets/products/segment-cabinet.png'
+export const PRODUCT_FALLBACK_IMAGE = '/assets/products/product-fallback.png'
 
-const CATEGORY_IMAGES: Record<string, string> = {
-  'on-grid-inverters': SEGMENT_IMAGE_STRING,
-  'hybrid-inverters': SEGMENT_IMAGE_STRING,
-  'utility-scale-inverters': SEGMENT_IMAGE_CABINET,
-  bess: SEGMENT_IMAGE_CABINET,
-}
-
-export function categoryImage(categoryName: string, cms?: CmsCategoryImages): string {
-  const fallback = CATEGORY_IMAGES[categorySlug(categoryName)] ?? SEGMENT_IMAGE_STRING
+export function categoryImage(_categoryName: string, cms?: CmsCategoryImages): string {
   const cmsUrl = cms?.imageUrl
   if (cmsUrl && !cmsUrl.toLowerCase().endsWith('.svg')) return cmsUrl
-  return fallback
+  return PRODUCT_FALLBACK_IMAGE
 }
 
-export function segmentImage(segmentTitle: string): string {
-  const title = segmentTitle.toLowerCase()
-  if (title.includes('home')) return SEGMENT_IMAGE_STRING
-  if (
-    title.includes('c&i') ||
-    title.includes('c and i') ||
-    title.includes('utility') ||
-    title.includes('core') ||
-    title.includes('bess')
-  ) {
-    return SEGMENT_IMAGE_CABINET
-  }
-  return SEGMENT_IMAGE_STRING
+export function segmentImage(_segmentTitle: string): string {
+  return PRODUCT_FALLBACK_IMAGE
 }
 
 export function familySlug(family: ProductFamily): string {

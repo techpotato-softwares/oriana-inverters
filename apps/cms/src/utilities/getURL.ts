@@ -10,6 +10,50 @@ export const normalizeServerURL = (url: string): string => {
   return `https://${trimmed.replace(/\/$/, '')}`
 }
 
+/**
+ * Origins allowed to send the admin auth cookie.
+ * Payload trusts only `serverURL`. Production is served on both the apex and
+ * `www` host; a request from the other host is treated as logged out and the
+ * admin shows "You are not allowed to perform this action."
+ */
+export const getTrustedOrigins = (serverURL = getServerSideURL()): string[] => {
+  const origins = new Set<string>()
+
+  const add = (value: string | undefined) => {
+    if (!value) return
+    try {
+      origins.add(new URL(normalizeServerURL(value)).origin)
+    } catch {
+      /* ignore invalid URLs */
+    }
+  }
+
+  add(serverURL)
+
+  try {
+    const url = new URL(normalizeServerURL(serverURL))
+    const host = url.hostname
+    const skipWwwPair =
+      host === 'localhost' ||
+      host === '127.0.0.1' ||
+      host.endsWith('.cloudfront.net') ||
+      host.endsWith('.amazonaws.com') ||
+      host.endsWith('.on.aws')
+
+    if (!skipWwwPair && host.includes('.')) {
+      add(
+        host.startsWith('www.')
+          ? `${url.protocol}//${host.slice(4)}`
+          : `${url.protocol}//www.${host}`,
+      )
+    }
+  } catch {
+    /* serverURL already skipped when invalid */
+  }
+
+  return [...origins]
+}
+
 export const getServerSideURL = () => {
   // Prefer runtime-only env vars. Next.js inlines process.env.NEXT_PUBLIC_* at
   // build time, so Docker builds bake localhost forever unless we read a

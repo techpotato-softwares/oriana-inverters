@@ -38,11 +38,13 @@ import { Sustainability } from './globals/Sustainability/config'
 import { SiteSettings } from './SiteSettings/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
-import { getServerSideURL } from './utilities/getURL'
+import { getServerSideURL, getTrustedOrigins } from './utilities/getURL'
 import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const serverURL = getServerSideURL()
+const trustedOrigins = getTrustedOrigins(serverURL)
 
 /** Same SMTP settings as distributor/career notifications; without SMTP_HOST, Payload logs emails instead of sending. */
 function smtpEmailAdapter() {
@@ -174,8 +176,11 @@ export default buildConfig({
     SustainabilityReports,
     Users,
   ],
-  cors: [getServerSideURL()].filter(Boolean),
-  serverURL: getServerSideURL(),
+  // Apex and www must both be trusted. Admin on www with serverURL set to the
+  // apex otherwise drops the auth cookie and every action returns Forbidden.
+  cors: trustedOrigins,
+  csrf: trustedOrigins,
+  serverURL,
   // Large videos/PDFs upload via S3 clientUploads (presigned PUT) — this limit is
   // enforced when minting the signed URL, not by buffering the file through Lambda.
   upload: {

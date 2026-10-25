@@ -57,8 +57,17 @@ function fromCms(doc: CmsCaseStudy): DisplayStudy {
 }
 
 export async function generateStaticParams() {
-  const cmsDocs = (await getCaseStudies()) as CmsCaseStudy[]
-  return cmsDocs.map((d) => ({ slug: d.slug }))
+  // Docker/CI image builds set BUILD_SKIP_DB — no Postgres is available at build time.
+  if (process.env.BUILD_SKIP_DB === 'true') {
+    return []
+  }
+
+  try {
+    const cmsDocs = (await getCaseStudies()) as CmsCaseStudy[]
+    return cmsDocs.map((d) => ({ slug: d.slug })).filter((p) => Boolean(p.slug))
+  } catch {
+    return []
+  }
 }
 
 export async function generateMetadata({ params }: Props) {
