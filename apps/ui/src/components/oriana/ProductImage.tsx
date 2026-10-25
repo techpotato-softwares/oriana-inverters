@@ -1,12 +1,7 @@
 import Image from 'next/image'
 import { cn } from '@/utilities/ui'
 
-const categoryPlaceholders: Record<string, string> = {
-  'on-grid-inverters': '/assets/products/segment-string.png',
-  'hybrid-inverters': '/assets/products/segment-string.png',
-  'utility-scale-inverters': '/assets/products/segment-cabinet.png',
-  bess: '/assets/products/segment-cabinet.png',
-}
+const PRODUCT_FALLBACK_IMAGE = '/assets/products/product-fallback.png'
 
 type ProductImageProps = {
   name: string
@@ -21,7 +16,7 @@ type ProductImageProps = {
 
 export function ProductImage({
   name,
-  categorySlug = 'on-grid-inverters',
+  categorySlug: _categorySlug = 'on-grid-inverters',
   src,
   alt,
   className,
@@ -29,11 +24,9 @@ export function ProductImage({
   sizes = '(max-width: 768px) 100vw, 50vw',
   plain = false,
 }: ProductImageProps) {
-  const placeholder =
-    categoryPlaceholders[categorySlug] ?? categoryPlaceholders['on-grid-inverters']
   const srcPath = src?.split('?')[0]?.toLowerCase() ?? ''
   const srcIsSvg = srcPath.endsWith('.svg')
-  const imageSrc = src && !srcIsSvg ? src : placeholder
+  const imageSrc = src && !srcIsSvg ? src : PRODUCT_FALLBACK_IMAGE
   const isSvg = imageSrc.split('?')[0]?.toLowerCase().endsWith('.svg') ?? false
 
   return (

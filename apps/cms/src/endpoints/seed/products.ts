@@ -41,12 +41,7 @@ function minimalPdf(name: string): File {
   }
 }
 
-const categoryImages: Record<string, string> = {
-  'on-grid-inverters': 'segment-string.png',
-  'hybrid-inverters': 'segment-string.png',
-  'utility-scale-inverters': 'segment-cabinet.png',
-  bess: 'segment-cabinet.png',
-}
+const PRODUCT_FALLBACK_FILENAME = 'product-fallback.png'
 
 export async function seedProducts({ payload }: { payload: Payload }) {
   payload.logger.info('— Seeding product categories...')
@@ -156,7 +151,7 @@ export async function seedProducts({ payload }: { payload: Payload }) {
 
     if (canUploadMedia && !heroImageId) {
       try {
-        const imageFile = readLocalImage(categoryImages[family.categorySlug] ?? 'segment-string.png')
+        const imageFile = readLocalImage(PRODUCT_FALLBACK_FILENAME)
         const hero = await payload.create({
           collection: 'media',
           data: {
